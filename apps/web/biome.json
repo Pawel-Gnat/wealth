@@ -1,0 +1,64 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.11/schema.json",
+	"extends": ["@repo/biome-config/biome"],
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true,
+		"root": "../.."
+	},
+	"linter": {
+		"enabled": true,
+		"domains": {
+			"react": "recommended"
+		},
+		"rules": {
+			"recommended": true,
+			"correctness": {
+				"noUnusedVariables": "warn",
+				"noUnusedImports": {
+					"level": "warn",
+					"fix": "unsafe"
+				},
+				"useExhaustiveDependencies": "warn"
+			},
+			"suspicious": {
+				"noConsole": {
+					"level": "warn",
+					"options": {
+						"allow": ["warn", "error", "info"]
+					}
+				},
+				"noVar": "error",
+				"noExplicitAny": "warn"
+			},
+			"complexity": {
+				"recommended": true
+			},
+			"a11y": {
+				"recommended": true
+			},
+			"performance": {
+				"recommended": true
+			},
+			"security": {
+				"recommended": true
+			},
+			"style": {
+				"useConst": {
+					"level": "warn",
+					"fix": "safe"
+				},
+				"useImportType": {
+					"level": "warn",
+					"fix": "safe"
+				}
+			}
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	}
+}
