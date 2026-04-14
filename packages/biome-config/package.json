@@ -5,8 +5,5 @@
 	"type": "module",
 	"exports": {
 		"./biome": "./biome.json"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "2.4.11"
 	}
 }

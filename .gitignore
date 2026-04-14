@@ -14,6 +14,7 @@ node_modules
 
 # Testing
 coverage
+.nyc_output
 
 # Turbo
 .turbo
@@ -26,13 +27,44 @@ coverage
 out/
 build
 dist
-
+*.tsbuildinfo
 
 # Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+logs
+*.log
 
 # Misc
 .DS_Store
 *.pem
+
+# IDEs and editors
+.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# VS Code (allow shared team settings)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Temp
+.temp
+.tmp
+
+# Runtime / diagnostics
+pids
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
