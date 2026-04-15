@@ -1,5 +1,5 @@
 function App() {
-	return <p className='text-3xl font-bold underline'>test</p>
+	return <p className="text-3xl font-bold underline">test</p>;
 }
 
-export default App
+export default App;
