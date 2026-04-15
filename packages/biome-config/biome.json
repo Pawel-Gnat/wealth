@@ -7,12 +7,12 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"includes": ["**", "!**/dist", "!**/build", "!**/out", "!**/coverage", "!**/components/ui"],
+		"includes": ["**", "!**/dist", "!**/build", "!**/out", "!**/coverage", "!**/shared/lib/ui"],
 		"ignoreUnknown": false
 	},
 	"formatter": {
 		"enabled": true,
-		"lineWidth": 100
+		"lineWidth": 80
 	},
 	"linter": {
 		"enabled": true,
