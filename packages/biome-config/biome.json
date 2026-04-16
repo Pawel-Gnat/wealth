@@ -7,7 +7,14 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"includes": ["**", "!**/dist", "!**/build", "!**/out", "!**/coverage", "!**/shared/lib/ui"],
+		"includes": [
+			"**",
+			"!**/dist/**",
+			"!**/build/**",
+			"!**/out/**",
+			"!**/coverage/**",
+			"!**/src/shared/lib/ui/**"
+		],
 		"ignoreUnknown": false
 	},
 	"formatter": {
