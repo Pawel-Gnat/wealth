@@ -4,7 +4,8 @@
 	"private": true,
 	"type": "module",
 	"exports": {
-		".": "./services/index.ts"
+		"./services": "./services/index.ts",
+		"./schemas": "./schemas/index.ts"
 	},
 	"scripts": {
 		"lint": "biome check .",
@@ -14,7 +15,7 @@
 	"dependencies": {
 		"@orpc/contract": "^1.13.14",
 		"@orpc/server": "^1.13.14",
-		"zod": "^4.3.6"
+		"zod": "catalog:"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
