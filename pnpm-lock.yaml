@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@biomejs/biome':
+      specifier: 2.4.11
+      version: 2.4.11
     typescript:
       specifier: 5.9.2
       version: 5.9.2
@@ -15,7 +18,7 @@ importers:
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: 2.4.11
+        specifier: 'catalog:'
         version: 2.4.11
       turbo:
         specifier: ^2.9.6
@@ -42,6 +45,9 @@ importers:
         specifier: ^7.8.1
         version: 7.8.2
     devDependencies:
+      '@biomejs/biome':
+        specifier: 'catalog:'
+        version: 2.4.11
       '@nestjs/cli':
         specifier: ^11.0.0
         version: 11.0.19(@types/node@22.15.3)
@@ -136,6 +142,9 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
     devDependencies:
+      '@biomejs/biome':
+        specifier: 'catalog:'
+        version: 2.4.11
       '@repo/biome-config':
         specifier: workspace:*
         version: link:../../packages/biome-config
@@ -169,6 +178,9 @@ importers:
         specifier: ^26.0.5
         version: 26.0.5(typescript@5.9.2)
     devDependencies:
+      '@biomejs/biome':
+        specifier: 'catalog:'
+        version: 2.4.11
       '@repo/biome-config':
         specifier: workspace:*
         version: link:../biome-config

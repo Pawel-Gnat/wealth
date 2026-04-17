@@ -23,6 +23,7 @@
 		"rxjs": "^7.8.1"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "catalog:",
 		"@repo/typescript-config": "workspace:*",
 		"@repo/biome-config": "workspace:*",
 		"@nestjs/cli": "^11.0.0",
