@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router";
+import { useAuth } from "@/context/auth";
 import { ROUTES } from "@/shared/config/routes";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -10,6 +11,8 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 	].join(" ");
 
 export function DashboardLayout() {
+	const { logout } = useAuth();
+
 	return (
 		<div className="flex min-h-dvh w-full">
 			<aside className="flex w-56 shrink-0 flex-col border-r bg-card p-4">
@@ -28,6 +31,7 @@ export function DashboardLayout() {
 				<button
 					type="button"
 					className="mt-auto rounded-md border px-3 py-2 text-sm font-medium"
+					onClick={() => logout()}
 				>
 					Logout
 				</button>
