@@ -1,0 +1,16 @@
+{
+	"extends": "@repo/typescript-config/base.json",
+	"compilerOptions": {
+		"lib": ["ES2023"],
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"noEmit": true,
+		"baseUrl": ".",
+		"paths": {
+			"@/schemas/*": ["./schemas/*"],
+			"@/services/*": ["./services/*"],
+			"@/contracts/*": ["./contracts/*"]
+		}
+	},
+	"include": ["schemas", "services", "contracts"]
+}

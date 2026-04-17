@@ -1,0 +1,25 @@
+{
+	"name": "@repo/api",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./services/index.ts"
+	},
+	"scripts": {
+		"lint": "biome check .",
+		"format": "biome check --write .",
+		"check-types": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@orpc/contract": "^1.13.14",
+		"@orpc/server": "^1.13.14",
+		"zod": "^4.3.6"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "catalog:",
+		"@repo/biome-config": "workspace:*",
+		"@repo/typescript-config": "workspace:*",
+		"typescript": "catalog:"
+	}
+}
