@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SignInPayload, signInPayloadSchema } from "@repo/api/schemas";
 import type { ComponentProps } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useAuth } from "@/context/auth";
-import { Button } from "@/shared/lib/ui/button";
+import { Form } from "@/shared/components/form/form";
+import { FormInput } from "@/shared/components/form/form-input";
 import {
 	Card,
 	CardContent,
@@ -12,14 +13,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/shared/lib/ui/card";
-import {
-	Field,
-	FieldDescription,
-	FieldError,
-	FieldGroup,
-	FieldLabel,
-} from "@/shared/lib/ui/field";
-import { Input } from "@/shared/lib/ui/input";
 import { cn } from "@/shared/lib/utils";
 
 type SigninFormProps = ComponentProps<"div"> & {
@@ -58,79 +51,21 @@ export function SigninForm({
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<form
-						noValidate
-						onSubmit={form.handleSubmit(onSubmit)}
-						className="space-y-0"
-					>
-						<FieldGroup>
-							<Controller
-								name="email"
-								control={form.control}
-								render={({ field, fieldState }) => (
-									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor="signin-email">Email</FieldLabel>
-										<Input
-											{...field}
-											id="signin-email"
-											type="email"
-											autoComplete="email"
-											placeholder="m@example.com"
-											aria-invalid={fieldState.invalid}
-										/>
-										{fieldState.invalid ? (
-											<FieldError errors={[fieldState.error]} />
-										) : null}
-									</Field>
-								)}
-							/>
-							<Controller
-								name="password"
-								control={form.control}
-								render={({ field, fieldState }) => (
-									<Field data-invalid={fieldState.invalid}>
-										<div className="flex items-center">
-											<FieldLabel htmlFor="signin-password">
-												Password
-											</FieldLabel>
-											<button
-												type="button"
-												className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-											>
-												Forgot your password?
-											</button>
-										</div>
-										<Input
-											{...field}
-											id="signin-password"
-											type="password"
-											autoComplete="current-password"
-											aria-invalid={fieldState.invalid}
-										/>
-										{fieldState.invalid ? (
-											<FieldError errors={[fieldState.error]} />
-										) : null}
-									</Field>
-								)}
-							/>
-							<Field>
-								<Button type="submit">Login</Button>
-								<Button variant="outline" type="button">
-									Login with Google
-								</Button>
-								<FieldDescription className="text-center">
-									Don&apos;t have an account?{" "}
-									<button
-										type="button"
-										className="text-foreground underline underline-offset-4 hover:text-primary"
-										onClick={onSwitchToSignUp}
-									>
-										Sign up
-									</button>
-								</FieldDescription>
-							</Field>
-						</FieldGroup>
-					</form>
+					<Form onSubmit={form.handleSubmit(onSubmit)}>
+						<FormInput
+							name="email"
+							label="Email"
+							type="email"
+							control={form.control}
+						/>
+
+						<FormInput
+							name="password"
+							label="Password"
+							type="password"
+							control={form.control}
+						/>
+					</Form>
 				</CardContent>
 			</Card>
 		</div>
