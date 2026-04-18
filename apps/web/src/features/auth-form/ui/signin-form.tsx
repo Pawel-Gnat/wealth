@@ -1,29 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SignInPayload, signInPayloadSchema } from "@repo/api/schemas";
-import type { ComponentProps } from "react";
+
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useAuth } from "@/context/auth";
-import { Form } from "@/shared/components/form/form";
-import { FormInput } from "@/shared/components/form/form-input";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/shared/lib/ui/card";
-import { cn } from "@/shared/lib/utils";
+import { Card, Form, FormInput, Text } from "@/shared/components";
 
-type SigninFormProps = ComponentProps<"div"> & {
-	onSwitchToSignUp?: () => void;
-};
-
-export function SigninForm({
-	className,
-	onSwitchToSignUp,
-	...props
-}: SigninFormProps) {
+export function SigninForm() {
 	const { login } = useAuth();
 	const form = useForm<SignInPayload>({
 		resolver: zodResolver(signInPayloadSchema),
@@ -42,32 +25,30 @@ export function SigninForm({
 	}
 
 	return (
-		<div className={cn("flex flex-col gap-6", className)} {...props}>
-			<Card>
-				<CardHeader>
-					<CardTitle>Login to your account</CardTitle>
-					<CardDescription>
-						Enter your email below to login to your account
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<Form onSubmit={form.handleSubmit(onSubmit)}>
-						<FormInput
-							name="email"
-							label="Email"
-							type="email"
-							control={form.control}
-						/>
+		<Card
+			header={
+				<>
+					<Text>Login to your account</Text>
+					<Text size="sm">Enter your email below to login to your account</Text>
+				</>
+			}
+			content={
+				<Form onSubmit={form.handleSubmit(onSubmit)} submitText="Login">
+					<FormInput
+						name="email"
+						label="Email"
+						type="email"
+						control={form.control}
+					/>
 
-						<FormInput
-							name="password"
-							label="Password"
-							type="password"
-							control={form.control}
-						/>
-					</Form>
-				</CardContent>
-			</Card>
-		</div>
+					<FormInput
+						name="password"
+						label="Password"
+						type="password"
+						control={form.control}
+					/>
+				</Form>
+			}
+		/>
 	);
 }

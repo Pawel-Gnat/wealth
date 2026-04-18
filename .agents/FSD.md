@@ -107,6 +107,7 @@ If a shared record model emerges (income vs expense), consider `entities/record`
 - **`lib/ui/*`** — Primitives and composite controls (button, card, dialog, pagination, …) — **no** domain logic.
 - **`lib/utils.ts`** — `cn()` and helpers.
 - **`lib/i18n.ts`** — i18n bootstrap (`initI18n` from `@repo/common`).
+- **`components/<slice>/`** — Composed UI (e.g. form wrappers, typography, card). Each slice has an **`index.ts`** barrel at its root — import from `@/shared/components/<slice>` (or `@/shared/components` for the aggregated barrel), **not** from deep paths like `.../form/form-input.tsx`.
 
 UI copy: **`DESIGN.md` requires English** for labels; translations may still go through i18n (e.g. `dashboard` namespace on `dashboard-page`).
 
@@ -119,6 +120,7 @@ UI copy: **`DESIGN.md` requires English** for labels; translations may still go 
 3. **Single action (e.g. delete modal)** → `features/<name>/`.
 4. **Business entity type or name** → `entities/<entity>/model/`.
 5. **Button / input used everywhere** → `shared/lib/ui/`.
+6. **Composed building blocks (app-level form/typography wrappers)** → `shared/components/<slice>/` with a barrel `index.ts`.
 
 ---
 

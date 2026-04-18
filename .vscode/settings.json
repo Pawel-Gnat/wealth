@@ -1,4 +1,12 @@
 {
+	"biome.inlineConfig": {
+		"css": {
+			"parser": {
+				"tailwindDirectives": true
+			}
+		}
+	},
+	"css.lint.unknownAtRules": "ignore",
 	"editor.formatOnSave": true,
 	"[typescript]": {
 		"editor.defaultFormatter": "biomejs.biome"

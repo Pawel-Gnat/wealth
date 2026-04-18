@@ -9,11 +9,11 @@
 	"files": {
 		"includes": [
 			"**",
-			"!**/dist/**",
-			"!**/build/**",
-			"!**/out/**",
-			"!**/coverage/**",
-			"!**/src/shared/lib/ui/**"
+			"!**/dist",
+			"!**/build",
+			"!**/out",
+			"!**/coverage",
+			"!**/src/shared/lib/ui"
 		],
 		"ignoreUnknown": false
 	},
