@@ -3,6 +3,18 @@
 		"download": "Download"
 	},
 	"action": {
-		"save": "Save"
+		"save": "Save",
+		"signin": "Sign in",
+		"signup": "Sign up"
+	},
+	"toast": {
+		"success": {
+			"signed_in": "Signed in successfully",
+			"account_created": "Account created successfully"
+		},
+		"error": {
+			"signed_in": "Failed to sign in",
+			"account_created": "Failed to create account"
+		}
 	}
 }

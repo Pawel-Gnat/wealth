@@ -1,12 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SignInPayload, signInPayloadSchema } from "@repo/api/schemas";
-
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAuth } from "@/context/auth";
 import { Card, Form, FormInput, Text } from "@/shared/components";
 
 export function SigninForm() {
+	const { t } = useTranslation();
 	const { login } = useAuth();
 	const form = useForm<SignInPayload>({
 		resolver: zodResolver(signInPayloadSchema),
@@ -16,34 +17,35 @@ export function SigninForm() {
 		},
 	});
 
-	function onSubmit(data: SignInPayload) {
+	function onSubmit(_data: SignInPayload) {
 		// Replace with API sign-in; token from response.
 		login("stub-token");
-		toast.success("Signed in", {
-			description: `${data.email}`,
-		});
+		toast.success(t("toast.success.signed_in", { ns: "common" }));
 	}
 
 	return (
 		<Card
 			header={
 				<>
-					<Text>Login to your account</Text>
-					<Text size="sm">Enter your email below to login to your account</Text>
+					<Text>{t("signin.title", { ns: "auth" })}</Text>
+					<Text size="sm">{t("signin.description", { ns: "auth" })}</Text>
 				</>
 			}
 			content={
-				<Form onSubmit={form.handleSubmit(onSubmit)} submitText="Login">
+				<Form
+					onSubmit={form.handleSubmit(onSubmit)}
+					submitText={t("action.signin", { ns: "common" })}
+				>
 					<FormInput
 						name="email"
-						label="Email"
+						label={t("email.label", { ns: "form" })}
 						type="email"
 						control={form.control}
 					/>
 
 					<FormInput
 						name="password"
-						label="Password"
+						label={t("password.label", { ns: "form" })}
 						type="password"
 						control={form.control}
 					/>

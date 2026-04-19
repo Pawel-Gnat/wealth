@@ -1,0 +1,20 @@
+{
+	"email": {
+		"invalid": "Invalid email",
+		"label": "Email",
+		"placeholder": "your@email.com"
+	},
+	"password": {
+		"label": "Password",
+		"min": "Password must be at least 8 characters long",
+		"invalid-uppercase": "Password must contain at least one uppercase letter",
+		"invalid-lowercase": "Password must contain at least one lowercase letter",
+		"invalid-number": "Password must contain at least one number",
+		"invalid-special-character": "Password must contain at least one special character",
+		"invalid-length": "Password is required"
+	},
+	"confirm-password": {
+		"label": "Confirm password",
+		"mismatch": "Passwords do not match"
+	}
+}
