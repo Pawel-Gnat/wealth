@@ -46,12 +46,14 @@ export function SignupForm() {
 						name="password"
 						label={t("password.label", { ns: "form" })}
 						type="password"
+						placeholder={t("password.placeholder", { ns: "form" })}
 						control={form.control}
 					/>
 					<FormInput
 						name="confirmPassword"
 						label={t("confirm-password.label", { ns: "form" })}
 						type="password"
+						placeholder={t("password.placeholder", { ns: "form" })}
 						control={form.control}
 					/>
 				</Form>

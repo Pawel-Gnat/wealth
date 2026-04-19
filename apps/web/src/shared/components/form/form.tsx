@@ -7,6 +7,7 @@ type FormProps = {
 	children: ReactNode;
 	className?: string;
 	submitText?: string;
+	submitDisabled?: boolean;
 };
 
 export const Form = ({
@@ -14,12 +15,15 @@ export const Form = ({
 	children,
 	className,
 	submitText = "Submit",
+	submitDisabled = false,
 }: FormProps) => {
 	return (
 		<form onSubmit={onSubmit} className={cn("space-y-6", className)}>
 			<div className="space-y-4">{children}</div>
 			<div className="flex *:w-full">
-				<Button type="submit">{submitText}</Button>
+				<Button type="submit" disabled={submitDisabled}>
+					{submitText}
+				</Button>
 			</div>
 		</form>
 	);

@@ -1,5 +1,5 @@
 import { implement } from "@orpc/server";
-import { signInContractService } from "@/contracts/signin.contract";
+import { signInContractService } from "../contracts/signin.contract";
 
 const os = implement(signInContractService);
 

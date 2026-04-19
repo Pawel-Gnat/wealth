@@ -6,6 +6,7 @@
 	},
 	"password": {
 		"label": "Password",
+		"placeholder": "********",
 		"min": "Password must be at least 8 characters long",
 		"invalid-uppercase": "Password must contain at least one uppercase letter",
 		"invalid-lowercase": "Password must contain at least one lowercase letter",

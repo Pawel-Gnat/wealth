@@ -96,6 +96,12 @@ importers:
       '@hookform/resolvers':
         specifier: 'catalog:'
         version: 5.2.2(react-hook-form@7.72.1(react@19.2.5))
+      '@orpc/client':
+        specifier: ^1.13.14
+        version: 1.13.14
+      '@orpc/contract':
+        specifier: ^1.13.14
+        version: 1.13.14
       '@repo/api':
         specifier: workspace:*
         version: link:../../packages/api

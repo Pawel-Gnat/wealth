@@ -2,7 +2,7 @@ import { oc } from "@orpc/contract";
 import {
 	signUpPayloadSchema,
 	signUpResponseSchema,
-} from "@/schemas/signup.schema";
+} from "../schemas/signup.schema";
 
 const signUpContract = oc
 	.input(signUpPayloadSchema)
