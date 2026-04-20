@@ -11,7 +11,7 @@ export const AUTH_TOKEN_STORAGE_KEY = "wealth.auth.token";
 
 type AuthContextValue = {
 	isAuthenticated: boolean;
-	login: (token: string) => void;
+	storeToken: (token: string) => void;
 	logout: () => void;
 };
 
@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		typeof window !== "undefined" ? readStoredToken() : null,
 	);
 
-	const login = useCallback((newToken: string) => {
+	const storeToken = useCallback((newToken: string) => {
 		localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, newToken);
 		setToken(newToken);
 	}, []);
@@ -43,10 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const value = useMemo<AuthContextValue>(
 		() => ({
 			isAuthenticated: Boolean(token),
-			login,
+			storeToken,
 			logout,
 		}),
-		[token, login, logout],
+		[token, storeToken, logout],
 	);
 
 	return <AuthContext value={value}>{children}</AuthContext>;

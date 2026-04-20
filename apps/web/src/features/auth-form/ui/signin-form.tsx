@@ -3,12 +3,22 @@ import { type SignInPayload, signInPayloadSchema } from "@repo/api/schemas";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { useAuth } from "@/context/auth";
 import { Card, Form, FormInput, Text } from "@/shared/components";
-import { useSignIn } from "../hook/use-sign-in";
+import { useSignIn } from "../hooks/use-sign-in";
 
 export function SigninForm() {
 	const { t } = useTranslation();
-	const { signIn, isLoading } = useSignIn();
+	const { storeToken } = useAuth();
+	const { signIn, isLoading } = useSignIn({
+		onSuccess: (data) => {
+			storeToken(data.data.token);
+		},
+		onError: () => {
+			toast.error(t("toast.error.signed_in", { ns: "common" }));
+		},
+	});
+
 	const form = useForm<SignInPayload>({
 		resolver: zodResolver(signInPayloadSchema),
 		defaultValues: {
@@ -18,12 +28,7 @@ export function SigninForm() {
 	});
 
 	async function onSubmit(data: SignInPayload) {
-		try {
-			await signIn(data);
-			toast.success(t("toast.success.signed_in", { ns: "common" }));
-		} catch {
-			toast.error(t("toast.error.signed_in", { ns: "common" }));
-		}
+		await signIn(data);
 	}
 
 	return (
@@ -39,6 +44,7 @@ export function SigninForm() {
 					onSubmit={form.handleSubmit(onSubmit)}
 					submitText={t("action.signin", { ns: "common" })}
 					submitDisabled={isLoading}
+					isLoading={isLoading}
 				>
 					<FormInput
 						name="email"

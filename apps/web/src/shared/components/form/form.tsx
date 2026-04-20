@@ -1,6 +1,6 @@
 import type { ReactNode, SubmitEventHandler } from "react";
-import { Button } from "@/shared/lib/ui/button";
-import { cn } from "@/shared/lib/utils";
+import { ButtonPrimary } from "@/shared/components/button";
+import { cn } from "@/shared/lib/tailwind/utils";
 
 type FormProps = {
 	onSubmit: SubmitEventHandler<HTMLFormElement>;
@@ -8,6 +8,7 @@ type FormProps = {
 	className?: string;
 	submitText?: string;
 	submitDisabled?: boolean;
+	isLoading?: boolean;
 };
 
 export const Form = ({
@@ -16,14 +17,19 @@ export const Form = ({
 	className,
 	submitText = "Submit",
 	submitDisabled = false,
+	isLoading = false,
 }: FormProps) => {
 	return (
 		<form onSubmit={onSubmit} className={cn("space-y-6", className)}>
 			<div className="space-y-4">{children}</div>
 			<div className="flex *:w-full">
-				<Button type="submit" disabled={submitDisabled}>
+				<ButtonPrimary
+					type="submit"
+					disabled={submitDisabled || isLoading}
+					isLoading={isLoading}
+				>
 					{submitText}
-				</Button>
+				</ButtonPrimary>
 			</div>
 		</form>
 	);

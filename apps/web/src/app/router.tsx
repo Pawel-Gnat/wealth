@@ -1,0 +1,62 @@
+import { Route, Routes } from "react-router";
+import { AuthenticatedLayout } from "@/app/authenticated-layout";
+import { UnauthenticatedLayout } from "@/app/unauthenticated-layout";
+import { AuthPage } from "@/pages/auth";
+import { DashboardPage } from "@/pages/dashboard";
+import {
+	ExpenseAddPage,
+	ExpenseEditPage,
+	ExpensesListPage,
+} from "@/pages/expenses";
+import {
+	IncomeAddPage,
+	IncomeEditPage,
+	IncomesListPage,
+} from "@/pages/incomes";
+import { DashboardLayout } from "@/widgets/dashboard-layout";
+
+export const APP_ROUTES = {
+	auth: "/auth",
+	dashboard: "/",
+	incomes: {
+		list: "/incomes",
+		add: "/incomes/add",
+		edit: (id: string) => `/incomes/${id}`,
+	},
+	expenses: {
+		list: "/expenses",
+		add: "/expenses/add",
+		edit: (id: string) => `/expenses/${id}`,
+	},
+} as const;
+export type AppRoutes = typeof APP_ROUTES;
+
+export function AppRoutes() {
+	return (
+		<Routes>
+			<Route element={<UnauthenticatedLayout />}>
+				<Route path="/auth" element={<AuthPage />} />
+			</Route>
+			<Route element={<AuthenticatedLayout />}>
+				<Route element={<DashboardLayout />}>
+					<Route path={APP_ROUTES.dashboard} element={<DashboardPage />} />
+					<Route path={APP_ROUTES.incomes.list} element={<IncomesListPage />} />
+					<Route path={APP_ROUTES.incomes.add} element={<IncomeAddPage />} />
+					<Route
+						path={APP_ROUTES.incomes.edit(":id")}
+						element={<IncomeEditPage />}
+					/>
+					<Route
+						path={APP_ROUTES.expenses.list}
+						element={<ExpensesListPage />}
+					/>
+					<Route path={APP_ROUTES.expenses.add} element={<ExpenseAddPage />} />
+					<Route
+						path={APP_ROUTES.expenses.edit(":id")}
+						element={<ExpenseEditPage />}
+					/>
+				</Route>
+			</Route>
+		</Routes>
+	);
+}
