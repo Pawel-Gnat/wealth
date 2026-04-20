@@ -1,6 +1,7 @@
 {
 	"extends": "@repo/typescript-config/base.json",
 	"compilerOptions": {
+		"tsBuildInfoFile": "./dist/.tsbuildinfo",
 		"verbatimModuleSyntax": false,
 		"module": "commonjs",
 		"moduleResolution": "node",
