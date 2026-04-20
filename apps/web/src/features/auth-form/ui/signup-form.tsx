@@ -26,7 +26,7 @@ export function SignupForm() {
 		<Card
 			header={
 				<>
-					<Text>{t("signup.title", { ns: "auth" })}</Text>
+					<Text weight="medium">{t("signup.title", { ns: "auth" })}</Text>
 					<Text size="sm">{t("signup.description", { ns: "auth" })}</Text>
 				</>
 			}

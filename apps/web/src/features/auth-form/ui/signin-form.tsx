@@ -35,7 +35,7 @@ export function SigninForm() {
 		<Card
 			header={
 				<>
-					<Text>{t("signin.title", { ns: "auth" })}</Text>
+					<Text weight="medium">{t("signin.title", { ns: "auth" })}</Text>
 					<Text size="sm">{t("signin.description", { ns: "auth" })}</Text>
 				</>
 			}
