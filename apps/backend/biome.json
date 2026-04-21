@@ -7,14 +7,9 @@
 		"useIgnoreFile": true,
 		"root": "../.."
 	},
-	"overrides": [
-		{
-			"includes": ["**/*.ts"],
-			"javascript": {
-				"parser": {
-					"unsafeParameterDecoratorsEnabled": true
-				}
-			}
+	"javascript": {
+		"parser": {
+			"unsafeParameterDecoratorsEnabled": true
 		}
-	]
+	}
 }
