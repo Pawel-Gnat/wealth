@@ -1,5 +1,5 @@
 import { pgTable, serial, text } from "drizzle-orm/pg-core";
-import { timestamp } from "./schema-helpers";
+import { timestamp } from "./helpers";
 
 export const usersTable = pgTable("users", {
 	id: serial("id").primaryKey(),
