@@ -3,8 +3,8 @@
 	"compilerOptions": {
 		"tsBuildInfoFile": "./dist/.tsbuildinfo",
 		"verbatimModuleSyntax": false,
-		"module": "commonjs",
-		"moduleResolution": "node",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
 		"lib": ["ES2023"],
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,

@@ -4,6 +4,7 @@
 	"description": "",
 	"author": "",
 	"private": true,
+	"type": "module",
 	"license": "UNLICENSED",
 	"scripts": {
 		"build": "nest build",
@@ -28,6 +29,7 @@
 		"@nestjs/platform-express": "^11.0.1",
 		"@repo/api": "workspace:*",
 		"@repo/common": "workspace:*",
+		"@orpc/server": "catalog:",
 		"drizzle-orm": "^0.45.2",
 		"passport-jwt": "^4.0.1",
 		"passport-local": "^1.0.0",
