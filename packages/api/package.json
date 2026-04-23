@@ -4,7 +4,6 @@
 	"private": true,
 	"type": "module",
 	"exports": {
-		"./services": "./services/index.ts",
 		"./schemas": "./schemas/index.ts",
 		"./contracts": "./contracts/index.ts"
 	},
@@ -15,7 +14,6 @@
 	},
 	"dependencies": {
 		"@orpc/contract": "^1.13.14",
-		"@orpc/server": "catalog:",
 		"zod": "catalog:"
 	},
 	"devDependencies": {

@@ -8,9 +8,8 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/schemas/*": ["./schemas/*"],
-			"@/services/*": ["./services/*"],
 			"@/contracts/*": ["./contracts/*"]
 		}
 	},
-	"include": ["schemas", "services", "contracts"]
+	"include": ["schemas", "contracts"]
 }

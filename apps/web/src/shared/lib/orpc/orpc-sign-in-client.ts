@@ -3,9 +3,9 @@ import { RPCLink } from "@orpc/client/fetch";
 import type { ContractRouterClient } from "@orpc/contract";
 import type { signInContractService } from "@repo/api/contracts";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const orpcUrl = import.meta.env.VITE_BACKEND_URL;
 
-if (!backendUrl) {
+if (!orpcUrl) {
 	throw new Error("VITE_BACKEND_URL is not set");
 }
 
@@ -21,7 +21,7 @@ function transportFetch(
 }
 
 const link = new RPCLink({
-	url: backendUrl,
+	url: orpcUrl,
 	fetch: transportFetch,
 });
 

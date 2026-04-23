@@ -17,4 +17,11 @@ export class UsersService {
 			.limit(1);
 		return user ?? null;
 	}
+
+	async createUser(email: string, passwordHash: string): Promise<void> {
+		await this.db.insert(usersTable).values({
+			email,
+			password: passwordHash,
+		});
+	}
 }
