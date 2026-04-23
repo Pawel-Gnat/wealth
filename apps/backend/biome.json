@@ -11,5 +11,22 @@
 		"parser": {
 			"unsafeParameterDecoratorsEnabled": true
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": [
+				"src/**/*.controller.ts",
+				"src/**/*.module.ts",
+				"src/**/*.service.ts",
+				"src/**/*.strategy.ts"
+			],
+			"linter": {
+				"rules": {
+					"style": {
+						"useImportType": "off"
+					}
+				}
+			}
+		}
+	]
 }

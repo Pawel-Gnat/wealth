@@ -1,15 +1,15 @@
-import { Module } from '@nestjs/common'
-import { ORPCModule, onError } from '@orpc/nest'
-import { AuthModule } from './auth/auth.module'
-import { DatabaseModule } from './database/database.module'
-import { UsersModule } from './users/users.module'
-import { AuthController } from './auth/auth.controller'
-import type { Request } from 'express'
-import { REQUEST } from '@nestjs/core'
+import { Module } from "@nestjs/common";
+import { REQUEST } from "@nestjs/core";
+import { ORPCModule, onError } from "@orpc/nest";
+import type { Request } from "express";
+import { AuthController } from "./auth/auth.controller";
+import { AuthModule } from "./auth/auth.module";
+import { DatabaseModule } from "./database/database.module";
+import { UsersModule } from "./users/users.module";
 
-declare module '@orpc/nest' {
-	interface ORPCGlobalConfig {
-		request: Request
+declare module "@orpc/nest" {
+	interface ORPCGlobalContext {
+		request: Request;
 	}
 }
 
@@ -20,7 +20,7 @@ declare module '@orpc/nest' {
 				context: { request },
 				interceptors: [
 					onError((error: unknown) => {
-						console.error('[oRPC]', error)
+						console.error("[oRPC]", error);
 					}),
 				],
 			}),
