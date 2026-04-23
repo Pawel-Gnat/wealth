@@ -12,7 +12,8 @@ type UseSignInProps = {
 
 export const useSignIn = ({ onSuccess, onError }: UseSignInProps = {}) => {
 	const mutation = useMutation<SignInResponse, Error, SignInPayload>({
-		mutationFn: (payload) => controlledAsync(() => orpcClient.signIn(payload)),
+		mutationFn: (payload) =>
+			controlledAsync(() => orpcClient.user.signIn(payload)),
 		onSuccess: (data) => {
 			onSuccess?.(data);
 		},

@@ -13,7 +13,7 @@
 		"check-types": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@orpc/contract": "^1.13.14",
+		"@orpc/contract": "^1.14.0",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
