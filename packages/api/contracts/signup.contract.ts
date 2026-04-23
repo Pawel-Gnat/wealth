@@ -4,10 +4,7 @@ import {
 	signUpResponseSchema,
 } from "../schemas/signup.schema";
 
-const signUpContract = oc
+export const signUpContract = oc
+	.route({ method: "POST", path: "/auth/signup" })
 	.input(signUpPayloadSchema)
 	.output(signUpResponseSchema);
-
-export const signUpContractService = {
-	signUp: signUpContract,
-};

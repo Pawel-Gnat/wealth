@@ -4,10 +4,7 @@ import {
 	tokenResponseSchema,
 } from "../schemas/signin.schema";
 
-const signInContract = oc
+export const signInContract = oc
+	.route({ method: "POST", path: "/auth/signin" })
 	.input(signInPayloadSchema)
 	.output(tokenResponseSchema);
-
-export const signInContractService = {
-	signIn: signInContract,
-};

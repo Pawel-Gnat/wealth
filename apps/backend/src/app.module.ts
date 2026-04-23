@@ -1,14 +1,35 @@
-import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
-import { AuthModule } from "./auth/auth.module";
-import { DatabaseModule } from "./database/database.module";
-import { OrpcModule } from "./orpc/orpc.module";
-import { UsersModule } from "./users/users.module";
+import { Module } from '@nestjs/common'
+import { ORPCModule, onError } from '@orpc/nest'
+import { AuthModule } from './auth/auth.module'
+import { DatabaseModule } from './database/database.module'
+import { UsersModule } from './users/users.module'
+import { AuthController } from './auth/auth.controller'
+import type { Request } from 'express'
+import { REQUEST } from '@nestjs/core'
+
+declare module '@orpc/nest' {
+	interface ORPCGlobalConfig {
+		request: Request
+	}
+}
 
 @Module({
-	imports: [UsersModule, AuthModule, DatabaseModule, OrpcModule],
-	controllers: [AppController],
-	providers: [AppService],
+	imports: [
+		ORPCModule.forRootAsync({
+			useFactory: (request: Request) => ({
+				context: { request },
+				interceptors: [
+					onError((error: unknown) => {
+						console.error('[oRPC]', error)
+					}),
+				],
+			}),
+			inject: [REQUEST],
+		}),
+		UsersModule,
+		AuthModule,
+		DatabaseModule,
+	],
+	controllers: [AuthController],
 })
 export class AppModule {}

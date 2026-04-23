@@ -15,6 +15,7 @@
 		"@hookform/resolvers": "catalog:",
 		"@orpc/client": "^1.13.14",
 		"@orpc/contract": "^1.13.14",
+		"@orpc/openapi-client": "^1.13.14",
 		"@repo/api": "workspace:*",
 		"@repo/common": "workspace:*",
 		"@tailwindcss/vite": "^4.2.2",
