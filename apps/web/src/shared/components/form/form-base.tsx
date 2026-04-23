@@ -10,9 +10,9 @@ import {
 	Field,
 	FieldContent,
 	FieldDescription,
-	FieldError,
 	FieldLabel,
 } from "@/shared/lib/ui/field";
+import { FieldError } from "./field-error";
 
 export type FormControlFunction<
 	ExtraProps extends Record<string, unknown> = Record<never, never>,

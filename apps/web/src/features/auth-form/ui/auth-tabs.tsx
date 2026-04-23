@@ -10,7 +10,7 @@ export function AuthTabs() {
 
 	return (
 		<Tabs defaultValue="signin" className="w-full max-w-sm">
-			<TabsList className="grid w-full grid-cols-2">
+			<TabsList className="w-full">
 				<TabsTrigger value="signin">
 					{t("action.signin", { ns: "common" })}
 				</TabsTrigger>
