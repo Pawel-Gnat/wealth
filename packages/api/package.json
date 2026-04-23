@@ -4,10 +4,20 @@
 	"private": true,
 	"type": "module",
 	"exports": {
-		"./schemas": "./schemas/index.ts",
-		"./contracts": "./contracts/index.ts"
+		"./schemas": {
+			"types": "./dist/schemas/index.d.ts",
+			"import": "./dist/schemas/index.js",
+			"default": "./dist/schemas/index.js"
+		},
+		"./contracts": {
+			"types": "./dist/contracts/index.d.ts",
+			"import": "./dist/contracts/index.js",
+			"default": "./dist/contracts/index.js"
+		}
 	},
 	"scripts": {
+		"dev": "tsc --watch",
+		"build": "tsc",
 		"lint": "biome check .",
 		"format": "biome check --write .",
 		"check-types": "tsc --noEmit"

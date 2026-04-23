@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { DBS } from "src/database/constants";
-import { usersTable } from "src/database/tables";
-import type { UserRow } from "src/database/types/types";
+import { DBS } from "../database/constants.js";
+import { usersTable } from "../database/tables/index.js";
+import type { UserRow } from "../database/types/types.js";
 
 @Injectable()
 export class UsersService {

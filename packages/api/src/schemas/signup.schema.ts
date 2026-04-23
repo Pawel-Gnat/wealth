@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { apiPayload } from "./common.schema";
+import { apiPayload } from "./common.schema.js";
 
 export const signUpPayloadSchema = z
 	.object({

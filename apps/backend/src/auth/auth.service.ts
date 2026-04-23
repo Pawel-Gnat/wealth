@@ -9,7 +9,7 @@ import type {
 	User,
 } from "@repo/api/schemas";
 import * as bcrypt from "bcrypt";
-import type { UsersService } from "src/users/users.service";
+import type { UsersService } from "../users/users.service.js";
 
 const BCRYPT_ROUNDS = 10;
 

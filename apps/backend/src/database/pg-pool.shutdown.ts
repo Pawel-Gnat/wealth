@@ -1,6 +1,6 @@
 import { Inject, Injectable, type OnModuleDestroy } from "@nestjs/common";
 import type { Pool } from "pg";
-import { PG_POOL_APP } from "./constants";
+import { PG_POOL_APP } from "./constants.js";
 
 @Injectable()
 export class PgPoolShutdown implements OnModuleDestroy {

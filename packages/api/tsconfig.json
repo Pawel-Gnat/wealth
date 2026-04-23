@@ -2,14 +2,14 @@
 	"extends": "@repo/typescript-config/base.json",
 	"compilerOptions": {
 		"lib": ["ES2023"],
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"noEmit": true,
-		"baseUrl": ".",
-		"paths": {
-			"@/schemas/*": ["./schemas/*"],
-			"@/contracts/*": ["./contracts/*"]
-		}
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"resolvePackageJsonExports": true,
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"rootDir": "./src",
+		"outDir": "./dist"
 	},
-	"include": ["schemas", "contracts"]
+	"include": ["src/**/*.ts"]
 }

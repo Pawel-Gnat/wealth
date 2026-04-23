@@ -3,8 +3,8 @@
 	"compilerOptions": {
 		"tsBuildInfoFile": "./dist/.tsbuildinfo",
 		"verbatimModuleSyntax": false,
-		"module": "ESNext",
-		"moduleResolution": "bundler",
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
 		"lib": ["ES2023"],
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
@@ -12,9 +12,6 @@
 		"sourceMap": true,
 		"rootDir": "./src",
 		"outDir": "./dist",
-		"paths": {
-			"src/*": ["./src/*"]
-		},
 		"incremental": true
 	},
 	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/drizzle.config.ts"],
