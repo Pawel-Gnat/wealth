@@ -1,6 +1,14 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.4.11/schema.json",
 	"extends": ["@repo/biome-config/biome"],
+	"overrides": [
+		{
+			"includes": ["**/src/shared/lib/ui/**"],
+			"formatter": { "enabled": false },
+			"linter": { "enabled": false },
+			"assist": { "enabled": false }
+		}
+	],
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
