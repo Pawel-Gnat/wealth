@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import type { JwtService } from "@nestjs/jwt";
+import { JwtService } from "@nestjs/jwt";
 import { ORPCError } from "@orpc/server";
 import type {
 	SignInPayload,
@@ -9,7 +9,7 @@ import type {
 	User,
 } from "@repo/api/schemas";
 import * as bcrypt from "bcrypt";
-import type { UsersService } from "../users/users.service.js";
+import { UsersService } from "../users/users.service.js";
 
 const BCRYPT_ROUNDS = 10;
 

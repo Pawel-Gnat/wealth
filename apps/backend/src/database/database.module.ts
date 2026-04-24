@@ -3,20 +3,20 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { DBS, PG_POOL_APP } from "./constants.js";
 import { PgPoolShutdown } from "./pg-pool.shutdown.js";
+import { ConfigService } from "@nestjs/config";
 
-if (!process.env.DATABASE_URL) {
-	throw new Error("DATABASE_URL is not set");
-}
+
 
 @Global()
 @Module({
 	providers: [
 		{
 			provide: PG_POOL_APP,
-			useFactory: () =>
+			useFactory: (configService: ConfigService) =>
 				new Pool({
-					connectionString: process.env.DATABASE_URL,
+					connectionString: configService.getOrThrow("DATABASE_URL"),
 				}),
+				inject: [ ConfigService],
 		},
 		{
 			provide: DBS.APP,

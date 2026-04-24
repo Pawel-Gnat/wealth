@@ -6,6 +6,7 @@ import { AuthController } from "./auth/auth.controller.js";
 import { AuthModule } from "./auth/auth.module.js";
 import { DatabaseModule } from "./database/database.module.js";
 import { UsersModule } from "./users/users.module.js";
+import { ConfigModule } from "@nestjs/config";
 
 declare module "@orpc/nest" {
 	interface ORPCGlobalContext {
@@ -15,6 +16,9 @@ declare module "@orpc/nest" {
 
 @Module({
 	imports: [
+		ConfigModule.forRoot({
+			isGlobal: true,
+		}),
 		ORPCModule.forRootAsync({
 			useFactory: (request: Request) => ({
 				context: { request },
