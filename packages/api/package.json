@@ -16,8 +16,8 @@
 		}
 	},
 	"scripts": {
-		"dev": "tsc --watch",
-		"build": "tsc",
+		"dev": "tsup --watch",
+		"build": "tsup",
 		"lint": "biome check .",
 		"format": "biome check --write .",
 		"check-types": "tsc --noEmit"
@@ -30,6 +30,7 @@
 		"@biomejs/biome": "catalog:",
 		"@repo/biome-config": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
+		"tsup": "catalog:",
 		"typescript": "catalog:"
 	}
 }

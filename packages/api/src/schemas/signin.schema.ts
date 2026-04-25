@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { apiPayload } from "./common.schema.js";
+import { apiPayload } from "./common.schema";
 
 export const tokenSchema = z.object({
 	token: z.string(),

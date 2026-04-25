@@ -3,8 +3,8 @@
 	"compilerOptions": {
 		"jsx": "react-jsx",
 		"lib": ["ES2023"],
-		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
 		"resolvePackageJsonExports": true,
 		"declaration": true,
 		"declarationMap": true,

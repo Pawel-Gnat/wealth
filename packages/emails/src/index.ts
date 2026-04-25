@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { render, toPlainText } from "react-email";
 
-import WelcomeEmail, { type WelcomeEmailProps } from "./emails/welcome.js";
+import WelcomeEmail, { type WelcomeEmailProps } from "./emails/welcome";
 
 export async function renderWelcomeEmail(params: WelcomeEmailProps) {
 	const html = await render(

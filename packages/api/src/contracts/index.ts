@@ -1,7 +1,7 @@
 import { populateContractRouterPaths } from "@orpc/contract";
-import { meContract } from "./me.contract.js";
-import { signInContract } from "./signin.contract.js";
-import { signUpContract } from "./signup.contract.js";
+import { meContract } from "./me.contract";
+import { signInContract } from "./signin.contract";
+import { signUpContract } from "./signup.contract";
 
 export const rpcContract = populateContractRouterPaths({
 	user: {

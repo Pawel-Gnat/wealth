@@ -1,13 +1,6 @@
 import { Head, Html, Preview, Tailwind } from "react-email";
-import {
-	Body,
-	Button,
-	Heading,
-	Hr,
-	Section,
-	Text,
-} from "../components/index.js";
-import tailwindConfig from "../tailwind.config.js";
+import { Body, Button, Heading, Hr, Section, Text } from "../components/index";
+import tailwindConfig from "../tailwind.config";
 
 export type WelcomeEmailProps = {
 	firstName: string;

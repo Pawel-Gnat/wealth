@@ -3,7 +3,7 @@
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
-	"main": "index.js",
+	"main": "./dist/index.js",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -12,9 +12,9 @@
 		}
 	},
 	"scripts": {
-		"dev": "tsc --watch",
+		"dev": "tsup --watch",
 		"preview": "email dev --dir src/emails --port 8000",
-		"build": "tsc",
+		"build": "tsup",
 		"lint": "biome check .",
 		"format": "biome check --write .",
 		"check-types": "tsc --noEmit"
@@ -22,7 +22,8 @@
 	"devDependencies": {
 		"@react-email/ui": "6.0.0",
 		"@types/react": "catalog:",
-		"@types/react-dom": "catalog:"
+		"@types/react-dom": "catalog:",
+		"tsup": "catalog:"
 	},
 	"dependencies": {
 		"@biomejs/biome": "catalog:",
