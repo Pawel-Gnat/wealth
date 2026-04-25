@@ -5,7 +5,7 @@ import { rpcContract } from "@repo/api/contracts";
 import swaggerUi from "swagger-ui-express";
 import { AppModule } from "./app.module.js";
 
-const corsOriginEnv = process.env["CORS_ORIGIN"];
+const corsOriginEnv = process.env.CORS_ORIGIN;
 const corsOrigin =
 	corsOriginEnv === undefined || corsOriginEnv === ""
 		? true

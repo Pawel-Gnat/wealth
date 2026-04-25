@@ -1,11 +1,9 @@
 import { Global, Module } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { DBS, PG_POOL_APP } from "./constants.js";
 import { PgPoolShutdown } from "./pg-pool.shutdown.js";
-import { ConfigService } from "@nestjs/config";
-
-
 
 @Global()
 @Module({
@@ -16,7 +14,7 @@ import { ConfigService } from "@nestjs/config";
 				new Pool({
 					connectionString: configService.getOrThrow("DATABASE_URL"),
 				}),
-				inject: [ ConfigService],
+			inject: [ConfigService],
 		},
 		{
 			provide: DBS.APP,

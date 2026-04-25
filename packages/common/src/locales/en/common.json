@@ -2,10 +2,16 @@
 	"common": {
 		"download": "Download"
 	},
+	"navigation": {
+		"dashboard": "Dashboard",
+		"incomes": "Incomes",
+		"expenses": "Expenses"
+	},
 	"action": {
 		"save": "Save",
 		"signin": "Sign in",
-		"signup": "Sign up"
+		"signup": "Sign up",
+		"logout": "Logout"
 	},
 	"toast": {
 		"success": {

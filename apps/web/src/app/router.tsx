@@ -21,15 +21,27 @@ export const APP_ROUTES = {
 	incomes: {
 		list: "/incomes",
 		add: "/incomes/add",
-		edit: (id: string) => `/incomes/${id}`,
+		edit: (id: string): `/incomes/${string}` => `/incomes/${id}`,
 	},
 	expenses: {
 		list: "/expenses",
 		add: "/expenses/add",
-		edit: (id: string) => `/expenses/${id}`,
+		edit: (id: string): `/expenses/${string}` => `/expenses/${id}`,
 	},
 } as const;
 export type AppRoutes = typeof APP_ROUTES;
+
+type RoutePathLeaf<T> = T extends string
+	? T
+	: T extends (...args: never[]) => infer R
+		? R extends string
+			? R
+			: never
+		: T extends Record<string, unknown>
+			? RoutePathLeaf<T[keyof T]>
+			: never;
+
+export type AppRoutePath = RoutePathLeaf<AppRoutes>;
 
 export function AppRoutes() {
 	return (

@@ -1,7 +1,12 @@
+import { useTranslation } from "react-i18next";
+import { Heading } from "@/shared/components";
+
 export function IncomesListPage() {
+	const { t } = useTranslation();
+
 	return (
 		<div>
-			<h1 className="text-2xl font-semibold">Incomes</h1>
+			<Heading>{t("title", { ns: "incomes" })}</Heading>
 		</div>
 	);
 }

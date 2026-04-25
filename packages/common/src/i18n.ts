@@ -9,7 +9,9 @@ export type { ParseKeys, TOptionsBase } from "i18next";
 import enAuth from "./locales/en/auth.json";
 import enCommon from "./locales/en/common.json";
 import enDashboard from "./locales/en/dashboard.json";
+import enExpenses from "./locales/en/expenses.json";
 import enForm from "./locales/en/form.json";
+import enIncomes from "./locales/en/incomes.json";
 
 export type ParseNsKeys<Ns extends Namespace> =
 	`${Ns extends string ? Ns : ""}:${ParseKeys<Ns>}`;
@@ -19,6 +21,8 @@ export const I18N_RESOURCES = {
 	en: {
 		common: enCommon,
 		dashboard: enDashboard,
+		incomes: enIncomes,
+		expenses: enExpenses,
 		form: enForm,
 		auth: enAuth,
 	},
