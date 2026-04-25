@@ -1,0 +1,36 @@
+{
+	"name": "@repo/emails",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"main": "index.js",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"scripts": {
+		"dev": "tsc --watch",
+		"preview": "email dev --dir src/emails --port 8000",
+		"build": "tsc",
+		"lint": "biome check .",
+		"format": "biome check --write .",
+		"check-types": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@react-email/ui": "6.0.0",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:"
+	},
+	"dependencies": {
+		"@biomejs/biome": "catalog:",
+		"@repo/biome-config": "workspace:*",
+		"@repo/typescript-config": "workspace:*",
+		"typescript": "catalog:",
+		"react": "catalog:",
+		"react-dom": "catalog:",
+		"react-email": "6.0.0"
+	}
+}
