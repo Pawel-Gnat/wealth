@@ -2,7 +2,6 @@ import { Module } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
 import { ORPCModule, onError } from "@orpc/nest";
 import type { Request } from "express";
-import { AuthController } from "./auth/auth.controller.js";
 import { AuthModule } from "./auth/auth.module.js";
 import { DatabaseModule } from "./database/database.module.js";
 import { UsersModule } from "./users/users.module.js";
@@ -34,6 +33,5 @@ declare module "@orpc/nest" {
 		AuthModule,
 		DatabaseModule,
 	],
-	controllers: [AuthController],
 })
 export class AppModule {}

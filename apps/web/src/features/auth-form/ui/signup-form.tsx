@@ -4,9 +4,20 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Card, Form, FormInput, Text } from "@/shared/components";
+import { useSignUp } from "../hooks/use-sign-up";
 
 export function SignupForm() {
 	const { t } = useTranslation();
+	const { signUp, isLoading } = useSignUp({
+		onSuccess: () => {
+			toast.success(t("toast.success.account_created", { ns: "common" }));
+			form.reset();
+		},
+		onError: () => {
+			toast.error(t("toast.error.account_created", { ns: "common" }));
+		},
+	});
+
 	const form = useForm<SignUpPayload>({
 		resolver: zodResolver(signUpPayloadSchema),
 		defaultValues: {
@@ -16,10 +27,8 @@ export function SignupForm() {
 		},
 	});
 
-	function onSubmit(_data: SignUpPayload) {
-		// Replace with API sign-up.
-		toast.success(t("toast.success.account_created", { ns: "common" }));
-		form.reset();
+	async function onSubmit(data: SignUpPayload) {
+		await signUp(data);
 	}
 
 	return (
@@ -34,6 +43,8 @@ export function SignupForm() {
 				<Form
 					onSubmit={form.handleSubmit(onSubmit)}
 					submitText={t("action.signup", { ns: "common" })}
+					submitDisabled={isLoading}
+					isLoading={isLoading}
 				>
 					<FormInput
 						name="email"

@@ -4,7 +4,7 @@ import { rpcContract } from "@repo/api/contracts";
 import { AuthService } from "./auth.service.js";
 import { PassportJwtGuard } from "./guards/passport-jwt.guard.js";
 
-@Controller("auth")
+@Controller()
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 

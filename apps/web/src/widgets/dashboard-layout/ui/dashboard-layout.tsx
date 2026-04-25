@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router";
 import { APP_ROUTES } from "@/app/router";
 import { useAuth } from "@/context/auth";
+import { Heading } from "@/shared/components";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 	[
@@ -14,9 +15,9 @@ export function DashboardLayout() {
 	const { logout } = useAuth();
 
 	return (
-		<div className="flex min-h-dvh w-full">
-			<aside className="flex w-56 shrink-0 flex-col border-r bg-card p-4">
-				<div className="mb-6 font-semibold">Wealth</div>
+		<div className="flex h-full w-full">
+			<aside className="flex w-56 shrink-0 flex-col border-r bg-card p-4 gap-6">
+				<Heading>Wealth</Heading>
 				<nav className="flex flex-1 flex-col gap-1">
 					<NavLink to={APP_ROUTES.dashboard} end className={navLinkClass}>
 						Dashboard

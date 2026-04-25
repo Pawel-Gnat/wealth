@@ -12,9 +12,7 @@ export default function App() {
 			<BrowserRouter>
 				<TooltipProvider>
 					<AuthProvider>
-						<main className="flex min-h-svh w-full items-center justify-center p-4 md:p-6">
-							<AppRoutes />
-						</main>
+						<AppRoutes />
 					</AuthProvider>
 				</TooltipProvider>
 			</BrowserRouter>
