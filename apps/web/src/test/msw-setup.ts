@@ -1,15 +1,15 @@
-import { afterAll, afterEach, beforeAll } from 'vitest'
+import { afterAll, afterEach, beforeAll } from "vitest";
 
-import { server } from './servers'
+import { server } from "./servers";
 
 beforeAll(() => {
-	server.listen({ onUnhandledRequest: 'error' })
-})
+	server.listen({ onUnhandledRequest: "error" });
+});
 
 afterEach(() => {
-	server.resetHandlers()
-})
+	server.resetHandlers();
+});
 
 afterAll(() => {
-	server.close()
-})
+	server.close();
+});

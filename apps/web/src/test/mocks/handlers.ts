@@ -1,18 +1,18 @@
-import { http, HttpResponse } from 'msw'
+import { HttpResponse, http } from "msw";
 
 const postAuthSignInHandler = () => {
 	return HttpResponse.json({
-		data: { token: 'mock-jwt-access-token' },
-	})
-}
+		data: { token: "mock-jwt-access-token" },
+	});
+};
 
 const postAuthSignUpHandler = () => {
 	return HttpResponse.json({
-		data: { message: 'user_created' as const },
-	})
-}
+		data: { message: "user_created" as const },
+	});
+};
 
 export const HANDLERS = [
-	http.post('*/auth/signin', postAuthSignInHandler),
-	http.post('*/auth/signup', postAuthSignUpHandler),
-]
+	http.post("*/auth/signin", postAuthSignInHandler),
+	http.post("*/auth/signup", postAuthSignUpHandler),
+];

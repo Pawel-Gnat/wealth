@@ -1,5 +1,5 @@
-import { setupServer } from 'msw/node'
+import { setupServer } from "msw/node";
 
-import { HANDLERS } from './mocks/handlers'
+import { HANDLERS } from "./mocks/handlers";
 
-export const server = setupServer(...HANDLERS)
+export const server = setupServer(...HANDLERS);
