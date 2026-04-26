@@ -19,7 +19,9 @@
 		"db:migrate": "drizzle-kit migrate --config src/drizzle.config.ts",
 		"db:show": "drizzle-kit studio --config src/drizzle.config.ts",
 		"db:push": "drizzle-kit push --config src/drizzle.config.ts",
-		"db:studio": "drizzle-kit studio --config src/drizzle.config.ts"
+		"db:studio": "drizzle-kit studio --config src/drizzle.config.ts",
+		"test": "vitest run",
+		"test:watch": "vitest"
 	},
 	"dependencies": {
 		"@nestjs/common": "^11.0.1",
@@ -43,6 +45,7 @@
 		"swagger-ui-express": "^5.0.1"
 	},
 	"devDependencies": {
+		"@swc/core": "^1.10.18",
 		"@biomejs/biome": "catalog:",
 		"@nestjs/cli": "^11.0.0",
 		"@nestjs/schematics": "^11.0.0",
@@ -60,6 +63,9 @@
 		"ts-loader": "^9.5.2",
 		"ts-node": "^10.9.2",
 		"tsconfig-paths": "^4.2.0",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"@vitest/coverage-v8": "^3.2.4",
+		"unplugin-swc": "^1.5.1",
+		"vitest": "catalog:"
 	}
 }
