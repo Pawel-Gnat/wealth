@@ -27,8 +27,8 @@ export function SigninForm() {
 		},
 	});
 
-	async function onSubmit(data: SignInPayload) {
-		await signIn(data);
+	function onSubmit(data: SignInPayload) {
+		signIn(data);
 	}
 
 	return (

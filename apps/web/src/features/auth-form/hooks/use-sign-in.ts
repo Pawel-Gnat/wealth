@@ -23,7 +23,7 @@ export const useSignIn = ({ onSuccess, onError }: UseSignInProps = {}) => {
 	});
 
 	return {
-		signIn: mutation.mutateAsync,
+		signIn: mutation.mutate,
 		isLoading: useSkeletonLoader({ isLoading: mutation.isPending }),
 		isError: mutation.isError,
 		error: mutation.error,
