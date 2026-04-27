@@ -20,6 +20,7 @@
 		"@orpc/openapi-client": "^1.14.0",
 		"@repo/api": "workspace:*",
 		"@repo/common": "workspace:*",
+		"@sentry/react": "^9.47.1",
 		"@tailwindcss/vite": "^4.2.2",
 		"@tanstack/react-query": "^5.99.2",
 		"class-variance-authority": "^0.7.1",

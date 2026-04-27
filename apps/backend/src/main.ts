@@ -1,3 +1,4 @@
+import "./instrument.js";
 import { NestFactory } from "@nestjs/core";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod";

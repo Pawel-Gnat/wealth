@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import {
 	createContext,
 	type ReactNode,
@@ -33,11 +34,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const storeToken = useCallback((newToken: string) => {
 		localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, newToken);
 		setToken(newToken);
+		Sentry.logger.info("Auth token stored", { log_source: "auth_session" });
 	}, []);
 
 	const logout = useCallback(() => {
 		localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
 		setToken(null);
+		Sentry.logger.info("User logged out", { log_source: "auth_session" });
 	}, []);
 
 	const value = useMemo<AuthContextValue>(
