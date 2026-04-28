@@ -1,13 +1,19 @@
 // https://docs.nestjs.com/recipes/swc#vitest
-import { resolve } from "node:path";
+
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import swc from "unplugin-swc";
 import { defineConfig } from "vitest/config";
+
+const configDir = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
 	test: {
 		globals: true,
 		root: "./",
 		include: ["src/**/*.spec.ts"],
+		globalSetup: ["./src/test/setup.ts"],
 	},
 	plugins: [
 		swc.vite({
@@ -16,7 +22,7 @@ export default defineConfig({
 	],
 	resolve: {
 		alias: {
-			src: resolve(__dirname, "./src"),
+			src: resolve(configDir, "src"),
 		},
 	},
 });

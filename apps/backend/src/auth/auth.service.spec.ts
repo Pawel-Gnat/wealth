@@ -1,142 +1,120 @@
 import { UnauthorizedException } from "@nestjs/common";
-import type { JwtService } from "@nestjs/jwt";
+import { JwtService } from "@nestjs/jwt";
 import { ORPCError } from "@orpc/server";
 import * as bcrypt from "bcrypt";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import type { UsersService } from "../users/users.service.js";
+import { createAuthTestingModule } from "../test/helpers/modules.js";
+import { UsersService } from "../users/users.service.js";
 import { AuthService } from "./auth.service.js";
 
-vi.mock("bcrypt", () => ({
-	compare: vi.fn(),
-	hash: vi.fn(),
-}));
+const uniqueEmail = () =>
+	`auth-${Date.now()}-${Math.random().toString(36).slice(2, 9)}@example.com`;
 
 describe("AuthService", () => {
+	let moduleRef: Awaited<ReturnType<typeof createAuthTestingModule>>;
 	let authService: AuthService;
-	let usersService: {
-		findUserByEmail: ReturnType<typeof vi.fn>;
-		createUser: ReturnType<typeof vi.fn>;
-	};
-	let jwtService: { signAsync: ReturnType<typeof vi.fn> };
+	let usersService: UsersService;
+	let jwtService: JwtService;
 
-	beforeEach(() => {
-		usersService = {
-			findUserByEmail: vi.fn(),
-			createUser: vi.fn(),
-		};
-		jwtService = {
-			signAsync: vi.fn().mockResolvedValue("test-jwt"),
-		};
-		authService = new AuthService(
-			usersService as unknown as UsersService,
-			jwtService as unknown as JwtService,
-		);
-		vi.mocked(bcrypt.compare).mockReset();
-		vi.mocked(bcrypt.hash).mockReset();
+	beforeAll(async () => {
+		moduleRef = await createAuthTestingModule();
+		authService = moduleRef.get(AuthService);
+		usersService = moduleRef.get(UsersService);
+		jwtService = moduleRef.get(JwtService);
+	});
+
+	afterAll(async () => {
+		await moduleRef.close();
 	});
 
 	describe("validateUser", () => {
 		it("throws when user is not found", async () => {
-			usersService.findUserByEmail.mockResolvedValue(null);
-
 			await expect(
 				authService.validateUser({
-					email: "missing@example.com",
+					email: "missing-user-alias@example.com",
 					password: "secret",
 				}),
 			).rejects.toThrow(UnauthorizedException);
-
-			expect(bcrypt.compare).not.toHaveBeenCalled();
 		});
 
 		it("throws when password does not match", async () => {
-			usersService.findUserByEmail.mockResolvedValue({
-				id: 1,
-				email: "user@example.com",
-				password: "hash",
-			});
-			vi.mocked(bcrypt.compare).mockResolvedValue(false as never);
+			const email = uniqueEmail();
+			const hash = await bcrypt.hash("correct-pass", 10);
+			await usersService.createUser(email, hash);
 
 			await expect(
 				authService.validateUser({
-					email: "user@example.com",
+					email,
 					password: "wrong",
 				}),
 			).rejects.toThrow(UnauthorizedException);
 		});
 
 		it("returns user when credentials are valid", async () => {
-			usersService.findUserByEmail.mockResolvedValue({
-				id: 42,
-				email: "user@example.com",
-				password: "hash",
-			});
-			vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
+			const email = uniqueEmail();
+			const plain = "secret-ok";
+			const hash = await bcrypt.hash(plain, 10);
+			await usersService.createUser(email, hash);
 
 			await expect(
-				authService.validateUser({
-					email: "user@example.com",
-					password: "ok",
-				}),
+				authService.validateUser({ email, password: plain }),
 			).resolves.toEqual({
-				id: "42",
-				email: "user@example.com",
+				id: expect.any(String),
+				email,
 			});
 		});
 	});
 
 	describe("signInForVerifiedUser", () => {
-		it("returns a JWT for the user", async () => {
+		it("returns a signed JWT", async () => {
 			const result = await authService.signInForVerifiedUser({
 				id: "7",
 				email: "verified@example.com",
 			});
 
-			expect(jwtService.signAsync).toHaveBeenCalledWith({
-				email: "verified@example.com",
+			const payload = await jwtService.verifyAsync<{
+				sub: string;
+				email: string;
+			}>(result.data.token);
+
+			expect(payload).toMatchObject({
 				sub: "7",
+				email: "verified@example.com",
 			});
-			expect(result).toEqual({ data: { token: "test-jwt" } });
 		});
 	});
 
 	describe("signUp", () => {
 		it("rejects when email is already registered", async () => {
-			usersService.findUserByEmail.mockResolvedValue({
-				id: 1,
-				email: "taken@example.com",
-				password: "x",
-			});
+			const email = uniqueEmail();
+			await usersService.createUser(email, await bcrypt.hash("x", 10));
 
 			await expect(
 				authService.signUp({
-					email: "taken@example.com",
+					email,
 					password: "password123",
 					confirmPassword: "password123",
 				}),
 			).rejects.toBeInstanceOf(ORPCError);
-
-			expect(bcrypt.hash).not.toHaveBeenCalled();
-			expect(usersService.createUser).not.toHaveBeenCalled();
 		});
 
 		it("creates user and returns success payload", async () => {
-			usersService.findUserByEmail.mockResolvedValue(null);
-			vi.mocked(bcrypt.hash).mockResolvedValue("hashed-password" as never);
-
+			const email = uniqueEmail();
 			const result = await authService.signUp({
-				email: "new@example.com",
+				email,
 				password: "password123",
 				confirmPassword: "password123",
 			});
 
-			expect(bcrypt.hash).toHaveBeenCalledWith("password123", 10);
-			expect(usersService.createUser).toHaveBeenCalledWith(
-				"new@example.com",
-				"hashed-password",
-			);
 			expect(result).toEqual({ data: { message: "user_created" } });
+
+			const row = await usersService.findUserByEmail(email);
+			expect(row).not.toBeNull();
+			if (row === null) throw new Error("expected user row");
+			expect(row.email).toBe(email);
+			const match = await bcrypt.compare("password123", row.password);
+			expect(match).toBe(true);
 		});
 	});
 });
