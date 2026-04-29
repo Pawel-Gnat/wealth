@@ -289,9 +289,6 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
-      '@testcontainers/postgresql':
-        specifier: ^11.14.0
-        version: 11.14.0
       '@testing-library/jest-dom':
         specifier: ^6.9.1
         version: 6.9.1
@@ -319,9 +316,6 @@ importers:
       msw:
         specifier: ^2.13.6
         version: 2.13.6(@types/node@24.12.2)(typescript@6.0.2)
-      testcontainers:
-        specifier: ^11.14.0
-        version: 11.14.0
       typescript:
         specifier: 'catalog:'
         version: 6.0.2

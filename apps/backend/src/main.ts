@@ -38,6 +38,6 @@ async function bootstrap() {
 	const expressApp = app.getHttpAdapter().getInstance();
 	expressApp.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
 
-	await app.listen(Number(process.env.PORT) || 3000);
+	await app.listen(Number(process.env.PORT) || 4000);
 }
 bootstrap();

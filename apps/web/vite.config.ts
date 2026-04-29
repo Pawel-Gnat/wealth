@@ -24,7 +24,8 @@ const vitestConfig = defineVitestConfig({
 		setupFiles: ["./src/test/setup.ts"],
 		environment: "jsdom",
 		env: {
-			VITE_BACKEND_URL: "http://localhost:3000",
+			VITE_BACKEND_URL:
+				process.env["VITE_BACKEND_URL"] ?? "http://localhost:4000",
 		},
 		include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
 		coverage: {

@@ -1,53 +1,39 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig, devices } from "@playwright/test";
 
-const backendPort = 3100
-const webPort = 4173
-const backendUrl = `http://127.0.0.1:${backendPort}`
-const webUrl = `http://127.0.0.1:${webPort}`
+const webUrl = process.env["VITE_WEB_URL"] ?? `http://127.0.0.1:3000`;
+const isCi = !!process.env["CI"];
 
 export default defineConfig({
-	testDir: './src/test/e2e',
-	globalSetup: './src/test/e2e/global-setup.ts',
+	testDir: "./src/test/e2e",
+	globalSetup: "./src/test/e2e/global-setup.ts",
 	fullyParallel: false,
-	forbidOnly: !!process.env.CI,
-	retries: process.env.CI ? 2 : 0,
-	workers: process.env.CI ? 1 : undefined,
-	reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
+	forbidOnly: isCi,
+	retries: isCi ? 2 : 0,
 	timeout: 30_000,
 	expect: {
 		timeout: 10_000,
 	},
 	use: {
 		baseURL: webUrl,
-		trace: 'on-first-retry',
-		screenshot: 'only-on-failure',
-		video: 'retain-on-failure',
+		trace: "on-first-retry",
+		actionTimeout: isCi ? 30000 : 15000,
+		navigationTimeout: isCi ? 30000 : 15000,
 	},
 	projects: [
 		{
-			name: 'chromium',
-			use: { ...devices['Desktop Chrome'] },
-		},
-	],
-	webServer: [
-		{
-			command: `PORT=${backendPort} pnpm --filter backend db:migrate && PORT=${backendPort} pnpm --filter backend dev`,
-			url: `${backendUrl}/api-docs`,
-			reuseExistingServer: !process.env.CI,
-			timeout: 120_000,
-		},
-		{
-			command: `VITE_BACKEND_URL="${backendUrl}" pnpm --filter web dev -- --port ${webPort} --strictPort`,
-			url: `${webUrl}/auth`,
-			reuseExistingServer: !process.env.CI,
-			timeout: 120_000,
+			name: "chromium",
+			use: { ...devices["Desktop Chrome"] },
 		},
 	],
 
-	/* Run your local dev server before starting the tests */
-	// webServer: {
-	//   command: 'npm run start',
-	//   url: 'http://localhost:3000',
-	//   reuseExistingServer: !process.env.CI,
-	// },
-})
+	...(isCi
+		? { workers: 1 }
+		: {
+				webServer: {
+					command: "pnpm run dev",
+					url: webUrl,
+					reuseExistingServer: true,
+					timeout: 120_000,
+				},
+			}),
+});
