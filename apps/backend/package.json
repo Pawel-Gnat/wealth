@@ -1,5 +1,6 @@
 {
-	"name": "backend",	"private": true,
+	"name": "backend",
+	"private": true,
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
@@ -17,7 +18,8 @@
 		"db:push": "drizzle-kit push --config src/drizzle.config.ts",
 		"db:studio": "drizzle-kit studio --config src/drizzle.config.ts",
 		"test": "vitest run",
-		"test:watch": "vitest"
+		"test:watch": "vitest",
+		"start:e2e": "tsx src/test/start-e2e.ts"
 	},
 	"dependencies": {
 		"@nestjs/common": "^11.0.1",
@@ -63,6 +65,7 @@
 		"testcontainers": "^11.14.0",
 		"ts-loader": "^9.5.2",
 		"ts-node": "^10.9.2",
+		"tsx": "^4.21.0",
 		"tsconfig-paths": "^4.2.0",
 		"typescript": "catalog:",
 		"unplugin-swc": "^1.5.1",
