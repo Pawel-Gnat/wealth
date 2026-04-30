@@ -16,10 +16,10 @@ export const NavLink = ({ to, children, ...rest }: NavLinkProps) => {
 			to={to}
 			className={({ isActive }) =>
 				cn(
-					"rounded-md px-3 py-2 text-sm font-medium transition-colors",
+					"flex gap-2 items-center rounded-4xl px-3 py-2 text-sm transition-colors active:bg-primary/50",
 					isActive
-						? "bg-accent text-accent-foreground"
-						: "text-muted-foreground hover:bg-muted hover:text-foreground",
+						? "bg-primary font-medium"
+						: "hover:bg-muted",
 				)
 			}
 			{...rest}

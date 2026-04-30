@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router";
 import { APP_ROUTES } from "@/app/router";
 import { useAuth } from "@/context/auth";
-import { ButtonPrimary, NavLink, Text } from "@/shared/components";
+import { ButtonPrimary, Icon, NavLink, Text } from "@/shared/components";
 
 export function DashboardLayout() {
 	const { logout } = useAuth();
@@ -16,12 +16,15 @@ export function DashboardLayout() {
 				</Text>
 				<nav className="flex flex-1 flex-col gap-1">
 					<NavLink to={APP_ROUTES.dashboard} end>
+						<Icon name="dashboard" />
 						{t("navigation.dashboard", { ns: "common" })}
 					</NavLink>
 					<NavLink to={APP_ROUTES.incomes.list}>
+						<Icon name="income" />
 						{t("navigation.incomes", { ns: "common" })}
 					</NavLink>
 					<NavLink to={APP_ROUTES.expenses.list}>
+						<Icon name="expense" />
 						{t("navigation.expenses", { ns: "common" })}
 					</NavLink>
 				</nav>

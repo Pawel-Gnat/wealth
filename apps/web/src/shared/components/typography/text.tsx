@@ -46,7 +46,7 @@ export const BaseText = ({
 };
 
 export const Text = (props: TextProps) => (
-	<BaseText {...props} toneClassName="text-secondary-foreground" />
+	<BaseText {...props} toneClassName="" />
 );
 
 export const TextSecondary = (props: TextProps) => (
