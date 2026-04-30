@@ -9,9 +9,5 @@ export function AuthenticatedLayout() {
 		return <Navigate to={APP_ROUTES.auth} replace />;
 	}
 
-	return (
-		<main className="flex h-svh w-full items-center justify-center">
-			<Outlet />
-		</main>
-	);
+	return <Outlet />;
 }
