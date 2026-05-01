@@ -3,7 +3,6 @@ export {
 	Heading,
 	Heading2,
 	Heading3,
-	Heading4,
 	type HeadingProps,
 } from "./heading";
 export {

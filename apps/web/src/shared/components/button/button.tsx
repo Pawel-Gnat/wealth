@@ -52,18 +52,11 @@ export const ButtonSecondary = ({
 	isLoading = false,
 	className,
 	size = "default",
+	variant = "secondary",
 	...props
 }: ButtonProps) => {
 	return (
-		<Button
-			size={size}
-			className={cn(
-				"bg-secondary text-primary border-primary/20 hover:bg-secondary/80 hover:border-primary/60 border",
-
-				className,
-			)}
-			{...props}
-		>
+		<Button size={size} className={cn(className)} variant={variant} {...props}>
 			{isLoading ? <Icon name="loader" className="animate-spin" /> : children}
 		</Button>
 	);
@@ -74,17 +67,11 @@ export const ButtonDestructive = ({
 	isLoading = false,
 	className,
 	size = "default",
+	variant = "destructive",
 	...props
 }: ButtonProps) => {
 	return (
-		<Button
-			size={size}
-			className={cn(
-				"bg-destructive text-primary-foreground hover:bg-destructive/90",
-				className,
-			)}
-			{...props}
-		>
+		<Button size={size} className={cn(className)} variant={variant} {...props}>
 			{isLoading ? <Icon name="loader" className="animate-spin" /> : children}
 		</Button>
 	);

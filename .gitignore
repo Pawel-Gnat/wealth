@@ -51,12 +51,8 @@ logs
 .settings/
 *.sublime-workspace
 
-# VS Code (allow shared team settings)
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# VS Code
+.vscode
 
 # Temp
 .temp

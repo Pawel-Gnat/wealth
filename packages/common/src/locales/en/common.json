@@ -1,11 +1,24 @@
 {
 	"common": {
-		"download": "Download"
+		"download": "Download",
+		"amount": "Amount",
+		"date": "Date",
+		"actions": "Actions",
+		"add": "Add",
+		"edit": "Edit",
+		"delete": "Delete"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",
 		"incomes": "Incomes",
 		"expenses": "Expenses"
+	},
+	"pagination": {
+		"rows-per-page": "Rows per page",
+		"page": "Page",
+		"of": "of",
+		"previous": "Previous",
+		"next": "Next"
 	},
 	"action": {
 		"save": "Save",

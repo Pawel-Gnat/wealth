@@ -20,12 +20,12 @@ export const APP_ROUTES = {
 	dashboard: "/",
 	incomes: {
 		list: "/incomes",
-		add: "/incomes/add",
+		add: "/incomes/new",
 		edit: (id: string): `/incomes/${string}` => `/incomes/${id}`,
 	},
 	expenses: {
 		list: "/expenses",
-		add: "/expenses/add",
+		add: "/expenses/new",
 		edit: (id: string): `/expenses/${string}` => `/expenses/${id}`,
 	},
 } as const;
