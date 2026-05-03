@@ -5,10 +5,10 @@ import { ORPCModule, onError } from "@orpc/nest";
 import * as Sentry from "@sentry/nestjs";
 import { SentryGlobalFilter, SentryModule } from "@sentry/nestjs/setup";
 import type { Request } from "express";
-import { AuthModule } from "./auth/auth.module.js";
-import { DatabaseModule } from "./database/database.module.js";
-import { ExpensesModule } from "./expenses/expenses.module.js";
-import { UsersModule } from "./users/users.module.js";
+import { AuthModule } from "./auth-service/auth.module.js";
+import { DatabaseModule } from "./database-service/database.module.js";
+import { ExpensesModule } from "./expenses-service/expenses.module.js";
+import { UsersModule } from "./users-service/users.module.js";
 
 declare module "@orpc/nest" {
 	interface ORPCGlobalContext {

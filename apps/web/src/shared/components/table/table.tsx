@@ -17,6 +17,10 @@ import {
 import { Pagination } from "./pagination";
 
 const SKELETON_ROW_COUNT = 10;
+const SKELETON_ROW_KEYS = Array.from(
+	{ length: SKELETON_ROW_COUNT },
+	(_, i) => `skeleton-row-${i}`,
+);
 
 type DataTableProps<TData, TValue> = {
 	columns: ColumnDef<TData, TValue>[];
@@ -37,8 +41,6 @@ export const Table = <TData, TValue>({
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 	});
-
-	const loadingColumns = table.getVisibleFlatColumns();
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -64,11 +66,10 @@ export const Table = <TData, TValue>({
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
-							Array.from({ length: SKELETON_ROW_COUNT }, (_, rowIndex) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: fixed-length skeleton rows
-								<TableRow key={`skeleton-${rowIndex}`}>
-									{loadingColumns.map((column) => (
-										<TableCell key={column.id}>
+							SKELETON_ROW_KEYS.map((rowKey) => (
+								<TableRow key={rowKey}>
+									{table.getVisibleFlatColumns().map((column) => (
+										<TableCell key={`${rowKey}-${column.id}`}>
 											<Skeleton className="h-4 w-full max-w-48" />
 										</TableCell>
 									))}

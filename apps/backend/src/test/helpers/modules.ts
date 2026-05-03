@@ -2,7 +2,7 @@ import { JwtModule } from "@nestjs/jwt";
 import type { TestingModule } from "@nestjs/testing";
 import { Test } from "@nestjs/testing";
 
-import { AuthService } from "../../auth/auth.service.js";
+import { AuthService } from "../../auth-service/auth.service.js";
 import { TestModule } from "../test.module.js";
 
 const TEST_JWT_SECRET = "test-only-jwt-secret";

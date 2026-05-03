@@ -2,8 +2,8 @@ import { Inject, Injectable } from "@nestjs/common";
 import type { ExpenseDocumentListResponse } from "@repo/api/schemas";
 import { desc, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { DBS } from "../database/constants.js";
-import { expenseDocumentsTable } from "../database/tables/index.js";
+import { DBS } from "../database-service/constants.js";
+import { expenseDocumentsTable } from "../database-service/tables/index.js";
 
 @Injectable()
 export class ExpensesService {

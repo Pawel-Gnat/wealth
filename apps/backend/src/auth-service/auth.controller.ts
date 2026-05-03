@@ -1,8 +1,8 @@
 import { Controller, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Implement, implement, ORPCError } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
+import { PassportJwtGuard } from "../guards/passport-jwt.guard.js";
 import { AuthService } from "./auth.service.js";
-import { PassportJwtGuard } from "./guards/passport-jwt.guard.js";
 
 @Controller()
 export class AuthController {

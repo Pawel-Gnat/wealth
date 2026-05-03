@@ -6,7 +6,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { createAuthTestingModule } from "../test/helpers/modules.js";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
-import { UsersService } from "../users/users.service.js";
+import { UsersService } from "../users-service/users.service.js";
 import { AuthService } from "./auth.service.js";
 
 describe("Auth service", () => {

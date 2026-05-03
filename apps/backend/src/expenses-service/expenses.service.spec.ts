@@ -1,11 +1,11 @@
 import { Test, type TestingModule } from "@nestjs/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DBS } from "../database/constants.js";
-import { expenseDocumentsTable } from "../database/tables/index.js";
+import { DBS } from "../database-service/constants.js";
+import { expenseDocumentsTable } from "../database-service/tables/index.js";
 import { createTestUser } from "../test/mocks/users.js";
 import { TestModule } from "../test/test.module.js";
-import { UsersService } from "../users/users.service.js";
+import { UsersService } from "../users-service/users.service.js";
 import { ExpensesService } from "./expenses.service.js";
 
 describe("Expenses service", () => {
