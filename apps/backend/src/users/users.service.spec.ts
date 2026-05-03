@@ -1,10 +1,11 @@
 import { Test, type TestingModule } from "@nestjs/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { uniqueTestUserEmail } from "../test/mocks/users.js";
 import { TestModule } from "../test/test.module.js";
 import { UsersService } from "./users.service.js";
 
-describe("UsersService", () => {
+describe("Users service", () => {
 	let moduleRef: TestingModule;
 	let usersService: UsersService;
 
@@ -26,7 +27,7 @@ describe("UsersService", () => {
 	});
 
 	it("creates a user and finds them by email", async () => {
-		const email = `int-test-${Date.now()}@example.com`;
+		const email = uniqueTestUserEmail("users-create");
 		const passwordHash = "hashed-for-integration";
 		await usersService.createUser(email, passwordHash);
 

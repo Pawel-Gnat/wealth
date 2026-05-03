@@ -5,13 +5,11 @@ import * as bcrypt from "bcrypt";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { createAuthTestingModule } from "../test/helpers/modules.js";
+import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
 import { UsersService } from "../users/users.service.js";
 import { AuthService } from "./auth.service.js";
 
-const uniqueEmail = () =>
-	`auth-${Date.now()}-${Math.random().toString(36).slice(2, 9)}@example.com`;
-
-describe("AuthService", () => {
+describe("Auth service", () => {
 	let moduleRef: Awaited<ReturnType<typeof createAuthTestingModule>>;
 	let authService: AuthService;
 	let usersService: UsersService;
@@ -28,7 +26,7 @@ describe("AuthService", () => {
 		await moduleRef.close();
 	});
 
-	describe("validateUser", () => {
+	describe("validate user", () => {
 		it("throws when user is not found", async () => {
 			await expect(
 				authService.validateUser({
@@ -39,34 +37,36 @@ describe("AuthService", () => {
 		});
 
 		it("throws when password does not match", async () => {
-			const email = uniqueEmail();
-			const hash = await bcrypt.hash("correct-pass", 10);
-			await usersService.createUser(email, hash);
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("correct-pass", 10),
+				emailTag: "auth-wrong-password",
+			});
 
 			await expect(
 				authService.validateUser({
-					email,
+					email: user.email,
 					password: "wrong",
 				}),
 			).rejects.toThrow(UnauthorizedException);
 		});
 
 		it("returns user when credentials are valid", async () => {
-			const email = uniqueEmail();
 			const plain = "secret-ok";
-			const hash = await bcrypt.hash(plain, 10);
-			await usersService.createUser(email, hash);
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash(plain, 10),
+				emailTag: "auth-valid-credentials",
+			});
 
 			await expect(
-				authService.validateUser({ email, password: plain }),
+				authService.validateUser({ email: user.email, password: plain }),
 			).resolves.toEqual({
 				id: expect.any(String),
-				email,
+				email: user.email,
 			});
 		});
 	});
 
-	describe("signInForVerifiedUser", () => {
+	describe("sign in for verified user", () => {
 		it("returns a signed JWT", async () => {
 			const result = await authService.signInForVerifiedUser({
 				id: "7",
@@ -85,14 +85,16 @@ describe("AuthService", () => {
 		});
 	});
 
-	describe("signUp", () => {
+	describe("sign up", () => {
 		it("rejects when email is already registered", async () => {
-			const email = uniqueEmail();
-			await usersService.createUser(email, await bcrypt.hash("x", 10));
+			const existing = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("x", 10),
+				emailTag: "auth-signup-conflict",
+			});
 
 			await expect(
 				authService.signUp({
-					email,
+					email: existing.email,
 					password: "password123",
 					confirmPassword: "password123",
 				}),
@@ -100,7 +102,7 @@ describe("AuthService", () => {
 		});
 
 		it("creates user and returns success payload", async () => {
-			const email = uniqueEmail();
+			const email = uniqueTestUserEmail("signup");
 			const result = await authService.signUp({
 				email,
 				password: "password123",

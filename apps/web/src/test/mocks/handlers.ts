@@ -12,7 +12,22 @@ const postAuthSignUpHandler = () => {
 	});
 };
 
+const getExpensesListSuccessHandler = () => {
+	return HttpResponse.json({
+		data: [
+			{
+				slug: "acme-march-2024",
+				totalAmount: 123.45,
+				createdAt: "2024-03-01T12:00:00.000Z",
+				updatedAt: "2024-03-02T08:00:00.000Z",
+			},
+		],
+		pagination: {},
+	});
+};
+
 export const HANDLERS = [
+	http.get("*/expenses", getExpensesListSuccessHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),
 ];
