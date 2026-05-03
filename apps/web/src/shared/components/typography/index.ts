@@ -8,10 +8,7 @@ export {
 export {
 	BaseText,
 	Text,
-	TextAccent,
 	TextError,
-	TextMuted,
 	type TextProps,
 	TextSecondary,
-	TextTetriary,
 } from "./text";

@@ -1,6 +1,7 @@
 export * from "./breadcrumbs";
 export * from "./button";
 export * from "./card";
+export * from "./error-state";
 export * from "./form";
 export * from "./icons";
 export * from "./link";

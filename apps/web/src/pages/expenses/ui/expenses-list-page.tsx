@@ -9,7 +9,7 @@ export function ExpensesListPage() {
 
 	return (
 		<>
-			<Heading>{t("title", { ns: "expenses" })}</Heading>
+			<Heading>{t("list.title", { ns: "expenses" })}</Heading>
 			<Card
 				header={
 					<ButtonSecondary className="w-fit ml-auto" asChild>

@@ -1,6 +1,7 @@
 {
-	"title": "Manage your expenses",
-	"error": {
-		"load_failed": "Could not load expenses."
+	"list": {
+		"title": "Manage your expenses",
+		"no-results": "No expenses found.",
+		"error": "Could not load expenses."
 	}
 }
