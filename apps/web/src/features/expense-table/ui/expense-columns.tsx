@@ -1,3 +1,4 @@
+import type { ExpenseDocumentListItem } from "@repo/api/schemas";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TFunction } from "i18next";
 import { Link } from "react-router";
@@ -9,12 +10,6 @@ import {
 	Tooltip,
 } from "@/shared/components";
 
-export type Expense = {
-	slug: string;
-	amount: number;
-	date: Date;
-};
-
 type ExpenseColumnsProps = {
 	t: TFunction<"common">;
 	language: string;
@@ -23,7 +18,7 @@ type ExpenseColumnsProps = {
 export const ExpenseColumns = ({
 	t,
 	language,
-}: ExpenseColumnsProps): ColumnDef<Expense>[] => [
+}: ExpenseColumnsProps): ColumnDef<ExpenseDocumentListItem>[] => [
 	{
 		accessorKey: "slug",
 		header: () => (
@@ -36,25 +31,29 @@ export const ExpenseColumns = ({
 		},
 	},
 	{
-		accessorKey: "date",
+		accessorKey: "createdAt",
 		header: () => (
 			<Text size="sm" weight="medium">
 				{t("common.date", { ns: "common" })}
 			</Text>
 		),
 		cell: ({ row }) => {
-			return <Text size="sm">{row.original.date.toLocaleDateString()}</Text>;
+			return (
+				<Text size="sm">
+					{new Date(row.original.createdAt).toLocaleDateString(language)}
+				</Text>
+			);
 		},
 	},
 	{
-		accessorKey: "amount",
+		accessorKey: "totalAmount",
 		header: () => (
 			<Text size="sm" weight="medium">
 				{t("common.amount", { ns: "common" })}
 			</Text>
 		),
 		cell: ({ row }) => {
-			const amount = parseFloat(row.getValue("amount"));
+			const amount = row.getValue<number>("totalAmount");
 			const formatted = new Intl.NumberFormat(language, {
 				style: "currency",
 				currency: "USD",

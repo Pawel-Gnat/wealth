@@ -1,4 +1,5 @@
-/**
- * Stable TanStack Query keys. Add namespaced factories as queries are introduced.
- */
-export const queryKeys = {};
+export const queryKeys = {
+	expenses: {
+		all: () => ["expenses"] as const,
+	},
+};

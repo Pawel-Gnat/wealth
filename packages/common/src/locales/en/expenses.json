@@ -1,3 +1,6 @@
 {
-	"title": "Manage your expenses"
+	"title": "Manage your expenses",
+	"error": {
+		"load_failed": "Could not load expenses."
+	}
 }

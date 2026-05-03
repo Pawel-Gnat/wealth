@@ -7,6 +7,7 @@ import { SentryGlobalFilter, SentryModule } from "@sentry/nestjs/setup";
 import type { Request } from "express";
 import { AuthModule } from "./auth/auth.module.js";
 import { DatabaseModule } from "./database/database.module.js";
+import { ExpensesModule } from "./expenses/expenses.module.js";
 import { UsersModule } from "./users/users.module.js";
 
 declare module "@orpc/nest" {
@@ -34,6 +35,7 @@ declare module "@orpc/nest" {
 			inject: [REQUEST],
 		}),
 		UsersModule,
+		ExpensesModule,
 		AuthModule,
 		DatabaseModule,
 	],

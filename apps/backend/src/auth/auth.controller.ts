@@ -16,8 +16,9 @@ export class AuthController {
 			if (!user?.userId) {
 				throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
 			}
+
 			return {
-				id: user.userId,
+				id: String(user.userId),
 				email: user.email,
 			};
 		});
