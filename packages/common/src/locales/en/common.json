@@ -1,14 +1,11 @@
 {
 	"common": {
-		"download": "Download",
 		"amount": "Amount",
 		"date": "Date",
 		"actions": "Actions",
-		"add": "Add",
-		"edit": "Edit",
-		"create": "Create",
-		"delete": "Delete",
-		"loading": "Loading"
+		"loading": "Loading",
+		"price": "Price",
+		"quantity": "Quantity"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",
@@ -26,7 +23,12 @@
 		"save": "Save",
 		"signin": "Sign in",
 		"signup": "Sign up",
-		"logout": "Logout"
+		"logout": "Logout",
+		"add": "Add",
+		"edit": "Edit",
+		"create": "Create",
+		"delete": "Delete",
+		"download": "Download"
 	},
 	"toast": {
 		"success": {

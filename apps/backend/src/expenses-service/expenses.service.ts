@@ -21,9 +21,8 @@ export class ExpensesService {
 		return {
 			data: rows.map((row) => ({
 				slug: row.slug,
+				date: row.createdAt,
 				totalAmount: Number(row.totalAmount),
-				createdAt: row.createdAt.toISOString(),
-				updatedAt: row.updatedAt.toISOString(),
 			})),
 			pagination: {},
 		};

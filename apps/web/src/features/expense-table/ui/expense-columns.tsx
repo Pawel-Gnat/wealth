@@ -9,6 +9,7 @@ import {
 	Text,
 	Tooltip,
 } from "@/shared/components";
+import { formatPrice } from "@/shared/helpers/price";
 
 type ExpenseColumnsProps = {
 	t: TFunction<"common">;
@@ -31,7 +32,7 @@ export const ExpenseColumns = ({
 		},
 	},
 	{
-		accessorKey: "createdAt",
+		accessorKey: "date",
 		header: () => (
 			<Text size="sm" weight="medium">
 				{t("common.date", { ns: "common" })}
@@ -40,7 +41,7 @@ export const ExpenseColumns = ({
 		cell: ({ row }) => {
 			return (
 				<Text size="sm">
-					{new Date(row.original.createdAt).toLocaleDateString(language)}
+					{new Date(row.original.date).toLocaleDateString(language)}
 				</Text>
 			);
 		},
@@ -54,12 +55,7 @@ export const ExpenseColumns = ({
 		),
 		cell: ({ row }) => {
 			const amount = row.getValue<number>("totalAmount");
-			const formatted = new Intl.NumberFormat(language, {
-				style: "currency",
-				currency: "USD",
-			}).format(amount);
-
-			return <Text size="sm">{formatted}</Text>;
+			return <Text size="sm">{formatPrice(amount, language)}</Text>;
 		},
 	},
 	{
@@ -71,8 +67,8 @@ export const ExpenseColumns = ({
 			</Text>
 		),
 		cell: ({ row }) => {
-			const editText = t("common.edit", { ns: "common" });
-			const deleteText = t("common.delete", { ns: "common" });
+			const editText = t("action.edit", { ns: "common" });
+			const deleteText = t("action.delete", { ns: "common" });
 
 			return (
 				<div className="flex items-center gap-2 justify-end">

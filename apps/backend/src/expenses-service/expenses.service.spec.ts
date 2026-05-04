@@ -88,15 +88,13 @@ describe("Expenses service", () => {
 			expect(forA.data[1]).toMatchObject({
 				slug: slugAOlder,
 				totalAmount: 100,
-				createdAt: "2024-01-15T08:00:00.000Z",
-				updatedAt: "2024-01-16T08:00:00.000Z",
+				date: new Date("2024-01-15T08:00:00.000Z"),
 			});
 
 			expect(forA.data[0]).toMatchObject({
 				slug: slugANewer,
 				totalAmount: 50.5,
-				createdAt: "2024-06-01T12:00:00.000Z",
-				updatedAt: "2024-06-01T12:00:00.000Z",
+				date: new Date("2024-06-01T12:00:00.000Z"),
 			});
 
 			const forB = await expensesService.listExpenseDocumentsByUserId(userB.id);

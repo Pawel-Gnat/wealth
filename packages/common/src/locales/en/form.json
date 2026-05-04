@@ -20,5 +20,11 @@
 	},
 	"date": {
 		"label": "Date"
+	},
+	"expense-line-item": {
+		"title": "Title",
+		"placeholder": "Single expense description",
+		"price": "Price",
+		"quantity": "Quantity"
 	}
 }
