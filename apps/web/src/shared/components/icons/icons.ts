@@ -1,4 +1,5 @@
 import {
+	CalendarIcon,
 	ChevronLeft,
 	ChevronRight,
 	LayoutDashboard,
@@ -22,6 +23,7 @@ export const icons = {
 	add: Plus,
 	arrowLeft: ChevronLeft,
 	arrowRight: ChevronRight,
+	calendar: CalendarIcon,
 };
 
 export type IconName = keyof typeof icons;

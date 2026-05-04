@@ -1,4 +1,6 @@
-{
+{"single":{
+	"title": "Create a new expense"
+},
 	"list": {
 		"title": "Manage your expenses",
 		"no-results": "No expenses found.",

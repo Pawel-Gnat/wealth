@@ -17,5 +17,8 @@
 	"confirm-password": {
 		"label": "Confirm password",
 		"mismatch": "Passwords do not match"
+	},
+	"date": {
+		"label": "Date"
 	}
 }
