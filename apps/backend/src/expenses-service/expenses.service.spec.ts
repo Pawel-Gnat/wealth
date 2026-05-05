@@ -38,7 +38,7 @@ describe("Expenses service", () => {
 			).resolves.toEqual({ data: [], pagination: {} });
 		});
 
-		it("lists only the requesting user's documents, ordered by createdAt descending", async () => {
+		it("lists only the requesting user's documents, ordered by expenseDate descending", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -59,6 +59,7 @@ describe("Expenses service", () => {
 				slug: slugAOlder,
 				userId: userA.id,
 				totalAmount: "100",
+				expenseDate: new Date("2024-01-15T08:00:00.000Z"),
 				createdAt: new Date("2024-01-15T08:00:00.000Z"),
 				updatedAt: new Date("2024-01-16T08:00:00.000Z"),
 			});
@@ -67,6 +68,7 @@ describe("Expenses service", () => {
 				slug: slugANewer,
 				userId: userA.id,
 				totalAmount: "50.50",
+				expenseDate: new Date("2024-06-01T12:00:00.000Z"),
 				createdAt: new Date("2024-06-01T12:00:00.000Z"),
 				updatedAt: new Date("2024-06-01T12:00:00.000Z"),
 			});
@@ -75,6 +77,7 @@ describe("Expenses service", () => {
 				slug: slugBOnly,
 				userId: userB.id,
 				totalAmount: "9.99",
+				expenseDate: new Date("2024-03-01T00:00:00.000Z"),
 				createdAt: new Date("2024-03-01T00:00:00.000Z"),
 				updatedAt: new Date("2024-03-01T00:00:00.000Z"),
 			});

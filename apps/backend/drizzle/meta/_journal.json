@@ -15,6 +15,13 @@
 			"when": 1777795948618,
 			"tag": "0001_tiny_jane_foster",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1777963511947,
+			"tag": "0002_careless_magik",
+			"breakpoints": true
 		}
 	]
 }

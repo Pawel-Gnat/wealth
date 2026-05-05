@@ -1,0 +1,1 @@
+ALTER TABLE "expense_documents" ADD COLUMN "expense_date" timestamp DEFAULT now() NOT NULL;

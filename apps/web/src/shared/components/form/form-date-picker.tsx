@@ -1,12 +1,12 @@
 import { format } from "date-fns";
 
-import { Button } from "@/shared/lib/ui/button";
 import { Calendar } from "@/shared/lib/ui/calendar";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/shared/lib/ui/popover";
+import { ButtonInput } from "../button/button";
 import { Icon } from "../icons";
 import { FormBase, type FormControlFunction } from "./form-base";
 
@@ -16,22 +16,10 @@ export const FormDatePicker: FormControlFunction = (props) => {
 			{({ onChange, value, ...field }) => (
 				<Popover>
 					<PopoverTrigger asChild>
-						<Button
-							type="button"
-							variant="outline"
-							className="w-full justify-start text-left font-normal"
-							{...field}
-						>
+						<ButtonInput className="w-full" {...field}>
 							<Icon name="calendar" />
 							{format(value, "PPP")}
-						</Button>
-						{/* <ButtonSecondary
-							type='button'
-							className='w-full justify-start text-left font-normal'
-							{...field}>
-							<Icon name='calendar' />
-							{format(value, 'PPP')}
-						</ButtonSecondary> */}
+						</ButtonInput>
 					</PopoverTrigger>
 					<PopoverContent className="w-auto p-0" align="start">
 						<Calendar

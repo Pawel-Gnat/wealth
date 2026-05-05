@@ -5,6 +5,7 @@ import {
 } from "@repo/api/schemas";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import {
 	Form,
 	FormDatePicker,
@@ -14,24 +15,28 @@ import {
 } from "@/shared/components";
 import { formatPrice } from "@/shared/helpers/price";
 import { Button } from "@/shared/lib/ui/button";
+import { useInsertExpense } from "../hooks/use-insert-expense";
 import { ExpenseLineItem } from "./expense-line-item";
+
+const DEFAULT_VALUES: DocumentCreatePayload = {
+	date: new Date(),
+	lineItems: [{ title: "", singleAmount: 1, quantity: 1 }],
+};
 
 export const ExpenseForm = () => {
 	const { t, i18n } = useTranslation();
-	// const { signIn, isLoading } = useSignIn({
-	// 	onSuccess: data => {
-	// 		storeToken(data.data.token)
-	// 	},
-	// 	onError: () => {
-	// 		toast.error(t('toast.error.signed_in', { ns: 'common' }))
-	// 	},
-	// })
 
 	const form = useForm<DocumentCreatePayload>({
 		resolver: zodResolver(documentCreatePayloadSchema),
-		defaultValues: {
-			date: new Date(),
-			lineItems: [{ title: "", singleAmount: 0, quantity: 1 }],
+		defaultValues: DEFAULT_VALUES,
+	});
+	const { insertExpense, isLoading } = useInsertExpense({
+		onSuccess: () => {
+			toast.success(t("toast.success.expense_created", { ns: "common" }));
+			form.reset(DEFAULT_VALUES);
+		},
+		onError: () => {
+			toast.error(t("toast.error.expense_created", { ns: "common" }));
 		},
 	});
 
@@ -48,15 +53,15 @@ export const ExpenseForm = () => {
 	}, 0);
 
 	function onSubmit(data: DocumentCreatePayload) {
-		console.log(data);
+		insertExpense(data);
 	}
 
 	return (
 		<Form
 			onSubmit={form.handleSubmit(onSubmit)}
 			submitText={t("action.create", { ns: "common" })}
-			submitDisabled={false}
-			isLoading={false}
+			submitDisabled={isLoading}
+			isLoading={isLoading}
 		>
 			<FormDatePicker
 				name="date"
@@ -88,10 +93,8 @@ export const ExpenseForm = () => {
 						<ExpenseLineItem
 							key={field.id}
 							index={index}
-							t={t}
 							form={form}
 							remove={remove}
-							language={i18n.language}
 							lineTotal={lineTotal}
 						/>
 					);

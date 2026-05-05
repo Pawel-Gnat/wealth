@@ -1,5 +1,8 @@
 import { populateContractRouterPaths } from "@orpc/contract";
-import { listExpensesContract } from "./expenses.contract";
+import {
+	createExpenseContract,
+	listExpensesContract,
+} from "./expenses.contract";
 import { meContract } from "./me.contract";
 import { signInContract } from "./signin.contract";
 import { signUpContract } from "./signup.contract";
@@ -11,6 +14,7 @@ export const rpcContract = populateContractRouterPaths({
 		me: meContract,
 	},
 	expenses: {
+		create: createExpenseContract,
 		list: listExpensesContract,
 	},
 });

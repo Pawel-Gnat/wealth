@@ -3,9 +3,7 @@
 		"amount": "Amount",
 		"date": "Date",
 		"actions": "Actions",
-		"loading": "Loading",
-		"price": "Price",
-		"quantity": "Quantity"
+		"loading": "Loading"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",
@@ -32,11 +30,13 @@
 	},
 	"toast": {
 		"success": {
-			"account_created": "Account created successfully"
+			"account_created": "Account created successfully",
+			"expense_created": "Expense created successfully"
 		},
 		"error": {
 			"signed_in": "Failed to sign in",
-			"account_created": "Failed to create account"
+			"account_created": "Failed to create account",
+			"expense_created": "Failed to create expense"
 		}
 	}
 }

@@ -20,6 +20,7 @@ export const expenseDocumentsTable = pgTable(
 		totalAmount: numeric("total_amount", { precision: 14, scale: 2 })
 			.notNull()
 			.default("0"),
+		expenseDate: timestamp("expense_date"),
 		createdAt: timestamp("created_at"),
 		updatedAt: timestamp("updated_at"),
 	},

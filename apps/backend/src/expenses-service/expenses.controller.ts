@@ -20,4 +20,19 @@ export class ExpensesController {
 			return this.expensesService.listExpenseDocumentsByUserId(user.userId);
 		});
 	}
+
+	@UseGuards(PassportJwtGuard)
+	@Implement(rpcContract.expenses.create)
+	createExpenseRpc() {
+		return implement(rpcContract.expenses.create).handler(
+			({ context, input }) => {
+				const user = context.request.user;
+				if (!user?.userId) {
+					throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
+				}
+
+				return this.expensesService.createExpenseByUserId(user.userId, input);
+			},
+		);
+	}
 }

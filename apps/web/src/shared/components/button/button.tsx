@@ -62,6 +62,29 @@ export const ButtonSecondary = ({
 	);
 };
 
+export const ButtonInput = ({
+	children,
+	isLoading = false,
+	className,
+	size = "default",
+	variant = "outline",
+	...props
+}: ButtonProps) => {
+	return (
+		<Button
+			size={size}
+			className={cn(
+				"bg-input/50 text-input-foreground hover:bg-input/30",
+				className,
+			)}
+			variant={variant}
+			{...props}
+		>
+			{isLoading ? <Icon name="loader" className="animate-spin" /> : children}
+		</Button>
+	);
+};
+
 export const ButtonDestructive = ({
 	children,
 	isLoading = false,

@@ -22,9 +22,18 @@
 		"label": "Date"
 	},
 	"expense-line-item": {
-		"title": "Title",
-		"placeholder": "Single expense description",
-		"price": "Price",
-		"quantity": "Quantity"
+		"label": "Expense",
+		"placeholder": "Description",
+		"required": "Description is required"
+	},
+	"quantity": {
+		"label": "Quantity",
+		"invalid": "Enter a valid quantity",
+		"min": "Quantity must be at least 1"
+	},
+	"single-amount": {
+		"label": "Price",
+		"invalid": "Enter a valid price",
+		"min": "Price must be at least 0.01"
 	}
 }
