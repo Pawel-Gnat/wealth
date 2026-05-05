@@ -21,17 +21,6 @@ export const ExpenseColumns = ({
 	language,
 }: ExpenseColumnsProps): ColumnDef<ExpenseDocumentListItem>[] => [
 	{
-		accessorKey: "slug",
-		header: () => (
-			<Text size="sm" weight="medium">
-				ID
-			</Text>
-		),
-		cell: ({ row }) => {
-			return <Text size="sm">{row.original.slug}</Text>;
-		},
-	},
-	{
 		accessorKey: "date",
 		header: () => (
 			<Text size="sm" weight="medium">
@@ -75,7 +64,7 @@ export const ExpenseColumns = ({
 					<Tooltip
 						trigger={
 							<ButtonSecondary asChild size="icon">
-								<Link to={`/expenses/${row.original.slug}`}>
+								<Link to={`/expenses/${row.original.id}`}>
 									<Icon name="edit" />
 									<span className="sr-only">{editText}</span>
 								</Link>

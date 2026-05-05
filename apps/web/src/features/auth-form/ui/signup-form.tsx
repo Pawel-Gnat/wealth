@@ -6,12 +6,17 @@ import { toast } from "sonner";
 import { Card, Form, FormInput, Text } from "@/shared/components";
 import { useSignUp } from "../hooks/use-sign-up";
 
-export function SignupForm() {
+type SignupFormProps = {
+	onSignedUp: () => void;
+};
+
+export function SignupForm({ onSignedUp }: SignupFormProps) {
 	const { t } = useTranslation();
 	const { signUp, isLoading } = useSignUp({
 		onSuccess: () => {
 			toast.success(t("toast.success.account_created", { ns: "common" }));
 			form.reset();
+			onSignedUp();
 		},
 		onError: () => {
 			toast.error(t("toast.error.account_created", { ns: "common" }));

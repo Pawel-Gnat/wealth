@@ -1,8 +1,8 @@
-import { pgTable, serial, text } from "drizzle-orm/pg-core";
-import { timestamp } from "./helpers.js";
+import { pgTable, text } from "drizzle-orm/pg-core";
+import { timestamp, ulidPrimaryKey } from "./helpers.js";
 
 export const usersTable = pgTable("users", {
-	id: serial("id").primaryKey(),
+	id: ulidPrimaryKey(),
 	email: text("email").notNull().unique(),
 	password: text("password").notNull(),
 	createdAt: timestamp("created_at"),

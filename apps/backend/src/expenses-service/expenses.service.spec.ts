@@ -42,10 +42,6 @@ describe("Expenses service", () => {
 			const db = moduleRef.get(DBS.APP);
 			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
-			const slugAOlder = `doc-a-old-${suffix}`;
-			const slugANewer = `doc-a-new-${suffix}`;
-			const slugBOnly = `doc-b-${suffix}`;
-
 			const userA = await createTestUser(usersService, {
 				email: `user-a-${suffix}@example.com`,
 				passwordHash: "hash",
@@ -56,7 +52,6 @@ describe("Expenses service", () => {
 			});
 
 			await db.insert(expenseDocumentsTable).values({
-				slug: slugAOlder,
 				userId: userA.id,
 				totalAmount: "100",
 				expenseDate: new Date("2024-01-15T08:00:00.000Z"),
@@ -65,7 +60,6 @@ describe("Expenses service", () => {
 			});
 
 			await db.insert(expenseDocumentsTable).values({
-				slug: slugANewer,
 				userId: userA.id,
 				totalAmount: "50.50",
 				expenseDate: new Date("2024-06-01T12:00:00.000Z"),
@@ -74,7 +68,6 @@ describe("Expenses service", () => {
 			});
 
 			await db.insert(expenseDocumentsTable).values({
-				slug: slugBOnly,
 				userId: userB.id,
 				totalAmount: "9.99",
 				expenseDate: new Date("2024-03-01T00:00:00.000Z"),
@@ -86,16 +79,13 @@ describe("Expenses service", () => {
 
 			expect(forA.pagination).toEqual({});
 			expect(forA.data).toHaveLength(2);
-			expect(forA.data.map((r) => r.slug)).toEqual([slugANewer, slugAOlder]);
 
 			expect(forA.data[1]).toMatchObject({
-				slug: slugAOlder,
 				totalAmount: 100,
 				date: new Date("2024-01-15T08:00:00.000Z"),
 			});
 
 			expect(forA.data[0]).toMatchObject({
-				slug: slugANewer,
 				totalAmount: 50.5,
 				date: new Date("2024-06-01T12:00:00.000Z"),
 			});
@@ -103,7 +93,6 @@ describe("Expenses service", () => {
 			const forB = await expensesService.listExpenseDocumentsByUserId(userB.id);
 			expect(forB.pagination).toEqual({});
 			expect(forB.data).toHaveLength(1);
-			expect(forB.data[0]?.slug).toBe(slugBOnly);
 		});
 	});
 });

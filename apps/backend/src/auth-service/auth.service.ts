@@ -43,7 +43,7 @@ export class AuthService {
 	async signInForVerifiedUser(user: User): Promise<SignInResponse> {
 		const token = await this.jwtService.signAsync({
 			email: user.email,
-			sub: Number(user.id),
+			sub: user.id,
 		});
 		return { data: { token } };
 	}

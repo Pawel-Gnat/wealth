@@ -1,20 +1,12 @@
-import {
-	index,
-	integer,
-	numeric,
-	pgTable,
-	serial,
-	text,
-} from "drizzle-orm/pg-core";
-import { timestamp } from "./helpers.js";
+import { index, numeric, pgTable, text } from "drizzle-orm/pg-core";
+import { timestamp, ulidPrimaryKey } from "./helpers.js";
 import { usersTable } from "./users.table.js";
 
 export const expenseDocumentsTable = pgTable(
 	"expense_documents",
 	{
-		id: serial("id").primaryKey(),
-		slug: text("slug").notNull().unique(),
-		userId: integer("user_id")
+		id: ulidPrimaryKey(),
+		userId: text("user_id")
 			.notNull()
 			.references(() => usersTable.id),
 		totalAmount: numeric("total_amount", { precision: 14, scale: 2 })

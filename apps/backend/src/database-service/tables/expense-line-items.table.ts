@@ -1,19 +1,12 @@
-import {
-	index,
-	integer,
-	numeric,
-	pgTable,
-	serial,
-	text,
-} from "drizzle-orm/pg-core";
+import { index, integer, numeric, pgTable, text } from "drizzle-orm/pg-core";
 import { expenseDocumentsTable } from "./expense-documents.table.js";
-import { timestamp } from "./helpers.js";
+import { timestamp, ulidPrimaryKey } from "./helpers.js";
 
 export const expenseLineItemsTable = pgTable(
 	"expense_line_items",
 	{
-		id: serial("id").primaryKey(),
-		expenseDocumentId: integer("expense_document_id")
+		id: ulidPrimaryKey(),
+		expenseDocumentId: text("expense_document_id")
 			.notNull()
 			.references(() => expenseDocumentsTable.id, { onDelete: "cascade" }),
 		title: text("title").notNull(),

@@ -3,9 +3,16 @@ import {
 	type DocumentCreatePayload,
 	documentCreatePayloadSchema,
 } from "@repo/api/schemas";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import {
+	type Resolver,
+	useFieldArray,
+	useForm,
+	useWatch,
+} from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
+import { APP_ROUTES } from "@/app/router";
 import {
 	Form,
 	FormDatePicker,
@@ -25,15 +32,19 @@ const DEFAULT_VALUES: DocumentCreatePayload = {
 
 export const ExpenseForm = () => {
 	const { t, i18n } = useTranslation();
+	const navigate = useNavigate();
 
 	const form = useForm<DocumentCreatePayload>({
-		resolver: zodResolver(documentCreatePayloadSchema),
+		resolver: zodResolver(
+			documentCreatePayloadSchema,
+		) as Resolver<DocumentCreatePayload>,
 		defaultValues: DEFAULT_VALUES,
 	});
 	const { insertExpense, isLoading } = useInsertExpense({
 		onSuccess: () => {
 			toast.success(t("toast.success.expense_created", { ns: "common" }));
 			form.reset(DEFAULT_VALUES);
+			navigate(APP_ROUTES.expenses.list);
 		},
 		onError: () => {
 			toast.error(t("toast.error.expense_created", { ns: "common" }));

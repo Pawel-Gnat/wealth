@@ -42,7 +42,8 @@
 		"pg": "^8.20.0",
 		"reflect-metadata": "^0.2.2",
 		"rxjs": "^7.8.1",
-		"swagger-ui-express": "^5.0.1"
+		"swagger-ui-express": "^5.0.1",
+		"ulid": "^3.0.2"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
@@ -65,8 +66,8 @@
 		"testcontainers": "^11.14.0",
 		"ts-loader": "^9.5.2",
 		"ts-node": "^10.9.2",
-		"tsx": "^4.21.0",
 		"tsconfig-paths": "^4.2.0",
+		"tsx": "^4.21.0",
 		"typescript": "catalog:",
 		"unplugin-swc": "^1.5.1",
 		"vitest": "catalog:"

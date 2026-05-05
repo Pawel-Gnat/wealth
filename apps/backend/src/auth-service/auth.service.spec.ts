@@ -74,12 +74,12 @@ describe("Auth service", () => {
 			});
 
 			const payload = await jwtService.verifyAsync<{
-				sub: number;
+				sub: string;
 				email: string;
 			}>(result.data.token);
 
 			expect(payload).toMatchObject({
-				sub: 7,
+				sub: "7",
 				email: "verified@example.com",
 			});
 		});

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/lib/ui/tabs";
@@ -5,24 +6,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/lib/ui/tabs";
 import { SigninForm } from "./signin-form";
 import { SignupForm } from "./signup-form";
 
+const TABS = {
+	signin: "signin",
+	signup: "signup",
+} as const;
+
 export function AuthTabs() {
 	const { t } = useTranslation();
+	const [activeTab, setActiveTab] = useState<string>(TABS.signin);
 
 	return (
-		<Tabs defaultValue="signin" className="w-full max-w-sm">
+		<Tabs
+			value={activeTab}
+			onValueChange={setActiveTab}
+			className="w-full max-w-sm"
+		>
 			<TabsList className="w-full">
-				<TabsTrigger value="signin">
+				<TabsTrigger value={TABS.signin}>
 					{t("action.signin", { ns: "common" })}
 				</TabsTrigger>
-				<TabsTrigger value="signup">
+				<TabsTrigger value={TABS.signup}>
 					{t("action.signup", { ns: "common" })}
 				</TabsTrigger>
 			</TabsList>
-			<TabsContent value="signin">
+			<TabsContent value={TABS.signin}>
 				<SigninForm />
 			</TabsContent>
-			<TabsContent value="signup">
-				<SignupForm />
+			<TabsContent value={TABS.signup}>
+				<SignupForm onSignedUp={() => setActiveTab(TABS.signin)} />
 			</TabsContent>
 		</Tabs>
 	);

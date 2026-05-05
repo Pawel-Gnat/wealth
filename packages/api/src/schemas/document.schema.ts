@@ -2,7 +2,7 @@ import { z } from "zod";
 import { apiPaginatedPayload, apiPayload } from "./common.schema";
 
 export const expenseDocumentListItemSchema = z.object({
-	slug: z.string(),
+	id: z.string(),
 	date: z.date(),
 	totalAmount: z.number(),
 });
@@ -29,7 +29,7 @@ export const lineItemSchema = z.object({
 export type LineItem = z.infer<typeof lineItemSchema>;
 
 export const documentCreatePayloadSchema = z.object({
-	date: z.date(),
+	date: z.coerce.date(),
 	lineItems: z.array(lineItemSchema),
 });
 export type DocumentCreatePayload = z.infer<typeof documentCreatePayloadSchema>;

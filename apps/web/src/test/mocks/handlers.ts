@@ -16,10 +16,9 @@ const getExpensesListSuccessHandler = () => {
 	return HttpResponse.json({
 		data: [
 			{
-				slug: "acme-march-2024",
+				id: "01JTZKQX2GT6PHGQER0M8FS6K8",
+				date: "2024-03-01T12:00:00.000Z",
 				totalAmount: 123.45,
-				createdAt: "2024-03-01T12:00:00.000Z",
-				updatedAt: "2024-03-02T08:00:00.000Z",
 			},
 		],
 		pagination: {},

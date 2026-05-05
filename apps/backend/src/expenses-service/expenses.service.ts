@@ -17,7 +17,7 @@ export class ExpensesService {
 	constructor(@Inject(DBS.APP) private readonly db: NodePgDatabase) {}
 
 	async listExpenseDocumentsByUserId(
-		userId: number,
+		userId: string,
 	): Promise<ExpenseDocumentListResponse> {
 		const rows = await this.db
 			.select()
@@ -27,7 +27,7 @@ export class ExpensesService {
 
 		return {
 			data: rows.map((row) => ({
-				slug: row.slug,
+				id: row.id,
 				date: row.expenseDate,
 				totalAmount: Number(row.totalAmount),
 			})),
@@ -36,20 +36,17 @@ export class ExpensesService {
 	}
 
 	async createExpenseByUserId(
-		userId: number,
+		userId: string,
 		payload: DocumentCreatePayload,
 	): Promise<DocumentCreateResponse> {
 		const totalAmount = payload.lineItems.reduce(
 			(sum, item) => sum + item.quantity * item.singleAmount,
 			0,
 		);
-		const slug = `exp-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-
 		await this.db.transaction(async (tx) => {
 			const [createdExpense] = await tx
 				.insert(expenseDocumentsTable)
 				.values({
-					slug,
 					userId,
 					expenseDate: payload.date,
 					totalAmount: totalAmount.toFixed(2),

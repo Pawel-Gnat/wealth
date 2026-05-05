@@ -22,6 +22,13 @@
 			"when": 1777963511947,
 			"tag": "0002_careless_magik",
 			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1778005726912,
+			"tag": "0003_condemned_scream",
+			"breakpoints": true
 		}
 	]
 }
