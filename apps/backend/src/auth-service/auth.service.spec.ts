@@ -85,6 +85,17 @@ describe("Auth service", () => {
 		});
 	});
 
+	describe("sign in", () => {
+		it("throws UnauthorizedException when credentials are invalid", async () => {
+			await expect(
+				authService.signIn({
+					email: "missing-user-signin@example.com",
+					password: "incorrect",
+				}),
+			).rejects.toThrow(UnauthorizedException);
+		});
+	});
+
 	describe("sign up", () => {
 		it("rejects when email is already registered", async () => {
 			const existing = await createTestUser(usersService, {
@@ -98,7 +109,7 @@ describe("Auth service", () => {
 					password: "password123",
 					confirmPassword: "password123",
 				}),
-			).rejects.toBeInstanceOf(ORPCError);
+			).rejects.toThrow("Email already registered");
 		});
 
 		it("creates user and returns success payload", async () => {

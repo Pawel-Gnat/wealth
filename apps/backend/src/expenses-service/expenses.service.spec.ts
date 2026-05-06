@@ -1,8 +1,12 @@
 import { Test, type TestingModule } from "@nestjs/testing";
+import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DBS } from "../database-service/constants.js";
-import { expenseDocumentsTable } from "../database-service/tables/index.js";
+import {
+	expenseDocumentsTable,
+	expenseLineItemsTable,
+} from "../database-service/tables/index.js";
 import { createTestUser } from "../test/mocks/users.js";
 import { TestModule } from "../test/test.module.js";
 import { UsersService } from "../users-service/users.service.js";
@@ -93,6 +97,126 @@ describe("Expenses service", () => {
 			const forB = await expensesService.listExpenseDocumentsByUserId(userB.id);
 			expect(forB.pagination).toEqual({});
 			expect(forB.data).toHaveLength(1);
+		});
+	});
+
+	describe("create expense by user id", () => {
+		it("creates expense document with computed total and line items", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const user = await createTestUser(usersService, {
+				passwordHash: "hashed-password",
+				emailTag: "exp-create",
+			});
+
+			const payload = {
+				date: new Date("2026-05-01T10:00:00.000Z"),
+				lineItems: [
+					{ title: "Taxi", quantity: 2, singleAmount: 12.5 },
+					{ title: "Lunch", quantity: 1, singleAmount: 30 },
+				],
+			};
+
+			await expect(
+				expensesService.createExpenseByUserId(user.id, payload),
+			).resolves.toEqual({
+				data: { message: "expense_created" },
+			});
+
+			const [createdDocument] = await db
+				.select()
+				.from(expenseDocumentsTable)
+				.where(eq(expenseDocumentsTable.userId, user.id))
+				.orderBy(expenseDocumentsTable.createdAt);
+
+			expect(createdDocument).toBeDefined();
+			expect(createdDocument?.totalAmount).toBe("55.00");
+			expect(createdDocument?.expenseDate).toEqual(payload.date);
+			if (!createdDocument) {
+				throw new Error("Expected created document");
+			}
+
+			const createdLineItems = await db
+				.select()
+				.from(expenseLineItemsTable)
+				.where(eq(expenseLineItemsTable.expenseDocumentId, createdDocument.id));
+
+			expect(createdLineItems).toHaveLength(2);
+			expect(createdLineItems).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						title: "Taxi",
+						quantity: 2,
+						singleAmount: "12.50",
+					}),
+					expect.objectContaining({
+						title: "Lunch",
+						quantity: 1,
+						singleAmount: "30.00",
+					}),
+				]),
+			);
+		});
+
+		it("exposes newly created document in user list response", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: "hashed-password",
+				emailTag: "exp-create-list",
+			});
+
+			const payload = {
+				date: new Date("2026-05-02T12:30:00.000Z"),
+				lineItems: [{ title: "Coffee", quantity: 3, singleAmount: 4 }],
+			};
+
+			await expensesService.createExpenseByUserId(user.id, payload);
+			const result = await expensesService.listExpenseDocumentsByUserId(
+				user.id,
+			);
+
+			expect(result.pagination).toEqual({});
+			expect(result.data).toHaveLength(1);
+			expect(result.data[0]).toMatchObject({
+				date: payload.date,
+				totalAmount: 12,
+			});
+		});
+
+		it("throws when user does not exist", async () => {
+			const missingUserId = "01K1MISSINGUSER000000000000";
+			const payload = {
+				date: new Date("2026-05-03T09:00:00.000Z"),
+				lineItems: [{ title: "Train", quantity: 1, singleAmount: 15 }],
+			};
+
+			await expect(
+				expensesService.createExpenseByUserId(missingUserId, payload),
+			).rejects.toThrow();
+		});
+
+		it("does not persist expense document when create fails", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const missingUserId = "01K1MISSINGUSER000000000000";
+			const payload = {
+				date: new Date("2026-05-03T09:00:00.000Z"),
+				lineItems: [{ title: "Train", quantity: 1, singleAmount: 15 }],
+			};
+
+			const beforeDocs = await db
+				.select()
+				.from(expenseDocumentsTable)
+				.where(eq(expenseDocumentsTable.userId, missingUserId));
+
+			await expect(
+				expensesService.createExpenseByUserId(missingUserId, payload),
+			).rejects.toThrow();
+
+			const afterDocs = await db
+				.select()
+				.from(expenseDocumentsTable)
+				.where(eq(expenseDocumentsTable.userId, missingUserId));
+
+			expect(beforeDocs).toHaveLength(0);
+			expect(afterDocs).toHaveLength(0);
 		});
 	});
 });

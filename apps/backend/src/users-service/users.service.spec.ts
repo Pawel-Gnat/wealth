@@ -35,4 +35,11 @@ describe("Users service", () => {
 		expect(row).not.toBeNull();
 		expect(row).toMatchObject({ email, password: passwordHash });
 	});
+
+	it("rejects when trying to create user with duplicated email", async () => {
+		const email = uniqueTestUserEmail("users-duplicate");
+		await usersService.createUser(email, "hash-1");
+
+		await expect(usersService.createUser(email, "hash-2")).rejects.toThrow();
+	});
 });
