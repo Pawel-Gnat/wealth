@@ -33,20 +33,19 @@ describe("SigninForm", () => {
 		it("persists token after successful sign in", async () => {
 			const user = userEvent.setup();
 			renderWithProviders(<SigninForm />);
+			const emailInput = screen.getByLabelText(
+				t("email.label", { ns: "form" }),
+			);
+			const passwordInput = screen.getByLabelText(
+				t("password.label", { ns: "form" }),
+			);
+			const signinButton = screen.getByRole("button", {
+				name: t("action.signin", { ns: "common" }),
+			});
 
-			await user.type(
-				screen.getByLabelText(t("email.label", { ns: "form" })),
-				"test@example.com",
-			);
-			await user.type(
-				screen.getByLabelText(t("password.label", { ns: "form" })),
-				"secret",
-			);
-			await user.click(
-				screen.getByRole("button", {
-					name: t("action.signin", { ns: "common" }),
-				}),
-			);
+			await user.type(emailInput, "test@example.com");
+			await user.type(passwordInput, "secret");
+			await user.click(signinButton);
 
 			await waitFor(() => {
 				expect(localStorage.getItem(AUTH_TOKEN_STORAGE_KEY)).toBe(
@@ -67,20 +66,19 @@ describe("SigninForm", () => {
 			);
 
 			renderWithProviders(<SigninForm />);
+			const emailInput = screen.getByLabelText(
+				t("email.label", { ns: "form" }),
+			);
+			const passwordInput = screen.getByLabelText(
+				t("password.label", { ns: "form" }),
+			);
+			const signinButton = screen.getByRole("button", {
+				name: t("action.signin", { ns: "common" }),
+			});
 
-			await user.type(
-				screen.getByLabelText(t("email.label", { ns: "form" })),
-				"test@example.com",
-			);
-			await user.type(
-				screen.getByLabelText(t("password.label", { ns: "form" })),
-				"secret",
-			);
-			await user.click(
-				screen.getByRole("button", {
-					name: t("action.signin", { ns: "common" }),
-				}),
-			);
+			await user.type(emailInput, "test@example.com");
+			await user.type(passwordInput, "secret");
+			await user.click(signinButton);
 
 			await waitFor(() => {
 				expect(toast.error).toHaveBeenCalledWith(
@@ -94,12 +92,11 @@ describe("SigninForm", () => {
 		it("shows field errors when submitting an empty form", async () => {
 			const user = userEvent.setup();
 			renderWithProviders(<SigninForm />);
+			const signinButton = screen.getByRole("button", {
+				name: t("action.signin", { ns: "common" }),
+			});
 
-			await user.click(
-				screen.getByRole("button", {
-					name: t("action.signin", { ns: "common" }),
-				}),
-			);
+			await user.click(signinButton);
 
 			expect(
 				await screen.findByText(t("email.invalid", { ns: "form" })),

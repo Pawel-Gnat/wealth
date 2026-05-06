@@ -21,6 +21,7 @@ vi.mock("sonner", () => ({
 
 describe("SignupForm", () => {
 	let t: TFunction;
+	let onSignedUp: ReturnType<typeof vi.fn>;
 
 	beforeAll(async () => {
 		t = (await init18nWeb({ lng: "en" })) as TFunction;
@@ -29,39 +30,38 @@ describe("SignupForm", () => {
 	beforeEach(() => {
 		vi.mocked(toast.success).mockClear();
 		vi.mocked(toast.error).mockClear();
+		onSignedUp = vi.fn();
 	});
 
 	describe("form submission", () => {
 		it("shows success toast and clears the form after sign up", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<SignupForm />);
+			renderWithProviders(<SignupForm onSignedUp={onSignedUp} />);
+			const emailInput = screen.getByLabelText(
+				t("email.label", { ns: "form" }),
+			);
+			const passwordInput = screen.getByLabelText(
+				t("password.label", { ns: "form" }),
+			);
+			const confirmPasswordInput = screen.getByLabelText(
+				t("confirm-password.label", { ns: "form" }),
+			);
+			const signupButton = screen.getByRole("button", {
+				name: t("action.signup", { ns: "common" }),
+			});
 
-			await user.type(
-				screen.getByLabelText(t("email.label", { ns: "form" })),
-				"new@example.com",
-			);
-			await user.type(
-				screen.getByLabelText(t("password.label", { ns: "form" })),
-				validPassword,
-			);
-			await user.type(
-				screen.getByLabelText(t("confirm-password.label", { ns: "form" })),
-				validPassword,
-			);
-			await user.click(
-				screen.getByRole("button", {
-					name: t("action.signup", { ns: "common" }),
-				}),
-			);
+			await user.type(emailInput, "new@example.com");
+			await user.type(passwordInput, validPassword);
+			await user.type(confirmPasswordInput, validPassword);
+			await user.click(signupButton);
 
 			await waitFor(() => {
 				expect(toast.success).toHaveBeenCalledWith(
 					t("toast.success.account_created", { ns: "common" }),
 				);
 			});
-			expect(
-				screen.getByLabelText(t("email.label", { ns: "form" })),
-			).toHaveValue("");
+			expect(onSignedUp).toHaveBeenCalledTimes(1);
+			expect(emailInput).toHaveValue("");
 		});
 
 		it("shows error toast on API error", async () => {
@@ -75,44 +75,43 @@ describe("SignupForm", () => {
 				),
 			);
 
-			renderWithProviders(<SignupForm />);
+			renderWithProviders(<SignupForm onSignedUp={onSignedUp} />);
+			const emailInput = screen.getByLabelText(
+				t("email.label", { ns: "form" }),
+			);
+			const passwordInput = screen.getByLabelText(
+				t("password.label", { ns: "form" }),
+			);
+			const confirmPasswordInput = screen.getByLabelText(
+				t("confirm-password.label", { ns: "form" }),
+			);
+			const signupButton = screen.getByRole("button", {
+				name: t("action.signup", { ns: "common" }),
+			});
 
-			await user.type(
-				screen.getByLabelText(t("email.label", { ns: "form" })),
-				"taken@example.com",
-			);
-			await user.type(
-				screen.getByLabelText(t("password.label", { ns: "form" })),
-				validPassword,
-			);
-			await user.type(
-				screen.getByLabelText(t("confirm-password.label", { ns: "form" })),
-				validPassword,
-			);
-			await user.click(
-				screen.getByRole("button", {
-					name: t("action.signup", { ns: "common" }),
-				}),
-			);
+			await user.type(emailInput, "taken@example.com");
+			await user.type(passwordInput, validPassword);
+			await user.type(confirmPasswordInput, validPassword);
+			await user.click(signupButton);
 
 			await waitFor(() => {
 				expect(toast.error).toHaveBeenCalledWith(
 					t("toast.error.account_created", { ns: "common" }),
 				);
 			});
+			expect(onSignedUp).not.toHaveBeenCalled();
 		});
 	});
 
 	describe("validation", () => {
 		it("shows field errors when submitting an empty form", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<SignupForm />);
+			renderWithProviders(<SignupForm onSignedUp={onSignedUp} />);
+			const signupButton = screen.getByRole("button", {
+				name: t("action.signup", { ns: "common" }),
+			});
 
-			await user.click(
-				screen.getByRole("button", {
-					name: t("action.signup", { ns: "common" }),
-				}),
-			);
+			await user.click(signupButton);
 
 			expect(
 				await screen.findByText(t("email.invalid", { ns: "form" })),
@@ -120,6 +119,7 @@ describe("SignupForm", () => {
 			expect(
 				screen.getByText(t("password.min", { ns: "form" })),
 			).toBeInTheDocument();
+			expect(onSignedUp).not.toHaveBeenCalled();
 		});
 	});
 });

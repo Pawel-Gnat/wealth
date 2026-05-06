@@ -25,8 +25,15 @@ const getExpensesListSuccessHandler = () => {
 	});
 };
 
+const postExpenseCreateSuccessHandler = () => {
+	return HttpResponse.json({
+		data: { message: "expense_created" as const },
+	});
+};
+
 export const HANDLERS = [
 	http.get("*/expenses", getExpensesListSuccessHandler),
+	http.post("*/expenses", postExpenseCreateSuccessHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),
 ];

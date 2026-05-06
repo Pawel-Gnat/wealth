@@ -26,7 +26,6 @@ export const ExpenseLineItem = ({
 				name={`lineItems.${index}.title`}
 				label={t("expense-line-item.label", { ns: "form" })}
 				placeholder={t("expense-line-item.placeholder", { ns: "form" })}
-				required
 				control={form.control}
 			/>
 
@@ -37,7 +36,6 @@ export const ExpenseLineItem = ({
 					placeholder="0.01"
 					type="number"
 					step="0.01"
-					min="0.01"
 					valueAsNumber
 					control={form.control}
 				/>
@@ -48,7 +46,6 @@ export const ExpenseLineItem = ({
 					placeholder="1"
 					type="number"
 					step="1"
-					min="1"
 					valueAsNumber
 					control={form.control}
 				/>

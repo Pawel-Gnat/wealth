@@ -22,11 +22,10 @@ describe("ExpenseTable", () => {
 		);
 
 		renderWithProviders(<ExpenseTable />);
+		const errorMessage = t("list.error", { ns: "expenses" });
 
 		await waitFor(() => {
-			expect(
-				screen.getByText(t("list.error", { ns: "expenses" })),
-			).toBeInTheDocument();
+			expect(screen.getByText(errorMessage)).toBeInTheDocument();
 		});
 	});
 
@@ -38,34 +37,34 @@ describe("ExpenseTable", () => {
 		);
 
 		renderWithProviders(<ExpenseTable />);
+		const noResultsMessage = t("list.no-results", { ns: "expenses" });
 
 		await waitFor(() => {
-			expect(
-				screen.getByText(t("list.no-results", { ns: "expenses" })),
-			).toBeInTheDocument();
+			expect(screen.getByText(noResultsMessage)).toBeInTheDocument();
 		});
 	});
 
 	it("renders rows when expense data is returned", async () => {
+		const expenseId = "01JTZKQX2GT6PHGQER0M8FS6K8";
+		const expenseDate = new Date("2024-03-01T12:00:00.000Z");
+		const formattedDate = expenseDate.toLocaleDateString("en");
+		const formattedAmount = new Intl.NumberFormat("en", {
+			style: "currency",
+			currency: "USD",
+		}).format(123.45);
+		const editActionLabel = t("action.edit", { ns: "common" });
+
 		renderWithProviders(<ExpenseTable />);
 
 		await waitFor(() => {
-			expect(screen.getByText("acme-march-2024")).toBeInTheDocument();
+			expect(screen.getByText(formattedDate)).toBeInTheDocument();
 		});
 
-		expect(
-			screen.getByText(
-				new Intl.NumberFormat("en", {
-					style: "currency",
-					currency: "USD",
-				}).format(123.45),
-			),
-		).toBeInTheDocument();
+		const editLink = screen.getByRole("link", {
+			name: editActionLabel,
+		});
 
-		expect(
-			screen.getByRole("link", {
-				name: t("common.edit", { ns: "common" }),
-			}),
-		).toHaveAttribute("href", "/expenses/acme-march-2024");
+		expect(screen.getByText(formattedAmount)).toBeInTheDocument();
+		expect(editLink).toHaveAttribute("href", `/expenses/${expenseId}`);
 	});
 });
