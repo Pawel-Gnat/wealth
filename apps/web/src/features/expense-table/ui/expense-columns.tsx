@@ -14,11 +14,17 @@ import { formatPrice } from "@/shared/helpers/price";
 type ExpenseColumnsProps = {
 	t: TFunction<"common">;
 	language: string;
+	onDeleteExpense: (expenseId: string) => void;
+	deletingExpenseId: string | null;
+	isDeleting: boolean;
 };
 
 export const ExpenseColumns = ({
 	t,
 	language,
+	onDeleteExpense,
+	deletingExpenseId,
+	isDeleting,
 }: ExpenseColumnsProps): ColumnDef<ExpenseDocumentListItem>[] => [
 	{
 		accessorKey: "date",
@@ -58,6 +64,7 @@ export const ExpenseColumns = ({
 		cell: ({ row }) => {
 			const editText = t("action.edit", { ns: "common" });
 			const deleteText = t("action.delete", { ns: "common" });
+			const isDisabled = deletingExpenseId === row.original.id || isDeleting;
 
 			return (
 				<div className="flex items-center gap-2 justify-end">
@@ -74,7 +81,12 @@ export const ExpenseColumns = ({
 					/>
 					<Tooltip
 						trigger={
-							<ButtonDestructive size="icon">
+							<ButtonDestructive
+								size="icon"
+								onClick={() => onDeleteExpense(row.original.id)}
+								disabled={isDisabled}
+								isLoading={isDisabled}
+							>
 								<Icon name="delete" />
 								<span className="sr-only">{deleteText}</span>
 							</ButtonDestructive>

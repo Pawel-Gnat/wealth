@@ -2,6 +2,8 @@ import { oc } from "@orpc/contract";
 import {
 	documentCreatePayloadSchema,
 	documentCreateResponseSchema,
+	documentDeletePayloadSchema,
+	documentDeleteResponseSchema,
 	expenseDocumentListResponseSchema,
 } from "../schemas/document.schema";
 
@@ -13,3 +15,8 @@ export const createExpenseContract = oc
 	.route({ method: "POST", path: "/expenses" })
 	.input(documentCreatePayloadSchema)
 	.output(documentCreateResponseSchema);
+
+export const deleteExpenseContract = oc
+	.route({ method: "DELETE", path: "/expenses" })
+	.input(documentDeletePayloadSchema)
+	.output(documentDeleteResponseSchema);

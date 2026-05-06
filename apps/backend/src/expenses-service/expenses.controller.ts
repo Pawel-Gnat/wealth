@@ -35,4 +35,29 @@ export class ExpensesController {
 			},
 		);
 	}
+
+	@UseGuards(PassportJwtGuard)
+	@Implement(rpcContract.expenses.delete)
+	deleteExpenseRpc() {
+		return implement(rpcContract.expenses.delete).handler(
+			async ({ context, input }) => {
+				const user = context.request.user;
+				if (!user?.userId) {
+					throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
+				}
+
+				try {
+					return await this.expensesService.deleteExpenseByUserId(
+						user.userId,
+						input.id,
+					);
+				} catch (error) {
+					if (error instanceof Error) {
+						throw new ORPCError("NOT_FOUND", { message: error.message });
+					}
+					throw error;
+				}
+			},
+		);
+	}
 }

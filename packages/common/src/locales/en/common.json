@@ -31,12 +31,14 @@
 	"toast": {
 		"success": {
 			"account_created": "Account created successfully",
-			"expense_created": "Expense created successfully"
+			"expense_created": "Expense created successfully",
+			"expense_deleted": "Expense deleted successfully"
 		},
 		"error": {
 			"signed_in": "Failed to sign in",
 			"account_created": "Failed to create account",
-			"expense_created": "Failed to create expense"
+			"expense_created": "Failed to create expense",
+			"expense_deleted": "Failed to delete expense"
 		}
 	}
 }

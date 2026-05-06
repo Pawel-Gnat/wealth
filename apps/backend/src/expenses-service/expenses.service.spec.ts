@@ -219,4 +219,110 @@ describe("Expenses service", () => {
 			expect(afterDocs).toHaveLength(0);
 		});
 	});
+
+	describe("delete expense by user id", () => {
+		it("deletes only user's own expense and returns success response", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+			const owner = await createTestUser(usersService, {
+				email: `delete-owner-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+			const otherUser = await createTestUser(usersService, {
+				email: `delete-other-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+
+			const [ownerExpense] = await db
+				.insert(expenseDocumentsTable)
+				.values({
+					userId: owner.id,
+					totalAmount: "20.00",
+					expenseDate: new Date("2026-05-04T09:00:00.000Z"),
+				})
+				.returning({ id: expenseDocumentsTable.id });
+
+			const [otherExpense] = await db
+				.insert(expenseDocumentsTable)
+				.values({
+					userId: otherUser.id,
+					totalAmount: "30.00",
+					expenseDate: new Date("2026-05-05T10:00:00.000Z"),
+				})
+				.returning({ id: expenseDocumentsTable.id });
+
+			if (!ownerExpense || !otherExpense) {
+				throw new Error("Expected seeded expenses");
+			}
+
+			await db.insert(expenseLineItemsTable).values({
+				expenseDocumentId: ownerExpense.id,
+				title: "Line item to delete",
+				quantity: 1,
+				singleAmount: "20.00",
+			});
+
+			await expect(
+				expensesService.deleteExpenseByUserId(owner.id, ownerExpense.id),
+			).resolves.toEqual({
+				data: { message: "expense_deleted" },
+			});
+
+			const ownerExpenseAfterDelete = await db
+				.select()
+				.from(expenseDocumentsTable)
+				.where(eq(expenseDocumentsTable.id, ownerExpense.id));
+			expect(ownerExpenseAfterDelete).toHaveLength(0);
+
+			const ownerLineItemsAfterDelete = await db
+				.select()
+				.from(expenseLineItemsTable)
+				.where(eq(expenseLineItemsTable.expenseDocumentId, ownerExpense.id));
+			expect(ownerLineItemsAfterDelete).toHaveLength(0);
+
+			const otherExpenseAfterDelete = await db
+				.select()
+				.from(expenseDocumentsTable)
+				.where(eq(expenseDocumentsTable.id, otherExpense.id));
+			expect(otherExpenseAfterDelete).toHaveLength(1);
+		});
+
+		it("throws when expense does not belong to the user", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+			const owner = await createTestUser(usersService, {
+				email: `delete-owner-scope-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+			const otherUser = await createTestUser(usersService, {
+				email: `delete-other-scope-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+
+			const [otherExpense] = await db
+				.insert(expenseDocumentsTable)
+				.values({
+					userId: otherUser.id,
+					totalAmount: "44.00",
+					expenseDate: new Date("2026-05-06T08:00:00.000Z"),
+				})
+				.returning({ id: expenseDocumentsTable.id });
+
+			if (!otherExpense) {
+				throw new Error("Expected seeded expense");
+			}
+
+			await expect(
+				expensesService.deleteExpenseByUserId(owner.id, otherExpense.id),
+			).rejects.toThrow("Expense not found");
+
+			const expenseStillExists = await db
+				.select()
+				.from(expenseDocumentsTable)
+				.where(eq(expenseDocumentsTable.id, otherExpense.id));
+			expect(expenseStillExists).toHaveLength(1);
+		});
+	});
 });

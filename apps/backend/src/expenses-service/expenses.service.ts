@@ -2,9 +2,10 @@ import { Inject, Injectable } from "@nestjs/common";
 import type {
 	DocumentCreatePayload,
 	DocumentCreateResponse,
+	DocumentDeleteResponse,
 	ExpenseDocumentListResponse,
 } from "@repo/api/schemas";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants.js";
 import {
@@ -70,6 +71,31 @@ export class ExpensesService {
 		return {
 			data: {
 				message: "expense_created",
+			},
+		};
+	}
+
+	async deleteExpenseByUserId(
+		userId: string,
+		expenseId: string,
+	): Promise<DocumentDeleteResponse> {
+		const [deletedExpense] = await this.db
+			.delete(expenseDocumentsTable)
+			.where(
+				and(
+					eq(expenseDocumentsTable.id, expenseId),
+					eq(expenseDocumentsTable.userId, userId),
+				),
+			)
+			.returning({ id: expenseDocumentsTable.id });
+
+		if (!deletedExpense) {
+			throw new Error("Expense not found");
+		}
+
+		return {
+			data: {
+				message: "expense_deleted",
 			},
 		};
 	}

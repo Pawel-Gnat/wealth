@@ -47,3 +47,22 @@ export const documentCreateResponseSchema = apiPayload(
 export type DocumentCreateResponse = z.infer<
 	typeof documentCreateResponseSchema
 >;
+
+export const documentDeletePayloadSchema = z.object({
+	id: z.string(),
+});
+export type DocumentDeletePayload = z.infer<typeof documentDeletePayloadSchema>;
+
+export const documentDeleteResponseDataSchema = z.object({
+	message: z.literal("expense_deleted"),
+});
+export type DocumentDeleteResponseData = z.infer<
+	typeof documentDeleteResponseDataSchema
+>;
+
+export const documentDeleteResponseSchema = apiPayload(
+	documentDeleteResponseDataSchema,
+);
+export type DocumentDeleteResponse = z.infer<
+	typeof documentDeleteResponseSchema
+>;
