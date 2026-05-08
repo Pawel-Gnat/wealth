@@ -48,6 +48,25 @@ export type DocumentCreateResponse = z.infer<
 	typeof documentCreateResponseSchema
 >;
 
+export const documentUpdatePayloadSchema = documentCreatePayloadSchema.extend({
+	id: z.string(),
+});
+export type DocumentUpdatePayload = z.infer<typeof documentUpdatePayloadSchema>;
+
+export const documentUpdateResponseDataSchema = z.object({
+	message: z.literal("expense_updated"),
+});
+export type DocumentUpdateResponseData = z.infer<
+	typeof documentUpdateResponseDataSchema
+>;
+
+export const documentUpdateResponseSchema = apiPayload(
+	documentUpdateResponseDataSchema,
+);
+export type DocumentUpdateResponse = z.infer<
+	typeof documentUpdateResponseSchema
+>;
+
 export const documentDeletePayloadSchema = z.object({
 	id: z.string(),
 });

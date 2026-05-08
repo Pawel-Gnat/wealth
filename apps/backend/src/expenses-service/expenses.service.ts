@@ -3,6 +3,7 @@ import type {
 	DocumentCreatePayload,
 	DocumentCreateResponse,
 	DocumentDeleteResponse,
+	DocumentUpdateResponse,
 	ExpenseDocumentListResponse,
 } from "@repo/api/schemas";
 import { and, desc, eq } from "drizzle-orm";
@@ -16,6 +17,25 @@ import {
 @Injectable()
 export class ExpensesService {
 	constructor(@Inject(DBS.APP) private readonly db: NodePgDatabase) {}
+
+	private calculateTotalAmount(payload: DocumentCreatePayload): number {
+		return payload.lineItems.reduce(
+			(sum, item) => sum + item.quantity * item.singleAmount,
+			0,
+		);
+	}
+
+	private toLineItemValues(
+		expenseDocumentId: string,
+		payload: DocumentCreatePayload,
+	) {
+		return payload.lineItems.map((lineItem) => ({
+			expenseDocumentId,
+			title: lineItem.title,
+			quantity: lineItem.quantity,
+			singleAmount: lineItem.singleAmount.toFixed(2),
+		}));
+	}
 
 	async listExpenseDocumentsByUserId(
 		userId: string,
@@ -40,10 +60,7 @@ export class ExpensesService {
 		userId: string,
 		payload: DocumentCreatePayload,
 	): Promise<DocumentCreateResponse> {
-		const totalAmount = payload.lineItems.reduce(
-			(sum, item) => sum + item.quantity * item.singleAmount,
-			0,
-		);
+		const totalAmount = this.calculateTotalAmount(payload);
 		await this.db.transaction(async (tx) => {
 			const [createdExpense] = await tx
 				.insert(expenseDocumentsTable)
@@ -58,19 +75,72 @@ export class ExpensesService {
 				throw new Error("Expense insert failed");
 			}
 
-			await tx.insert(expenseLineItemsTable).values(
-				payload.lineItems.map((lineItem) => ({
-					expenseDocumentId: createdExpense.id,
-					title: lineItem.title,
-					quantity: lineItem.quantity,
-					singleAmount: lineItem.singleAmount.toFixed(2),
-				})),
-			);
+			await tx
+				.insert(expenseLineItemsTable)
+				.values(this.toLineItemValues(createdExpense.id, payload));
 		});
 
 		return {
 			data: {
 				message: "expense_created",
+			},
+		};
+	}
+
+	async updateExpenseByUserId(
+		userId: string,
+		expenseId: string,
+		payload: DocumentCreatePayload,
+	): Promise<DocumentUpdateResponse> {
+		const newTotalAmount = this.calculateTotalAmount(payload);
+		const newTotalAmountStr = newTotalAmount.toFixed(2);
+
+		await this.db.transaction(async (tx) => {
+			const [existing] = await tx
+				.select({
+					id: expenseDocumentsTable.id,
+					expenseDate: expenseDocumentsTable.expenseDate,
+					totalAmount: expenseDocumentsTable.totalAmount,
+				})
+				.from(expenseDocumentsTable)
+				.where(
+					and(
+						eq(expenseDocumentsTable.id, expenseId),
+						eq(expenseDocumentsTable.userId, userId),
+					),
+				);
+
+			if (!existing) {
+				throw new Error("Expense not found");
+			}
+
+			const dateChanged =
+				existing.expenseDate?.getTime() !== payload.date.getTime();
+			const totalChanged = existing.totalAmount !== newTotalAmountStr;
+
+			if (dateChanged || totalChanged) {
+				await tx
+					.update(expenseDocumentsTable)
+					.set({
+						expenseDate: payload.date,
+						totalAmount: newTotalAmountStr,
+						updatedAt: new Date(),
+					})
+					.where(eq(expenseDocumentsTable.id, expenseId));
+			}
+
+			await tx
+				.delete(expenseLineItemsTable)
+				.where(eq(expenseLineItemsTable.expenseDocumentId, expenseId));
+
+			await tx
+				.insert(expenseLineItemsTable)
+				.values(this.toLineItemValues(expenseId, payload));
+		});
+
+		return {
+			data: {
+				message: "expense_updated",
 			},
 		};
 	}

@@ -37,6 +37,33 @@ export class ExpensesController {
 	}
 
 	@UseGuards(PassportJwtGuard)
+	@Implement(rpcContract.expenses.update)
+	updateExpenseRpc() {
+		return implement(rpcContract.expenses.update).handler(
+			async ({ context, input }) => {
+				const user = context.request.user;
+				if (!user?.userId) {
+					throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
+				}
+
+				try {
+					const { id, ...payload } = input;
+					return await this.expensesService.updateExpenseByUserId(
+						user.userId,
+						id,
+						payload,
+					);
+				} catch (error) {
+					if (error instanceof Error) {
+						throw new ORPCError("NOT_FOUND", { message: error.message });
+					}
+					throw error;
+				}
+			},
+		);
+	}
+
+	@UseGuards(PassportJwtGuard)
 	@Implement(rpcContract.expenses.delete)
 	deleteExpenseRpc() {
 		return implement(rpcContract.expenses.delete).handler(

@@ -3,6 +3,7 @@ import {
 	createExpenseContract,
 	deleteExpenseContract,
 	listExpensesContract,
+	updateExpenseContract,
 } from "./expenses.contract";
 import { meContract } from "./me.contract";
 import { signInContract } from "./signin.contract";
@@ -17,6 +18,7 @@ export const rpcContract = populateContractRouterPaths({
 	expenses: {
 		create: createExpenseContract,
 		list: listExpensesContract,
+		update: updateExpenseContract,
 		delete: deleteExpenseContract,
 	},
 });
