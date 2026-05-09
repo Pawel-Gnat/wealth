@@ -37,6 +37,31 @@ export class ExpensesController {
 	}
 
 	@UseGuards(PassportJwtGuard)
+	@Implement(rpcContract.expenses.get)
+	getExpenseRpc() {
+		return implement(rpcContract.expenses.get).handler(
+			async ({ context, input }) => {
+				const user = context.request.user;
+				if (!user?.userId) {
+					throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
+				}
+
+				try {
+					return await this.expensesService.getExpenseByUserId(
+						user.userId,
+						input.id,
+					);
+				} catch (error) {
+					if (error instanceof Error) {
+						throw new ORPCError("NOT_FOUND", { message: error.message });
+					}
+					throw error;
+				}
+			},
+		);
+	}
+
+	@UseGuards(PassportJwtGuard)
 	@Implement(rpcContract.expenses.update)
 	updateExpenseRpc() {
 		return implement(rpcContract.expenses.update).handler(
@@ -44,6 +69,11 @@ export class ExpensesController {
 				const user = context.request.user;
 				if (!user?.userId) {
 					throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
+				}
+				if (!input.id) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "Expense id is required",
+					});
 				}
 
 				try {

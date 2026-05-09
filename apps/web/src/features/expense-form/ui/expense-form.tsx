@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-	type DocumentCreatePayload,
-	documentCreatePayloadSchema,
+	type DocumentUpsertPayload,
+	documentUpsertPayloadSchema,
 } from "@repo/api/schemas";
+import { useEffect } from "react";
 import {
 	type Resolver,
 	useFieldArray,
@@ -22,32 +23,61 @@ import {
 } from "@/shared/components";
 import { formatPrice } from "@/shared/helpers/price";
 import { Button } from "@/shared/lib/ui/button";
-import { useInsertExpense } from "../hooks/use-insert-expense";
+import { useUpsertExpense } from "../hooks/use-upsert-expense";
 import { ExpenseLineItem } from "./expense-line-item";
 
-const DEFAULT_VALUES: DocumentCreatePayload = {
+type ExpenseFormValues = Omit<DocumentUpsertPayload, "id">;
+
+const DEFAULT_VALUES: ExpenseFormValues = {
 	date: new Date(),
 	lineItems: [{ title: "", singleAmount: 1, quantity: 1 }],
 };
 
-export const ExpenseForm = () => {
+type ExpenseFormProps = {
+	expenseId?: string;
+	initialValues?: ExpenseFormValues;
+};
+
+export const ExpenseForm = ({ expenseId, initialValues }: ExpenseFormProps) => {
 	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
+	const isEditMode = Boolean(expenseId);
+	const defaultValues = initialValues ?? DEFAULT_VALUES;
 
-	const form = useForm<DocumentCreatePayload>({
+	const form = useForm<ExpenseFormValues>({
 		resolver: zodResolver(
-			documentCreatePayloadSchema,
-		) as Resolver<DocumentCreatePayload>,
-		defaultValues: DEFAULT_VALUES,
+			documentUpsertPayloadSchema.omit({ id: true }),
+		) as Resolver<ExpenseFormValues>,
+		defaultValues,
 	});
-	const { insertExpense, isLoading } = useInsertExpense({
+
+	useEffect(() => {
+		if (initialValues) {
+			form.reset(initialValues);
+		}
+	}, [form, initialValues]);
+
+	const { upsertExpense, isLoading } = useUpsertExpense({
 		onSuccess: () => {
-			toast.success(t("toast.success.expense_created", { ns: "common" }));
-			form.reset(DEFAULT_VALUES);
+			toast.success(
+				t(
+					isEditMode
+						? "toast.success.expense_updated"
+						: "toast.success.expense_created",
+					{ ns: "common" },
+				),
+			);
 			navigate(APP_ROUTES.expenses.list);
 		},
 		onError: () => {
-			toast.error(t("toast.error.expense_created", { ns: "common" }));
+			toast.error(
+				t(
+					isEditMode
+						? "toast.error.expense_updated"
+						: "toast.error.expense_created",
+					{ ns: "common" },
+				),
+			);
 		},
 	});
 
@@ -63,14 +93,16 @@ export const ExpenseForm = () => {
 		return sum + item.singleAmount * item.quantity;
 	}, 0);
 
-	function onSubmit(data: DocumentCreatePayload) {
-		insertExpense(data);
+	function onSubmit(data: ExpenseFormValues) {
+		upsertExpense(expenseId ? { ...data, id: expenseId } : data);
 	}
 
 	return (
 		<Form
 			onSubmit={form.handleSubmit(onSubmit)}
-			submitText={t("action.create", { ns: "common" })}
+			submitText={t(isEditMode ? "action.save" : "action.create", {
+				ns: "common",
+			})}
 			submitDisabled={isLoading}
 			isLoading={isLoading}
 		>

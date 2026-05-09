@@ -1,21 +1,19 @@
 import { z } from "zod";
 import { apiPaginatedPayload, apiPayload } from "./common.schema";
 
-export const expenseDocumentListItemSchema = z.object({
+export const EXPENSE_UPDATED_MESSAGE = "expense_updated";
+
+export const documentListItemSchema = z.object({
 	id: z.string(),
 	date: z.date(),
 	totalAmount: z.number(),
 });
-export type ExpenseDocumentListItem = z.infer<
-	typeof expenseDocumentListItemSchema
->;
+export type DocumentListItem = z.infer<typeof documentListItemSchema>;
 
-export const expenseDocumentListResponseSchema = apiPaginatedPayload(
-	expenseDocumentListItemSchema,
+export const documentListResponseSchema = apiPaginatedPayload(
+	documentListItemSchema,
 );
-export type ExpenseDocumentListResponse = z.infer<
-	typeof expenseDocumentListResponseSchema
->;
+export type DocumentListResponse = z.infer<typeof documentListResponseSchema>;
 
 export const lineItemSchema = z.object({
 	title: z.string().trim().min(1, "form:expense-line-item.required"),
@@ -28,11 +26,25 @@ export const lineItemSchema = z.object({
 });
 export type LineItem = z.infer<typeof lineItemSchema>;
 
-export const documentCreatePayloadSchema = z.object({
+export const documentSchema = z.object({
+	id: z.string(),
+	date: z.date(),
+	totalAmount: z.number(),
+	lineItems: z.array(lineItemSchema),
+});
+export type DocumentDetails = z.infer<typeof documentSchema>;
+
+export const documentDetailsResponseSchema = apiPayload(documentSchema);
+export type DocumentDetailsResponse = z.infer<
+	typeof documentDetailsResponseSchema
+>;
+
+export const documentUpsertPayloadSchema = z.object({
+	id: z.string().optional(),
 	date: z.coerce.date(),
 	lineItems: z.array(lineItemSchema),
 });
-export type DocumentCreatePayload = z.infer<typeof documentCreatePayloadSchema>;
+export type DocumentUpsertPayload = z.infer<typeof documentUpsertPayloadSchema>;
 
 export const documentCreateResponseDataSchema = z.object({
 	message: z.literal("expense_created"),
@@ -48,13 +60,8 @@ export type DocumentCreateResponse = z.infer<
 	typeof documentCreateResponseSchema
 >;
 
-export const documentUpdatePayloadSchema = documentCreatePayloadSchema.extend({
-	id: z.string(),
-});
-export type DocumentUpdatePayload = z.infer<typeof documentUpdatePayloadSchema>;
-
 export const documentUpdateResponseDataSchema = z.object({
-	message: z.literal("expense_updated"),
+	message: z.literal(EXPENSE_UPDATED_MESSAGE),
 });
 export type DocumentUpdateResponseData = z.infer<
 	typeof documentUpdateResponseDataSchema
@@ -66,6 +73,11 @@ export const documentUpdateResponseSchema = apiPayload(
 export type DocumentUpdateResponse = z.infer<
 	typeof documentUpdateResponseSchema
 >;
+
+export const documentGetPayloadSchema = z.object({
+	id: z.string(),
+});
+export type DocumentGetPayload = z.infer<typeof documentGetPayloadSchema>;
 
 export const documentDeletePayloadSchema = z.object({
 	id: z.string(),

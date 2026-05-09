@@ -1,10 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type {
-	DocumentCreatePayload,
 	DocumentCreateResponse,
 	DocumentDeleteResponse,
+	DocumentDetailsResponse,
+	DocumentListResponse,
 	DocumentUpdateResponse,
-	ExpenseDocumentListResponse,
+	DocumentUpsertPayload,
 } from "@repo/api/schemas";
 import { and, desc, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
@@ -18,7 +19,7 @@ import {
 export class ExpensesService {
 	constructor(@Inject(DBS.APP) private readonly db: NodePgDatabase) {}
 
-	private calculateTotalAmount(payload: DocumentCreatePayload): number {
+	private calculateTotalAmount(payload: DocumentUpsertPayload): number {
 		return payload.lineItems.reduce(
 			(sum, item) => sum + item.quantity * item.singleAmount,
 			0,
@@ -27,7 +28,7 @@ export class ExpensesService {
 
 	private toLineItemValues(
 		expenseDocumentId: string,
-		payload: DocumentCreatePayload,
+		payload: DocumentUpsertPayload,
 	) {
 		return payload.lineItems.map((lineItem) => ({
 			expenseDocumentId,
@@ -39,7 +40,7 @@ export class ExpensesService {
 
 	async listExpenseDocumentsByUserId(
 		userId: string,
-	): Promise<ExpenseDocumentListResponse> {
+	): Promise<DocumentListResponse> {
 		const rows = await this.db
 			.select()
 			.from(expenseDocumentsTable)
@@ -56,9 +57,54 @@ export class ExpensesService {
 		};
 	}
 
+	async getExpenseByUserId(
+		userId: string,
+		expenseId: string,
+	): Promise<DocumentDetailsResponse> {
+		const [document] = await this.db
+			.select({
+				id: expenseDocumentsTable.id,
+				date: expenseDocumentsTable.expenseDate,
+				totalAmount: expenseDocumentsTable.totalAmount,
+			})
+			.from(expenseDocumentsTable)
+			.where(
+				and(
+					eq(expenseDocumentsTable.id, expenseId),
+					eq(expenseDocumentsTable.userId, userId),
+				),
+			);
+
+		if (!document) {
+			throw new Error("Expense not found");
+		}
+
+		const lineItems = await this.db
+			.select({
+				title: expenseLineItemsTable.title,
+				quantity: expenseLineItemsTable.quantity,
+				singleAmount: expenseLineItemsTable.singleAmount,
+			})
+			.from(expenseLineItemsTable)
+			.where(eq(expenseLineItemsTable.expenseDocumentId, expenseId));
+
+		return {
+			data: {
+				id: document.id,
+				date: document.date,
+				totalAmount: Number(document.totalAmount),
+				lineItems: lineItems.map((lineItem) => ({
+					title: lineItem.title,
+					quantity: lineItem.quantity,
+					singleAmount: Number(lineItem.singleAmount),
+				})),
+			},
+		};
+	}
+
 	async createExpenseByUserId(
 		userId: string,
-		payload: DocumentCreatePayload,
+		payload: DocumentUpsertPayload,
 	): Promise<DocumentCreateResponse> {
 		const totalAmount = this.calculateTotalAmount(payload);
 		await this.db.transaction(async (tx) => {
@@ -90,7 +136,7 @@ export class ExpensesService {
 	async updateExpenseByUserId(
 		userId: string,
 		expenseId: string,
-		payload: DocumentCreatePayload,
+		payload: DocumentUpsertPayload,
 	): Promise<DocumentUpdateResponse> {
 		const newTotalAmount = this.calculateTotalAmount(payload);
 		const newTotalAmountStr = newTotalAmount.toFixed(2);

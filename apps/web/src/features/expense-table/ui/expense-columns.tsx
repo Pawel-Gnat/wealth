@@ -1,4 +1,4 @@
-import type { ExpenseDocumentListItem } from "@repo/api/schemas";
+import type { DocumentListItem } from "@repo/api/schemas";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TFunction } from "i18next";
 import { Link } from "react-router";
@@ -25,7 +25,7 @@ export const ExpenseColumns = ({
 	onDeleteExpense,
 	deletingExpenseId,
 	isDeleting,
-}: ExpenseColumnsProps): ColumnDef<ExpenseDocumentListItem>[] => [
+}: ExpenseColumnsProps): ColumnDef<DocumentListItem>[] => [
 	{
 		accessorKey: "date",
 		header: () => (

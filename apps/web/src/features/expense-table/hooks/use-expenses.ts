@@ -1,4 +1,4 @@
-import type { ExpenseDocumentListResponse } from "@repo/api/schemas";
+import type { DocumentListResponse } from "@repo/api/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
@@ -8,7 +8,7 @@ import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 export const useExpenses = () => {
 	const query = useQuery({
 		queryKey: queryKeys.expenses.all(),
-		queryFn: async (): Promise<ExpenseDocumentListResponse> => {
+		queryFn: async (): Promise<DocumentListResponse> => {
 			return controlledAsync(() => orpcClient.expenses.list({}));
 		},
 		select: (response) => response.data,

@@ -179,5 +179,32 @@ describe("ExpenseForm", () => {
 
 			expect(navigateMock).not.toHaveBeenCalled();
 		});
+
+		it("updates expense when expenseId is provided", async () => {
+			const user = userEvent.setup();
+			const expenseId = "01JTZKQX2GT6PHGQER0M8FS6K8";
+			renderWithProviders(
+				<ExpenseForm
+					expenseId={expenseId}
+					initialValues={{
+						date: new Date("2024-03-01T12:00:00.000Z"),
+						lineItems: [{ title: "Taxi", quantity: 1, singleAmount: 123.45 }],
+					}}
+				/>,
+			);
+
+			const saveButton = screen.getByRole("button", {
+				name: t("action.save", { ns: "common" }),
+			});
+			await user.click(saveButton);
+
+			await waitFor(() => {
+				expect(toast.success).toHaveBeenCalledWith(
+					t("toast.success.expense_updated", { ns: "common" }),
+				);
+			});
+
+			expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.expenses.list);
+		});
 	});
 });

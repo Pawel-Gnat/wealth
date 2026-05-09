@@ -1,26 +1,32 @@
 import { oc } from "@orpc/contract";
 import {
-	documentCreatePayloadSchema,
 	documentCreateResponseSchema,
 	documentDeletePayloadSchema,
 	documentDeleteResponseSchema,
-	documentUpdatePayloadSchema,
+	documentDetailsResponseSchema,
+	documentGetPayloadSchema,
+	documentListResponseSchema,
 	documentUpdateResponseSchema,
-	expenseDocumentListResponseSchema,
+	documentUpsertPayloadSchema,
 } from "../schemas/document.schema";
 
 export const listExpensesContract = oc
 	.route({ method: "GET", path: "/expenses" })
-	.output(expenseDocumentListResponseSchema);
+	.output(documentListResponseSchema);
 
 export const createExpenseContract = oc
 	.route({ method: "POST", path: "/expenses" })
-	.input(documentCreatePayloadSchema)
+	.input(documentUpsertPayloadSchema)
 	.output(documentCreateResponseSchema);
+
+export const getExpenseContract = oc
+	.route({ method: "GET", path: "/expenses/{id}" })
+	.input(documentGetPayloadSchema)
+	.output(documentDetailsResponseSchema);
 
 export const updateExpenseContract = oc
 	.route({ method: "PUT", path: "/expenses/{id}" })
-	.input(documentUpdatePayloadSchema)
+	.input(documentUpsertPayloadSchema)
 	.output(documentUpdateResponseSchema);
 
 export const deleteExpenseContract = oc

@@ -1,14 +1,56 @@
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router";
 import { ExpenseForm } from "@/features/expense-form";
-import { Card, Heading } from "@/shared/components";
+import { useExpense } from "@/features/expense-form/hooks/use-expense";
+import { Card, ErrorState, Heading } from "@/shared/components";
+import { Skeleton } from "@/shared/lib/ui/skeleton";
 
 export const ExpenseFormPage = () => {
 	const { t } = useTranslation();
+	const { id } = useParams();
+	const isEditMode = Boolean(id);
+	const { data, isLoading, isError } = useExpense(id ? { expenseId: id } : {});
+
+	if (isEditMode && isLoading) {
+		return (
+			<>
+				<Heading>{t("list.title", { ns: "expenses" })}</Heading>
+				<Card
+					content={
+						<div className="space-y-4">
+							<Skeleton className="h-10 w-full" />
+							<Skeleton className="h-16 w-full" />
+							<Skeleton className="h-16 w-full" />
+							<Skeleton className="h-10 w-28 ml-auto" />
+						</div>
+					}
+				/>
+			</>
+		);
+	}
+
+	if (isEditMode && (isError || !data)) {
+		return (
+			<>
+				<Heading>{t("list.title", { ns: "expenses" })}</Heading>
+				<Card
+					content={<ErrorState text={t("list.error", { ns: "expenses" })} />}
+				/>
+			</>
+		);
+	}
 
 	return (
 		<>
 			<Heading>{t("list.title", { ns: "expenses" })}</Heading>
-			<Card content={<ExpenseForm />} />
+			<Card
+				content={
+					<ExpenseForm
+						{...(id ? { expenseId: id } : {})}
+						{...(data ? { initialValues: data } : {})}
+					/>
+				}
+			/>
 		</>
 	);
 };
