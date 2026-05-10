@@ -1,6 +1,7 @@
 {
 	"single": {
-		"title": "Create a new expense",
+		"title-create": "Create a new expense",
+		"title-edit": "Edit expense",
 		"expenses": "Expenses"
 	},
 	"list": {

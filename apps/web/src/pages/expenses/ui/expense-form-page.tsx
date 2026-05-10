@@ -14,17 +14,8 @@ export const ExpenseFormPage = () => {
 	if (isEditMode && isLoading) {
 		return (
 			<>
-				<Heading>{t("list.title", { ns: "expenses" })}</Heading>
-				<Card
-					content={
-						<div className="space-y-4">
-							<Skeleton className="h-10 w-full" />
-							<Skeleton className="h-16 w-full" />
-							<Skeleton className="h-16 w-full" />
-							<Skeleton className="h-10 w-28 ml-auto" />
-						</div>
-					}
-				/>
+				<Heading>{t("single.title-edit", { ns: "expenses" })}</Heading>
+				<Card content={<ExpenseFormSkeleton />} />
 			</>
 		);
 	}
@@ -32,7 +23,7 @@ export const ExpenseFormPage = () => {
 	if (isEditMode && (isError || !data)) {
 		return (
 			<>
-				<Heading>{t("list.title", { ns: "expenses" })}</Heading>
+				<Heading>{t("single.title-edit", { ns: "expenses" })}</Heading>
 				<Card
 					content={<ErrorState text={t("list.error", { ns: "expenses" })} />}
 				/>
@@ -42,7 +33,7 @@ export const ExpenseFormPage = () => {
 
 	return (
 		<>
-			<Heading>{t("list.title", { ns: "expenses" })}</Heading>
+			<Heading>{t("single.title-create", { ns: "expenses" })}</Heading>
 			<Card
 				content={
 					<ExpenseForm
@@ -52,5 +43,18 @@ export const ExpenseFormPage = () => {
 				}
 			/>
 		</>
+	);
+};
+
+const ExpenseFormSkeleton = () => {
+	return (
+		<div className="space-y-4">
+			<Skeleton className="h-4 w-10" />
+			<Skeleton className="h-9 w-full" />
+			<Skeleton className="h-7 w-16" />
+			<Skeleton className="h-0.5 w-full" />
+			<Skeleton className="h-4 w-14" />
+			<Skeleton className="h-40 w-full" />
+		</div>
 	);
 };

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-	type DocumentUpsertPayload,
-	documentUpsertPayloadSchema,
+	type DocumentCreatePayload,
+	documentCreatePayloadSchema,
 } from "@repo/api/schemas";
 import { useEffect } from "react";
 import {
@@ -26,7 +26,7 @@ import { Button } from "@/shared/lib/ui/button";
 import { useUpsertExpense } from "../hooks/use-upsert-expense";
 import { ExpenseLineItem } from "./expense-line-item";
 
-type ExpenseFormValues = Omit<DocumentUpsertPayload, "id">;
+type ExpenseFormValues = DocumentCreatePayload;
 
 const DEFAULT_VALUES: ExpenseFormValues = {
 	date: new Date(),
@@ -46,7 +46,7 @@ export const ExpenseForm = ({ expenseId, initialValues }: ExpenseFormProps) => {
 
 	const form = useForm<ExpenseFormValues>({
 		resolver: zodResolver(
-			documentUpsertPayloadSchema.omit({ id: true }),
+			documentCreatePayloadSchema,
 		) as Resolver<ExpenseFormValues>,
 		defaultValues,
 	});

@@ -1,7 +1,8 @@
 import type {
+	DocumentCreatePayload,
 	DocumentCreateResponse,
+	DocumentUpdatePayload,
 	DocumentUpdateResponse,
-	DocumentUpsertPayload,
 } from "@repo/api/schemas";
 import { EXPENSE_UPDATED_MESSAGE } from "@repo/api/schemas";
 import * as Sentry from "@sentry/react";
@@ -22,10 +23,10 @@ export const useUpsertExpense = ({
 	const mutation = useMutation<
 		DocumentCreateResponse | DocumentUpdateResponse,
 		Error,
-		DocumentUpsertPayload
+		DocumentCreatePayload | DocumentUpdatePayload
 	>({
 		mutationFn: (payload) => {
-			if (payload.id) {
+			if ("id" in payload) {
 				const { id, ...updatePayload } = payload;
 				return controlledAsync(() =>
 					orpcClient.expenses.update({ id, ...updatePayload }),

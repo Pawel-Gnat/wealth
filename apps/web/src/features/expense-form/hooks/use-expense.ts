@@ -1,4 +1,4 @@
-import type { DocumentUpsertPayload } from "@repo/api/schemas";
+import type { DocumentCreatePayload } from "@repo/api/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
@@ -20,7 +20,7 @@ export const useExpense = ({ expenseId }: UseExpenseProps) => {
 				}),
 			);
 		},
-		select: (response): Omit<DocumentUpsertPayload, "id"> => ({
+		select: (response): DocumentCreatePayload => ({
 			date: new Date(response.data.date),
 			lineItems: response.data.lineItems,
 		}),

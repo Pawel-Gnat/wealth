@@ -70,18 +70,18 @@ export class ExpensesController {
 				if (!user?.userId) {
 					throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
 				}
-				if (!input.id) {
-					throw new ORPCError("BAD_REQUEST", {
-						message: "Expense id is required",
-					});
-				}
-
 				try {
-					const { id, ...payload } = input;
+					const expenseId = input.id;
+					if (expenseId === undefined) {
+						throw new ORPCError("BAD_REQUEST", {
+							message: "Expense id is required",
+						});
+					}
+
 					return await this.expensesService.updateExpenseByUserId(
 						user.userId,
-						id,
-						payload,
+						expenseId,
+						{ date: input.date, lineItems: input.lineItems },
 					);
 				} catch (error) {
 					if (error instanceof Error) {

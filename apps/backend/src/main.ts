@@ -1,7 +1,7 @@
 import "./instrument.js";
 import { NestFactory } from "@nestjs/core";
 import { OpenAPIGenerator } from "@orpc/openapi";
-import { ZodToJsonSchemaConverter } from "@orpc/zod";
+import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { rpcContract } from "@repo/api/contracts";
 import swaggerUi from "swagger-ui-express";
 import { AppModule } from "./app.module.js";

@@ -1,11 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type {
+	DocumentCreatePayload,
 	DocumentCreateResponse,
 	DocumentDeleteResponse,
 	DocumentDetailsResponse,
 	DocumentListResponse,
 	DocumentUpdateResponse,
-	DocumentUpsertPayload,
 } from "@repo/api/schemas";
 import { and, desc, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
@@ -19,7 +19,7 @@ import {
 export class ExpensesService {
 	constructor(@Inject(DBS.APP) private readonly db: NodePgDatabase) {}
 
-	private calculateTotalAmount(payload: DocumentUpsertPayload): number {
+	private calculateTotalAmount(payload: DocumentCreatePayload): number {
 		return payload.lineItems.reduce(
 			(sum, item) => sum + item.quantity * item.singleAmount,
 			0,
@@ -28,7 +28,7 @@ export class ExpensesService {
 
 	private toLineItemValues(
 		expenseDocumentId: string,
-		payload: DocumentUpsertPayload,
+		payload: DocumentCreatePayload,
 	) {
 		return payload.lineItems.map((lineItem) => ({
 			expenseDocumentId,
@@ -104,7 +104,7 @@ export class ExpensesService {
 
 	async createExpenseByUserId(
 		userId: string,
-		payload: DocumentUpsertPayload,
+		payload: DocumentCreatePayload,
 	): Promise<DocumentCreateResponse> {
 		const totalAmount = this.calculateTotalAmount(payload);
 		await this.db.transaction(async (tx) => {
@@ -136,7 +136,7 @@ export class ExpensesService {
 	async updateExpenseByUserId(
 		userId: string,
 		expenseId: string,
-		payload: DocumentUpsertPayload,
+		payload: DocumentCreatePayload,
 	): Promise<DocumentUpdateResponse> {
 		const newTotalAmount = this.calculateTotalAmount(payload);
 		const newTotalAmountStr = newTotalAmount.toFixed(2);

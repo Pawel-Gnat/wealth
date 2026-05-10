@@ -1,4 +1,4 @@
-import type { DocumentUpsertPayload } from "@repo/api/schemas";
+import type { DocumentCreatePayload } from "@repo/api/schemas";
 
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ import { formatPrice } from "@/shared/helpers/price";
 
 type ExpenseLineItemProps = {
 	index: number;
-	form: UseFormReturn<Omit<DocumentUpsertPayload, "id">>;
+	form: UseFormReturn<DocumentCreatePayload>;
 	remove: (index: number) => void;
 	lineTotal: number;
 };

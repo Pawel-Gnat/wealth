@@ -39,12 +39,16 @@ export type DocumentDetailsResponse = z.infer<
 	typeof documentDetailsResponseSchema
 >;
 
-export const documentUpsertPayloadSchema = z.object({
-	id: z.string().optional(),
+export const documentCreatePayloadSchema = z.object({
 	date: z.coerce.date(),
 	lineItems: z.array(lineItemSchema),
 });
-export type DocumentUpsertPayload = z.infer<typeof documentUpsertPayloadSchema>;
+export type DocumentCreatePayload = z.infer<typeof documentCreatePayloadSchema>;
+
+export const documentUpdatePayloadSchema = documentCreatePayloadSchema.extend({
+	id: z.string(),
+});
+export type DocumentUpdatePayload = z.infer<typeof documentUpdatePayloadSchema>;
 
 export const documentCreateResponseDataSchema = z.object({
 	message: z.literal("expense_created"),
