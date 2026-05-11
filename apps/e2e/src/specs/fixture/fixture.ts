@@ -1,34 +1,43 @@
-import { expect, test as base } from "@playwright/test";
-
-export const E2E_EMAIL = "test@example.com";
-export const E2E_PASSWORD = "Password123!";
+import { expect, test as base } from '@playwright/test'
+import { USER_EMAIL, USER_PASSWORD } from '../helpers/consts'
+import { ensureI18nInit, getI18nText } from '../helpers/i18n'
 
 type Fixtures = {
-	loginAsTestUser: () => Promise<void>;
-};
+	loginAsTestUser: () => Promise<void>
+}
 
 export const test = base.extend<Fixtures>({
 	loginAsTestUser: async ({ page }, run) => {
 		const loginAsTestUser = async () => {
-			await page.goto("/auth");
+			await ensureI18nInit()
 
-			await page.getByRole("tab", { name: "Sign up" }).click();
-			await page.getByLabel("Email").fill(E2E_EMAIL);
-			await page.getByLabel("Password", { exact: true }).fill(E2E_PASSWORD);
-			await page.getByLabel("Confirm password").fill(E2E_PASSWORD);
+			await page.goto('/auth')
 
-			await page.getByRole("button", { name: "Sign up" }).click();
-			await expect(page.getByRole("button", { name: "Sign up" })).toBeEnabled({
+			const signupText = getI18nText('common', 'action.signup')
+			const emailLabel = getI18nText('form', 'email.label')
+			const passwordLabel = getI18nText('form', 'password.label')
+			const confirmPasswordLabel = getI18nText('form', 'confirm-password.label')
+			const signupButton = getI18nText('common', 'action.signup')
+			const signinText = getI18nText('common', 'action.signin')
+			const signinButton = getI18nText('common', 'action.signin')
+
+			await page.getByRole('tab', { name: signupText }).click()
+			await page.getByLabel(emailLabel).fill(USER_EMAIL)
+			await page.getByLabel(passwordLabel, { exact: true }).fill(USER_PASSWORD)
+			await page.getByLabel(confirmPasswordLabel).fill(USER_PASSWORD)
+
+			await page.getByRole('button', { name: signupButton }).click()
+			await expect(page.getByRole('button', { name: signupButton })).toBeEnabled({
 				timeout: 30_000,
-			});
+			})
 
-			await page.getByRole("tab", { name: "Sign in" }).click();
-			await page.getByLabel("Email").fill(E2E_EMAIL);
-			await page.getByLabel("Password").fill(E2E_PASSWORD);
-			await page.getByRole("button", { name: "Sign in" }).click();
-			await expect(page).toHaveURL("/", { timeout: 30_000 });
-		};
+			await page.getByRole('tab', { name: signinText }).click()
+			await page.getByLabel(emailLabel).fill(USER_EMAIL)
+			await page.getByLabel(passwordLabel, { exact: true }).fill(USER_PASSWORD)
+			await page.getByRole('button', { name: signinButton }).click()
+			await expect(page).toHaveURL('/', { timeout: 30_000 })
+		}
 
-		await run(loginAsTestUser);
+		await run(loginAsTestUser)
 	},
-});
+})

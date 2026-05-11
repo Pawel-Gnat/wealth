@@ -2,8 +2,8 @@
 	"extends": "@repo/typescript-config/base.json",
 	"compilerOptions": {
 		"types": ["node"],
-		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
+		"module": "esnext",
+		"moduleResolution": "bundler",
 	},
 	"include": ["src/**/*.ts", "playwright.config.ts"]
 }

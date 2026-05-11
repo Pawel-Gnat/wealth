@@ -1,69 +1,72 @@
-import { expect, test } from "./helpers/test.js";
+import { ensureI18nInit, getI18nText } from './helpers/i18n'
+import { expect, test } from './helpers/test'
 
 function formatUsd(amount: number) {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "USD",
-	}).format(amount);
+	return new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'USD',
+	}).format(amount)
 }
 
-test("expense document lifecycle", async ({ page, loginAsTestUser }) => {
-	await loginAsTestUser();
+test('expense document lifecycle', async ({ page, loginAsTestUser }) => {
+	await ensureI18nInit()
+	await loginAsTestUser()
 
-	await page.goto("/expenses/new");
-	await expect(
-		page.getByRole("heading", { name: "Create a new expense" }),
-	).toBeVisible();
+	const expenseLabel = getI18nText('form', 'expense-line-item.label')
+	const priceLabel = getI18nText('form', 'single-amount.label')
+	const quantityLabel = getI18nText('form', 'quantity.label')
+	const saveButton = getI18nText('common', 'action.save')
+	const createButton = getI18nText('common', 'action.create')
+	const addLineButton = getI18nText('common', 'action.add')
+	const editButton = getI18nText('common', 'action.edit')
+	const deleteButton = getI18nText('common', 'action.delete')
+	const createExpenseText = getI18nText('expenses', 'single.title-create')
+	const editExpenseText = getI18nText('expenses', 'single.title-edit')
 
-	await page.getByLabel("Expense").nth(0).fill("Coffee");
-	await page.getByLabel("Price").nth(0).fill("10");
-	await page.getByLabel("Quantity").nth(0).fill("2");
+	await page.goto('/expenses/new')
+	await expect(page.getByRole('heading', { name: createExpenseText })).toBeVisible()
 
-	await page.getByRole("button", { name: "Add" }).click();
+	await page.getByLabel(expenseLabel).nth(0).fill('Coffee')
+	await page.getByLabel(priceLabel).nth(0).fill('10')
+	await page.getByLabel(quantityLabel).nth(0).fill('2')
 
-	await page.getByLabel("Expense").nth(1).fill("Taxi");
-	await page.getByLabel("Price").nth(1).fill("7");
-	await page.getByLabel("Quantity").nth(1).fill("3");
+	await page.getByRole('button', { name: addLineButton }).click()
 
-	const initialTotal = 10 * 2 + 7 * 3;
-	const initialFormatted = formatUsd(initialTotal);
+	await page.getByLabel(expenseLabel).nth(1).fill('Taxi')
+	await page.getByLabel(priceLabel).nth(1).fill('7')
+	await page.getByLabel(quantityLabel).nth(1).fill('3')
 
-	await page.getByRole("button", { name: "Create" }).click();
-	await expect(page).toHaveURL("/expenses");
+	const initialTotal = 10 * 2 + 7 * 3
+	const initialFormatted = formatUsd(initialTotal)
 
-	const tbody = page.locator('[data-slot="table-body"]');
-	const initialRow = tbody
-		.getByRole("row")
-		.filter({ hasText: initialFormatted });
-	await expect(initialRow).toBeVisible();
+	await page.getByRole('button', { name: createButton }).click()
+	await expect(page).toHaveURL('/expenses')
 
-	await initialRow.getByRole("link", { name: /^edit$/i }).click();
-	await expect(page.getByRole("heading", { name: "Edit expense" })).toBeVisible();
+	const tbody = page.locator('[data-slot="table-body"]')
+	const initialRow = tbody.getByRole('row').filter({ hasText: initialFormatted })
+	await expect(initialRow).toBeVisible()
 
-	await page.getByLabel("Expense").nth(0).fill("Coffee XL");
-	await page.getByLabel("Price").nth(0).fill("25");
-	await page.getByLabel("Quantity").nth(0).fill("1");
-	await page.getByLabel("Expense").nth(1).fill("Taxi XL");
-	await page.getByLabel("Price").nth(1).fill("25");
-	await page.getByLabel("Quantity").nth(1).fill("1");
+	await initialRow.getByRole('link', { name: editButton }).click()
+	await expect(page.getByRole('heading', { name: editExpenseText })).toBeVisible()
 
-	const updatedTotal = 50;
-	const updatedFormatted = formatUsd(updatedTotal);
+	await page.getByLabel(expenseLabel).nth(0).fill('Coffee XL')
+	await page.getByLabel(priceLabel).nth(0).fill('25')
+	await page.getByLabel(quantityLabel).nth(0).fill('1')
+	await page.getByLabel(expenseLabel).nth(1).fill('Taxi XL')
+	await page.getByLabel(priceLabel).nth(1).fill('25')
+	await page.getByLabel(quantityLabel).nth(1).fill('1')
 
-	await page.getByRole("button", { name: "Save" }).click();
-	await expect(page).toHaveURL("/expenses");
+	const updatedTotal = 50
+	const updatedFormatted = formatUsd(updatedTotal)
 
-	const updatedRow = tbody
-		.getByRole("row")
-		.filter({ hasText: updatedFormatted });
-	await expect(updatedRow).toBeVisible();
-	await expect(
-		tbody.getByRole("row").filter({ hasText: initialFormatted }),
-	).toHaveCount(0);
+	await page.getByRole('button', { name: saveButton }).click()
+	await expect(page).toHaveURL('/expenses')
 
-	await updatedRow.getByRole("button", { name: /^delete$/i }).click();
+	const updatedRow = tbody.getByRole('row').filter({ hasText: updatedFormatted })
+	await expect(updatedRow).toBeVisible()
+	await expect(tbody.getByRole('row').filter({ hasText: initialFormatted })).toHaveCount(0)
 
-	await expect(
-		tbody.getByRole("row").filter({ hasText: updatedFormatted }),
-	).toHaveCount(0);
-});
+	await updatedRow.getByRole('button', { name: deleteButton }).click()
+
+	await expect(tbody.getByRole('row').filter({ hasText: updatedFormatted })).toHaveCount(0)
+})

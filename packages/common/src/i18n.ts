@@ -4,14 +4,14 @@ import i18n, {
 	type ParseKeys,
 } from "i18next";
 
-export type { ParseKeys, TOptionsBase } from "i18next";
+export type { Namespace, ParseKeys, TOptionsBase } from "i18next";
 
-import enAuth from "./locales/en/auth.json";
-import enCommon from "./locales/en/common.json";
-import enDashboard from "./locales/en/dashboard.json";
-import enExpenses from "./locales/en/expenses.json";
-import enForm from "./locales/en/form.json";
-import enIncomes from "./locales/en/incomes.json";
+import enAuth from "./locales/en/auth.json" with { type: "json" };
+import enCommon from "./locales/en/common.json" with { type: "json" };
+import enDashboard from "./locales/en/dashboard.json" with { type: "json" };
+import enExpenses from "./locales/en/expenses.json" with { type: "json" };
+import enForm from "./locales/en/form.json" with { type: "json" };
+import enIncomes from "./locales/en/incomes.json" with { type: "json" };
 
 export type ParseNsKeys<Ns extends Namespace> =
 	`${Ns extends string ? Ns : ""}:${ParseKeys<Ns>}`;
@@ -52,6 +52,8 @@ export function initI18n(
 		...options,
 	});
 }
+
+export { i18n };
 
 declare module "i18next" {
 	interface CustomTypeOptions {

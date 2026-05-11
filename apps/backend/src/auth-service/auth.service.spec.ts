@@ -1,6 +1,5 @@
 import { UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { ORPCError } from "@orpc/server";
 import * as bcrypt from "bcrypt";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

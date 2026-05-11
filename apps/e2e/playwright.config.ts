@@ -30,6 +30,7 @@ export default defineConfig({
 	...(isCi ? { workers: 1 } : {}),
 	webServer: [
 		{
+			name: "API",
 			command: "pnpm --filter backend start:e2e",
 			cwd: repoRoot,
 			url: backendUrl,
@@ -37,11 +38,12 @@ export default defineConfig({
 			timeout: 180_000,
 		},
 		{
+			name: "Vite",
 			command: "pnpm --filter web dev",
 			cwd: repoRoot,
 			url: webUrl,
 			reuseExistingServer: !isCi,
-			timeout: 180_000,
+			timeout: 120_000,
 			env: {
 				VITE_BACKEND_URL: backendBase,
 			},

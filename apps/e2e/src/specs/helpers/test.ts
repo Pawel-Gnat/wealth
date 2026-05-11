@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { test as base } from "../fixture/fixture.js";
+import { test as base } from "../fixture/fixture";
 
 const test = base.extend<{
 	// shared mocks can be added here later
