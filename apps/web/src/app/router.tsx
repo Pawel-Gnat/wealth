@@ -30,9 +30,7 @@ export type AppRoutes = typeof APP_ROUTES;
 type RoutePathLeaf<T> = T extends string
 	? T
 	: T extends (...args: never[]) => infer R
-		? R extends string
-			? R
-			: never
+		? R
 		: T extends Record<string, unknown>
 			? RoutePathLeaf<T[keyof T]>
 			: never;
@@ -43,7 +41,7 @@ export function AppRoutes() {
 	return (
 		<Routes>
 			<Route element={<UnauthenticatedLayout />}>
-				<Route path="/auth" element={<AuthPage />} />
+				<Route path={APP_ROUTES.auth} element={<AuthPage />} />
 			</Route>
 			<Route element={<AuthenticatedLayout />}>
 				<Route element={<DashboardLayout />}>
