@@ -1,12 +1,12 @@
 import * as Sentry from "@sentry/nestjs";
-import { nodeProfilingIntegration } from "@sentry/profiling-node";
 
 const dsn = process.env.SENTRY_DSN;
 const nodeEnv = process.env.NODE_ENV ?? "development";
-const isSentryEnabled =
-	Boolean(dsn) && (nodeEnv === "production" || nodeEnv === "staging");
+const isDeployedEnv = nodeEnv === "production";
+const isSentryEnabled = Boolean(dsn) && isDeployedEnv;
 
 if (isSentryEnabled && dsn) {
+	const { nodeProfilingIntegration } = await import("@sentry/profiling-node");
 	Sentry.init({
 		dsn,
 		environment: nodeEnv,

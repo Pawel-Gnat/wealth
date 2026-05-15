@@ -1,10 +1,10 @@
-import type {
-	DocumentCreatePayload,
-	DocumentCreateResponse,
-	DocumentUpdatePayload,
-	DocumentUpdateResponse,
+import {
+	type DocumentCreatePayload,
+	type DocumentUpdatePayload,
+	EXPENSE_UPDATED_MESSAGE,
+	type ExpenseDocumentCreateResponse,
+	type ExpenseDocumentUpdateResponse,
 } from "@repo/api/schemas";
-import { EXPENSE_UPDATED_MESSAGE } from "@repo/api/schemas";
 import * as Sentry from "@sentry/react";
 import { useMutation } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
@@ -12,7 +12,9 @@ import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
 type UseUpsertExpenseProps = {
-	onSuccess?: (data: DocumentCreateResponse | DocumentUpdateResponse) => void;
+	onSuccess?: (
+		data: ExpenseDocumentCreateResponse | ExpenseDocumentUpdateResponse,
+	) => void;
 	onError?: (error: Error) => void;
 };
 
@@ -21,7 +23,7 @@ export const useUpsertExpense = ({
 	onError,
 }: UseUpsertExpenseProps = {}) => {
 	const mutation = useMutation<
-		DocumentCreateResponse | DocumentUpdateResponse,
+		ExpenseDocumentCreateResponse | ExpenseDocumentUpdateResponse,
 		Error,
 		DocumentCreatePayload | DocumentUpdatePayload
 	>({

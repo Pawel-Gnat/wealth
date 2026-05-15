@@ -29,6 +29,13 @@
 			"when": 1778005726912,
 			"tag": "0003_condemned_scream",
 			"breakpoints": true
+		},
+		{
+			"idx": 4,
+			"version": "7",
+			"when": 1778860779838,
+			"tag": "0004_foamy_revanche",
+			"breakpoints": true
 		}
 	]
 }

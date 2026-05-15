@@ -1,33 +1,33 @@
 import { Test, type TestingModule } from "@nestjs/testing";
 import {
-	EXPENSE_CREATED_MESSAGE,
-	EXPENSE_DELETED_MESSAGE,
-	EXPENSE_UPDATED_MESSAGE,
+	INCOME_CREATED_MESSAGE,
+	INCOME_DELETED_MESSAGE,
+	INCOME_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DBS } from "../database-service/constants.js";
 import {
-	expenseDocumentsTable,
-	expenseLineItemsTable,
+	incomeDocumentsTable,
+	incomeLineItemsTable,
 } from "../database-service/tables/index.js";
 import { createTestUser } from "../test/mocks/users.js";
 import { TestModule } from "../test/test.module.js";
 import { UsersService } from "../users-service/users.service.js";
-import { ExpensesService } from "./expenses.service.js";
+import { IncomesService } from "./incomes.service.js";
 
-describe("Expenses service", () => {
+describe("Incomes service", () => {
 	let moduleRef: TestingModule;
-	let expensesService: ExpensesService;
+	let incomesService: IncomesService;
 	let usersService: UsersService;
 
 	beforeAll(async () => {
 		moduleRef = await Test.createTestingModule({
 			imports: [TestModule],
-			providers: [ExpensesService],
+			providers: [IncomesService],
 		}).compile();
-		expensesService = moduleRef.get(ExpensesService);
+		incomesService = moduleRef.get(IncomesService);
 		usersService = moduleRef.get(UsersService);
 	});
 
@@ -35,56 +35,56 @@ describe("Expenses service", () => {
 		await moduleRef.close();
 	});
 
-	describe("list expense documents by user id", () => {
-		it("returns an empty list when the user has no expense documents", async () => {
+	describe("list income documents by user id", () => {
+		it("returns an empty list when the user has no income documents", async () => {
 			const user = await createTestUser(usersService, {
 				passwordHash: "hashed-password",
-				emailTag: "exp-empty",
+				emailTag: "inc-empty",
 			});
 
 			await expect(
-				expensesService.listExpenseDocumentsByUserId(user.id),
+				incomesService.listIncomeDocumentsByUserId(user.id),
 			).resolves.toEqual({ data: [], pagination: {} });
 		});
 
-		it("lists only the requesting user's documents, ordered by expenseDate descending", async () => {
+		it("lists only the requesting user's documents, ordered by incomeDate descending", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
 			const userA = await createTestUser(usersService, {
-				email: `user-a-${suffix}@example.com`,
+				email: `inc-user-a-${suffix}@example.com`,
 				passwordHash: "hash",
 			});
 			const userB = await createTestUser(usersService, {
-				email: `user-b-${suffix}@example.com`,
+				email: `inc-user-b-${suffix}@example.com`,
 				passwordHash: "hash",
 			});
 
-			await db.insert(expenseDocumentsTable).values({
+			await db.insert(incomeDocumentsTable).values({
 				userId: userA.id,
 				totalAmount: "100",
-				expenseDate: new Date("2024-01-15T08:00:00.000Z"),
+				incomeDate: new Date("2024-01-15T08:00:00.000Z"),
 				createdAt: new Date("2024-01-15T08:00:00.000Z"),
 				updatedAt: new Date("2024-01-16T08:00:00.000Z"),
 			});
 
-			await db.insert(expenseDocumentsTable).values({
+			await db.insert(incomeDocumentsTable).values({
 				userId: userA.id,
 				totalAmount: "50.50",
-				expenseDate: new Date("2024-06-01T12:00:00.000Z"),
+				incomeDate: new Date("2024-06-01T12:00:00.000Z"),
 				createdAt: new Date("2024-06-01T12:00:00.000Z"),
 				updatedAt: new Date("2024-06-01T12:00:00.000Z"),
 			});
 
-			await db.insert(expenseDocumentsTable).values({
+			await db.insert(incomeDocumentsTable).values({
 				userId: userB.id,
 				totalAmount: "9.99",
-				expenseDate: new Date("2024-03-01T00:00:00.000Z"),
+				incomeDate: new Date("2024-03-01T00:00:00.000Z"),
 				createdAt: new Date("2024-03-01T00:00:00.000Z"),
 				updatedAt: new Date("2024-03-01T00:00:00.000Z"),
 			});
 
-			const forA = await expensesService.listExpenseDocumentsByUserId(userA.id);
+			const forA = await incomesService.listIncomeDocumentsByUserId(userA.id);
 
 			expect(forA.pagination).toEqual({});
 			expect(forA.data).toHaveLength(2);
@@ -99,62 +99,62 @@ describe("Expenses service", () => {
 				date: new Date("2024-06-01T12:00:00.000Z"),
 			});
 
-			const forB = await expensesService.listExpenseDocumentsByUserId(userB.id);
+			const forB = await incomesService.listIncomeDocumentsByUserId(userB.id);
 			expect(forB.pagination).toEqual({});
 			expect(forB.data).toHaveLength(1);
 		});
 	});
 
-	describe("create expense by user id", () => {
-		it("creates expense document with computed total and line items", async () => {
+	describe("create income by user id", () => {
+		it("creates income document with computed total and line items", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
 				passwordHash: "hashed-password",
-				emailTag: "exp-create",
+				emailTag: "inc-create",
 			});
 
 			const payload = {
 				date: new Date("2026-05-01T10:00:00.000Z"),
 				lineItems: [
-					{ title: "Taxi", quantity: 2, singleAmount: 12.5 },
-					{ title: "Lunch", quantity: 1, singleAmount: 30 },
+					{ title: "Salary", quantity: 2, singleAmount: 12.5 },
+					{ title: "Bonus", quantity: 1, singleAmount: 30 },
 				],
 			};
 
 			await expect(
-				expensesService.createExpenseByUserId(user.id, payload),
+				incomesService.createIncomeByUserId(user.id, payload),
 			).resolves.toEqual({
-				data: { message: EXPENSE_CREATED_MESSAGE },
+				data: { message: INCOME_CREATED_MESSAGE },
 			});
 
 			const [createdDocument] = await db
 				.select()
-				.from(expenseDocumentsTable)
-				.where(eq(expenseDocumentsTable.userId, user.id))
-				.orderBy(expenseDocumentsTable.createdAt);
+				.from(incomeDocumentsTable)
+				.where(eq(incomeDocumentsTable.userId, user.id))
+				.orderBy(incomeDocumentsTable.createdAt);
 
 			expect(createdDocument).toBeDefined();
 			expect(createdDocument?.totalAmount).toBe("55.00");
-			expect(createdDocument?.expenseDate).toEqual(payload.date);
+			expect(createdDocument?.incomeDate).toEqual(payload.date);
 			if (!createdDocument) {
 				throw new Error("Expected created document");
 			}
 
 			const createdLineItems = await db
 				.select()
-				.from(expenseLineItemsTable)
-				.where(eq(expenseLineItemsTable.expenseDocumentId, createdDocument.id));
+				.from(incomeLineItemsTable)
+				.where(eq(incomeLineItemsTable.incomeDocumentId, createdDocument.id));
 
 			expect(createdLineItems).toHaveLength(2);
 			expect(createdLineItems).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
-						title: "Taxi",
+						title: "Salary",
 						quantity: 2,
 						singleAmount: "12.50",
 					}),
 					expect.objectContaining({
-						title: "Lunch",
+						title: "Bonus",
 						quantity: 1,
 						singleAmount: "30.00",
 					}),
@@ -165,18 +165,16 @@ describe("Expenses service", () => {
 		it("exposes newly created document in user list response", async () => {
 			const user = await createTestUser(usersService, {
 				passwordHash: "hashed-password",
-				emailTag: "exp-create-list",
+				emailTag: "inc-create-list",
 			});
 
 			const payload = {
 				date: new Date("2026-05-02T12:30:00.000Z"),
-				lineItems: [{ title: "Coffee", quantity: 3, singleAmount: 4 }],
+				lineItems: [{ title: "Freelance", quantity: 3, singleAmount: 4 }],
 			};
 
-			await expensesService.createExpenseByUserId(user.id, payload);
-			const result = await expensesService.listExpenseDocumentsByUserId(
-				user.id,
-			);
+			await incomesService.createIncomeByUserId(user.id, payload);
+			const result = await incomesService.listIncomeDocumentsByUserId(user.id);
 
 			expect(result.pagination).toEqual({});
 			expect(result.data).toHaveLength(1);
@@ -190,172 +188,172 @@ describe("Expenses service", () => {
 			const missingUserId = "01K1MISSINGUSER000000000000";
 			const payload = {
 				date: new Date("2026-05-03T09:00:00.000Z"),
-				lineItems: [{ title: "Train", quantity: 1, singleAmount: 15 }],
+				lineItems: [{ title: "Consulting", quantity: 1, singleAmount: 15 }],
 			};
 
 			await expect(
-				expensesService.createExpenseByUserId(missingUserId, payload),
+				incomesService.createIncomeByUserId(missingUserId, payload),
 			).rejects.toThrow();
 		});
 
-		it("does not persist expense document when create fails", async () => {
+		it("does not persist income document when create fails", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const missingUserId = "01K1MISSINGUSER000000000000";
 			const payload = {
 				date: new Date("2026-05-03T09:00:00.000Z"),
-				lineItems: [{ title: "Train", quantity: 1, singleAmount: 15 }],
+				lineItems: [{ title: "Consulting", quantity: 1, singleAmount: 15 }],
 			};
 
 			const beforeDocs = await db
 				.select()
-				.from(expenseDocumentsTable)
-				.where(eq(expenseDocumentsTable.userId, missingUserId));
+				.from(incomeDocumentsTable)
+				.where(eq(incomeDocumentsTable.userId, missingUserId));
 
 			await expect(
-				expensesService.createExpenseByUserId(missingUserId, payload),
+				incomesService.createIncomeByUserId(missingUserId, payload),
 			).rejects.toThrow();
 
 			const afterDocs = await db
 				.select()
-				.from(expenseDocumentsTable)
-				.where(eq(expenseDocumentsTable.userId, missingUserId));
+				.from(incomeDocumentsTable)
+				.where(eq(incomeDocumentsTable.userId, missingUserId));
 
 			expect(beforeDocs).toHaveLength(0);
 			expect(afterDocs).toHaveLength(0);
 		});
 	});
 
-	describe("delete expense by user id", () => {
-		it("deletes only user's own expense and returns success response", async () => {
+	describe("delete income by user id", () => {
+		it("deletes only user's own income and returns success response", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
 			const owner = await createTestUser(usersService, {
-				email: `delete-owner-${suffix}@example.com`,
+				email: `inc-delete-owner-${suffix}@example.com`,
 				passwordHash: "hash",
 			});
 			const otherUser = await createTestUser(usersService, {
-				email: `delete-other-${suffix}@example.com`,
+				email: `inc-delete-other-${suffix}@example.com`,
 				passwordHash: "hash",
 			});
 
-			const [ownerExpense] = await db
-				.insert(expenseDocumentsTable)
+			const [ownerIncome] = await db
+				.insert(incomeDocumentsTable)
 				.values({
 					userId: owner.id,
 					totalAmount: "20.00",
-					expenseDate: new Date("2026-05-04T09:00:00.000Z"),
+					incomeDate: new Date("2026-05-04T09:00:00.000Z"),
 				})
-				.returning({ id: expenseDocumentsTable.id });
+				.returning({ id: incomeDocumentsTable.id });
 
-			const [otherExpense] = await db
-				.insert(expenseDocumentsTable)
+			const [otherIncome] = await db
+				.insert(incomeDocumentsTable)
 				.values({
 					userId: otherUser.id,
 					totalAmount: "30.00",
-					expenseDate: new Date("2026-05-05T10:00:00.000Z"),
+					incomeDate: new Date("2026-05-05T10:00:00.000Z"),
 				})
-				.returning({ id: expenseDocumentsTable.id });
+				.returning({ id: incomeDocumentsTable.id });
 
-			if (!ownerExpense || !otherExpense) {
-				throw new Error("Expected seeded expenses");
+			if (!ownerIncome || !otherIncome) {
+				throw new Error("Expected seeded incomes");
 			}
 
-			await db.insert(expenseLineItemsTable).values({
-				expenseDocumentId: ownerExpense.id,
+			await db.insert(incomeLineItemsTable).values({
+				incomeDocumentId: ownerIncome.id,
 				title: "Line item to delete",
 				quantity: 1,
 				singleAmount: "20.00",
 			});
 
 			await expect(
-				expensesService.deleteExpenseByUserId(owner.id, ownerExpense.id),
+				incomesService.deleteIncomeByUserId(owner.id, ownerIncome.id),
 			).resolves.toEqual({
-				data: { message: EXPENSE_DELETED_MESSAGE },
+				data: { message: INCOME_DELETED_MESSAGE },
 			});
 
-			const ownerExpenseAfterDelete = await db
+			const ownerIncomeAfterDelete = await db
 				.select()
-				.from(expenseDocumentsTable)
-				.where(eq(expenseDocumentsTable.id, ownerExpense.id));
-			expect(ownerExpenseAfterDelete).toHaveLength(0);
+				.from(incomeDocumentsTable)
+				.where(eq(incomeDocumentsTable.id, ownerIncome.id));
+			expect(ownerIncomeAfterDelete).toHaveLength(0);
 
 			const ownerLineItemsAfterDelete = await db
 				.select()
-				.from(expenseLineItemsTable)
-				.where(eq(expenseLineItemsTable.expenseDocumentId, ownerExpense.id));
+				.from(incomeLineItemsTable)
+				.where(eq(incomeLineItemsTable.incomeDocumentId, ownerIncome.id));
 			expect(ownerLineItemsAfterDelete).toHaveLength(0);
 
-			const otherExpenseAfterDelete = await db
+			const otherIncomeAfterDelete = await db
 				.select()
-				.from(expenseDocumentsTable)
-				.where(eq(expenseDocumentsTable.id, otherExpense.id));
-			expect(otherExpenseAfterDelete).toHaveLength(1);
+				.from(incomeDocumentsTable)
+				.where(eq(incomeDocumentsTable.id, otherIncome.id));
+			expect(otherIncomeAfterDelete).toHaveLength(1);
 		});
 
-		it("throws when expense does not belong to the user", async () => {
+		it("throws when income does not belong to the user", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
 			const owner = await createTestUser(usersService, {
-				email: `delete-owner-scope-${suffix}@example.com`,
+				email: `inc-delete-owner-scope-${suffix}@example.com`,
 				passwordHash: "hash",
 			});
 			const otherUser = await createTestUser(usersService, {
-				email: `delete-other-scope-${suffix}@example.com`,
+				email: `inc-delete-other-scope-${suffix}@example.com`,
 				passwordHash: "hash",
 			});
 
-			const [otherExpense] = await db
-				.insert(expenseDocumentsTable)
+			const [otherIncome] = await db
+				.insert(incomeDocumentsTable)
 				.values({
 					userId: otherUser.id,
 					totalAmount: "44.00",
-					expenseDate: new Date("2026-05-06T08:00:00.000Z"),
+					incomeDate: new Date("2026-05-06T08:00:00.000Z"),
 				})
-				.returning({ id: expenseDocumentsTable.id });
+				.returning({ id: incomeDocumentsTable.id });
 
-			if (!otherExpense) {
-				throw new Error("Expected seeded expense");
+			if (!otherIncome) {
+				throw new Error("Expected seeded income");
 			}
 
 			await expect(
-				expensesService.deleteExpenseByUserId(owner.id, otherExpense.id),
-			).rejects.toThrow("Expense not found");
+				incomesService.deleteIncomeByUserId(owner.id, otherIncome.id),
+			).rejects.toThrow("Income not found");
 
-			const expenseStillExists = await db
+			const incomeStillExists = await db
 				.select()
-				.from(expenseDocumentsTable)
-				.where(eq(expenseDocumentsTable.id, otherExpense.id));
-			expect(expenseStillExists).toHaveLength(1);
+				.from(incomeDocumentsTable)
+				.where(eq(incomeDocumentsTable.id, otherIncome.id));
+			expect(incomeStillExists).toHaveLength(1);
 		});
 	});
 
-	describe("update expense by user id", () => {
-		it("updates expense date, total amount, and replaces line items", async () => {
+	describe("update income by user id", () => {
+		it("updates income date, total amount, and replaces line items", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
 				passwordHash: "hashed-password",
-				emailTag: "exp-update",
+				emailTag: "inc-update",
 			});
 
-			const [expense] = await db
-				.insert(expenseDocumentsTable)
+			const [income] = await db
+				.insert(incomeDocumentsTable)
 				.values({
 					userId: user.id,
 					totalAmount: "20.00",
-					expenseDate: new Date("2024-01-01T12:00:00.000Z"),
+					incomeDate: new Date("2024-01-01T12:00:00.000Z"),
 					createdAt: new Date("2024-01-01T12:00:00.000Z"),
 					updatedAt: new Date("2024-01-02T12:00:00.000Z"),
 				})
-				.returning({ id: expenseDocumentsTable.id });
+				.returning({ id: incomeDocumentsTable.id });
 
-			if (!expense) {
-				throw new Error("Expected seeded expense");
+			if (!income) {
+				throw new Error("Expected seeded income");
 			}
 
-			await db.insert(expenseLineItemsTable).values({
-				expenseDocumentId: expense.id,
+			await db.insert(incomeLineItemsTable).values({
+				incomeDocumentId: income.id,
 				title: "Old item",
 				quantity: 1,
 				singleAmount: "20.00",
@@ -364,31 +362,31 @@ describe("Expenses service", () => {
 			const newDate = new Date("2025-06-15T08:00:00.000Z");
 			const payload = {
 				date: newDate,
-				lineItems: [{ title: "Train", quantity: 2, singleAmount: 15 }],
+				lineItems: [{ title: "Royalty", quantity: 2, singleAmount: 15 }],
 			};
 
 			await expect(
-				expensesService.updateExpenseByUserId(user.id, expense.id, payload),
+				incomesService.updateIncomeByUserId(user.id, income.id, payload),
 			).resolves.toEqual({
-				data: { message: EXPENSE_UPDATED_MESSAGE },
+				data: { message: INCOME_UPDATED_MESSAGE },
 			});
 
 			const [docAfter] = await db
 				.select()
-				.from(expenseDocumentsTable)
-				.where(eq(expenseDocumentsTable.id, expense.id));
+				.from(incomeDocumentsTable)
+				.where(eq(incomeDocumentsTable.id, income.id));
 
 			expect(docAfter?.totalAmount).toBe("30.00");
-			expect(docAfter?.expenseDate).toEqual(newDate);
+			expect(docAfter?.incomeDate).toEqual(newDate);
 
 			const lineItemsAfter = await db
 				.select()
-				.from(expenseLineItemsTable)
-				.where(eq(expenseLineItemsTable.expenseDocumentId, expense.id));
+				.from(incomeLineItemsTable)
+				.where(eq(incomeLineItemsTable.incomeDocumentId, income.id));
 
 			expect(lineItemsAfter).toHaveLength(1);
 			expect(lineItemsAfter[0]).toMatchObject({
-				title: "Train",
+				title: "Royalty",
 				quantity: 2,
 				singleAmount: "15.00",
 			});
@@ -398,118 +396,118 @@ describe("Expenses service", () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
 				passwordHash: "hashed-password",
-				emailTag: "exp-update-skip-doc",
+				emailTag: "inc-update-skip-doc",
 			});
 
-			const expenseDate = new Date("2026-05-10T10:00:00.000Z");
-			const [expense] = await db
-				.insert(expenseDocumentsTable)
+			const incomeDate = new Date("2026-05-10T10:00:00.000Z");
+			const [income] = await db
+				.insert(incomeDocumentsTable)
 				.values({
 					userId: user.id,
 					totalAmount: "55.00",
-					expenseDate,
+					incomeDate,
 					createdAt: new Date("2026-05-10T10:00:00.000Z"),
 					updatedAt: new Date("2024-03-01T15:00:00.000Z"),
 				})
-				.returning({ id: expenseDocumentsTable.id });
+				.returning({ id: incomeDocumentsTable.id });
 
-			if (!expense) {
-				throw new Error("Expected seeded expense");
+			if (!income) {
+				throw new Error("Expected seeded income");
 			}
 
-			await db.insert(expenseLineItemsTable).values([
+			await db.insert(incomeLineItemsTable).values([
 				{
-					expenseDocumentId: expense.id,
-					title: "Taxi",
+					incomeDocumentId: income.id,
+					title: "Salary piece",
 					quantity: 2,
 					singleAmount: "12.50",
 				},
 				{
-					expenseDocumentId: expense.id,
-					title: "Lunch",
+					incomeDocumentId: income.id,
+					title: "Tips",
 					quantity: 1,
 					singleAmount: "30.00",
 				},
 			]);
 
 			const payload = {
-				date: expenseDate,
-				lineItems: [{ title: "Coffee", quantity: 11, singleAmount: 5 }],
+				date: incomeDate,
+				lineItems: [{ title: "Commission", quantity: 11, singleAmount: 5 }],
 			};
 
-			await expensesService.updateExpenseByUserId(user.id, expense.id, payload);
+			await incomesService.updateIncomeByUserId(user.id, income.id, payload);
 
 			const [docAfter] = await db
 				.select()
-				.from(expenseDocumentsTable)
-				.where(eq(expenseDocumentsTable.id, expense.id));
+				.from(incomeDocumentsTable)
+				.where(eq(incomeDocumentsTable.id, income.id));
 
 			expect(docAfter?.totalAmount).toBe("55.00");
-			expect(docAfter?.expenseDate).toEqual(expenseDate);
+			expect(docAfter?.incomeDate).toEqual(incomeDate);
 
 			const lineItemsAfter = await db
 				.select()
-				.from(expenseLineItemsTable)
-				.where(eq(expenseLineItemsTable.expenseDocumentId, expense.id));
+				.from(incomeLineItemsTable)
+				.where(eq(incomeLineItemsTable.incomeDocumentId, income.id));
 
 			expect(lineItemsAfter).toHaveLength(1);
 			expect(lineItemsAfter[0]).toMatchObject({
-				title: "Coffee",
+				title: "Commission",
 				quantity: 11,
 				singleAmount: "5.00",
 			});
 		});
 
-		it("throws when expense does not belong to the user", async () => {
+		it("throws when income does not belong to the user", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
 			const owner = await createTestUser(usersService, {
-				email: `update-owner-${suffix}@example.com`,
+				email: `inc-update-owner-${suffix}@example.com`,
 				passwordHash: "hash",
 			});
 			const otherUser = await createTestUser(usersService, {
-				email: `update-other-${suffix}@example.com`,
+				email: `inc-update-other-${suffix}@example.com`,
 				passwordHash: "hash",
 			});
 
-			const [otherExpense] = await db
-				.insert(expenseDocumentsTable)
+			const [otherIncome] = await db
+				.insert(incomeDocumentsTable)
 				.values({
 					userId: otherUser.id,
 					totalAmount: "22.00",
-					expenseDate: new Date("2026-05-07T08:00:00.000Z"),
+					incomeDate: new Date("2026-05-07T08:00:00.000Z"),
 				})
-				.returning({ id: expenseDocumentsTable.id });
+				.returning({ id: incomeDocumentsTable.id });
 
-			if (!otherExpense) {
-				throw new Error("Expected seeded expense");
+			if (!otherIncome) {
+				throw new Error("Expected seeded income");
 			}
 
-			await db.insert(expenseLineItemsTable).values({
-				expenseDocumentId: otherExpense.id,
+			await db.insert(incomeLineItemsTable).values({
+				incomeDocumentId: otherIncome.id,
 				title: "Item",
 				quantity: 1,
 				singleAmount: "22.00",
 			});
 
 			await expect(
-				expensesService.updateExpenseByUserId(owner.id, otherExpense.id, {
+				incomesService.updateIncomeByUserId(owner.id, otherIncome.id, {
 					date: new Date("2026-05-08T08:00:00.000Z"),
 					lineItems: [{ title: "X", quantity: 1, singleAmount: 10 }],
 				}),
-			).rejects.toThrow("Expense not found");
+			).rejects.toThrow("Income not found");
 
-			const expenseStillExists = await db
+			const incomeStillExists = await db
 				.select()
-				.from(expenseDocumentsTable)
-				.where(eq(expenseDocumentsTable.id, otherExpense.id));
-			expect(expenseStillExists).toHaveLength(1);
+				.from(incomeDocumentsTable)
+				.where(eq(incomeDocumentsTable.id, otherIncome.id));
+			expect(incomeStillExists).toHaveLength(1);
 
 			const lineItemsUnchanged = await db
 				.select()
-				.from(expenseLineItemsTable)
-				.where(eq(expenseLineItemsTable.expenseDocumentId, otherExpense.id));
+				.from(incomeLineItemsTable)
+				.where(eq(incomeLineItemsTable.incomeDocumentId, otherIncome.id));
 			expect(lineItemsUnchanged).toHaveLength(1);
 			expect(lineItemsUnchanged[0]?.title).toBe("Item");
 		});

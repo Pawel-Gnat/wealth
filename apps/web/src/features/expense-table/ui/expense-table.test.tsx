@@ -104,7 +104,7 @@ describe("ExpenseTable", () => {
 
 				return HttpResponse.json({ data: [], pagination: {} });
 			}),
-			http.delete("*/expenses", () =>
+			http.delete("*/expenses/:id", () =>
 				HttpResponse.json({
 					data: { message: "expense_deleted" as const },
 				}),
@@ -138,7 +138,7 @@ describe("ExpenseTable", () => {
 		const user = userEvent.setup();
 
 		server.use(
-			http.delete("*/expenses", () =>
+			http.delete("*/expenses/:id", () =>
 				HttpResponse.json({ message: "Delete failed" }, { status: 500 }),
 			),
 		);

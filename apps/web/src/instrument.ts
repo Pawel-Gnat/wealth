@@ -11,7 +11,7 @@ import { configureWebHttp } from "@/shared/helpers/controlled-fetch";
 const dsn = import.meta.env.VITE_SENTRY_DSN;
 const mode = import.meta.env.MODE;
 
-if (dsn && (mode === "production" || mode === "staging")) {
+if (dsn && import.meta.env.PROD) {
 	const tracePropagationTargets = import.meta.env.VITE_BACKEND_URL
 		? [import.meta.env.VITE_BACKEND_URL, /^\//]
 		: [/^\//];

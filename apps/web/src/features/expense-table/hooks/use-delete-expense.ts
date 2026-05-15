@@ -1,4 +1,4 @@
-import type { DocumentDeleteResponse } from "@repo/api/schemas";
+import type { ExpenseDocumentDeleteResponse } from "@repo/api/schemas";
 import * as Sentry from "@sentry/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
@@ -7,7 +7,7 @@ import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
 type UseDeleteExpenseProps = {
-	onSuccess?: (data: DocumentDeleteResponse) => void;
+	onSuccess?: (data: ExpenseDocumentDeleteResponse) => void;
 	onError?: (error: Error) => void;
 };
 
@@ -17,7 +17,7 @@ export const useDeleteExpense = ({
 }: UseDeleteExpenseProps = {}) => {
 	const queryClient = useQueryClient();
 
-	const mutation = useMutation<DocumentDeleteResponse, Error, string>({
+	const mutation = useMutation<ExpenseDocumentDeleteResponse, Error, string>({
 		mutationFn: (expenseId) =>
 			controlledAsync(() => orpcClient.expenses.delete({ id: expenseId })),
 		onSuccess: (data) => {

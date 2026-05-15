@@ -1,11 +1,14 @@
 import { Inject, Injectable } from "@nestjs/common";
-import type {
-	DocumentCreatePayload,
-	DocumentCreateResponse,
-	DocumentDeleteResponse,
-	DocumentDetailsResponse,
-	DocumentListResponse,
-	DocumentUpdateResponse,
+import {
+	type DocumentCreatePayload,
+	type DocumentDetailsResponse,
+	type DocumentListResponse,
+	EXPENSE_CREATED_MESSAGE,
+	EXPENSE_DELETED_MESSAGE,
+	EXPENSE_UPDATED_MESSAGE,
+	type ExpenseDocumentCreateResponse,
+	type ExpenseDocumentDeleteResponse,
+	type ExpenseDocumentUpdateResponse,
 } from "@repo/api/schemas";
 import { and, desc, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
@@ -14,29 +17,14 @@ import {
 	expenseDocumentsTable,
 	expenseLineItemsTable,
 } from "../database-service/tables/index.js";
+import {
+	calculateDocumentTotalAmount,
+	mapPayloadLineItemsToInsertRows,
+} from "../shared/document/document-line-items.helpers.js";
 
 @Injectable()
 export class ExpensesService {
 	constructor(@Inject(DBS.APP) private readonly db: NodePgDatabase) {}
-
-	private calculateTotalAmount(payload: DocumentCreatePayload): number {
-		return payload.lineItems.reduce(
-			(sum, item) => sum + item.quantity * item.singleAmount,
-			0,
-		);
-	}
-
-	private toLineItemValues(
-		expenseDocumentId: string,
-		payload: DocumentCreatePayload,
-	) {
-		return payload.lineItems.map((lineItem) => ({
-			expenseDocumentId,
-			title: lineItem.title,
-			quantity: lineItem.quantity,
-			singleAmount: lineItem.singleAmount.toFixed(2),
-		}));
-	}
 
 	async listExpenseDocumentsByUserId(
 		userId: string,
@@ -105,8 +93,9 @@ export class ExpensesService {
 	async createExpenseByUserId(
 		userId: string,
 		payload: DocumentCreatePayload,
-	): Promise<DocumentCreateResponse> {
-		const totalAmount = this.calculateTotalAmount(payload);
+	): Promise<ExpenseDocumentCreateResponse> {
+		const totalAmount = calculateDocumentTotalAmount(payload);
+
 		await this.db.transaction(async (tx) => {
 			const [createdExpense] = await tx
 				.insert(expenseDocumentsTable)
@@ -121,14 +110,17 @@ export class ExpensesService {
 				throw new Error("Expense insert failed");
 			}
 
-			await tx
-				.insert(expenseLineItemsTable)
-				.values(this.toLineItemValues(createdExpense.id, payload));
+			await tx.insert(expenseLineItemsTable).values(
+				mapPayloadLineItemsToInsertRows(payload).map((row) => ({
+					expenseDocumentId: createdExpense.id,
+					...row,
+				})),
+			);
 		});
 
 		return {
 			data: {
-				message: "expense_created",
+				message: EXPENSE_CREATED_MESSAGE,
 			},
 		};
 	}
@@ -137,8 +129,8 @@ export class ExpensesService {
 		userId: string,
 		expenseId: string,
 		payload: DocumentCreatePayload,
-	): Promise<DocumentUpdateResponse> {
-		const newTotalAmount = this.calculateTotalAmount(payload);
+	): Promise<ExpenseDocumentUpdateResponse> {
+		const newTotalAmount = calculateDocumentTotalAmount(payload);
 		const newTotalAmountStr = newTotalAmount.toFixed(2);
 
 		await this.db.transaction(async (tx) => {
@@ -179,14 +171,17 @@ export class ExpensesService {
 				.delete(expenseLineItemsTable)
 				.where(eq(expenseLineItemsTable.expenseDocumentId, expenseId));
 
-			await tx
-				.insert(expenseLineItemsTable)
-				.values(this.toLineItemValues(expenseId, payload));
+			await tx.insert(expenseLineItemsTable).values(
+				mapPayloadLineItemsToInsertRows(payload).map((row) => ({
+					expenseDocumentId: expenseId,
+					...row,
+				})),
+			);
 		});
 
 		return {
 			data: {
-				message: "expense_updated",
+				message: EXPENSE_UPDATED_MESSAGE,
 			},
 		};
 	}
@@ -194,7 +189,7 @@ export class ExpensesService {
 	async deleteExpenseByUserId(
 		userId: string,
 		expenseId: string,
-	): Promise<DocumentDeleteResponse> {
+	): Promise<ExpenseDocumentDeleteResponse> {
 		const [deletedExpense] = await this.db
 			.delete(expenseDocumentsTable)
 			.where(
@@ -211,7 +206,7 @@ export class ExpensesService {
 
 		return {
 			data: {
-				message: "expense_deleted",
+				message: EXPENSE_DELETED_MESSAGE,
 			},
 		};
 	}

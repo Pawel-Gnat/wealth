@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { apiPaginatedPayload, apiPayload } from "./common.schema";
 
-export const EXPENSE_UPDATED_MESSAGE = "expense_updated";
+export const EXPENSE_CREATED_MESSAGE = "expense_created" as const;
+export const INCOME_CREATED_MESSAGE = "income_created" as const;
+export const EXPENSE_UPDATED_MESSAGE = "expense_updated" as const;
+export const INCOME_UPDATED_MESSAGE = "income_updated" as const;
+export const EXPENSE_DELETED_MESSAGE = "expense_deleted" as const;
+export const INCOME_DELETED_MESSAGE = "income_deleted" as const;
 
 export const documentListItemSchema = z.object({
 	id: z.string(),
@@ -50,32 +55,60 @@ export const documentUpdatePayloadSchema = documentCreatePayloadSchema.extend({
 });
 export type DocumentUpdatePayload = z.infer<typeof documentUpdatePayloadSchema>;
 
-export const documentCreateResponseDataSchema = z.object({
-	message: z.literal("expense_created"),
+export const expenseDocumentCreateResponseDataSchema = z.object({
+	message: z.literal(EXPENSE_CREATED_MESSAGE),
 });
-export type DocumentCreateResponseData = z.infer<
-	typeof documentCreateResponseDataSchema
+export type ExpenseDocumentCreateResponseData = z.infer<
+	typeof expenseDocumentCreateResponseDataSchema
 >;
 
-export const documentCreateResponseSchema = apiPayload(
-	documentCreateResponseDataSchema,
+export const expenseDocumentCreateResponseSchema = apiPayload(
+	expenseDocumentCreateResponseDataSchema,
 );
-export type DocumentCreateResponse = z.infer<
-	typeof documentCreateResponseSchema
+export type ExpenseDocumentCreateResponse = z.infer<
+	typeof expenseDocumentCreateResponseSchema
 >;
 
-export const documentUpdateResponseDataSchema = z.object({
+export const incomeDocumentCreateResponseDataSchema = z.object({
+	message: z.literal(INCOME_CREATED_MESSAGE),
+});
+export type IncomeDocumentCreateResponseData = z.infer<
+	typeof incomeDocumentCreateResponseDataSchema
+>;
+
+export const incomeDocumentCreateResponseSchema = apiPayload(
+	incomeDocumentCreateResponseDataSchema,
+);
+export type IncomeDocumentCreateResponse = z.infer<
+	typeof incomeDocumentCreateResponseSchema
+>;
+
+export const expenseDocumentUpdateResponseDataSchema = z.object({
 	message: z.literal(EXPENSE_UPDATED_MESSAGE),
 });
-export type DocumentUpdateResponseData = z.infer<
-	typeof documentUpdateResponseDataSchema
+export type ExpenseDocumentUpdateResponseData = z.infer<
+	typeof expenseDocumentUpdateResponseDataSchema
 >;
 
-export const documentUpdateResponseSchema = apiPayload(
-	documentUpdateResponseDataSchema,
+export const expenseDocumentUpdateResponseSchema = apiPayload(
+	expenseDocumentUpdateResponseDataSchema,
 );
-export type DocumentUpdateResponse = z.infer<
-	typeof documentUpdateResponseSchema
+export type ExpenseDocumentUpdateResponse = z.infer<
+	typeof expenseDocumentUpdateResponseSchema
+>;
+
+export const incomeDocumentUpdateResponseDataSchema = z.object({
+	message: z.literal(INCOME_UPDATED_MESSAGE),
+});
+export type IncomeDocumentUpdateResponseData = z.infer<
+	typeof incomeDocumentUpdateResponseDataSchema
+>;
+
+export const incomeDocumentUpdateResponseSchema = apiPayload(
+	incomeDocumentUpdateResponseDataSchema,
+);
+export type IncomeDocumentUpdateResponse = z.infer<
+	typeof incomeDocumentUpdateResponseSchema
 >;
 
 export const documentGetPayloadSchema = z.object({
@@ -83,21 +116,30 @@ export const documentGetPayloadSchema = z.object({
 });
 export type DocumentGetPayload = z.infer<typeof documentGetPayloadSchema>;
 
-export const documentDeletePayloadSchema = z.object({
-	id: z.string(),
+export const expenseDocumentDeleteResponseDataSchema = z.object({
+	message: z.literal(EXPENSE_DELETED_MESSAGE),
 });
-export type DocumentDeletePayload = z.infer<typeof documentDeletePayloadSchema>;
-
-export const documentDeleteResponseDataSchema = z.object({
-	message: z.literal("expense_deleted"),
-});
-export type DocumentDeleteResponseData = z.infer<
-	typeof documentDeleteResponseDataSchema
+export type ExpenseDocumentDeleteResponseData = z.infer<
+	typeof expenseDocumentDeleteResponseDataSchema
 >;
 
-export const documentDeleteResponseSchema = apiPayload(
-	documentDeleteResponseDataSchema,
+export const expenseDocumentDeleteResponseSchema = apiPayload(
+	expenseDocumentDeleteResponseDataSchema,
 );
-export type DocumentDeleteResponse = z.infer<
-	typeof documentDeleteResponseSchema
+export type ExpenseDocumentDeleteResponse = z.infer<
+	typeof expenseDocumentDeleteResponseSchema
+>;
+
+export const incomeDocumentDeleteResponseDataSchema = z.object({
+	message: z.literal(INCOME_DELETED_MESSAGE),
+});
+export type IncomeDocumentDeleteResponseData = z.infer<
+	typeof incomeDocumentDeleteResponseDataSchema
+>;
+
+export const incomeDocumentDeleteResponseSchema = apiPayload(
+	incomeDocumentDeleteResponseDataSchema,
+);
+export type IncomeDocumentDeleteResponse = z.infer<
+	typeof incomeDocumentDeleteResponseSchema
 >;

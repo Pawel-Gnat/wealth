@@ -6,6 +6,13 @@ import {
 	listExpensesContract,
 	updateExpenseContract,
 } from "./expenses.contract";
+import {
+	createIncomeContract,
+	deleteIncomeContract,
+	getIncomeContract,
+	listIncomesContract,
+	updateIncomeContract,
+} from "./incomes.contract";
 import { meContract } from "./me.contract";
 import { signInContract } from "./signin.contract";
 import { signUpContract } from "./signup.contract";
@@ -22,5 +29,12 @@ export const rpcContract = populateContractRouterPaths({
 		get: getExpenseContract,
 		update: updateExpenseContract,
 		delete: deleteExpenseContract,
+	},
+	incomes: {
+		create: createIncomeContract,
+		list: listIncomesContract,
+		get: getIncomeContract,
+		update: updateIncomeContract,
+		delete: deleteIncomeContract,
 	},
 });
