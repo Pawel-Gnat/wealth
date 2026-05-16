@@ -9,7 +9,7 @@ import { APP_ROUTES } from "@/app/router";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
-import { ExpenseForm } from "./expense-form";
+import { IncomeForm } from "./income-form";
 
 const { navigateMock } = vi.hoisted(() => ({
 	navigateMock: vi.fn(),
@@ -30,7 +30,7 @@ vi.mock("sonner", () => ({
 	},
 }));
 
-describe("ExpenseForm", () => {
+describe("IncomeForm", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -46,7 +46,7 @@ describe("ExpenseForm", () => {
 	describe("validation", () => {
 		it("shows title field error when submitting with empty line title", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<ExpenseForm />);
+			renderWithProviders(<IncomeForm />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -61,13 +61,13 @@ describe("ExpenseForm", () => {
 
 		it("shows price field error when submitting with price below 0.01", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<ExpenseForm />);
+			renderWithProviders(<IncomeForm />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
 			});
 			const lineItemLabel = screen.getByLabelText(
-				t("line-item.expense-label", { ns: "form" }),
+				t("line-item.income-label", { ns: "form" }),
 			);
 			const priceInput = screen.getByLabelText(
 				t("single-amount.label", { ns: "form" }),
@@ -84,13 +84,13 @@ describe("ExpenseForm", () => {
 
 		it("shows quantity field error when submitting with quantity below 1", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<ExpenseForm />);
+			renderWithProviders(<IncomeForm />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
 			});
 			const lineItemLabel = screen.getByLabelText(
-				t("line-item.expense-label", { ns: "form" }),
+				t("line-item.income-label", { ns: "form" }),
 			);
 			const quantityInput = screen.getByLabelText(
 				t("quantity.label", { ns: "form" }),
@@ -105,9 +105,9 @@ describe("ExpenseForm", () => {
 			).toBeInTheDocument();
 		});
 
-		it("add button click creates new expense line", async () => {
+		it("add button click creates new income line", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<ExpenseForm />);
+			renderWithProviders(<IncomeForm />);
 
 			const addButton = screen.getByRole("button", {
 				name: t("action.add", { ns: "common" }),
@@ -116,7 +116,7 @@ describe("ExpenseForm", () => {
 			await user.click(addButton);
 
 			const lineItemInputs = screen.getAllByLabelText(
-				t("line-item.expense-label", { ns: "form" }),
+				t("line-item.income-label", { ns: "form" }),
 			);
 			expect(lineItemInputs).toHaveLength(2);
 		});
@@ -125,13 +125,13 @@ describe("ExpenseForm", () => {
 	describe("form submission", () => {
 		it("shows success toast and navigates after create", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<ExpenseForm />);
+			renderWithProviders(<IncomeForm />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
 			});
 			const lineItemLabel = screen.getByLabelText(
-				t("line-item.expense-label", { ns: "form" }),
+				t("line-item.income-label", { ns: "form" }),
 			);
 
 			await user.type(lineItemLabel, "Lunch meeting");
@@ -139,17 +139,17 @@ describe("ExpenseForm", () => {
 
 			await waitFor(() => {
 				expect(toast.success).toHaveBeenCalledWith(
-					t("toast.success.expense_created", { ns: "common" }),
+					t("toast.success.income_created", { ns: "common" }),
 				);
 			});
 
-			expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.expenses.list);
+			expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.incomes.list);
 		});
 
 		it("shows error toast on API error", async () => {
 			const user = userEvent.setup();
 			server.use(
-				http.post("*/expenses", () =>
+				http.post("*/incomes", () =>
 					HttpResponse.json(
 						{ error: { message: "Bad Request" } },
 						{ status: 400 },
@@ -157,13 +157,13 @@ describe("ExpenseForm", () => {
 				),
 			);
 
-			renderWithProviders(<ExpenseForm />);
+			renderWithProviders(<IncomeForm />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
 			});
 			const lineItemLabel = screen.getByLabelText(
-				t("line-item.expense-label", { ns: "form" }),
+				t("line-item.income-label", { ns: "form" }),
 			);
 
 			await user.type(lineItemLabel, "Valid row");
@@ -171,19 +171,19 @@ describe("ExpenseForm", () => {
 
 			await waitFor(() => {
 				expect(toast.error).toHaveBeenCalledWith(
-					t("toast.error.expense_created", { ns: "common" }),
+					t("toast.error.income_created", { ns: "common" }),
 				);
 			});
 
 			expect(navigateMock).not.toHaveBeenCalled();
 		});
 
-		it("updates expense when expenseId is provided", async () => {
+		it("updates income when incomeId is provided", async () => {
 			const user = userEvent.setup();
-			const expenseId = "01JTZKQX2GT6PHGQER0M8FS6K8";
+			const incomeId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 			renderWithProviders(
-				<ExpenseForm
-					expenseId={expenseId}
+				<IncomeForm
+					incomeId={incomeId}
 					initialValues={{
 						date: new Date("2024-03-01T12:00:00.000Z"),
 						lineItems: [{ title: "Taxi", quantity: 1, singleAmount: 123.45 }],
@@ -198,11 +198,11 @@ describe("ExpenseForm", () => {
 
 			await waitFor(() => {
 				expect(toast.success).toHaveBeenCalledWith(
-					t("toast.success.expense_updated", { ns: "common" }),
+					t("toast.success.income_updated", { ns: "common" }),
 				);
 			});
 
-			expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.expenses.list);
+			expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.incomes.list);
 		});
 	});
 });

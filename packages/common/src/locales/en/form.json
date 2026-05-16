@@ -21,8 +21,9 @@
 	"date": {
 		"label": "Date"
 	},
-	"expense-line-item": {
-		"label": "Expense",
+	"line-item": {
+		"expense-label": "Expense",
+		"income-label": "Income",
 		"placeholder": "Description",
 		"required": "Description is required"
 	},

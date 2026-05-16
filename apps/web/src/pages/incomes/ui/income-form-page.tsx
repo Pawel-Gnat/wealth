@@ -1,21 +1,21 @@
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
-import { ExpenseForm } from "@/features/expense-form";
-import { useExpense } from "@/features/expense-form/hooks/use-expense";
+import { IncomeForm } from "@/features/income-form";
+import { useIncome } from "@/features/income-form/hooks/use-income";
 import { Card, ErrorState, Heading } from "@/shared/components";
 import { Skeleton } from "@/shared/lib/ui/skeleton";
 
-export const ExpenseFormPage = () => {
+export const IncomeFormPage = () => {
 	const { t } = useTranslation();
 	const { id } = useParams();
 	const isEditMode = Boolean(id);
-	const { data, isLoading, isError } = useExpense(id ? { expenseId: id } : {});
+	const { data, isLoading, isError } = useIncome(id ? { incomeId: id } : {});
 
 	if (isEditMode && isLoading) {
 		return (
 			<>
-				<Heading>{t("single.title-edit", { ns: "expenses" })}</Heading>
-				<Card content={<ExpenseFormSkeleton />} />
+				<Heading>{t("single.title-edit", { ns: "incomes" })}</Heading>
+				<Card content={<IncomeFormSkeleton />} />
 			</>
 		);
 	}
@@ -23,9 +23,9 @@ export const ExpenseFormPage = () => {
 	if (isEditMode && (isError || !data)) {
 		return (
 			<>
-				<Heading>{t("single.title-edit", { ns: "expenses" })}</Heading>
+				<Heading>{t("single.title-edit", { ns: "incomes" })}</Heading>
 				<Card
-					content={<ErrorState text={t("list.error", { ns: "expenses" })} />}
+					content={<ErrorState text={t("list.error", { ns: "incomes" })} />}
 				/>
 			</>
 		);
@@ -35,13 +35,13 @@ export const ExpenseFormPage = () => {
 		<>
 			<Heading>
 				{isEditMode
-					? t("single.title-edit", { ns: "expenses" })
-					: t("single.title-create", { ns: "expenses" })}
+					? t("single.title-edit", { ns: "incomes" })
+					: t("single.title-create", { ns: "incomes" })}
 			</Heading>
 			<Card
 				content={
-					<ExpenseForm
-						{...(id ? { expenseId: id } : {})}
+					<IncomeForm
+						{...(id ? { incomeId: id } : {})}
 						{...(data ? { initialValues: data } : {})}
 					/>
 				}
@@ -50,7 +50,7 @@ export const ExpenseFormPage = () => {
 	);
 };
 
-const ExpenseFormSkeleton = () => {
+const IncomeFormSkeleton = () => {
 	return (
 		<div className="space-y-4">
 			<Skeleton className="h-4 w-10" />

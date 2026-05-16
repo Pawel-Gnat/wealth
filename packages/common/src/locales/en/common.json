@@ -34,7 +34,9 @@
 			"expense_created": "Expense created successfully",
 			"expense_updated": "Expense updated successfully",
 			"expense_deleted": "Expense deleted successfully",
-			"income_deleted": "Income deleted successfully"
+			"income_deleted": "Income deleted successfully",
+			"income_created": "Income created successfully",
+			"income_updated": "Income updated successfully"
 		},
 		"error": {
 			"signed_in": "Failed to sign in",
@@ -42,7 +44,9 @@
 			"expense_created": "Failed to create expense",
 			"expense_updated": "Failed to update expense",
 			"expense_deleted": "Failed to delete expense",
-			"income_deleted": "Failed to delete income"
+			"income_deleted": "Failed to delete income",
+			"income_created": "Failed to create income",
+			"income_updated": "Failed to update income"
 		}
 	}
 }

@@ -12,7 +12,7 @@ test('expense document lifecycle', async ({ page, loginAsTestUser }) => {
 	await ensureI18nInit()
 	await loginAsTestUser()
 
-	const expenseLabel = getI18nText('form', 'expense-line-item.label')
+	const expenseLabel = getI18nText('form', 'line-item.expense-label')
 	const priceLabel = getI18nText('form', 'single-amount.label')
 	const quantityLabel = getI18nText('form', 'quantity.label')
 	const saveButton = getI18nText('common', 'action.save')

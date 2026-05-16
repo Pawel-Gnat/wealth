@@ -4,11 +4,7 @@ import { UnauthenticatedLayout } from "@/app/unauthenticated-layout";
 import { AuthPage } from "@/pages/auth";
 import { DashboardPage } from "@/pages/dashboard";
 import { ExpenseFormPage, ExpensesListPage } from "@/pages/expenses";
-import {
-	IncomeAddPage,
-	IncomeEditPage,
-	IncomesListPage,
-} from "@/pages/incomes";
+import { IncomeFormPage, IncomesListPage } from "@/pages/incomes";
 import { DashboardLayout } from "@/widgets/dashboard-layout";
 
 export const APP_ROUTES = {
@@ -47,10 +43,10 @@ export function AppRoutes() {
 				<Route element={<DashboardLayout />}>
 					<Route path={APP_ROUTES.dashboard} element={<DashboardPage />} />
 					<Route path={APP_ROUTES.incomes.list} element={<IncomesListPage />} />
-					<Route path={APP_ROUTES.incomes.add} element={<IncomeAddPage />} />
+					<Route path={APP_ROUTES.incomes.add} element={<IncomeFormPage />} />
 					<Route
 						path={APP_ROUTES.incomes.edit(":id")}
-						element={<IncomeEditPage />}
+						element={<IncomeFormPage />}
 					/>
 					<Route
 						path={APP_ROUTES.expenses.list}

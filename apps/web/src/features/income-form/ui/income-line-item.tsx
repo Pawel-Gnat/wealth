@@ -5,26 +5,26 @@ import { useTranslation } from "react-i18next";
 import { ButtonDestructive, FormInput, Icon, Text } from "@/shared/components";
 import { formatPrice } from "@/shared/helpers/price";
 
-type ExpenseLineItemProps = {
+type IncomeLineItemProps = {
 	index: number;
 	form: UseFormReturn<DocumentCreatePayload>;
 	remove: (index: number) => void;
 	lineTotal: number;
 };
 
-export const ExpenseLineItem = ({
+export const IncomeLineItem = ({
 	index,
 	form,
 	remove,
 	lineTotal,
-}: ExpenseLineItemProps) => {
+}: IncomeLineItemProps) => {
 	const { t, i18n } = useTranslation();
 
 	return (
 		<div className="flex flex-col gap-4 border-b pb-4 last:border-b-0 last:pb-0">
 			<FormInput
 				name={`lineItems.${index}.title`}
-				label={t("line-item.expense-label", { ns: "form" })}
+				label={t("line-item.income-label", { ns: "form" })}
 				placeholder={t("line-item.placeholder", { ns: "form" })}
 				control={form.control}
 			/>

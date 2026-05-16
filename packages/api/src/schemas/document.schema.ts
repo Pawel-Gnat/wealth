@@ -21,7 +21,7 @@ export const documentListResponseSchema = apiPaginatedPayload(
 export type DocumentListResponse = z.infer<typeof documentListResponseSchema>;
 
 export const lineItemSchema = z.object({
-	title: z.string().trim().min(1, "form:expense-line-item.required"),
+	title: z.string().trim().min(1, "form:line-item.required"),
 	quantity: z
 		.number({ error: "form:quantity.invalid" })
 		.min(1, "form:quantity.min"),

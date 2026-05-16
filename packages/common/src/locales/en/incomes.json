@@ -1,7 +1,8 @@
 {
 	"single": {
 		"title-create": "Create a new income",
-		"title-edit": "Edit income"
+		"title-edit": "Edit income",
+		"incomes": "Incomes"
 	},
 	"list": {
 		"title": "Manage your incomes",
