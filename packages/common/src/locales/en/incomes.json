@@ -1,3 +1,11 @@
 {
-	"title": "Incomes"
+	"single": {
+		"title-create": "Create a new income",
+		"title-edit": "Edit income"
+	},
+	"list": {
+		"title": "Manage your incomes",
+		"no-results": "No incomes found.",
+		"error": "Could not load incomes."
+	}
 }

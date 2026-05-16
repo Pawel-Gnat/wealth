@@ -33,14 +33,16 @@
 			"account_created": "Account created successfully",
 			"expense_created": "Expense created successfully",
 			"expense_updated": "Expense updated successfully",
-			"expense_deleted": "Expense deleted successfully"
+			"expense_deleted": "Expense deleted successfully",
+			"income_deleted": "Income deleted successfully"
 		},
 		"error": {
 			"signed_in": "Failed to sign in",
 			"account_created": "Failed to create account",
 			"expense_created": "Failed to create expense",
 			"expense_updated": "Failed to update expense",
-			"expense_deleted": "Failed to delete expense"
+			"expense_deleted": "Failed to delete expense",
+			"income_deleted": "Failed to delete income"
 		}
 	}
 }

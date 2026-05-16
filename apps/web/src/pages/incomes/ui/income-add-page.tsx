@@ -1,7 +1,8 @@
-export function IncomeAddPage() {
-	return (
-		<div>
-			<h1 className="text-2xl font-semibold">Add income</h1>
-		</div>
-	);
-}
+import { useTranslation } from "react-i18next";
+import { Heading } from "@/shared/components";
+
+export const IncomeAddPage = () => {
+	const { t } = useTranslation();
+
+	return <Heading>{t("single.title-create", { ns: "incomes" })}</Heading>;
+};

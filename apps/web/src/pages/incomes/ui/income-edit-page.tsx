@@ -1,10 +1,8 @@
-import { useParams } from "react-router";
+import { useTranslation } from "react-i18next";
+import { Heading } from "@/shared/components";
 
-export function IncomeEditPage() {
-	const { id } = useParams<{ id: string }>();
-	return (
-		<div>
-			<h1 className="text-2xl font-semibold">Edit income {id}</h1>
-		</div>
-	);
-}
+export const IncomeEditPage = () => {
+	const { t } = useTranslation();
+
+	return <Heading>{t("single.title-edit", { ns: "incomes" })}</Heading>;
+};

@@ -48,11 +48,51 @@ const putExpenseUpdateHandler = () => {
 	});
 };
 
+const getIncomesListHandler = () => {
+	return HttpResponse.json({
+		data: [
+			{
+				id: "01JTZKQX2GT6PHGQER0M8FS6K8",
+				date: "2024-03-01T12:00:00.000Z",
+				totalAmount: 123.45,
+			},
+		],
+		pagination: {},
+	});
+};
+
+const postIncomeCreateHandler = () => {
+	return HttpResponse.json({
+		data: { message: "income_created" as const },
+	});
+};
+
+const getIncomeByIdHandler = () => {
+	return HttpResponse.json({
+		data: {
+			id: "01JTZKQX2GT6PHGQER0M8FS6K8",
+			date: "2024-03-01T12:00:00.000Z",
+			totalAmount: 123.45,
+			lineItems: [{ title: "Salary", quantity: 1, singleAmount: 123.45 }],
+		},
+	});
+};
+
+const putIncomeUpdateHandler = () => {
+	return HttpResponse.json({
+		data: { message: "income_updated" as const },
+	});
+};
+
 export const HANDLERS = [
 	http.get("*/expenses", getExpensesListHandler),
 	http.get("*/expenses/:id", getExpenseByIdHandler),
 	http.post("*/expenses", postExpenseCreateHandler),
 	http.put("*/expenses/:id", putExpenseUpdateHandler),
+	http.get("*/incomes", getIncomesListHandler),
+	http.get("*/incomes/:id", getIncomeByIdHandler),
+	http.post("*/incomes", postIncomeCreateHandler),
+	http.put("*/incomes/:id", putIncomeUpdateHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),
 ];
