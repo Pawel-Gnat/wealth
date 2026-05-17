@@ -18,7 +18,7 @@ Before changing types, forms, or data hooks:
 - Use **`@repo/api`** (`packages/api`): `@repo/api/schemas` for Zod + TypeScript types, `@repo/api/contracts` for oRPC contracts.
 - Wire the client via `orpcClient` in `apps/web/src/shared/lib/orpc/` — do not redefine API shapes in the web app.
 - **Do not add FSD `entities` slices** whose only job is mirroring `@repo/api` types; contracts and schemas from oRPC are the domain layer.
-- Shared income/expense UI belongs in **features** (e.g. `document-form`, `record-line-items`) with `kind: 'income' | 'expense'`, not duplicated `expense-*` / `income-*` trees.
+- Shared income/expense UI belongs in **features** (`document-form`, `document-table`, `record-line-items`) with `kind: 'income' | 'expense'`. **Pages** import them directly — no `expense-*` / `income-*` wrapper slices.
 
 Full monorepo section: **`AGENTS.md` → “Wealth monorepo (`apps/web`) — read first”**. FSD: `.agents/FSD.md`.
 

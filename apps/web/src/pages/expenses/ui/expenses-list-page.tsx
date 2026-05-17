@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { APP_ROUTES } from "@/app/router";
-import { ExpenseTable } from "@/features/expense-table";
+import { DocumentTable } from "@/features/document-table";
 import { ButtonSecondary, Card, Heading, Icon } from "@/shared/components";
 
 export const ExpensesListPage = () => {
@@ -19,7 +19,7 @@ export const ExpensesListPage = () => {
 						</Link>
 					</ButtonSecondary>
 				}
-				content={<ExpenseTable />}
+				content={<DocumentTable kind="expense" />}
 			/>
 		</>
 	);

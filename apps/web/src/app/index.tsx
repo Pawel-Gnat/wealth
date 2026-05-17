@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router";
-import { AppRoutes } from "@/app/router";
+import { AppRouter } from "@/app/router";
 import { AuthProvider } from "@/context/auth";
 import { TooltipProvider } from "@/shared/lib/ui/tooltip";
 
@@ -12,7 +12,7 @@ export default function App() {
 			<BrowserRouter>
 				<TooltipProvider>
 					<AuthProvider>
-						<AppRoutes />
+						<AppRouter />
 					</AuthProvider>
 				</TooltipProvider>
 			</BrowserRouter>

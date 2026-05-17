@@ -1,21 +1,23 @@
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
-import { ExpenseForm } from "@/features/expense-form";
-import { useExpense } from "@/features/expense-form/hooks/use-expense";
+import { useDocument } from "@/features/document";
+import { DocumentForm, DocumentFormSkeleton } from "@/features/document-form";
 import { Card, ErrorState, Heading } from "@/shared/components";
-import { Skeleton } from "@/shared/lib/ui/skeleton";
 
 export const ExpenseFormPage = () => {
 	const { t } = useTranslation();
 	const { id } = useParams();
 	const isEditMode = Boolean(id);
-	const { data, isLoading, isError } = useExpense(id ? { expenseId: id } : {});
+	const { data, isLoading, isError } = useDocument({
+		kind: "expense",
+		...(id ? { documentId: id } : {}),
+	});
 
 	if (isEditMode && isLoading) {
 		return (
 			<>
 				<Heading>{t("single.title-edit", { ns: "expenses" })}</Heading>
-				<Card content={<ExpenseFormSkeleton />} />
+				<Card content={<DocumentFormSkeleton />} />
 			</>
 		);
 	}
@@ -40,25 +42,13 @@ export const ExpenseFormPage = () => {
 			</Heading>
 			<Card
 				content={
-					<ExpenseForm
-						{...(id ? { expenseId: id } : {})}
+					<DocumentForm
+						kind="expense"
+						{...(id ? { documentId: id } : {})}
 						{...(data ? { initialValues: data } : {})}
 					/>
 				}
 			/>
 		</>
-	);
-};
-
-const ExpenseFormSkeleton = () => {
-	return (
-		<div className="space-y-4">
-			<Skeleton className="h-4 w-10" />
-			<Skeleton className="h-9 w-full" />
-			<Skeleton className="h-7 w-16" />
-			<Skeleton className="h-0.5 w-full" />
-			<Skeleton className="h-4 w-14" />
-			<Skeleton className="h-40 w-full" />
-		</div>
 	);
 };

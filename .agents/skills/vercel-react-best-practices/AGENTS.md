@@ -24,7 +24,7 @@ This skill applies to the **wealth** repo. Before adding types, validation, or A
 | `@repo/api/contracts` | oRPC contract definitions consumed by `orpcClient` (`apps/web/src/shared/lib/orpc/orpc-client.ts`) |
 
 - **Single source of truth** for request/response shapes and validation lives in `packages/api`, not in `apps/web/src/entities`.
-- Forms: import schemas from `@repo/api/schemas` and pass them to `zodResolver` (see `expense-form` / `income-form`).
+- Forms: import schemas from `@repo/api/schemas` and pass them to `zodResolver` (see `document-form`).
 - Data hooks: call `orpcClient.expenses.*` / `orpcClient.incomes.*` with types imported from `@repo/api/schemas`; keep TanStack Query keys in `@/shared/lib/tanstack/query-key-factory`.
 
 ### Do not add an `entities` layer for API types

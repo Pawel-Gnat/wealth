@@ -7,33 +7,11 @@ import { ExpenseFormPage, ExpensesListPage } from "@/pages/expenses";
 import { IncomeFormPage, IncomesListPage } from "@/pages/incomes";
 import { DashboardLayout } from "@/widgets/dashboard-layout";
 
-export const APP_ROUTES = {
-	auth: "/auth",
-	dashboard: "/",
-	incomes: {
-		list: "/incomes",
-		add: "/incomes/new",
-		edit: (id: string): `/incomes/${string}` => `/incomes/${id}`,
-	},
-	expenses: {
-		list: "/expenses",
-		add: "/expenses/new",
-		edit: (id: string): `/expenses/${string}` => `/expenses/${id}`,
-	},
-} as const;
-export type AppRoutes = typeof APP_ROUTES;
+export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";
 
-type RoutePathLeaf<T> = T extends string
-	? T
-	: T extends (...args: never[]) => infer R
-		? R
-		: T extends Record<string, unknown>
-			? RoutePathLeaf<T[keyof T]>
-			: never;
+import { APP_ROUTES } from "./routes";
 
-export type AppRoutePath = RoutePathLeaf<AppRoutes>;
-
-export function AppRoutes() {
+export function AppRouter() {
 	return (
 		<Routes>
 			<Route element={<UnauthenticatedLayout />}>
