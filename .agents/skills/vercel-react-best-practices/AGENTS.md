@@ -12,6 +12,41 @@ January 2026
 
 ---
 
+## Wealth monorepo (`apps/web`) — read first
+
+This skill applies to the **wealth** repo. Before adding types, validation, or API layers in the frontend, use the shared API package and oRPC — do not mirror contracts in FSD `entities`.
+
+### `@repo/api` (`packages/api`)
+
+| Import | Use for |
+|--------|---------|
+| `@repo/api/schemas` | Zod schemas and inferred types (`DocumentCreatePayload`, `documentCreatePayloadSchema`, list/detail responses, toast message constants) |
+| `@repo/api/contracts` | oRPC contract definitions consumed by `orpcClient` (`apps/web/src/shared/lib/orpc/orpc-client.ts`) |
+
+- **Single source of truth** for request/response shapes and validation lives in `packages/api`, not in `apps/web/src/entities`.
+- Forms: import schemas from `@repo/api/schemas` and pass them to `zodResolver` (see `expense-form` / `income-form`).
+- Data hooks: call `orpcClient.expenses.*` / `orpcClient.incomes.*` with types imported from `@repo/api/schemas`; keep TanStack Query keys in `@/shared/lib/tanstack/query-key-factory`.
+
+### Do not add an `entities` layer for API types
+
+- **Do not** create `entities/income`, `entities/expense`, or `entities/document` only to re-export types already defined in `@repo/api/schemas`.
+- **Do not** duplicate Zod schemas or DTO mappers that repeat oRPC contract shapes.
+- **OK in `features/*/model/`**: UI-only config (`RecordKind`, i18n keys, route builders), pure helpers (line totals, default form values) that are not part of the API contract.
+- **OK in `features/*/api/`** (or `hooks/`): TanStack Query/mutation hooks wired to `orpcClient`, parameterized by `income` \| `expense` when behavior is shared.
+
+Income and expense share the same document model (`DocumentCreatePayload`, `DocumentListItem`, shared list/get contracts). Prefer **one feature per behavior** (e.g. `document-form`, `record-line-items`, `document-table`) with a `kind` or config object, not parallel `expense-*` / `income-*` copies.
+
+### FSD and architecture docs
+
+- Layering and slice conventions: [`.agents/FSD.md`](../../FSD.md).
+- Product/UI scope: [`.agents/DESIGN.md`](../../DESIGN.md).
+
+### Performance rules below
+
+The sections that follow (waterfalls, bundle size, re-renders, etc.) are **generic** Vercel/React guidance. Apply them on top of the monorepo rules above — never introduce duplicate domain types in `entities` when refactoring for performance or DRY.
+
+---
+
 ## Abstract
 
 Comprehensive performance optimization guide for React and Next.js applications, designed for AI agents and LLMs. Contains 40+ rules across 8 categories, prioritized by impact from critical (eliminating waterfalls, reducing bundle size) to incremental (advanced patterns). Each rule includes detailed explanations, real-world examples comparing incorrect vs. correct implementations, and specific impact metrics to guide automated refactoring and code generation.
