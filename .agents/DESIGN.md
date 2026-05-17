@@ -1,177 +1,120 @@
-Create a clean, modern UI for a simple personal budget application. Focus on layout, reusable components, clear navigation, and good UX. The app should feel minimal, professional, and responsive, with a desktop-first dashboard and solid mobile behavior.
+# Product & UI design — personal budget (`apps/web`)
 
-General requirements:
+High-level UX and screen requirements. **Architecture mapping** (FSD layers, file locations) is in [`FSD.md`](./FSD.md).
 
-- Use a clean dashboard style with a sidebar layout after authentication.
-- Keep the visual design simple, modern, and polished.
-- Use reusable UI components.
-- Use clear spacing, card-based sections, rounded corners, subtle shadows, and strong visual hierarchy.
-- Make the whole app responsive.
-- Use English for all labels, headings, buttons, placeholders, and helper text.
-- Do not implement backend logic. Focus on pages, components, states, and interactions.
+---
 
-Routes and pages:
+## General requirements
 
-1. `/auth`
-   Create a single authentication page with one centered auth card.
-   Inside the card, add tabs to switch between:
+- Clean dashboard with **sidebar after authentication**.
+- Minimal, modern, professional look; responsive (desktop-first dashboard).
+- Reusable UI components; card-based sections; clear hierarchy.
+- **English** copy in the UI (via i18n namespaces in `@repo/common`).
+- Backend is real (oRPC + API); this doc focuses on screens and interactions.
 
-- Sign In
-- Sign Up
+---
 
-Both tab views should contain a form with:
+## Routes and pages
 
-- Email input
-- Password input
-- Primary submit button
+### 1. `/auth`
 
-Design expectations:
+Single auth page: centered card with **Sign In** / **Sign Up** tabs, email + password, submit.
 
-- Clean auth layout
-- Simple logo/title area above the form
-- Tabbed interface inside the card
-- Form validation states in UI
-- Proper input labels and placeholders
-- Responsive centered layout
+**Implementation:** `pages/auth` → `features/auth-form`.
 
-2. `/`
-   Create the main dashboard page shown after login.
-   This page should use a dashboard layout with a left sidebar and a main content area.
+### 2. `/` — Dashboard
 
-Sidebar requirements:
+Sidebar layout + main content. Sidebar: logo, Dashboard / Incomes / Expenses links, logout at bottom.
 
-- App/logo area at the top
-- Navigation links:
-  - Dashboard
-  - Incomes
-  - Expenses
-- Logout button pinned at the bottom of the sidebar
+**Content (planned):** heading + summary cards (Total Incomes, Total Expenses, Current Balance).
 
-Dashboard content requirements:
+**Implementation:** `widgets/dashboard-layout`, `pages/dashboard` (summary cards **not yet** implemented).
 
-- Page heading
-- Summary cards for the current month:
-  - Total Incomes
-  - Total Expenses
-  - Current Balance
-- Use a simple card layout for these values
-- Optionally include small icons or trend indicators
-- Keep it visually clean and readable
+### 3. `/incomes` and 4. `/expenses`
 
-3. `/incomes`
-   Create a page that displays a paginated table or list of income entries.
-   Each entry should show basic information in a readable row/card format.
+Paginated table: date, total amount, edit link, delete control. Page title + **Add** button.
 
-Page requirements:
+**Interactions:**
 
-- Page title
-- “Add Income” button at the top
-- Paginated table or list of entries
-- Each row/item should include:
-  - Description / title
-  - Total amount
-  - Date or basic metadata
-  - Edit button or link
-  - Delete button
+- Edit → `/incomes/:id` or `/expenses/:id`
+- Delete → immediate delete with toast today; **confirmation modal** is planned (see Modal requirements)
 
-Interactions:
+**Implementation:**
 
-- Edit should navigate to `/incomes/:id`
-- Delete should open a confirmation modal before removing the item
+| Concern | Location |
+|---------|----------|
+| Route adapters | `pages/incomes`, `pages/expenses` (pass `kind`) |
+| List shell (title, add link, card) | `widgets/document-list-page` |
+| Table + delete | `features/document-table` |
+| Data | `features/document` hooks + `@repo/api` |
 
-4. `/expenses`
-   Create a page that displays a paginated table or list of expense entries.
-   This should mirror the incomes page but for expenses.
+### 5–8. Add / edit — `/incomes/new`, `/expenses/new`, `/incomes/:id`, `/expenses/:id`
 
-Page requirements:
+Shared form: date, multiple **line items** (description, price, quantity), add/remove rows, line totals, save.
 
-- Page title
-- “Add Expense” button at the top
-- Paginated table or list of entries
-- Each row/item should include:
-  - Description / title
-  - Total amount
-  - Date or basic metadata
-  - Edit button or link
-  - Delete button
+**Implementation:**
 
-Interactions:
+| Concern | Location |
+|---------|----------|
+| Route adapters | `pages/incomes`, `pages/expenses` |
+| Form shell (heading, loading, error) | `widgets/document-form-page` |
+| Form + validation | `features/document-form` |
+| Line item row | `features/record-line-items` |
+| Per-kind labels, routes, API | `features/document` → `DOCUMENT_CONFIG` + `kind` |
 
-- Edit should navigate to `/expenses/:id`
-- Delete should open a confirmation modal before removing the item
+---
 
-5. `/incomes/add`
-   Create a form page for adding a new income record.
+## Shared income / expense model
 
-6. `/expenses/add`
-   Create a form page for adding a new expense record.
+Incomes and expenses are the same **document** shape in the API (line items, date, totals). The UI uses:
 
-7. `/incomes/:id`
-   Create an edit page for an existing income record.
+- `kind: 'income' | 'expense'` on widgets and features
+- `DOCUMENT_CONFIG` for namespace, routes, oRPC client, toast keys
 
-8. `/expenses/:id`
-   Create an edit page for an existing expense record.
+Do **not** duplicate separate `income-form` / `expense-form` feature slices.
 
-Form requirements for add/edit income and expense pages:
-These pages should use the same reusable form design.
-The form should support multiple line items inside one record.
+---
 
-Each line item should contain:
+## Modal requirements (planned)
 
-- Description input
-- Price input
-- Quantity input
+Reusable **confirmation modal** before delete (title, message, cancel, destructive confirm).
 
-Behavior and UI:
+**Current behavior:** delete from table without modal; toast on success/error.
 
-- Button to add a new line item
-- Button to remove the current line item
-- Automatically calculate line total from price × quantity
-- Show a summary section at the bottom with the total sum of all line items
-- Use a clean card or section-based form layout
-- Include primary save action and secondary cancel action
-- Keep edit and create views visually consistent
+**Future home:** `features/delete-record` or dialog in `document-table` when implemented.
 
-Modal requirements:
-Create a reusable confirmation modal for deleting an income or expense.
-The modal should include:
+---
 
-- Clear title
-- Short confirmation message
-- Cancel button
-- Confirm delete button
-  Make the destructive action visually distinct.
+## Component map (implemented vs planned)
 
-Component expectations:
-Create reusable components for:
+| UI building block | Status | Location |
+|-------------------|--------|----------|
+| Auth card + tabs | Done | `features/auth-form` |
+| Sidebar navigation | Done | `widgets/dashboard-layout` |
+| Document list page | Done | `widgets/document-list-page` |
+| Document form page | Done | `widgets/document-form-page` |
+| Data table (incomes/expenses) | Done | `features/document-table` |
+| Record form + line items | Done | `features/document-form`, `record-line-items` |
+| Dashboard summary cards | Planned | `pages/dashboard` / future widget |
+| Pagination controls | Partial | table uses API pagination |
+| Delete confirmation modal | Planned | — |
+| Dedicated “page header” widget | N/A | header lives in `document-list-page` |
 
-- Auth form card with tabs
-- Sidebar navigation
-- Dashboard summary cards
-- Data table or list for incomes and expenses
-- Pagination controls
-- Confirmation modal
-- Reusable record form
-- Reusable line item row
-- Total summary section
-- Page header with action button
+---
 
-Visual style:
+## Visual style
 
-- Minimal and modern
-- Professional finance app aesthetic
-- Neutral base colors with one clear accent color
-- Good contrast and accessible typography
-- Clear hover, focus, active, empty, and disabled states
-- Consistent spacing and alignment
+- Minimal finance-app aesthetic; neutral base + one accent.
+- Accessible contrast; hover/focus/active/empty/disabled states.
+- Consistent spacing; empty and error states on list/form.
 
-Sample content:
-Use realistic demo data for incomes and expenses so the pages look complete and believable.
+---
 
-Deliver:
+## Deliverables checklist
 
-- Full UI structure for all pages listed above
-- Reusable components
-- Responsive layouts
-- Good empty states, pagination states, and modal states
-- Clean navigation flow between auth, dashboard, list pages, and add/edit pages
+- [x] Auth, sidebar layout, navigation
+- [x] Income/expense list and add/edit flows (shared document UI)
+- [x] Line-item forms with validation
+- [ ] Dashboard summary cards
+- [ ] Delete confirmation modal
+- [ ] Full pagination UI polish (if beyond current table)

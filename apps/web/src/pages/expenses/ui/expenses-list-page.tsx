@@ -1,26 +1,3 @@
-import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
-import { APP_ROUTES } from "@/app/router";
-import { DocumentTable } from "@/features/document-table";
-import { ButtonSecondary, Card, Heading, Icon } from "@/shared/components";
+import { DocumentListPage } from "@/widgets/document-list-page";
 
-export const ExpensesListPage = () => {
-	const { t } = useTranslation();
-
-	return (
-		<>
-			<Heading>{t("list.title", { ns: "expenses" })}</Heading>
-			<Card
-				header={
-					<ButtonSecondary className="w-fit ml-auto" asChild>
-						<Link to={APP_ROUTES.expenses.add}>
-							<Icon name="add" />
-							{t("action.add", { ns: "common" })}
-						</Link>
-					</ButtonSecondary>
-				}
-				content={<DocumentTable kind="expense" />}
-			/>
-		</>
-	);
-};
+export const ExpensesListPage = () => <DocumentListPage kind="expense" />;
