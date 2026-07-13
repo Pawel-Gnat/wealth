@@ -12,6 +12,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
+		"@pawel-gnat/ai-toolkit": "^0.1.4",
 		"turbo": "^2.9.6",
 		"typescript": "catalog:"
 	},

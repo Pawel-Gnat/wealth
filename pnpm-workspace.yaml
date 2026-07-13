@@ -1,15 +1,28 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+allowBuilds:
+  '@nestjs/core': true
+  '@pawel-gnat/ai-toolkit': true
+  '@scarf/scarf': true
+  '@sentry-internal/node-cpu-profiler': true
+  '@swc/core': true
+  bcrypt: true
+  cpu-features: true
+  esbuild: true
+  msw: true
+  protobufjs: true
+  sharp: true
+  ssh2: true
 
 catalog:
-  vitest: '^3.2.4'
   '@biomejs/biome': '2.4.11'
   '@hookform/resolvers': '^5.2.2'
   '@types/react': '^19.2.14'
   '@types/react-dom': '^19.2.3'
   react: '^19.2.5'
   react-dom: '^19.2.5'
-  typescript: '5.9.2'
   tsup: '^8.5.1'
+  typescript: '5.9.2'
+  vitest: '^3.2.4'
   zod: '^4.3.6'
