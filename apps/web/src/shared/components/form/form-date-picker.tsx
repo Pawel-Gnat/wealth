@@ -24,6 +24,7 @@ export const FormDatePicker: FormControlFunction = (props) => {
 					<PopoverContent className="w-auto p-0" align="start">
 						<Calendar
 							mode="single"
+							required
 							selected={value}
 							onSelect={(selected) => {
 								onChange(selected);
