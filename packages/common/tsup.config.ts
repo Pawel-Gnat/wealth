@@ -1,12 +1,12 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-	entry: ["src/schemas/index.ts", "src/contracts/index.ts"],
+	entry: ["src/i18n.ts", "src/helpers/index.ts"],
 	format: ["esm"],
 	target: "es2023",
 	outDir: "dist",
 	sourcemap: true,
 	dts: true,
 	treeshake: true,
-	external: ["@orpc/contract", "zod"],
+	external: ["i18next"],
 });

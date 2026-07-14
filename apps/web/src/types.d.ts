@@ -1,4 +1,4 @@
-import type { DEFAULT_NS, I18N_RESOURCES } from "@repo/common";
+import type { DEFAULT_NS, I18N_RESOURCES } from "@repo/common/i18n";
 
 declare module "i18next" {
 	interface CustomTypeOptions {

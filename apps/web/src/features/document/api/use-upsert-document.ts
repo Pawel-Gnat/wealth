@@ -6,6 +6,7 @@ import type {
 	IncomeDocumentCreateResponse,
 	IncomeDocumentUpdateResponse,
 } from "@repo/api/schemas";
+import { normalizeDocumentDateForApi } from "@repo/common/helpers";
 import * as Sentry from "@sentry/react";
 import { useMutation } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/features/document/model/document-config";
@@ -38,14 +39,19 @@ export function useUpsertDocument({
 		DocumentCreatePayload | DocumentUpdatePayload
 	>({
 		mutationFn: async (payload) => {
-			if ("id" in payload) {
-				const { id, ...updatePayload } = payload;
+			const normalizedPayload = {
+				...payload,
+				date: normalizeDocumentDateForApi(payload.date),
+			};
+
+			if ("id" in normalizedPayload) {
+				const { id, ...updatePayload } = normalizedPayload;
 				return controlledAsync<DocumentUpsertResponse>(async () =>
 					config.client.update({ id, ...updatePayload }),
 				);
 			}
 			return controlledAsync<DocumentUpsertResponse>(async () =>
-				config.client.create(payload),
+				config.client.create(normalizedPayload),
 			);
 		},
 		onSuccess: (data) => {

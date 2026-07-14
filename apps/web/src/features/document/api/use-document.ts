@@ -1,4 +1,5 @@
 import type { DocumentCreatePayload } from "@repo/api/schemas";
+import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { useQuery } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/features/document/model/document-config";
 import type { RecordKind } from "@/features/document/model/record-kind";
@@ -24,7 +25,7 @@ export function useDocument({ kind, documentId }: UseDocumentProps) {
 			);
 		},
 		select: (response): DocumentCreatePayload => ({
-			date: new Date(response.data.date),
+			date: decodeDocumentDateFromStorage(response.data.date),
 			lineItems: response.data.lineItems,
 		}),
 	});

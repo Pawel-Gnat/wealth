@@ -1,4 +1,5 @@
 import type { DocumentListItem } from "@repo/api/schemas";
+import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TFunction } from "i18next";
 import { Link } from "react-router";
@@ -39,7 +40,9 @@ export function createDocumentColumns({
 			cell: ({ row }) => {
 				return (
 					<Text size="sm">
-						{new Date(row.original.date).toLocaleDateString(language)}
+						{decodeDocumentDateFromStorage(
+							row.original.date,
+						).toLocaleDateString(language)}
 					</Text>
 				);
 			},

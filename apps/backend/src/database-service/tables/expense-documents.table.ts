@@ -1,4 +1,4 @@
-import { index, numeric, pgTable, text } from "drizzle-orm/pg-core";
+import { date, index, numeric, pgTable, text } from "drizzle-orm/pg-core";
 import { timestamp, ulidPrimaryKey } from "./helpers.js";
 import { usersTable } from "./users.table.js";
 
@@ -12,7 +12,7 @@ export const expenseDocumentsTable = pgTable(
 		totalAmount: numeric("total_amount", { precision: 14, scale: 2 })
 			.notNull()
 			.default("0"),
-		expenseDate: timestamp("expense_date"),
+		expenseDate: date("expense_date").notNull(),
 		createdAt: timestamp("created_at"),
 		updatedAt: timestamp("updated_at"),
 	},

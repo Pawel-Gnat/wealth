@@ -10,6 +10,11 @@ import {
 	type IncomeDocumentDeleteResponse,
 	type IncomeDocumentUpdateResponse,
 } from "@repo/api/schemas";
+import {
+	decodeDocumentDateFromStorage,
+	encodeDocumentDateForStorage,
+	isStoredDocumentDateEqual,
+} from "@repo/common/helpers";
 import { and, desc, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants.js";
@@ -38,7 +43,7 @@ export class IncomesService {
 		return {
 			data: rows.map((row) => ({
 				id: row.id,
-				date: row.incomeDate,
+				date: decodeDocumentDateFromStorage(row.incomeDate),
 				totalAmount: Number(row.totalAmount),
 			})),
 			pagination: {},
@@ -79,7 +84,7 @@ export class IncomesService {
 		return {
 			data: {
 				id: document.id,
-				date: document.date,
+				date: decodeDocumentDateFromStorage(document.date),
 				totalAmount: Number(document.totalAmount),
 				lineItems: lineItems.map((lineItem) => ({
 					title: lineItem.title,
@@ -101,7 +106,7 @@ export class IncomesService {
 				.insert(incomeDocumentsTable)
 				.values({
 					userId,
-					incomeDate: payload.date,
+					incomeDate: encodeDocumentDateForStorage(payload.date),
 					totalAmount: totalAmount.toFixed(2),
 				})
 				.returning({ id: incomeDocumentsTable.id });
@@ -152,15 +157,17 @@ export class IncomesService {
 				throw new Error("Income not found");
 			}
 
-			const dateChanged =
-				existing.incomeDate?.getTime() !== payload.date.getTime();
+			const dateChanged = !isStoredDocumentDateEqual(
+				existing.incomeDate,
+				payload.date,
+			);
 			const totalChanged = existing.totalAmount !== newTotalAmountStr;
 
 			if (dateChanged || totalChanged) {
 				await tx
 					.update(incomeDocumentsTable)
 					.set({
-						incomeDate: payload.date,
+						incomeDate: encodeDocumentDateForStorage(payload.date),
 						totalAmount: newTotalAmountStr,
 						updatedAt: new Date(),
 					})

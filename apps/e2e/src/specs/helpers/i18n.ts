@@ -1,4 +1,4 @@
-import { i18n, initI18n, type Namespace, type ParseKeys } from '@repo/common'
+import { i18n, initI18n, type Namespace, type ParseKeys } from '@repo/common/i18n'
 
 const TEST_LANGUAGE = 'en'
 

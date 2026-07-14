@@ -1,4 +1,4 @@
-import { initI18n } from "@repo/common";
+import { initI18n } from "@repo/common/i18n";
 import type { InitOptions } from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";

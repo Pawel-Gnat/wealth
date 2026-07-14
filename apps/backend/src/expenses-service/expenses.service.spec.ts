@@ -4,9 +4,9 @@ import {
 	EXPENSE_DELETED_MESSAGE,
 	EXPENSE_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
+import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { DBS } from "../database-service/constants.js";
 import {
 	expenseDocumentsTable,
@@ -135,7 +135,7 @@ describe("Expenses service", () => {
 
 			expect(createdDocument).toBeDefined();
 			expect(createdDocument?.totalAmount).toBe("55.00");
-			expect(createdDocument?.expenseDate).toEqual(payload.date);
+			expect(createdDocument?.expenseDate).toBe("2026-05-01");
 			if (!createdDocument) {
 				throw new Error("Expected created document");
 			}
@@ -363,7 +363,7 @@ describe("Expenses service", () => {
 
 			const newDate = "2025-06-15";
 			const payload = {
-				date: newDate,
+				date: decodeDocumentDateFromStorage(newDate),
 				lineItems: [{ title: "Train", quantity: 2, singleAmount: 15 }],
 			};
 
@@ -433,7 +433,7 @@ describe("Expenses service", () => {
 			]);
 
 			const payload = {
-				date: expenseDate,
+				date: decodeDocumentDateFromStorage(expenseDate),
 				lineItems: [{ title: "Coffee", quantity: 11, singleAmount: 5 }],
 			};
 
