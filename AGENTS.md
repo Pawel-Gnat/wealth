@@ -1,6 +1,5 @@
-
-
 <!-- BEGIN @pawel-gnat/ai-toolkit -->
+
 # Pawel — global AI rules
 
 ## Comments
@@ -18,3 +17,8 @@
 - File naming in code: kebab-case.
 - Prefer arrow functions over function declarations.
 <!-- END @pawel-gnat/ai-toolkit -->
+
+## ShadCN UI
+
+- Try to use components from /shared folder, shadcn library keeps raw components inside /ui folder.
+- If you need to use components from /ui folder, analyze then if you need to create a reusable component inside /shared folder.

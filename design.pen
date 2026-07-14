@@ -1,5 +1,5 @@
 {
-  "version": "2.11",
+  "version": "2.14",
   "children": [
     {
       "type": "prompt",
@@ -83,11 +83,9 @@
           "width": "fill_container",
           "fill": "$--card",
           "cornerRadius": 12,
-          "stroke": {
-            "align": "inside",
-            "thickness": 1,
-            "fill": "$--border"
-          },
+          "stroke": "$--border",
+          "strokeWidth": 1,
+          "strokeAlignment": "inner",
           "layout": "vertical",
           "children": [
             {
@@ -170,13 +168,11 @@
               "id": "XIpWg",
               "name": "row1",
               "width": "fill_container",
-              "stroke": {
-                "align": "inside",
-                "thickness": {
-                  "bottom": 1
-                },
-                "fill": "$--border"
+              "stroke": "$--border",
+              "strokeWidth": {
+                "bottom": 1
               },
+              "strokeAlignment": "inner",
               "gap": 16,
               "padding": [
                 14,
@@ -263,11 +259,9 @@
                       "id": "SSqO6",
                       "name": "d1",
                       "cornerRadius": 6,
-                      "stroke": {
-                        "align": "inside",
-                        "thickness": 1,
-                        "fill": "$--border"
-                      },
+                      "stroke": "$--border",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
                       "gap": 6,
                       "padding": [
                         8,
@@ -296,13 +290,11 @@
               "id": "MhEcx",
               "name": "row2",
               "width": "fill_container",
-              "stroke": {
-                "align": "inside",
-                "thickness": {
-                  "bottom": 1
-                },
-                "fill": "$--border"
+              "stroke": "$--border",
+              "strokeWidth": {
+                "bottom": 1
               },
+              "strokeAlignment": "inner",
               "gap": 16,
               "padding": [
                 14,
@@ -389,11 +381,9 @@
                       "id": "rv5xJ",
                       "name": "d2",
                       "cornerRadius": 6,
-                      "stroke": {
-                        "align": "inside",
-                        "thickness": 1,
-                        "fill": "$--border"
-                      },
+                      "stroke": "$--border",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
                       "gap": 6,
                       "padding": [
                         8,
@@ -422,13 +412,11 @@
               "id": "nWNcm",
               "name": "row3",
               "width": "fill_container",
-              "stroke": {
-                "align": "inside",
-                "thickness": {
-                  "bottom": 1
-                },
-                "fill": "$--border"
+              "stroke": "$--border",
+              "strokeWidth": {
+                "bottom": 1
               },
+              "strokeAlignment": "inner",
               "gap": 16,
               "padding": [
                 14,
@@ -515,11 +503,9 @@
                       "id": "I27wT",
                       "name": "d3",
                       "cornerRadius": 6,
-                      "stroke": {
-                        "align": "inside",
-                        "thickness": 1,
-                        "fill": "$--border"
-                      },
+                      "stroke": "$--border",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
                       "gap": 6,
                       "padding": [
                         8,
@@ -634,11 +620,9 @@
                       "id": "cFwyv",
                       "name": "d4",
                       "cornerRadius": 6,
-                      "stroke": {
-                        "align": "inside",
-                        "thickness": 1,
-                        "fill": "$--border"
-                      },
+                      "stroke": "$--border",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
                       "gap": 6,
                       "padding": [
                         8,
@@ -684,11 +668,9 @@
               "id": "pGk0U",
               "name": "prevBtn",
               "cornerRadius": 6,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1,
-                "fill": "$--border"
-              },
+              "stroke": "$--border",
+              "strokeWidth": 1,
+              "strokeAlignment": "inner",
               "gap": 6,
               "padding": [
                 8,
@@ -1629,5 +1611,6 @@
         }
       ]
     }
-  }
+  },
+  "fileToken": "c8f45537-0a9c-450a-900c-8fc9e5e94918"
 }
