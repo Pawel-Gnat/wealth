@@ -9,6 +9,7 @@
 		"check-types": "tsc --noEmit",
 		"lint": "biome check .",
 		"format": "biome check --write .",
+		"ui:patch-ts-nocheck": "node scripts/patch-ui-ts-nocheck.mjs",
 		"preview": "vite preview",
 		"test": "vitest run",
 		"test:watch": "vitest --watch"

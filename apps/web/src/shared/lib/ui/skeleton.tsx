@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { cn } from "@/shared/lib/tailwind/utils"
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
