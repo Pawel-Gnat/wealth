@@ -1,5 +1,9 @@
 import { populateContractRouterPaths } from "@orpc/contract";
 import {
+	getDashboardChartContract,
+	getDashboardWidgetsContract,
+} from "./dashboard.contract";
+import {
 	createExpenseContract,
 	deleteExpenseContract,
 	getExpenseContract,
@@ -36,5 +40,9 @@ export const rpcContract = populateContractRouterPaths({
 		get: getIncomeContract,
 		update: updateIncomeContract,
 		delete: deleteIncomeContract,
+	},
+	dashboard: {
+		getWidgets: getDashboardWidgetsContract,
+		getChart: getDashboardChartContract,
 	},
 });

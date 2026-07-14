@@ -37,6 +37,7 @@
 		"@sentry/nestjs": "^9.47.1",
 		"@sentry/profiling-node": "^9.47.1",
 		"bcrypt": "^6.0.0",
+		"date-fns": "catalog:",
 		"drizzle-orm": "^0.45.2",
 		"passport-jwt": "^4.0.1",
 		"pg": "^8.20.0",
