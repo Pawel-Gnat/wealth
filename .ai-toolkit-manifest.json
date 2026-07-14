@@ -1,15 +1,18 @@
 {
   "package": "@pawel-gnat/ai-toolkit",
-  "version": "0.1.4",
-  "installedAt": "2026-07-13T21:31:04.323Z",
+  "version": "0.1.5",
+  "installedAt": "2026-07-14T05:16:23.597Z",
   "files": [
     ".cursor/skills/build",
+    ".cursor/skills/fix",
     ".cursor/skills/plan",
     ".cursor/skills/research",
     ".claude/skills/build",
+    ".claude/skills/fix",
     ".claude/skills/plan",
     ".claude/skills/research",
     ".agents/skills/build",
+    ".agents/skills/fix",
     ".agents/skills/plan",
     ".agents/skills/research",
     "AGENTS.md"
