@@ -15,12 +15,18 @@ export const dashboardWidgetSchema = z.object({
 });
 export type DashboardWidget = z.infer<typeof dashboardWidgetSchema>;
 
-export const dashboardWidgetsDataSchema = z.object({
+const dashboardWidgetsDataShape = {
 	expenses: dashboardWidgetSchema,
 	incomes: dashboardWidgetSchema,
 	netBalance: dashboardWidgetSchema,
-});
+} as const;
+
+export const dashboardWidgetsDataSchema = z.object(dashboardWidgetsDataShape);
 export type DashboardWidgetsData = z.infer<typeof dashboardWidgetsDataSchema>;
+
+export const dashboardWidgetKindSchema = dashboardWidgetsDataSchema.keyof();
+export type DashboardWidgetKind = z.infer<typeof dashboardWidgetKindSchema>;
+export const dashboardWidgetKinds = dashboardWidgetKindSchema.options;
 
 export const dashboardWidgetsResponseSchema = apiPayload(
 	dashboardWidgetsDataSchema,

@@ -1,3 +1,9 @@
 {
-	"title": "Dashboard"
+	"title": "Dashboard",
+	"widgets": {
+		"expenses": "Expenses",
+		"incomes": "Incomes",
+		"netBalance": "Net balance",
+		"error": "Could not load summary."
+	}
 }

@@ -17,7 +17,7 @@ const trendBadgeVariants = cva("", {
 type UiBadgeVariant = NonNullable<
 	VariantProps<typeof badgeVariants>["variant"]
 >;
-type TrendBadgeVariant = "positive" | "negative";
+export type TrendBadgeVariant = "positive" | "negative";
 type BadgeVariant = UiBadgeVariant | TrendBadgeVariant;
 
 type BadgeProps = Omit<ComponentProps<typeof BadgeUI>, "variant"> & {
