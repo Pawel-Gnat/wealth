@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { apiPayload } from "./common.schema";
 
-export const chartPeriodSchema = z.enum(["month", "week"]).default("month");
-export type ChartPeriod = z.infer<typeof chartPeriodSchema>;
+export const chartPeriodEnumSchema = z.enum(["month", "week"]);
+export const chartPeriodSchema = chartPeriodEnumSchema.default("month");
+export type ChartPeriod = z.infer<typeof chartPeriodEnumSchema>;
+export const chartPeriodValues = chartPeriodEnumSchema.options;
 
 export const dashboardChartInputSchema = z.object({
 	chartPeriod: chartPeriodSchema,

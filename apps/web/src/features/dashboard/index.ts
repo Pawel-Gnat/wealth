@@ -6,6 +6,8 @@ export { buildWidgetLabel } from "./helpers/widget-label";
 export {
 	type ChartPeriod,
 	chartPeriodSchema,
+	chartPeriodValues,
 	DEFAULT_CHART_PERIOD,
 } from "./model/chart-period";
+export { DashboardChartSection } from "./ui/dashboard-chart-section";
 export { DashboardWidgets } from "./ui/dashboard-widgets";

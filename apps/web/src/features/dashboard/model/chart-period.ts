@@ -1,6 +1,10 @@
-import { type ChartPeriod, chartPeriodSchema } from "@repo/api/schemas";
+import {
+	type ChartPeriod,
+	chartPeriodSchema,
+	chartPeriodValues,
+} from "@repo/api/schemas";
 
 export type { ChartPeriod };
-export { chartPeriodSchema };
+export { chartPeriodSchema, chartPeriodValues };
 
 export const DEFAULT_CHART_PERIOD = "month" satisfies ChartPeriod;
