@@ -64,24 +64,18 @@ describe("Incomes service", () => {
 				userId: userA.id,
 				totalAmount: "100",
 				incomeDate: "2024-01-15",
-				createdAt: new Date("2024-01-15T08:00:00.000Z"),
-				updatedAt: new Date("2024-01-16T08:00:00.000Z"),
 			});
 
 			await db.insert(incomeDocumentsTable).values({
 				userId: userA.id,
 				totalAmount: "50.50",
 				incomeDate: "2024-06-01",
-				createdAt: new Date("2024-06-01T12:00:00.000Z"),
-				updatedAt: new Date("2024-06-01T12:00:00.000Z"),
 			});
 
 			await db.insert(incomeDocumentsTable).values({
 				userId: userB.id,
 				totalAmount: "9.99",
 				incomeDate: "2024-03-01",
-				createdAt: new Date("2024-03-01T00:00:00.000Z"),
-				updatedAt: new Date("2024-03-01T00:00:00.000Z"),
 			});
 
 			const forA = await incomesService.listIncomeDocumentsByUserId(userA.id);
@@ -343,8 +337,6 @@ describe("Incomes service", () => {
 					userId: user.id,
 					totalAmount: "20.00",
 					incomeDate: "2024-01-01",
-					createdAt: new Date("2024-01-01T12:00:00.000Z"),
-					updatedAt: new Date("2024-01-02T12:00:00.000Z"),
 				})
 				.returning({ id: incomeDocumentsTable.id });
 
@@ -406,8 +398,6 @@ describe("Incomes service", () => {
 					userId: user.id,
 					totalAmount: "55.00",
 					incomeDate,
-					createdAt: new Date("2026-05-10T10:00:00.000Z"),
-					updatedAt: new Date("2024-03-01T15:00:00.000Z"),
 				})
 				.returning({ id: incomeDocumentsTable.id });
 

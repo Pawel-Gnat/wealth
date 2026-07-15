@@ -9,6 +9,9 @@ catalogs:
     '@biomejs/biome':
       specifier: 2.4.11
       version: 2.4.11
+    '@date-fns/tz':
+      specifier: ^1.4.1
+      version: 1.4.1
     '@hookform/resolvers':
       specifier: ^5.2.2
       version: 5.2.2
@@ -62,6 +65,9 @@ importers:
 
   apps/backend:
     dependencies:
+      '@date-fns/tz':
+        specifier: 'catalog:'
+        version: 1.4.1
       '@nestjs/common':
         specifier: ^11.0.1
         version: 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
