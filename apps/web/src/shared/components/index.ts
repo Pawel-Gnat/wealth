@@ -1,3 +1,4 @@
+export * from "./badge";
 export * from "./breadcrumbs";
 export * from "./button";
 export * from "./card";
@@ -7,5 +8,6 @@ export * from "./icons";
 export * from "./link";
 export * from "./separator";
 export * from "./table";
+export * from "./toggle-group";
 export * from "./tooltip";
 export * from "./typography";
