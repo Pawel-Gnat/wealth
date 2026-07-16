@@ -21,12 +21,9 @@ export const DashboardWidgetCard = ({
 		<Card
 			content={
 				<div className="flex flex-col gap-2">
-					<Text size="sm" className="text-muted-foreground">
-						{label}
-					</Text>
 					<div className="flex flex-wrap items-center gap-2">
-						<Text size="lg" weight="bold">
-							{formatPrice(widget.amount, language)}
+						<Text size="sm" className="text-muted-foreground">
+							{label}
 						</Text>
 						{widget.percentChange !== null && (
 							<Badge variant={getTrendBadgeVariant(kind, widget.percentChange)}>
@@ -34,6 +31,9 @@ export const DashboardWidgetCard = ({
 							</Badge>
 						)}
 					</div>
+					<Text size="lg" weight="bold">
+						{formatPrice(widget.amount, language)}
+					</Text>
 				</div>
 			}
 		/>
