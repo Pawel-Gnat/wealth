@@ -1,8 +1,12 @@
 import type { ChartPeriod } from "@repo/api/schemas";
 import { useTranslation } from "react-i18next";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { useDashboardChart } from "@/features/dashboard/api/use-dashboard-chart";
 import { getChartConfig } from "@/features/dashboard/helpers/get-chart-config";
+import {
+	getChartYAxisMax,
+	getChartYAxisTicks,
+} from "@/features/dashboard/helpers/get-chart-y-axis-max";
 import { toChartData } from "@/features/dashboard/helpers/to-chart-data";
 import { Card, ErrorState, Text } from "@/shared/components";
 import { formatPrice } from "@/shared/helpers/price";
@@ -31,6 +35,8 @@ export const DashboardChart = ({ chartPeriod }: DashboardChartProps) => {
 	}
 
 	const chartData = toChartData(data.points, i18n.language);
+	const yAxisMax = getChartYAxisMax(chartData);
+	const yAxisTicks = getChartYAxisTicks(yAxisMax);
 
 	return (
 		<Card
@@ -44,6 +50,17 @@ export const DashboardChart = ({ chartPeriod }: DashboardChartProps) => {
 							axisLine={false}
 							tickMargin={8}
 							minTickGap={24}
+						/>
+						<YAxis
+							domain={[0, yAxisMax]}
+							ticks={yAxisTicks}
+							tickLine={false}
+							axisLine={false}
+							tickMargin={8}
+							width={64}
+							tickFormatter={(value) =>
+								formatPrice(Number(value), i18n.language)
+							}
 						/>
 						<ChartTooltip
 							content={
