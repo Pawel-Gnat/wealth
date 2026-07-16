@@ -8,6 +8,7 @@ import { getDocumentConfig } from "@/features/document/model/document-config";
 import type { RecordKind } from "@/features/document/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
 type DocumentDeleteResponse =
 	| ExpenseDocumentDeleteResponse
@@ -38,6 +39,9 @@ export function useDeleteDocument({
 			});
 			void queryClient.invalidateQueries({
 				queryKey: config.queryKeys.all(),
+			});
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.dashboard.all(),
 			});
 			onSuccess?.(data);
 		},

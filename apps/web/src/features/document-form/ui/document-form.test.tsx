@@ -7,6 +7,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { DOCUMENT_CONFIG } from "@/features/document/model/document-config";
 import type { RecordKind } from "@/features/document/model/record-kind";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 import { DocumentForm } from "./document-form";
@@ -131,7 +132,8 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind, apiSegment }) => {
 	describe("form submission", () => {
 		it("shows success toast and navigates after create", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<DocumentForm kind={kind} />);
+			const { queryClient } = renderWithProviders(<DocumentForm kind={kind} />);
+			const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -150,6 +152,9 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind, apiSegment }) => {
 			});
 
 			expect(navigateMock).toHaveBeenCalledWith(config.listRoute);
+			expect(invalidateSpy).toHaveBeenCalledWith({
+				queryKey: queryKeys.dashboard.all(),
+			});
 		});
 
 		it("shows error toast on API error", async () => {

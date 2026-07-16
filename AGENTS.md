@@ -46,3 +46,9 @@
 ## API schemas (`@repo/api`)
 
 - All Zod schemas live in `packages/api/src/schemas/` only — do not define validation schemas in `apps/web` or `apps/backend`.
+
+## Web tests (MSW)
+
+- Happy-path API responses for feature tests belong in `apps/web/src/test/mocks/handlers.ts` and are registered on the shared MSW server.
+- Success / default cases should rely on those handlers — do not duplicate the same payload with `server.use` in the test.
+- Use `server.use(...)` only to override the default for that case (e.g. error status, empty list, hanging/loading response).
