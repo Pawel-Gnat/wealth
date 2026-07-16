@@ -1,5 +1,4 @@
 <!-- BEGIN @pawel-gnat/ai-toolkit -->
-
 # Pawel — global AI rules
 
 ## Comments

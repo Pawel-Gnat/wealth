@@ -1,20 +1,26 @@
 {
   "package": "@pawel-gnat/ai-toolkit",
-  "version": "0.1.6",
-  "installedAt": "2026-07-14T15:34:08.941Z",
+  "version": "0.2.0",
+  "installedAt": "2026-07-16T06:07:59.245Z",
   "files": [
     ".cursor/skills/ai-build",
+    ".cursor/skills/ai-change",
     ".cursor/skills/ai-fix",
     ".cursor/skills/ai-plan",
     ".cursor/skills/ai-research",
+    ".cursor/skills/ai-review",
     ".claude/skills/ai-build",
+    ".claude/skills/ai-change",
     ".claude/skills/ai-fix",
     ".claude/skills/ai-plan",
     ".claude/skills/ai-research",
+    ".claude/skills/ai-review",
     ".agents/skills/ai-build",
+    ".agents/skills/ai-change",
     ".agents/skills/ai-fix",
     ".agents/skills/ai-plan",
     ".agents/skills/ai-research",
+    ".agents/skills/ai-review",
     "AGENTS.md"
   ]
 }

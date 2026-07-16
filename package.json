@@ -13,7 +13,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
-		"@pawel-gnat/ai-toolkit": "^0.1.6",
+		"@pawel-gnat/ai-toolkit": "^0.2.0",
 		"lefthook": "^2.1.10",
 		"turbo": "^2.9.6",
 		"typescript": "catalog:"
