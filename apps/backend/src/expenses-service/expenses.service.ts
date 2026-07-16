@@ -10,6 +10,11 @@ import {
 	type ExpenseDocumentDeleteResponse,
 	type ExpenseDocumentUpdateResponse,
 } from "@repo/api/schemas";
+import {
+	decodeDocumentDateFromStorage,
+	encodeDocumentDateForStorage,
+	isStoredDocumentDateEqual,
+} from "@repo/common/helpers";
 import { and, desc, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants.js";
@@ -38,7 +43,7 @@ export class ExpensesService {
 		return {
 			data: rows.map((row) => ({
 				id: row.id,
-				date: row.expenseDate,
+				date: decodeDocumentDateFromStorage(row.expenseDate),
 				totalAmount: Number(row.totalAmount),
 			})),
 			pagination: {},
@@ -79,7 +84,7 @@ export class ExpensesService {
 		return {
 			data: {
 				id: document.id,
-				date: document.date,
+				date: decodeDocumentDateFromStorage(document.date),
 				totalAmount: Number(document.totalAmount),
 				lineItems: lineItems.map((lineItem) => ({
 					title: lineItem.title,
@@ -101,7 +106,7 @@ export class ExpensesService {
 				.insert(expenseDocumentsTable)
 				.values({
 					userId,
-					expenseDate: payload.date,
+					expenseDate: encodeDocumentDateForStorage(payload.date),
 					totalAmount: totalAmount.toFixed(2),
 				})
 				.returning({ id: expenseDocumentsTable.id });
@@ -152,15 +157,17 @@ export class ExpensesService {
 				throw new Error("Expense not found");
 			}
 
-			const dateChanged =
-				existing.expenseDate?.getTime() !== payload.date.getTime();
+			const dateChanged = !isStoredDocumentDateEqual(
+				existing.expenseDate,
+				payload.date,
+			);
 			const totalChanged = existing.totalAmount !== newTotalAmountStr;
 
 			if (dateChanged || totalChanged) {
 				await tx
 					.update(expenseDocumentsTable)
 					.set({
-						expenseDate: payload.date,
+						expenseDate: encodeDocumentDateForStorage(payload.date),
 						totalAmount: newTotalAmountStr,
 						updatedAt: new Date(),
 					})

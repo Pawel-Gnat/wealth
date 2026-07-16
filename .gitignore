@@ -25,7 +25,7 @@ coverage
 # Build Outputs
 .next/
 out/
-/build
+build
 dist
 *.tsbuildinfo
 

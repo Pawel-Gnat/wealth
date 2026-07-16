@@ -26,9 +26,9 @@ Single auth page: centered card with **Sign In** / **Sign Up** tabs, email + pas
 
 Sidebar layout + main content. Sidebar: logo, Dashboard / Incomes / Expenses links, logout at bottom.
 
-**Content (planned):** heading + summary cards (Total Incomes, Total Expenses, Current Balance).
+**Content:** heading, summary widgets (Expenses, Incomes, Net balance with MoM % badges), and a cumulative line chart (month/week toggle).
 
-**Implementation:** `widgets/dashboard-layout`, `pages/dashboard` (summary cards **not yet** implemented).
+**Implementation:** `widgets/dashboard-layout`, `pages/dashboard` → `features/dashboard` (`DashboardContent`).
 
 ### 3. `/incomes` and 4. `/expenses`
 
@@ -95,7 +95,7 @@ Reusable **confirmation modal** before delete (title, message, cancel, destructi
 | Document form page | Done | `widgets/document-form-page` |
 | Data table (incomes/expenses) | Done | `features/document-table` |
 | Record form + line items | Done | `features/document-form`, `record-line-items` |
-| Dashboard summary cards | Planned | `pages/dashboard` / future widget |
+| Dashboard summary cards + chart | Done | `features/dashboard`, `pages/dashboard` |
 | Pagination controls | Partial | table uses API pagination |
 | Delete confirmation modal | Planned | — |
 | Dedicated “page header” widget | N/A | header lives in `document-list-page` |
@@ -115,6 +115,6 @@ Reusable **confirmation modal** before delete (title, message, cancel, destructi
 - [x] Auth, sidebar layout, navigation
 - [x] Income/expense list and add/edit flows (shared document UI)
 - [x] Line-item forms with validation
-- [ ] Dashboard summary cards
+- [x] Dashboard summary cards
 - [ ] Delete confirmation modal
 - [ ] Full pagination UI polish (if beyond current table)

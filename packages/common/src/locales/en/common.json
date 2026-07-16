@@ -3,7 +3,12 @@
 		"amount": "Amount",
 		"date": "Date",
 		"actions": "Actions",
-		"loading": "Loading"
+		"loading": "Loading",
+		"expenses": "Expenses",
+		"incomes": "Incomes",
+		"net_balance": "Net balance",
+		"month": "Month",
+		"week": "Week"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",

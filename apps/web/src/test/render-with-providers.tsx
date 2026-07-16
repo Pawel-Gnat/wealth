@@ -5,14 +5,17 @@ import { MemoryRouter } from "react-router";
 import { AuthProvider } from "@/context/auth";
 import { TooltipProvider } from "@/shared/lib/ui/tooltip";
 
-export const createWrapper = () => {
-	const queryClient = new QueryClient({
+export const createTestQueryClient = () =>
+	new QueryClient({
 		defaultOptions: {
 			queries: { retry: false },
 			mutations: { retry: false },
 		},
 	});
 
+export const createWrapper = (
+	queryClient: QueryClient = createTestQueryClient(),
+) => {
 	return ({ children }: { children: ReactNode }) => (
 		<QueryClientProvider client={queryClient}>
 			<MemoryRouter>
@@ -28,5 +31,11 @@ export const renderWithProviders = (
 	ui: ReactElement,
 	options?: Omit<RenderOptions, "wrapper">,
 ) => {
-	return render(ui, { wrapper: createWrapper(), ...options });
+	const queryClient = createTestQueryClient();
+	const result = render(ui, {
+		wrapper: createWrapper(queryClient),
+		...options,
+	});
+
+	return { ...result, queryClient };
 };

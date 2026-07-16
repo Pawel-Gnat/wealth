@@ -22,6 +22,10 @@ async function orpcTransportFetch(
 			if (token) {
 				headers.set("Authorization", `Bearer ${token}`);
 			}
+			headers.set(
+				"X-Timezone",
+				Intl.DateTimeFormat().resolvedOptions().timeZone,
+			);
 		}
 
 		return await fetch(input, {

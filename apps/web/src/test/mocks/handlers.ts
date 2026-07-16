@@ -84,6 +84,30 @@ const putIncomeUpdateHandler = () => {
 	});
 };
 
+const getDashboardWidgetsHandler = () => {
+	return HttpResponse.json({
+		data: {
+			expenses: { amount: 100, percentChange: 12.5 },
+			incomes: { amount: 250, percentChange: null },
+			netBalance: { amount: 150, percentChange: -3.2 },
+		},
+	});
+};
+
+const getDashboardChartHandler = () => {
+	return HttpResponse.json({
+		data: {
+			points: [
+				{
+					date: "2024-07-01T00:00:00.000Z",
+					expensesCumulative: 100,
+					incomesCumulative: 50,
+				},
+			],
+		},
+	});
+};
+
 export const HANDLERS = [
 	http.get("*/expenses", getExpensesListHandler),
 	http.get("*/expenses/:id", getExpenseByIdHandler),
@@ -93,6 +117,8 @@ export const HANDLERS = [
 	http.get("*/incomes/:id", getIncomeByIdHandler),
 	http.post("*/incomes", postIncomeCreateHandler),
 	http.put("*/incomes/:id", putIncomeUpdateHandler),
+	http.get("*/dashboard/widgets", getDashboardWidgetsHandler),
+	http.get("*/dashboard/chart", getDashboardChartHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),
 ];

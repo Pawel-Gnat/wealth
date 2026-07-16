@@ -11,6 +11,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { DOCUMENT_CONFIG } from "@/features/document/model/document-config";
 import type { RecordKind } from "@/features/document/model/record-kind";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 import { DocumentTable } from "./document-table";
@@ -140,7 +141,8 @@ describe.each(tableKinds)("$kind DocumentTable", ({
 			),
 		);
 
-		renderWithProviders(<DocumentTable kind={kind} />);
+		const { queryClient } = renderWithProviders(<DocumentTable kind={kind} />);
+		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
 		const deleteButtonLabel = t("action.delete", { ns: "common" });
 		const noResultsMessage = t("list.no-results", { ns: config.i18nNamespace });
@@ -159,6 +161,9 @@ describe.each(tableKinds)("$kind DocumentTable", ({
 		});
 
 		expect(listCallCount).toBeGreaterThanOrEqual(2);
+		expect(invalidateSpy).toHaveBeenCalledWith({
+			queryKey: queryKeys.dashboard.all(),
+		});
 	});
 
 	it("shows error toast when delete fails", async () => {

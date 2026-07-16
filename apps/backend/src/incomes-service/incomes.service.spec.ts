@@ -4,9 +4,9 @@ import {
 	INCOME_DELETED_MESSAGE,
 	INCOME_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
+import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { DBS } from "../database-service/constants.js";
 import {
 	incomeDocumentsTable,
@@ -63,25 +63,19 @@ describe("Incomes service", () => {
 			await db.insert(incomeDocumentsTable).values({
 				userId: userA.id,
 				totalAmount: "100",
-				incomeDate: new Date("2024-01-15T08:00:00.000Z"),
-				createdAt: new Date("2024-01-15T08:00:00.000Z"),
-				updatedAt: new Date("2024-01-16T08:00:00.000Z"),
+				incomeDate: "2024-01-15",
 			});
 
 			await db.insert(incomeDocumentsTable).values({
 				userId: userA.id,
 				totalAmount: "50.50",
-				incomeDate: new Date("2024-06-01T12:00:00.000Z"),
-				createdAt: new Date("2024-06-01T12:00:00.000Z"),
-				updatedAt: new Date("2024-06-01T12:00:00.000Z"),
+				incomeDate: "2024-06-01",
 			});
 
 			await db.insert(incomeDocumentsTable).values({
 				userId: userB.id,
 				totalAmount: "9.99",
-				incomeDate: new Date("2024-03-01T00:00:00.000Z"),
-				createdAt: new Date("2024-03-01T00:00:00.000Z"),
-				updatedAt: new Date("2024-03-01T00:00:00.000Z"),
+				incomeDate: "2024-03-01",
 			});
 
 			const forA = await incomesService.listIncomeDocumentsByUserId(userA.id);
@@ -91,12 +85,12 @@ describe("Incomes service", () => {
 
 			expect(forA.data[1]).toMatchObject({
 				totalAmount: 100,
-				date: new Date("2024-01-15T08:00:00.000Z"),
+				date: decodeDocumentDateFromStorage("2024-01-15"),
 			});
 
 			expect(forA.data[0]).toMatchObject({
 				totalAmount: 50.5,
-				date: new Date("2024-06-01T12:00:00.000Z"),
+				date: decodeDocumentDateFromStorage("2024-06-01"),
 			});
 
 			const forB = await incomesService.listIncomeDocumentsByUserId(userB.id);
@@ -114,7 +108,7 @@ describe("Incomes service", () => {
 			});
 
 			const payload = {
-				date: new Date("2026-05-01T10:00:00.000Z"),
+				date: decodeDocumentDateFromStorage("2026-05-01"),
 				lineItems: [
 					{ title: "Salary", quantity: 2, singleAmount: 12.5 },
 					{ title: "Bonus", quantity: 1, singleAmount: 30 },
@@ -135,7 +129,7 @@ describe("Incomes service", () => {
 
 			expect(createdDocument).toBeDefined();
 			expect(createdDocument?.totalAmount).toBe("55.00");
-			expect(createdDocument?.incomeDate).toEqual(payload.date);
+			expect(createdDocument?.incomeDate).toBe("2026-05-01");
 			if (!createdDocument) {
 				throw new Error("Expected created document");
 			}
@@ -169,7 +163,7 @@ describe("Incomes service", () => {
 			});
 
 			const payload = {
-				date: new Date("2026-05-02T12:30:00.000Z"),
+				date: decodeDocumentDateFromStorage("2026-05-02"),
 				lineItems: [{ title: "Freelance", quantity: 3, singleAmount: 4 }],
 			};
 
@@ -187,7 +181,7 @@ describe("Incomes service", () => {
 		it("throws when user does not exist", async () => {
 			const missingUserId = "01K1MISSINGUSER000000000000";
 			const payload = {
-				date: new Date("2026-05-03T09:00:00.000Z"),
+				date: decodeDocumentDateFromStorage("2026-05-03"),
 				lineItems: [{ title: "Consulting", quantity: 1, singleAmount: 15 }],
 			};
 
@@ -200,7 +194,7 @@ describe("Incomes service", () => {
 			const db = moduleRef.get(DBS.APP);
 			const missingUserId = "01K1MISSINGUSER000000000000";
 			const payload = {
-				date: new Date("2026-05-03T09:00:00.000Z"),
+				date: decodeDocumentDateFromStorage("2026-05-03"),
 				lineItems: [{ title: "Consulting", quantity: 1, singleAmount: 15 }],
 			};
 
@@ -242,7 +236,7 @@ describe("Incomes service", () => {
 				.values({
 					userId: owner.id,
 					totalAmount: "20.00",
-					incomeDate: new Date("2026-05-04T09:00:00.000Z"),
+					incomeDate: "2026-05-04",
 				})
 				.returning({ id: incomeDocumentsTable.id });
 
@@ -251,7 +245,7 @@ describe("Incomes service", () => {
 				.values({
 					userId: otherUser.id,
 					totalAmount: "30.00",
-					incomeDate: new Date("2026-05-05T10:00:00.000Z"),
+					incomeDate: "2026-05-05",
 				})
 				.returning({ id: incomeDocumentsTable.id });
 
@@ -309,7 +303,7 @@ describe("Incomes service", () => {
 				.values({
 					userId: otherUser.id,
 					totalAmount: "44.00",
-					incomeDate: new Date("2026-05-06T08:00:00.000Z"),
+					incomeDate: "2026-05-06",
 				})
 				.returning({ id: incomeDocumentsTable.id });
 
@@ -342,9 +336,7 @@ describe("Incomes service", () => {
 				.values({
 					userId: user.id,
 					totalAmount: "20.00",
-					incomeDate: new Date("2024-01-01T12:00:00.000Z"),
-					createdAt: new Date("2024-01-01T12:00:00.000Z"),
-					updatedAt: new Date("2024-01-02T12:00:00.000Z"),
+					incomeDate: "2024-01-01",
 				})
 				.returning({ id: incomeDocumentsTable.id });
 
@@ -359,9 +351,9 @@ describe("Incomes service", () => {
 				singleAmount: "20.00",
 			});
 
-			const newDate = new Date("2025-06-15T08:00:00.000Z");
+			const newDate = "2025-06-15";
 			const payload = {
-				date: newDate,
+				date: decodeDocumentDateFromStorage(newDate),
 				lineItems: [{ title: "Royalty", quantity: 2, singleAmount: 15 }],
 			};
 
@@ -399,15 +391,13 @@ describe("Incomes service", () => {
 				emailTag: "inc-update-skip-doc",
 			});
 
-			const incomeDate = new Date("2026-05-10T10:00:00.000Z");
+			const incomeDate = "2026-05-10";
 			const [income] = await db
 				.insert(incomeDocumentsTable)
 				.values({
 					userId: user.id,
 					totalAmount: "55.00",
 					incomeDate,
-					createdAt: new Date("2026-05-10T10:00:00.000Z"),
-					updatedAt: new Date("2024-03-01T15:00:00.000Z"),
 				})
 				.returning({ id: incomeDocumentsTable.id });
 
@@ -431,7 +421,7 @@ describe("Incomes service", () => {
 			]);
 
 			const payload = {
-				date: incomeDate,
+				date: decodeDocumentDateFromStorage(incomeDate),
 				lineItems: [{ title: "Commission", quantity: 11, singleAmount: 5 }],
 			};
 
@@ -476,7 +466,7 @@ describe("Incomes service", () => {
 				.values({
 					userId: otherUser.id,
 					totalAmount: "22.00",
-					incomeDate: new Date("2026-05-07T08:00:00.000Z"),
+					incomeDate: "2026-05-07",
 				})
 				.returning({ id: incomeDocumentsTable.id });
 
@@ -493,7 +483,7 @@ describe("Incomes service", () => {
 
 			await expect(
 				incomesService.updateIncomeByUserId(owner.id, otherIncome.id, {
-					date: new Date("2026-05-08T08:00:00.000Z"),
+					date: decodeDocumentDateFromStorage("2026-05-08"),
 					lineItems: [{ title: "X", quantity: 1, singleAmount: 10 }],
 				}),
 			).rejects.toThrow("Income not found");

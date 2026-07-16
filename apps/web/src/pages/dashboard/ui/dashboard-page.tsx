@@ -1,12 +1,5 @@
-import { useTranslation } from "react-i18next";
-import { Heading } from "@/shared/components";
+import { DashboardContent } from "@/features/dashboard";
 
 export function DashboardPage() {
-	const { t } = useTranslation();
-
-	return (
-		<div>
-			<Heading>{t("title", { ns: "dashboard" })}</Heading>
-		</div>
-	);
+	return <DashboardContent />;
 }

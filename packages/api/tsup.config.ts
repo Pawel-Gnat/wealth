@@ -5,7 +5,6 @@ export default defineConfig({
 	format: ["esm"],
 	target: "es2023",
 	outDir: "dist",
-	clean: true,
 	sourcemap: true,
 	dts: true,
 	treeshake: true,

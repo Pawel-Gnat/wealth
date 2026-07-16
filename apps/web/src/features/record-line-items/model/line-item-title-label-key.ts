@@ -1,4 +1,4 @@
-import type { ParseNsKeys } from "@repo/common";
+import type { ParseNsKeys } from "@repo/common/i18n";
 
 type FormLineItemTitleLabelNsKey = Extract<
 	ParseNsKeys<"form">,

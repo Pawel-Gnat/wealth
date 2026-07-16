@@ -17,7 +17,7 @@
 	},
 	"scripts": {
 		"dev": "tsup --watch",
-		"build": "tsup",
+		"build": "tsup --clean",
 		"lint": "biome check .",
 		"format": "biome check --write .",
 		"check-types": "tsc --noEmit"

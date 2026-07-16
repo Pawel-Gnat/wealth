@@ -64,7 +64,7 @@ One slice per **routing domain** (`auth`, `dashboard`, `incomes`, `expenses`).
 | Route | Page slice | Widget / feature |
 |-------|------------|------------------|
 | `/auth` | `pages/auth` | `features/auth-form` |
-| `/` | `pages/dashboard` | (stub — summary cards planned) |
+| `/` | `pages/dashboard` | `features/dashboard` (`DashboardContent`) |
 | `/incomes`, `/incomes/new`, `/incomes/:id` | `pages/incomes` | `widgets/document-list-page`, `document-form-page` with `kind="income"` |
 | `/expenses`, … | `pages/expenses` | same widgets with `kind="expense"` |
 
@@ -130,8 +130,8 @@ Validation schemas: **`@repo/api/schemas`** (Zod). Features wire forms to those 
 
 ## Current snapshot
 
-- Router, auth, dashboard layout, and full **income/expense** CRUD UI are implemented.
-- **Dashboard** summary cards and **delete confirmation modal** are described in `DESIGN.md` but not built yet.
+- Router, auth, dashboard layout, **dashboard summary widgets + chart**, and full **income/expense** CRUD UI are implemented.
+- **Delete confirmation modal** is described in `DESIGN.md` but not built yet.
 - Tests for document table/form live under `features/document-*/ui/*.test.tsx`.
 
 Keep **pages** as thin route adapters and **features** as the place for behavior and data.
