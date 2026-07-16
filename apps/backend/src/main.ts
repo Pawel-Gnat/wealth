@@ -23,6 +23,7 @@ async function bootstrap() {
 	app.enableCors({
 		origin: corsOrigin,
 		credentials: true,
+		allowedHeaders: ["Authorization", "Content-Type", "X-Timezone"],
 	});
 
 	const generator = new OpenAPIGenerator({

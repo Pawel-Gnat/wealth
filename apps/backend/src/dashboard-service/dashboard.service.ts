@@ -15,14 +15,18 @@ import {
 	expenseDocumentsTable,
 	incomeDocumentsTable,
 } from "../database-service/tables/index.js";
+import { getTodayInTimeZone } from "../shared/time-zone/get-today-in-time-zone.js";
 import type { AmountRow } from "./types/amount-row.js";
 
 @Injectable()
 export class DashboardService {
 	constructor(@Inject(DBS.APP) private readonly db: NodePgDatabase) {}
 
-	async getWidgets(userId: string): Promise<DashboardWidgetsResponse> {
-		const today = encodeDocumentDateForStorage(new Date());
+	async getWidgets(
+		userId: string,
+		timeZone: string,
+	): Promise<DashboardWidgetsResponse> {
+		const today = getTodayInTimeZone(timeZone);
 		const currentMonthStart = this.getCurrentMonthStart(today);
 		const previousPeriod = this.getPreviousPeriodBounds(today);
 
@@ -89,8 +93,9 @@ export class DashboardService {
 	async getChart(
 		userId: string,
 		chartPeriod: ChartPeriod,
+		timeZone: string,
 	): Promise<DashboardChartResponse> {
-		const today = encodeDocumentDateForStorage(new Date());
+		const today = getTodayInTimeZone(timeZone);
 		const periodStart =
 			chartPeriod === "week"
 				? this.getCurrentWeekStart(today)

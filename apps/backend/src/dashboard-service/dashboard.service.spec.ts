@@ -56,7 +56,9 @@ describe("Dashboard service", () => {
 				emailTag: "dash-empty",
 			});
 
-			await expect(dashboardService.getWidgets(user.id)).resolves.toEqual({
+			await expect(
+				dashboardService.getWidgets(user.id, "UTC"),
+			).resolves.toEqual({
 				data: {
 					expenses: { amount: 0, percentChange: null },
 					incomes: { amount: 0, percentChange: null },
@@ -91,7 +93,7 @@ describe("Dashboard service", () => {
 				incomeDate: "2026-07-05",
 			});
 
-			const result = await dashboardService.getWidgets(user.id);
+			const result = await dashboardService.getWidgets(user.id, "UTC");
 
 			expect(result.data.expenses.amount).toBe(150);
 			expect(result.data.incomes.amount).toBe(300);
@@ -111,7 +113,7 @@ describe("Dashboard service", () => {
 				expenseDate: "2026-07-10",
 			});
 
-			const result = await dashboardService.getWidgets(user.id);
+			const result = await dashboardService.getWidgets(user.id, "UTC");
 
 			expect(result.data.expenses.percentChange).toBeNull();
 		});
@@ -136,7 +138,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getWidgets(user.id);
+			const result = await dashboardService.getWidgets(user.id, "UTC");
 
 			const previousDays = 15;
 			const currentDays = 15;
@@ -168,7 +170,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getWidgets(user.id);
+			const result = await dashboardService.getWidgets(user.id, "UTC");
 
 			const previousDays = 15;
 			const currentDays = 15;
@@ -204,7 +206,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getWidgets(user.id);
+			const result = await dashboardService.getWidgets(user.id, "UTC");
 
 			const previousDays = 28;
 			const currentDays = 31;
@@ -236,9 +238,41 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getWidgets(user.id);
+			const result = await dashboardService.getWidgets(user.id, "UTC");
 
 			expect(result.data.expenses.amount).toBe(100);
+		});
+
+		it("uses the client time zone for the today boundary", async () => {
+			vi.setSystemTime(new Date("2026-07-15T23:30:00.000Z"));
+
+			const db = moduleRef.get(DBS.APP);
+			const user = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "dash-tz-boundary",
+			});
+
+			await db.insert(expenseDocumentsTable).values([
+				{
+					userId: user.id,
+					totalAmount: "100",
+					expenseDate: "2026-07-15",
+				},
+				{
+					userId: user.id,
+					totalAmount: "50",
+					expenseDate: "2026-07-16",
+				},
+			]);
+
+			const utcResult = await dashboardService.getWidgets(user.id, "UTC");
+			const warsawResult = await dashboardService.getWidgets(
+				user.id,
+				"Europe/Warsaw",
+			);
+
+			expect(utcResult.data.expenses.amount).toBe(100);
+			expect(warsawResult.data.expenses.amount).toBe(150);
 		});
 	});
 
@@ -249,7 +283,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-chart-empty",
 			});
 
-			const result = await dashboardService.getChart(user.id, "month");
+			const result = await dashboardService.getChart(user.id, "month", "UTC");
 
 			expect(result.data.points.length).toBe(15);
 			expect(
@@ -286,7 +320,7 @@ describe("Dashboard service", () => {
 				incomeDate: "2026-07-02",
 			});
 
-			const result = await dashboardService.getChart(user.id, "month");
+			const result = await dashboardService.getChart(user.id, "month", "UTC");
 
 			const expensesByDate = new Map(
 				result.data.points.map((point) => [
@@ -315,7 +349,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-chart-month",
 			});
 
-			const result = await dashboardService.getChart(user.id, "month");
+			const result = await dashboardService.getChart(user.id, "month", "UTC");
 
 			expect(result.data.points[0]?.date).toEqual(
 				decodeDocumentDateFromStorage("2026-07-01"),
@@ -331,7 +365,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-chart-week",
 			});
 
-			const result = await dashboardService.getChart(user.id, "week");
+			const result = await dashboardService.getChart(user.id, "week", "UTC");
 
 			expect(result.data.points.length).toBe(3);
 			expect(result.data.points[0]?.date).toEqual(
@@ -363,8 +397,8 @@ describe("Dashboard service", () => {
 				incomeDate: "2026-07-14",
 			});
 
-			const widgets = await dashboardService.getWidgets(user.id);
-			const chart = await dashboardService.getChart(user.id, "month");
+			const widgets = await dashboardService.getWidgets(user.id, "UTC");
+			const chart = await dashboardService.getChart(user.id, "month", "UTC");
 
 			expect(widgets.data).toMatchObject({
 				expenses: { amount: 75 },

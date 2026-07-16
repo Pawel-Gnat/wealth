@@ -38,6 +38,7 @@
 		"@sentry/profiling-node": "^9.47.1",
 		"bcrypt": "^6.0.0",
 		"date-fns": "catalog:",
+		"date-fns-tz": "^3.2.0",
 		"drizzle-orm": "^0.45.2",
 		"passport-jwt": "^4.0.1",
 		"pg": "^8.20.0",
