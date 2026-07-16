@@ -15,6 +15,3 @@ export const getChartYAxisMax = (points: DashboardChartDataPoint[]) => {
 
 	return Math.ceil(maxValue / 10) * 10;
 };
-
-export const getChartYAxisTicks = (yAxisMax: number) =>
-	Array.from({ length: yAxisMax / 10 + 1 }, (_, index) => index * 10);

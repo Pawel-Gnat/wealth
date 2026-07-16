@@ -23,8 +23,9 @@ describe("getTrendBadgeVariant", () => {
 		expect(getTrendBadgeVariant("netBalance", -4)).toBe("negative");
 	});
 
-	it("treats zero change as non-increase for expenses and incomes", () => {
-		expect(getTrendBadgeVariant("expenses", 0)).toBe("positive");
-		expect(getTrendBadgeVariant("incomes", 0)).toBe("negative");
+	it("treats zero change as neutral for all widget kinds", () => {
+		expect(getTrendBadgeVariant("expenses", 0)).toBe("neutral");
+		expect(getTrendBadgeVariant("incomes", 0)).toBe("neutral");
+		expect(getTrendBadgeVariant("netBalance", 0)).toBe("neutral");
 	});
 });

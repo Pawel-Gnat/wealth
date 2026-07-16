@@ -142,9 +142,44 @@ describe("Dashboard service", () => {
 			const currentDays = 15;
 			const avgPrevious = 150 / previousDays;
 			const avgCurrent = 300 / currentDays;
-			const expected = ((avgCurrent - avgPrevious) / avgPrevious) * 100;
+			const expected =
+				((avgCurrent - avgPrevious) / Math.abs(avgPrevious)) * 100;
 
 			expect(result.data.expenses.percentChange).toBe(expected);
+		});
+
+		it("keeps net balance percentChange direction when previous average is negative", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const user = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "dash-neg-net",
+			});
+
+			await db.insert(expenseDocumentsTable).values([
+				{
+					userId: user.id,
+					totalAmount: "300",
+					expenseDate: "2026-06-01",
+				},
+				{
+					userId: user.id,
+					totalAmount: "100",
+					expenseDate: "2026-07-01",
+				},
+			]);
+
+			const result = await dashboardService.getWidgets(user.id);
+
+			const previousDays = 15;
+			const currentDays = 15;
+			const avgPrevious = -300 / previousDays;
+			const avgCurrent = -100 / currentDays;
+			const expected =
+				((avgCurrent - avgPrevious) / Math.abs(avgPrevious)) * 100;
+
+			expect(result.data.netBalance.amount).toBe(-100);
+			expect(result.data.netBalance.percentChange).toBe(expected);
+			expect(result.data.netBalance.percentChange).toBeGreaterThan(0);
 		});
 
 		it("clamps the previous period end when the current day exceeds the previous month length", async () => {
@@ -175,7 +210,8 @@ describe("Dashboard service", () => {
 			const currentDays = 31;
 			const avgPrevious = 280 / previousDays;
 			const avgCurrent = 100 / currentDays;
-			const expected = ((avgCurrent - avgPrevious) / avgPrevious) * 100;
+			const expected =
+				((avgCurrent - avgPrevious) / Math.abs(avgPrevious)) * 100;
 
 			expect(result.data.expenses.percentChange).toBe(expected);
 		});

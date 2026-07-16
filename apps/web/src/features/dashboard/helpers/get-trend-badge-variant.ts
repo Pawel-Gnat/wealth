@@ -5,6 +5,10 @@ export const getTrendBadgeVariant = (
 	kind: DashboardWidgetKind,
 	percentChange: number,
 ): TrendBadgeVariant => {
+	if (percentChange === 0) {
+		return "neutral";
+	}
+
 	const isIncrease = percentChange > 0;
 
 	switch (kind) {

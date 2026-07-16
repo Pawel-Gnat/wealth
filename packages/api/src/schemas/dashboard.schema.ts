@@ -38,7 +38,7 @@ export type DashboardWidgetsResponse = z.infer<
 >;
 
 export const dashboardChartPointSchema = z.object({
-	date: z.date(),
+	date: z.coerce.date(),
 	expensesCumulative: z.number(),
 	incomesCumulative: z.number(),
 });

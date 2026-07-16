@@ -45,9 +45,15 @@ describe("DashboardWidgets", () => {
 		expect(screen.getByText("+12.5%")).toBeInTheDocument();
 		expect(screen.getByText("-3.2%")).toBeInTheDocument();
 		expect(screen.queryByText("0.0%")).not.toBeInTheDocument();
-		expect(screen.getByText(/Expenses ·/)).toBeInTheDocument();
-		expect(screen.getByText(/Incomes ·/)).toBeInTheDocument();
-		expect(screen.getByText(/Net balance ·/)).toBeInTheDocument();
+		expect(
+			screen.getByText(t("common.expenses", { ns: "common" })),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText(t("common.incomes", { ns: "common" })),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText(t("common.net_balance", { ns: "common" })),
+		).toBeInTheDocument();
 	});
 
 	it("shows skeleton while widgets are loading", async () => {

@@ -8,7 +8,7 @@ import {
 	decodeDocumentDateFromStorage,
 	encodeDocumentDateForStorage,
 } from "@repo/common/helpers";
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, lte, sum } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants.js";
 import {
@@ -26,35 +26,26 @@ export class DashboardService {
 		const currentMonthStart = this.getCurrentMonthStart(today);
 		const previousPeriod = this.getPreviousPeriodBounds(today);
 
-		const [expenseRows, incomeRows] = await Promise.all([
-			this.fetchAmountRows(userId, previousPeriod.start, today, "expense"),
-			this.fetchAmountRows(userId, previousPeriod.start, today, "income"),
-		]);
+		const [currentExpenses, previousExpenses, currentIncomes, previousIncomes] =
+			await Promise.all([
+				this.fetchSumInRange(userId, currentMonthStart, today, "expense"),
+				this.fetchSumInRange(
+					userId,
+					previousPeriod.start,
+					previousPeriod.end,
+					"expense",
+				),
+				this.fetchSumInRange(userId, currentMonthStart, today, "income"),
+				this.fetchSumInRange(
+					userId,
+					previousPeriod.start,
+					previousPeriod.end,
+					"income",
+				),
+			]);
 
 		const currentDays = this.countDaysInRange(currentMonthStart, today);
 		const previousDays = this.countDaysInRange(
-			previousPeriod.start,
-			previousPeriod.end,
-		);
-
-		const currentExpenses = this.sumAmountsInRange(
-			expenseRows,
-			currentMonthStart,
-			today,
-		);
-		const previousExpenses = this.sumAmountsInRange(
-			expenseRows,
-			previousPeriod.start,
-			previousPeriod.end,
-		);
-
-		const currentIncomes = this.sumAmountsInRange(
-			incomeRows,
-			currentMonthStart,
-			today,
-		);
-		const previousIncomes = this.sumAmountsInRange(
-			incomeRows,
 			previousPeriod.start,
 			previousPeriod.end,
 		);
@@ -105,13 +96,11 @@ export class DashboardService {
 				? this.getCurrentWeekStart(today)
 				: this.getCurrentMonthStart(today);
 
-		const [expenseRows, incomeRows] = await Promise.all([
-			this.fetchAmountRows(userId, periodStart, today, "expense"),
-			this.fetchAmountRows(userId, periodStart, today, "income"),
+		const [expenseDailyTotals, incomeDailyTotals] = await Promise.all([
+			this.fetchDailyTotals(userId, periodStart, today, "expense"),
+			this.fetchDailyTotals(userId, periodStart, today, "income"),
 		]);
 
-		const expenseDailyTotals = this.buildDailyTotals(expenseRows);
-		const incomeDailyTotals = this.buildDailyTotals(incomeRows);
 		const dates = this.enumerateDates(periodStart, today);
 
 		let expensesCumulative = 0;
@@ -131,12 +120,12 @@ export class DashboardService {
 		return { data: { points } };
 	}
 
-	private async fetchAmountRows(
+	private async fetchSumInRange(
 		userId: string,
 		rangeStart: string,
 		rangeEnd: string,
 		documentKind: "expense" | "income",
-	): Promise<AmountRow[]> {
+	): Promise<number> {
 		const table =
 			documentKind === "expense" ? expenseDocumentsTable : incomeDocumentsTable;
 		const dateColumn =
@@ -144,10 +133,9 @@ export class DashboardService {
 				? expenseDocumentsTable.expenseDate
 				: incomeDocumentsTable.incomeDate;
 
-		const rows = await this.db
+		const [row] = await this.db
 			.select({
-				date: dateColumn,
-				amount: table.totalAmount,
+				amount: sum(table.totalAmount),
 			})
 			.from(table)
 			.where(
@@ -158,10 +146,53 @@ export class DashboardService {
 				),
 			);
 
-		return rows.map((row) => ({
-			date: row.date,
-			amount: Number(row.amount),
-		}));
+		return Number(row?.amount ?? 0);
+	}
+
+	private async fetchDailyTotals(
+		userId: string,
+		rangeStart: string,
+		rangeEnd: string,
+		documentKind: "expense" | "income",
+	): Promise<Map<string, number>> {
+		const table =
+			documentKind === "expense" ? expenseDocumentsTable : incomeDocumentsTable;
+		const dateColumn =
+			documentKind === "expense"
+				? expenseDocumentsTable.expenseDate
+				: incomeDocumentsTable.incomeDate;
+
+		const rows = await this.db
+			.select({
+				date: dateColumn,
+				amount: sum(table.totalAmount),
+			})
+			.from(table)
+			.where(
+				and(
+					eq(table.userId, userId),
+					gte(dateColumn, rangeStart),
+					lte(dateColumn, rangeEnd),
+				),
+			)
+			.groupBy(dateColumn);
+
+		return this.toDailyTotalsMap(
+			rows.map((row) => ({
+				date: row.date,
+				amount: Number(row.amount ?? 0),
+			})),
+		);
+	}
+
+	private toDailyTotalsMap(rows: AmountRow[]): Map<string, number> {
+		const totals = new Map<string, number>();
+
+		for (const row of rows) {
+			totals.set(row.date, row.amount);
+		}
+
+		return totals;
 	}
 
 	private getCurrentMonthStart(today: string): string {
@@ -237,26 +268,6 @@ export class DashboardService {
 		return this.enumerateDates(start, end).length;
 	}
 
-	private sumAmountsInRange(
-		rows: AmountRow[],
-		rangeStart: string,
-		rangeEnd: string,
-	): number {
-		return rows
-			.filter((row) => row.date >= rangeStart && row.date <= rangeEnd)
-			.reduce((sum, row) => sum + row.amount, 0);
-	}
-
-	private buildDailyTotals(rows: AmountRow[]): Map<string, number> {
-		const totals = new Map<string, number>();
-
-		for (const row of rows) {
-			totals.set(row.date, (totals.get(row.date) ?? 0) + row.amount);
-		}
-
-		return totals;
-	}
-
 	private calcPercentChange(
 		currentSum: number,
 		currentDays: number,
@@ -275,6 +286,6 @@ export class DashboardService {
 
 		const avgCurrent = currentSum / currentDays;
 
-		return ((avgCurrent - avgPrevious) / avgPrevious) * 100;
+		return ((avgCurrent - avgPrevious) / Math.abs(avgPrevious)) * 100;
 	}
 }
