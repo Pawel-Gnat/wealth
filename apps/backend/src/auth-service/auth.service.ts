@@ -104,12 +104,14 @@ export class AuthService {
 		const refreshExpiresAt = this.getRefreshTokenExpiresAt();
 		const now = new Date();
 
-		await this.db.insert(refreshTokensTable).values({
-			userId: user.id,
-			tokenHash: this.hashRefreshToken(refreshToken),
-			expiresAt: refreshExpiresAt,
+		await this.db.transaction(async (tx) => {
+			await tx.insert(refreshTokensTable).values({
+				userId: user.id,
+				tokenHash: this.hashRefreshToken(refreshToken),
+				expiresAt: refreshExpiresAt,
+			});
+			await this.cleanupStaleRefreshTokens(tx, user.id, now);
 		});
-		await this.cleanupStaleRefreshTokens(this.db, user.id, now);
 
 		return {
 			accessToken,

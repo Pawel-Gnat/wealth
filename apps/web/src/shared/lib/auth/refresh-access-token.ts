@@ -9,7 +9,10 @@ const CHANNEL_NAME = "wealth.auth";
 const PEER_FRESH_MS = 5_000;
 const REFRESH_RETRY_DELAY_MS = 150;
 
-type AuthBusMessage = { type: "refresh-done" } | { type: "clear" };
+type AuthBusMessage =
+	| { type: "refresh-done" }
+	| { type: "session-ready" }
+	| { type: "clear" };
 
 const isAuthBusMessage = (data: unknown): data is AuthBusMessage => {
 	if (typeof data !== "object" || data === null) {
@@ -17,7 +20,11 @@ const isAuthBusMessage = (data: unknown): data is AuthBusMessage => {
 	}
 
 	const message = data as Partial<AuthBusMessage>;
-	return message.type === "refresh-done" || message.type === "clear";
+	return (
+		message.type === "refresh-done" ||
+		message.type === "session-ready" ||
+		message.type === "clear"
+	);
 };
 
 const authBus = createBroadcastBus(CHANNEL_NAME, isAuthBusMessage);
@@ -66,6 +73,11 @@ export const initAuthTabSync = (): (() => void) => {
 				return;
 			}
 
+			if (message.type === "session-ready") {
+				void refreshAccessToken();
+				return;
+			}
+
 			clearAuthSession();
 		});
 	}
@@ -74,6 +86,10 @@ export const initAuthTabSync = (): (() => void) => {
 		stopListening?.();
 		stopListening = null;
 	};
+};
+
+export const notifySessionReadyAcrossTabs = (): void => {
+	authBus.publish({ type: "session-ready" });
 };
 
 export const clearAuthSessionAcrossTabs = (): void => {

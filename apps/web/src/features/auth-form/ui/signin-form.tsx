@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Card, Form, FormInput, Text } from "@/shared/components";
 import { persistAccessToken } from "@/shared/lib/auth/auth-session";
+import { notifySessionReadyAcrossTabs } from "@/shared/lib/auth/refresh-access-token";
 import { useSignIn } from "../hooks/use-sign-in";
 
 export function SigninForm() {
@@ -12,6 +13,7 @@ export function SigninForm() {
 	const { signIn, isLoading } = useSignIn({
 		onSuccess: (data) => {
 			persistAccessToken(data.data.token);
+			notifySessionReadyAcrossTabs();
 		},
 		onError: () => {
 			toast.error(t("toast.error.signed_in", { ns: "common" }));
