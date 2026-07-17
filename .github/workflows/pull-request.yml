@@ -1,0 +1,31 @@
+name: Pull Request Staging Deployment
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  Deploy-Staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Configure node
+        uses: ./.github/actions/setup-project
+
+      - name: Format & Lint code
+        uses: ./.github/actions/format-code
+
+      - name: Run tests
+        uses: ./.github/actions/run-tests
+
+      - name: Build app
+        run: pnpm run build
+        env:
+          VITE_BACKEND_URL: ${{ secrets.STAGING_BACKEND_URL }}

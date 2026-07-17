@@ -1,0 +1,9 @@
+name: Format & Lint
+description: Format and lint code
+
+runs:
+  using: "composite"
+  steps:
+    - name: Format and lint code
+      run: pnpm run lint
+      shell: bash

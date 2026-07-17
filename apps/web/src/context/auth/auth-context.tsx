@@ -9,6 +9,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
 import { bootstrapSession, logoutSession } from "@/shared/lib/auth/auth-api";
 import { configureAuthSession } from "@/shared/lib/auth/auth-session";
 
@@ -23,7 +24,11 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const queryClient = useQueryClient();
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
-	const [isAuthLoading, setIsAuthLoading] = useState(true);
+	const [isResolvingSession, setIsResolvingSession] = useState(true);
+	const isAuthLoading = useSkeletonLoader({
+		isLoading: isResolvingSession,
+		delay: 0,
+	});
 
 	useEffect(() => {
 		configureAuthSession({
@@ -43,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				const hasSession = await bootstrapSession();
 				setIsAuthenticated(hasSession);
 			} finally {
-				setIsAuthLoading(false);
+				setIsResolvingSession(false);
 			}
 		};
 

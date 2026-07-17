@@ -3,11 +3,7 @@ import { useAuth } from "@/context/auth";
 import { APP_ROUTES } from "./router";
 
 export function UnauthenticatedLayout() {
-	const { isAuthenticated, isAuthLoading } = useAuth();
-
-	if (isAuthLoading) {
-		return <>loading</>;
-	}
+	const { isAuthenticated } = useAuth();
 
 	if (isAuthenticated) {
 		return <Navigate to={APP_ROUTES.dashboard} replace />;
