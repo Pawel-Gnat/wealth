@@ -1,27 +1,35 @@
 import { reportClientError } from "@/shared/helpers/controlled-fetch";
-import { delay } from "@/shared/helpers/delay";
 import {
 	clearAuthSession,
 	getAccessToken,
 } from "@/shared/lib/auth/auth-session";
-import { withRefreshMutex } from "@/shared/lib/auth/refresh-access-token";
-import { refreshAccessTokenRaw } from "@/shared/lib/auth/refresh-access-token-raw";
+import { refreshAccessToken } from "@/shared/lib/auth/refresh-access-token";
 
-const PUBLIC_AUTH_PATHS = [
+const PUBLIC_AUTH_PATHS = new Set([
 	"/auth/signin",
 	"/auth/signup",
 	"/auth/refresh",
 	"/auth/logout",
-] as const;
+]);
 
-const REFRESH_RETRY_DELAY_MS = 150;
+const getRequestPathname = (requestUrl: string): string => {
+	try {
+		if (typeof window !== "undefined") {
+			return new URL(requestUrl, window.location.origin).pathname;
+		}
+
+		return new URL(requestUrl).pathname;
+	} catch {
+		return requestUrl;
+	}
+};
 
 const isPublicAuthRoute = (requestUrl: string): boolean => {
-	return PUBLIC_AUTH_PATHS.some((path) => requestUrl.includes(path));
+	return PUBLIC_AUTH_PATHS.has(getRequestPathname(requestUrl));
 };
 
 const shouldAttemptRefresh = (requestUrl: string): boolean => {
-	return !PUBLIC_AUTH_PATHS.some((path) => requestUrl.includes(path));
+	return !isPublicAuthRoute(requestUrl);
 };
 
 const createRequestInit = (init?: RequestInit): RequestInit => {
@@ -43,16 +51,6 @@ const createRequestInit = (init?: RequestInit): RequestInit => {
 	};
 };
 
-const refreshAccessTokenWithRetry = async (): Promise<string | null> => {
-	const firstAttempt = await withRefreshMutex(refreshAccessTokenRaw);
-	if (firstAttempt) {
-		return firstAttempt;
-	}
-
-	await delay(REFRESH_RETRY_DELAY_MS);
-	return withRefreshMutex(refreshAccessTokenRaw);
-};
-
 export const orpcTransportFetch = async (
 	input: RequestInfo | URL,
 	init?: RequestInit,
@@ -67,7 +65,7 @@ export const orpcTransportFetch = async (
 			shouldAttemptRefresh(requestUrl) &&
 			typeof window !== "undefined"
 		) {
-			const refreshedToken = await refreshAccessTokenWithRetry();
+			const refreshedToken = await refreshAccessToken();
 
 			if (refreshedToken) {
 				response = await fetch(input, createRequestInit(init));

@@ -1,24 +1,35 @@
+import { createHash } from "node:crypto";
 import { UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
+import { subDays } from "date-fns";
+import { and, eq, isNull } from "drizzle-orm";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { DBS } from "../database-service/constants.js";
+import { refreshTokensTable } from "../database-service/tables/index.js";
 import { createAuthTestingModule } from "../test/helpers/modules.js";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
 import { UsersService } from "../users-service/users.service.js";
 import { AuthService } from "./auth.service.js";
+
+const hashToken = (token: string) =>
+	createHash("sha256").update(token).digest("hex");
 
 describe("Auth service", () => {
 	let moduleRef: Awaited<ReturnType<typeof createAuthTestingModule>>;
 	let authService: AuthService;
 	let usersService: UsersService;
 	let jwtService: JwtService;
+	let db: NodePgDatabase;
 
 	beforeAll(async () => {
 		moduleRef = await createAuthTestingModule();
 		authService = moduleRef.get(AuthService);
 		usersService = moduleRef.get(UsersService);
 		jwtService = moduleRef.get(JwtService);
+		db = moduleRef.get(DBS.APP);
 	});
 
 	afterAll(async () => {
@@ -90,6 +101,33 @@ describe("Auth service", () => {
 			expect(result.refreshToken.length).toBeGreaterThan(0);
 			expect(result.refreshExpiresAt).toBeInstanceOf(Date);
 		});
+
+		it("deletes expired refresh tokens for the user", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-cleanup-create",
+			});
+
+			await db.insert(refreshTokensTable).values({
+				userId: user.id,
+				tokenHash: hashToken("expired-create-token"),
+				expiresAt: subDays(new Date(), 1),
+			});
+
+			await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+
+			const rows = await db
+				.select()
+				.from(refreshTokensTable)
+				.where(eq(refreshTokensTable.userId, user.id));
+
+			expect(rows).toHaveLength(1);
+			expect(rows[0]?.expiresAt.getTime()).toBeGreaterThan(Date.now());
+			expect(rows[0]?.tokenHash).not.toBe(hashToken("expired-create-token"));
+		});
 	});
 
 	describe("refresh session", () => {
@@ -111,6 +149,71 @@ describe("Auth service", () => {
 			await expect(
 				authService.refreshSession(session.refreshToken),
 			).rejects.toThrow(UnauthorizedException);
+		});
+
+		it("keeps unexpired revoked tokens so reuse can be detected", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-keep-revoked",
+			});
+
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+			const previousHash = hashToken(session.refreshToken);
+
+			await authService.refreshSession(session.refreshToken);
+
+			const [revoked] = await db
+				.select()
+				.from(refreshTokensTable)
+				.where(eq(refreshTokensTable.tokenHash, previousHash))
+				.limit(1);
+
+			expect(revoked).toBeDefined();
+			expect(revoked?.revokedAt).toBeInstanceOf(Date);
+		});
+
+		it("deletes expired refresh tokens for the user on rotate", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-cleanup-refresh",
+			});
+
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+
+			await db.insert(refreshTokensTable).values({
+				userId: user.id,
+				tokenHash: hashToken("expired-refresh-token"),
+				expiresAt: subDays(new Date(), 2),
+			});
+
+			await authService.refreshSession(session.refreshToken);
+
+			const expiredRows = await db
+				.select()
+				.from(refreshTokensTable)
+				.where(
+					eq(refreshTokensTable.tokenHash, hashToken("expired-refresh-token")),
+				);
+
+			expect(expiredRows).toHaveLength(0);
+
+			const activeRows = await db
+				.select()
+				.from(refreshTokensTable)
+				.where(
+					and(
+						eq(refreshTokensTable.userId, user.id),
+						isNull(refreshTokensTable.revokedAt),
+					),
+				);
+
+			expect(activeRows).toHaveLength(1);
 		});
 
 		it("revokes all active sessions when a rotated refresh token is reused", async () => {
@@ -142,6 +245,44 @@ describe("Auth service", () => {
 			await expect(
 				authService.refreshSession(secondSession.refreshToken),
 			).rejects.toThrow(UnauthorizedException);
+		});
+	});
+
+	describe("logout session", () => {
+		it("revokes the current refresh token and leaves other sessions active", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-logout",
+			});
+
+			const firstSession = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+			const secondSession = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+
+			await authService.logoutSession(firstSession.refreshToken);
+
+			const [revoked] = await db
+				.select()
+				.from(refreshTokensTable)
+				.where(
+					eq(
+						refreshTokensTable.tokenHash,
+						hashToken(firstSession.refreshToken),
+					),
+				)
+				.limit(1);
+
+			expect(revoked?.revokedAt).toBeInstanceOf(Date);
+
+			const stillActive = await authService.refreshSession(
+				secondSession.refreshToken,
+			);
+			expect(stillActive.refreshToken).not.toBe(secondSession.refreshToken);
 		});
 	});
 

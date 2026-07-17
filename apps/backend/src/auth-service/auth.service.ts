@@ -19,7 +19,7 @@ import {
 } from "@repo/common/constants";
 import * as bcrypt from "bcrypt";
 import { addDays } from "date-fns";
-import { and, eq, gt, isNull } from "drizzle-orm";
+import { and, eq, gt, isNull, lt } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Request, Response } from "express";
 import { DBS } from "../database-service/constants.js";
@@ -27,6 +27,8 @@ import { refreshTokensTable } from "../database-service/tables/index.js";
 import { UsersService } from "../users-service/users.service.js";
 
 const BCRYPT_ROUNDS = 10;
+
+type RefreshTokensDb = Pick<NodePgDatabase, "delete">;
 
 type AuthSessionResult = {
 	accessToken: string;
@@ -100,12 +102,14 @@ export class AuthService {
 		const accessToken = await this.createAccessToken(user);
 		const refreshToken = this.generateRefreshToken();
 		const refreshExpiresAt = this.getRefreshTokenExpiresAt();
+		const now = new Date();
 
 		await this.db.insert(refreshTokensTable).values({
 			userId: user.id,
 			tokenHash: this.hashRefreshToken(refreshToken),
 			expiresAt: refreshExpiresAt,
 		});
+		await this.cleanupStaleRefreshTokens(this.db, user.id, now);
 
 		return {
 			accessToken,
@@ -168,11 +172,14 @@ export class AuthService {
 			const nextRefreshToken = this.generateRefreshToken();
 			const refreshExpiresAt = this.getRefreshTokenExpiresAt();
 
+			const userId = String(user.id);
+
 			await tx.insert(refreshTokensTable).values({
-				userId: String(user.id),
+				userId,
 				tokenHash: this.hashRefreshToken(nextRefreshToken),
 				expiresAt: refreshExpiresAt,
 			});
+			await this.cleanupStaleRefreshTokens(tx, userId, now);
 
 			return {
 				ok: true as const,
@@ -205,6 +212,21 @@ export class AuthService {
 				and(
 					eq(refreshTokensTable.tokenHash, tokenHash),
 					isNull(refreshTokensTable.revokedAt),
+				),
+			);
+	}
+
+	private async cleanupStaleRefreshTokens(
+		db: RefreshTokensDb,
+		userId: string,
+		now: Date,
+	): Promise<void> {
+		await db
+			.delete(refreshTokensTable)
+			.where(
+				and(
+					eq(refreshTokensTable.userId, userId),
+					lt(refreshTokensTable.expiresAt, now),
 				),
 			);
 	}
