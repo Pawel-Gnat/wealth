@@ -12,6 +12,7 @@ import {
 import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
 import { bootstrapSession, logoutSession } from "@/shared/lib/auth/auth-api";
 import { configureAuthSession } from "@/shared/lib/auth/auth-session";
+import { initAuthTabSync } from "@/shared/lib/auth/refresh-access-token";
 
 type AuthContextValue = {
 	isAuthenticated: boolean;
@@ -40,6 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				queryClient.clear();
 			},
 		});
+
+		return initAuthTabSync();
 	}, [queryClient]);
 
 	useEffect(() => {

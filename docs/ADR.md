@@ -1,12 +1,15 @@
 # Architecture Decision Records
 
-## ADR-001: Logout revokes only the current refresh session
+## ADR-001: Logout scope (device vs other devices)
 
-**Context:** Refresh tokens support multiple concurrent sessions (e.g. phone + desktop). Logout must decide whether to end only the current device session or every session for the user.
+**Context:** Refresh tokens support multiple concurrent sessions (e.g. phone + desktop). Logout must decide whether to end only the current browser session or every session for the user.
 
-**Decision:** Logout revokes only the refresh token presented with the request (the current device cookie). Other devices keep their sessions until expiry, logout, or refresh-token reuse detection. Sign-in may create an additional refresh token without revoking existing ones.
+**Decision:**
+- **Server:** Logout revokes only the refresh token presented with the request (the current device cookie). Other devices keep their sessions until expiry, logout, or refresh-token reuse detection. Sign-in may create an additional refresh token without revoking existing ones.
+- **Same browser (all tabs):** Logout (and client-side session clear) is synchronized across tabs via a same-origin broadcast (`clear`), so every tab drops its in-memory access token and auth UI state together.
 
 **Consequences:**
 - Users can stay signed in on other devices after logging out on one.
+- Within one browser, logout is expected to sign the user out in every open tab.
 - Compromised sessions on other devices are not cleared by a single logout; mitigate via short refresh TTL, reuse detection on rotated tokens, and a future “sessions” / “logout everywhere” feature if needed.
-- Product copy and UX should not imply a global sign-out unless that feature is added.
+- Product copy may say the user is signed out of this browser; it must not imply a global sign-out across devices unless that feature is added.
