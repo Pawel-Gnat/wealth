@@ -4,7 +4,7 @@ import { APP_FILTER, REQUEST } from "@nestjs/core";
 import { ORPCModule, onError } from "@orpc/nest";
 import * as Sentry from "@sentry/nestjs";
 import { SentryGlobalFilter, SentryModule } from "@sentry/nestjs/setup";
-import type { Request } from "express";
+import type { Request, Response } from "express";
 import { AuthModule } from "./auth-service/auth.module.js";
 import { DashboardModule } from "./dashboard-service/dashboard.module.js";
 import { DatabaseModule } from "./database-service/database.module.js";
@@ -15,6 +15,7 @@ import { UsersModule } from "./users-service/users.module.js";
 declare module "@orpc/nest" {
 	interface ORPCGlobalContext {
 		request: Request;
+		response: Response;
 	}
 }
 
@@ -25,15 +26,21 @@ declare module "@orpc/nest" {
 			isGlobal: true,
 		}),
 		ORPCModule.forRootAsync({
-			useFactory: (request: Request) => ({
-				context: { request },
-				interceptors: [
-					onError((error: unknown) => {
-						console.error("[oRPC]", error);
-						Sentry.captureException(error);
-					}),
-				],
-			}),
+			useFactory: (request: Request) => {
+				if (!request.res) {
+					throw new Error("Response is not available on request");
+				}
+
+				return {
+					context: { request, response: request.res },
+					interceptors: [
+						onError((error: unknown) => {
+							console.error("[oRPC]", error);
+							Sentry.captureException(error);
+						}),
+					],
+				};
+			},
 			inject: [REQUEST],
 		}),
 		UsersModule,

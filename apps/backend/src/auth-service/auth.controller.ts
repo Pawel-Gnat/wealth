@@ -26,15 +26,41 @@ export class AuthController {
 
 	@Implement(rpcContract.user.signIn)
 	signInRpc() {
-		return implement(rpcContract.user.signIn).handler(async ({ input }) => {
+		return implement(rpcContract.user.signIn).handler(
+			async ({ input, context }) => {
+				try {
+					return await this.authService.signIn(input, context.response);
+				} catch (err) {
+					if (err instanceof UnauthorizedException) {
+						throw new ORPCError("UNAUTHORIZED", { message: err.message });
+					}
+					throw err;
+				}
+			},
+		);
+	}
+
+	@Implement(rpcContract.user.refresh)
+	refreshRpc() {
+		return implement(rpcContract.user.refresh).handler(async ({ context }) => {
 			try {
-				return await this.authService.signIn(input);
+				return await this.authService.refresh(
+					context.request,
+					context.response,
+				);
 			} catch (err) {
 				if (err instanceof UnauthorizedException) {
 					throw new ORPCError("UNAUTHORIZED", { message: err.message });
 				}
 				throw err;
 			}
+		});
+	}
+
+	@Implement(rpcContract.user.logout)
+	logoutRpc() {
+		return implement(rpcContract.user.logout).handler(async ({ context }) => {
+			return this.authService.logout(context.request, context.response);
 		});
 	}
 

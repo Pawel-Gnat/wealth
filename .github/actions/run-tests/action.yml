@@ -1,0 +1,9 @@
+name: Run Tests
+description: Run project tests
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run tests
+      run: pnpm run test
+      shell: bash

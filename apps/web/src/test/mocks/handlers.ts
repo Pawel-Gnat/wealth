@@ -108,6 +108,19 @@ const getDashboardChartHandler = () => {
 	});
 };
 
+const postAuthRefreshHandler = () => {
+	return HttpResponse.json(
+		{ error: { message: "Unauthorized" } },
+		{ status: 401 },
+	);
+};
+
+const postAuthLogoutHandler = () => {
+	return HttpResponse.json({
+		data: { message: "logged_out" as const },
+	});
+};
+
 export const HANDLERS = [
 	http.get("*/expenses", getExpensesListHandler),
 	http.get("*/expenses/:id", getExpenseByIdHandler),
@@ -121,4 +134,6 @@ export const HANDLERS = [
 	http.get("*/dashboard/chart", getDashboardChartHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),
+	http.post("*/auth/refresh", postAuthRefreshHandler),
+	http.post("*/auth/logout", postAuthLogoutHandler),
 ];

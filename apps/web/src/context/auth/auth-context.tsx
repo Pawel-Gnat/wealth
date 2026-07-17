@@ -1,55 +1,75 @@
 import * as Sentry from "@sentry/react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
 	createContext,
 	type ReactNode,
 	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
 	useState,
 } from "react";
-
-export const AUTH_TOKEN_STORAGE_KEY = "wealth.auth.token";
+import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
+import { bootstrapSession, logoutSession } from "@/shared/lib/auth/auth-api";
+import { configureAuthSession } from "@/shared/lib/auth/auth-session";
+import { initAuthTabSync } from "@/shared/lib/auth/refresh-access-token";
 
 type AuthContextValue = {
 	isAuthenticated: boolean;
-	storeToken: (token: string) => void;
-	logout: () => void;
+	isAuthLoading: boolean;
+	logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function readStoredToken(): string | null {
-	try {
-		return localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
-	} catch {
-		return null;
-	}
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-	const [token, setToken] = useState<string | null>(() =>
-		typeof window !== "undefined" ? readStoredToken() : null,
-	);
+	const queryClient = useQueryClient();
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [isResolvingSession, setIsResolvingSession] = useState(true);
+	const isAuthLoading = useSkeletonLoader({
+		isLoading: isResolvingSession,
+		delay: 0,
+	});
 
-	const storeToken = useCallback((newToken: string) => {
-		localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, newToken);
-		setToken(newToken);
-		Sentry.logger.info("Auth token stored", { log_source: "auth_session" });
+	useEffect(() => {
+		configureAuthSession({
+			onTokenRefreshed: () => {
+				setIsAuthenticated(true);
+			},
+			onUnauthorized: () => {
+				setIsAuthenticated(false);
+				queryClient.clear();
+			},
+		});
+
+		return initAuthTabSync();
+	}, [queryClient]);
+
+	useEffect(() => {
+		const initializeAuth = async () => {
+			try {
+				const hasSession = await bootstrapSession();
+				setIsAuthenticated(hasSession);
+			} finally {
+				setIsResolvingSession(false);
+			}
+		};
+
+		void initializeAuth();
 	}, []);
 
-	const logout = useCallback(() => {
-		localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
-		setToken(null);
+	const logout = useCallback(async () => {
+		await logoutSession();
 		Sentry.logger.info("User logged out", { log_source: "auth_session" });
 	}, []);
 
 	const value = useMemo<AuthContextValue>(
 		() => ({
-			isAuthenticated: Boolean(token),
-			storeToken,
+			isAuthenticated,
+			isAuthLoading,
 			logout,
 		}),
-		[token, storeToken, logout],
+		[isAuthenticated, isAuthLoading, logout],
 	);
 
 	return <AuthContext value={value}>{children}</AuthContext>;

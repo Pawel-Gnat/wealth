@@ -13,6 +13,11 @@
 			"types": "./dist/helpers/index.d.ts",
 			"import": "./dist/helpers/index.js",
 			"default": "./dist/helpers/index.js"
+		},
+		"./constants": {
+			"types": "./dist/constants/index.d.ts",
+			"import": "./dist/constants/index.js",
+			"default": "./dist/constants/index.js"
 		}
 	},
 	"scripts": {

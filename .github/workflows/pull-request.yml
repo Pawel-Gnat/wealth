@@ -1,0 +1,44 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Require VITE_BACKEND_URL
+        run: |
+          if [ -z "${VITE_BACKEND_URL}" ]; then
+            echo "VITE_BACKEND_URL secret must be set"
+            exit 1
+          fi
+
+      - name: Configure node
+        uses: ./.github/actions/setup-project
+        with:
+          node-auth-token: ${{ secrets.NODE_AUTH_TOKEN }}
+
+      - name: Format & Lint code
+        uses: ./.github/actions/format-code
+
+      - name: Run tests
+        uses: ./.github/actions/run-tests
+
+      - name: Build app
+        run: pnpm run build

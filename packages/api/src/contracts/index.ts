@@ -17,7 +17,9 @@ import {
 	listIncomesContract,
 	updateIncomeContract,
 } from "./incomes.contract";
+import { logoutContract } from "./logout.contract";
 import { meContract } from "./me.contract";
+import { refreshContract } from "./refresh.contract";
 import { signInContract } from "./signin.contract";
 import { signUpContract } from "./signup.contract";
 
@@ -25,6 +27,8 @@ export const rpcContract = populateContractRouterPaths({
 	user: {
 		signIn: signInContract,
 		signUp: signUpContract,
+		refresh: refreshContract,
+		logout: logoutContract,
 		me: meContract,
 	},
 	expenses: {

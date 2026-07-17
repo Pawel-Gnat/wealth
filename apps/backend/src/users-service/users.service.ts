@@ -24,4 +24,13 @@ export class UsersService {
 			password: passwordHash,
 		});
 	}
+
+	async findUserById(id: string): Promise<UserRow | null> {
+		const [user] = await this.db
+			.select()
+			.from(usersTable)
+			.where(eq(usersTable.id, id))
+			.limit(1);
+		return user ?? null;
+	}
 }

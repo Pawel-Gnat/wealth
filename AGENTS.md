@@ -17,6 +17,10 @@
 - Prefer arrow functions over function declarations.
 <!-- END @pawel-gnat/ai-toolkit -->
 
+## Architecture decisions
+
+- Read and follow `docs/ADR.md` for accepted architecture decisions (e.g. auth session / logout scope). Do not contradict an ADR without updating that file.
+
 ## ShadCN UI
 
 - Try to use components from /shared folder, shadcn library keeps raw components inside /ui folder.

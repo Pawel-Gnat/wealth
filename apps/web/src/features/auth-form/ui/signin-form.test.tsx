@@ -4,8 +4,8 @@ import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
 import { toast } from "sonner";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-
-import { AUTH_TOKEN_STORAGE_KEY } from "@/context/auth";
+import { getAccessToken } from "@/shared/lib/auth/auth-session";
+import { resetRefreshMutex } from "@/shared/lib/auth/refresh-access-token";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
@@ -26,7 +26,7 @@ describe("SigninForm", () => {
 
 	beforeEach(() => {
 		vi.mocked(toast.error).mockClear();
-		localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+		resetRefreshMutex();
 	});
 
 	describe("form submission", () => {
@@ -48,9 +48,7 @@ describe("SigninForm", () => {
 			await user.click(signinButton);
 
 			await waitFor(() => {
-				expect(localStorage.getItem(AUTH_TOKEN_STORAGE_KEY)).toBe(
-					"mock-jwt-access-token",
-				);
+				expect(getAccessToken()).toBe("mock-jwt-access-token");
 			});
 		});
 

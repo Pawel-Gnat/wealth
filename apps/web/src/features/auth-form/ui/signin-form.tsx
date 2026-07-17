@@ -3,16 +3,17 @@ import { type SignInPayload, signInPayloadSchema } from "@repo/api/schemas";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { useAuth } from "@/context/auth";
 import { Card, Form, FormInput, Text } from "@/shared/components";
+import { persistAccessToken } from "@/shared/lib/auth/auth-session";
+import { notifySessionReadyAcrossTabs } from "@/shared/lib/auth/refresh-access-token";
 import { useSignIn } from "../hooks/use-sign-in";
 
 export function SigninForm() {
 	const { t } = useTranslation();
-	const { storeToken } = useAuth();
 	const { signIn, isLoading } = useSignIn({
 		onSuccess: (data) => {
-			storeToken(data.data.token);
+			persistAccessToken(data.data.token);
+			notifySessionReadyAcrossTabs();
 		},
 		onError: () => {
 			toast.error(t("toast.error.signed_in", { ns: "common" }));
