@@ -13,7 +13,7 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     env:
-      VITE_BACKEND_URL: ${{ secrets.STAGING_BACKEND_URL }}
+      VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -21,7 +21,7 @@ jobs:
       - name: Require VITE_BACKEND_URL
         run: |
           if [ -z "${VITE_BACKEND_URL}" ]; then
-            echo "STAGING_BACKEND_URL secret must be set"
+            echo "VITE_BACKEND_URL secret must be set"
             exit 1
           fi
 
