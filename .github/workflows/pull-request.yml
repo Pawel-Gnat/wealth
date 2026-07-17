@@ -9,6 +9,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   checks:
     runs-on: ubuntu-latest
@@ -27,6 +31,8 @@ jobs:
 
       - name: Configure node
         uses: ./.github/actions/setup-project
+        with:
+          node-auth-token: ${{ secrets.NODE_AUTH_TOKEN }}
 
       - name: Format & Lint code
         uses: ./.github/actions/format-code
