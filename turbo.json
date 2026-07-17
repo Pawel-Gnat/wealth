@@ -17,7 +17,7 @@
 			"dependsOn": ["^check-types"]
 		},
 		"test": {
-			"dependsOn": ["^test"]
+			"dependsOn": ["^build"]
 		},
 		"test:e2e": {
 			"cache": false
