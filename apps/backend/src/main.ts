@@ -7,14 +7,28 @@ import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import { AppModule } from "./app.module.js";
 
-const corsOriginEnv = process.env.CORS_ORIGIN;
-const corsOrigin =
-	corsOriginEnv === undefined || corsOriginEnv === ""
-		? true
-		: corsOriginEnv
-				.split(",")
-				.map((o) => o.trim())
-				.filter(Boolean);
+const resolveCorsOrigin = (): boolean | string[] => {
+	const corsOriginEnv = process.env.CORS_ORIGIN;
+	const allowlist = (corsOriginEnv ?? "")
+		.split(",")
+		.map((o) => o.trim())
+		.filter(Boolean);
+
+	if (process.env.NODE_ENV === "production") {
+		if (allowlist.length === 0) {
+			throw new Error(
+				"CORS_ORIGIN must be set to a comma-separated allowlist in production",
+			);
+		}
+		return allowlist;
+	}
+
+	if (allowlist.length > 0) {
+		return allowlist;
+	}
+
+	return true;
+};
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
@@ -24,7 +38,7 @@ async function bootstrap() {
 	app.use(cookieParser());
 
 	app.enableCors({
-		origin: corsOrigin,
+		origin: resolveCorsOrigin(),
 		credentials: true,
 		allowedHeaders: ["Authorization", "Content-Type", "X-Timezone"],
 	});
@@ -42,6 +56,11 @@ async function bootstrap() {
 	const expressApp = app.getHttpAdapter().getInstance();
 	expressApp.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
 
-	await app.listen(Number(process.env.PORT) || 4000);
+	const port = process.env.PORT;
+	if (!port) {
+		throw new Error("PORT is not set");
+	}
+
+	await app.listen(Number(port));
 }
 bootstrap();

@@ -118,36 +118,77 @@ export class AuthService {
 		const tokenHash = this.hashRefreshToken(refreshToken);
 		const now = new Date();
 
-		const [storedToken] = await this.db
-			.select()
-			.from(refreshTokensTable)
-			.where(
-				and(
-					eq(refreshTokensTable.tokenHash, tokenHash),
-					isNull(refreshTokensTable.revokedAt),
-					gt(refreshTokensTable.expiresAt, now),
-				),
-			)
-			.limit(1);
+		const result = await this.db.transaction(async (tx) => {
+			const [storedToken] = await tx
+				.update(refreshTokensTable)
+				.set({ revokedAt: now })
+				.where(
+					and(
+						eq(refreshTokensTable.tokenHash, tokenHash),
+						isNull(refreshTokensTable.revokedAt),
+						gt(refreshTokensTable.expiresAt, now),
+					),
+				)
+				.returning();
 
-		if (!storedToken) {
-			throw new UnauthorizedException("Invalid refresh token");
-		}
+			if (!storedToken) {
+				const [existing] = await tx
+					.select({
+						userId: refreshTokensTable.userId,
+						revokedAt: refreshTokensTable.revokedAt,
+					})
+					.from(refreshTokensTable)
+					.where(eq(refreshTokensTable.tokenHash, tokenHash))
+					.limit(1);
 
-		await this.db
-			.update(refreshTokensTable)
-			.set({ revokedAt: now })
-			.where(eq(refreshTokensTable.id, storedToken.id));
+				if (existing?.revokedAt != null) {
+					await tx
+						.update(refreshTokensTable)
+						.set({ revokedAt: now })
+						.where(
+							and(
+								eq(refreshTokensTable.userId, existing.userId),
+								isNull(refreshTokensTable.revokedAt),
+							),
+						);
+				}
 
-		const user = await this.usersService.findUserById(storedToken.userId);
-		if (!user) {
-			throw new UnauthorizedException("Invalid refresh token");
-		}
+				return { ok: false as const };
+			}
 
-		return this.createSession({
-			id: String(user.id),
-			email: user.email,
+			const user = await this.usersService.findUserById(storedToken.userId);
+			if (!user) {
+				return { ok: false as const };
+			}
+
+			const accessToken = await this.createAccessToken({
+				id: String(user.id),
+				email: user.email,
+			});
+			const nextRefreshToken = this.generateRefreshToken();
+			const refreshExpiresAt = this.getRefreshTokenExpiresAt();
+
+			await tx.insert(refreshTokensTable).values({
+				userId: String(user.id),
+				tokenHash: this.hashRefreshToken(nextRefreshToken),
+				expiresAt: refreshExpiresAt,
+			});
+
+			return {
+				ok: true as const,
+				session: {
+					accessToken,
+					refreshToken: nextRefreshToken,
+					refreshExpiresAt,
+				},
+			};
 		});
+
+		if (!result.ok) {
+			throw new UnauthorizedException("Invalid refresh token");
+		}
+
+		return result.session;
 	}
 
 	async logoutSession(refreshToken: string | null): Promise<void> {

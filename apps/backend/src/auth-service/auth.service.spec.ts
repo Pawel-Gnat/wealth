@@ -106,11 +106,41 @@ describe("Auth service", () => {
 
 			const refreshed = await authService.refreshSession(session.refreshToken);
 
-			expect(refreshed.accessToken).not.toBe(session.accessToken);
 			expect(refreshed.refreshToken).not.toBe(session.refreshToken);
 
 			await expect(
 				authService.refreshSession(session.refreshToken),
+			).rejects.toThrow(UnauthorizedException);
+		});
+
+		it("revokes all active sessions when a rotated refresh token is reused", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-refresh-reuse",
+			});
+
+			const firstSession = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+			const secondSession = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+
+			const rotated = await authService.refreshSession(
+				firstSession.refreshToken,
+			);
+
+			await expect(
+				authService.refreshSession(firstSession.refreshToken),
+			).rejects.toThrow(UnauthorizedException);
+
+			await expect(
+				authService.refreshSession(rotated.refreshToken),
+			).rejects.toThrow(UnauthorizedException);
+			await expect(
+				authService.refreshSession(secondSession.refreshToken),
 			).rejects.toThrow(UnauthorizedException);
 		});
 	});

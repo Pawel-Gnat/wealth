@@ -19,16 +19,11 @@ const viteConfig = defineViteConfig({
 	},
 });
 
-const { VITE_BACKEND_URL } = process.env;
-
 const vitestConfig = defineVitestConfig({
 	test: {
 		globals: true,
 		setupFiles: ["./src/test/setup.ts"],
 		environment: "jsdom",
-		env: {
-			VITE_BACKEND_URL: VITE_BACKEND_URL ?? "http://localhost:4000",
-		},
 		include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
 		coverage: {
 			reporter: ["text"],

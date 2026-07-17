@@ -4,7 +4,7 @@ declare namespace NodeJS {
 		PORT: string;
 		DATABASE_URL: string;
 		JWT_SECRET: string;
-		/** Comma-separated browser origins for CORS (optional; default reflects `Origin`). */
+		/** Comma-separated browser origins for CORS. Required in production. */
 		CORS_ORIGIN?: string;
 		SENTRY_DSN?: string;
 	}

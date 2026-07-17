@@ -1,4 +1,5 @@
 import { reportClientError } from "@/shared/helpers/controlled-fetch";
+import { delay } from "@/shared/helpers/delay";
 import {
 	clearAuthSession,
 	getAccessToken,
@@ -12,6 +13,8 @@ const PUBLIC_AUTH_PATHS = [
 	"/auth/refresh",
 	"/auth/logout",
 ] as const;
+
+const REFRESH_RETRY_DELAY_MS = 150;
 
 const isPublicAuthRoute = (requestUrl: string): boolean => {
 	return PUBLIC_AUTH_PATHS.some((path) => requestUrl.includes(path));
@@ -40,6 +43,16 @@ const createRequestInit = (init?: RequestInit): RequestInit => {
 	};
 };
 
+const refreshAccessTokenWithRetry = async (): Promise<string | null> => {
+	const firstAttempt = await withRefreshMutex(refreshAccessTokenRaw);
+	if (firstAttempt) {
+		return firstAttempt;
+	}
+
+	await delay(REFRESH_RETRY_DELAY_MS);
+	return withRefreshMutex(refreshAccessTokenRaw);
+};
+
 export const orpcTransportFetch = async (
 	input: RequestInfo | URL,
 	init?: RequestInit,
@@ -54,7 +67,7 @@ export const orpcTransportFetch = async (
 			shouldAttemptRefresh(requestUrl) &&
 			typeof window !== "undefined"
 		) {
-			const refreshedToken = await withRefreshMutex(refreshAccessTokenRaw);
+			const refreshedToken = await refreshAccessTokenWithRetry();
 
 			if (refreshedToken) {
 				response = await fetch(input, createRequestInit(init));

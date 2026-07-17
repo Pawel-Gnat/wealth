@@ -1,4 +1,4 @@
-name: Pull Request Staging Deployment
+name: Pull Request Checks
 
 on:
   pull_request:
@@ -10,11 +10,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  Deploy-Staging:
+  checks:
     runs-on: ubuntu-latest
+    env:
+      VITE_BACKEND_URL: ${{ secrets.STAGING_BACKEND_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Require VITE_BACKEND_URL
+        run: |
+          if [ -z "${VITE_BACKEND_URL}" ]; then
+            echo "STAGING_BACKEND_URL secret must be set"
+            exit 1
+          fi
 
       - name: Configure node
         uses: ./.github/actions/setup-project
@@ -27,5 +36,3 @@ jobs:
 
       - name: Build app
         run: pnpm run build
-        env:
-          VITE_BACKEND_URL: ${{ secrets.STAGING_BACKEND_URL }}
