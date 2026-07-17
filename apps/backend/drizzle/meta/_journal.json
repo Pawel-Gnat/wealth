@@ -43,6 +43,13 @@
 			"when": 1784063420779,
 			"tag": "0005_sparkling_ezekiel_stane",
 			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "7",
+			"when": 1784276166150,
+			"tag": "0006_clear_cardiac",
+			"breakpoints": true
 		}
 	]
 }

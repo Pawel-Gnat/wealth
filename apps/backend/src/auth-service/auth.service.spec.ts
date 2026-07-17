@@ -65,32 +65,52 @@ describe("Auth service", () => {
 		});
 	});
 
-	describe("sign in for verified user", () => {
-		it("returns a signed JWT", async () => {
-			const result = await authService.signInForVerifiedUser({
-				id: "7",
-				email: "verified@example.com",
+	describe("create session", () => {
+		it("returns a signed access token and refresh token", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-create-session",
+			});
+
+			const result = await authService.createSession({
+				id: user.id,
+				email: user.email,
 			});
 
 			const payload = await jwtService.verifyAsync<{
 				sub: string;
 				email: string;
-			}>(result.data.token);
+			}>(result.accessToken);
 
 			expect(payload).toMatchObject({
-				sub: "7",
-				email: "verified@example.com",
+				sub: user.id,
+				email: user.email,
 			});
+			expect(result.refreshToken).toBeTypeOf("string");
+			expect(result.refreshToken.length).toBeGreaterThan(0);
+			expect(result.refreshExpiresAt).toBeInstanceOf(Date);
 		});
 	});
 
-	describe("sign in", () => {
-		it("throws UnauthorizedException when credentials are invalid", async () => {
+	describe("refresh session", () => {
+		it("rotates refresh token and returns a new access token", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-refresh",
+			});
+
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+
+			const refreshed = await authService.refreshSession(session.refreshToken);
+
+			expect(refreshed.accessToken).not.toBe(session.accessToken);
+			expect(refreshed.refreshToken).not.toBe(session.refreshToken);
+
 			await expect(
-				authService.signIn({
-					email: "missing-user-signin@example.com",
-					password: "incorrect",
-				}),
+				authService.refreshSession(session.refreshToken),
 			).rejects.toThrow(UnauthorizedException);
 		});
 	});

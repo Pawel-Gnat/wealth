@@ -3,11 +3,13 @@ import { expenseDocumentsTable } from "./expense-documents.table.js";
 import { expenseLineItemsTable } from "./expense-line-items.table.js";
 import { incomeDocumentsTable } from "./income-documents.table.js";
 import { incomeLineItemsTable } from "./income-line-items.table.js";
+import { refreshTokensTable } from "./refresh-tokens.table.js";
 import { usersTable } from "./users.table.js";
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
 	expenseDocuments: many(expenseDocumentsTable),
 	incomeDocuments: many(incomeDocumentsTable),
+	refreshTokens: many(refreshTokensTable),
 }));
 
 export const expenseDocumentsRelations = relations(
@@ -48,6 +50,16 @@ export const incomeLineItemsRelations = relations(
 		incomeDocument: one(incomeDocumentsTable, {
 			fields: [incomeLineItemsTable.incomeDocumentId],
 			references: [incomeDocumentsTable.id],
+		}),
+	}),
+);
+
+export const refreshTokensRelations = relations(
+	refreshTokensTable,
+	({ one }) => ({
+		user: one(usersTable, {
+			fields: [refreshTokensTable.userId],
+			references: [usersTable.id],
 		}),
 	}),
 );
