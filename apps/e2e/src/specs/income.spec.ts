@@ -22,6 +22,7 @@ test('income document lifecycle', async ({ page, loginAsTestUser }) => {
 	const deleteButton = getI18nText('common', 'action.delete')
 	const createIncomeText = getI18nText('incomes', 'single.title-create')
 	const editIncomeText = getI18nText('incomes', 'single.title-edit')
+	const deleteIncomeTitle = getI18nText('incomes', 'delete.title')
 
 	await page.goto('/incomes/new')
 	await expect(page.getByRole('heading', { name: createIncomeText })).toBeVisible()
@@ -67,6 +68,11 @@ test('income document lifecycle', async ({ page, loginAsTestUser }) => {
 	await expect(tbody.getByRole('row').filter({ hasText: initialFormatted })).toHaveCount(0)
 
 	await updatedRow.getByRole('button', { name: deleteButton }).click()
+
+	const deleteDialog = page.getByRole('alertdialog')
+	await expect(deleteDialog).toBeVisible()
+	await expect(deleteDialog.getByText(deleteIncomeTitle)).toBeVisible()
+	await deleteDialog.getByRole('button', { name: deleteButton }).click()
 
 	await expect(tbody.getByRole('row').filter({ hasText: updatedFormatted })).toHaveCount(0)
 })

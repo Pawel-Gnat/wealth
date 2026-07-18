@@ -17,8 +17,6 @@ type CreateDocumentColumnsProps = {
 	language: string;
 	getEditPath: (id: string) => string;
 	onDelete: (documentId: string) => void;
-	deletingDocumentId: string | null;
-	isDeleting: boolean;
 };
 
 export function createDocumentColumns({
@@ -26,8 +24,6 @@ export function createDocumentColumns({
 	language,
 	getEditPath,
 	onDelete,
-	deletingDocumentId,
-	isDeleting,
 }: CreateDocumentColumnsProps): ColumnDef<DocumentListItem>[] {
 	return [
 		{
@@ -72,7 +68,6 @@ export function createDocumentColumns({
 			cell: ({ row }) => {
 				const editText = t("action.edit", { ns: "common" });
 				const deleteText = t("action.delete", { ns: "common" });
-				const isDisabled = deletingDocumentId === row.original.id || isDeleting;
 
 				return (
 					<div className="flex items-center gap-2 justify-end">
@@ -92,8 +87,6 @@ export function createDocumentColumns({
 								<ButtonDestructive
 									size="icon"
 									onClick={() => onDelete(row.original.id)}
-									disabled={isDisabled}
-									isLoading={isDisabled}
 								>
 									<Icon name="delete" />
 									<span className="sr-only">{deleteText}</span>
