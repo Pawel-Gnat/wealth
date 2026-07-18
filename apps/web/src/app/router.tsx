@@ -2,13 +2,15 @@ import { Route, Routes } from "react-router";
 import { AuthenticatedLayout } from "@/app/authenticated-layout";
 import { UnauthenticatedLayout } from "@/app/unauthenticated-layout";
 import { AuthPage } from "@/pages/auth";
-import { DashboardPage } from "@/pages/dashboard";
-import { ExpenseFormPage, ExpensesListPage } from "@/pages/expenses";
-import { IncomeFormPage, IncomesListPage } from "@/pages/incomes";
-import { DashboardLayout } from "@/widgets/dashboard-layout";
 
 export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";
 
+import { DashboardPage } from "@/pages/dashboard";
+import { ExpenseFormPage } from "@/pages/expense-form";
+import { ExpensesListPage } from "@/pages/expenses";
+import { IncomeFormPage } from "@/pages/income-form";
+import { IncomesListPage } from "@/pages/incomes";
+import { DashboardLayout } from "@/widgets/dashboard-layout";
 import { APP_ROUTES } from "./routes";
 
 export function AppRouter() {

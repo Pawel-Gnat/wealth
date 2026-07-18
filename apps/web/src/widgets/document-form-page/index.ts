@@ -1,1 +1,1 @@
-export { DocumentFormPage } from "./ui/document-form-page";
+export { DocumentFormPage } from "./document-form-page";

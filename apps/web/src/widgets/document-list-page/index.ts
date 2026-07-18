@@ -1,1 +1,1 @@
-export { DocumentListPage } from "./ui/document-list-page";
+export { DocumentListPage } from "./document-list-page";
