@@ -8,5 +8,9 @@
 		"title": "Manage your expenses",
 		"no-results": "No expenses found.",
 		"error": "Could not load expenses."
+	},
+	"delete": {
+		"title": "Delete expense?",
+		"description": "Deleting an expense cannot be undone."
 	}
 }

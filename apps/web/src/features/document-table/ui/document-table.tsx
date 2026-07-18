@@ -1,12 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { useDeleteDocument } from "@/features/document/api/use-delete-document";
 import { useDocumentsList } from "@/features/document/api/use-documents-list";
 import { getDocumentConfig } from "@/features/document/model/document-config";
 import type { RecordKind } from "@/features/document/model/record-kind";
 import { ErrorState, Table } from "@/shared/components";
 import { createDocumentColumns } from "./create-document-columns";
+import { DocumentDeleteDialog } from "./document-delete-dialog";
 
 type DocumentTableProps = {
 	kind: RecordKind;
@@ -16,19 +15,7 @@ export const DocumentTable = ({ kind }: DocumentTableProps) => {
 	const config = getDocumentConfig(kind);
 	const { t, i18n } = useTranslation();
 	const { data, isLoading, isError } = useDocumentsList(kind);
-	const {
-		deleteDocument,
-		deletingDocumentId,
-		isLoading: isDeleting,
-	} = useDeleteDocument({
-		kind,
-		onSuccess: () => {
-			toast.success(t(config.toast.deleted, { ns: "common" }));
-		},
-		onError: () => {
-			toast.error(t(config.toast.deleteError, { ns: "common" }));
-		},
-	});
+	const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
 	const columns = useMemo(
 		() =>
@@ -36,18 +23,9 @@ export const DocumentTable = ({ kind }: DocumentTableProps) => {
 				t,
 				language: i18n.language,
 				getEditPath: config.editRoute,
-				onDelete: deleteDocument,
-				deletingDocumentId,
-				isDeleting,
+				onDelete: setPendingDeleteId,
 			}),
-		[
-			config.editRoute,
-			deleteDocument,
-			deletingDocumentId,
-			i18n.language,
-			isDeleting,
-			t,
-		],
+		[config.editRoute, i18n.language, t],
 	);
 
 	if (isError) {
@@ -55,11 +33,22 @@ export const DocumentTable = ({ kind }: DocumentTableProps) => {
 	}
 
 	return (
-		<Table
-			columns={columns}
-			data={data}
-			noResultsText={t("list.no-results", { ns: config.i18nNamespace })}
-			isLoading={isLoading}
-		/>
+		<>
+			<Table
+				columns={columns}
+				data={data}
+				noResultsText={t("list.no-results", { ns: config.i18nNamespace })}
+				isLoading={isLoading}
+			/>
+			{pendingDeleteId && (
+				<DocumentDeleteDialog
+					id={pendingDeleteId}
+					kind={kind}
+					onClose={() => {
+						setPendingDeleteId(null);
+					}}
+				/>
+			)}
+		</>
 	);
 };

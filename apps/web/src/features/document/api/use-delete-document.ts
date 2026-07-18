@@ -7,7 +7,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/features/document/model/document-config";
 import type { RecordKind } from "@/features/document/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
-import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
 type DocumentDeleteResponse =
@@ -52,7 +51,6 @@ export function useDeleteDocument({
 
 	return {
 		deleteDocument: mutation.mutate,
-		isLoading: useSkeletonLoader({ isLoading: mutation.isPending }),
-		deletingDocumentId: mutation.isPending ? mutation.variables : null,
+		isLoading: mutation.isPending,
 	};
 }

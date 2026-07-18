@@ -1,13 +1,8 @@
-import {
-	EXPENSE_DELETED_MESSAGE,
-	INCOME_DELETED_MESSAGE,
-} from "@repo/api/schemas";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
-import { toast } from "sonner";
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { DOCUMENT_CONFIG } from "@/features/document/model/document-config";
 import type { RecordKind } from "@/features/document/model/record-kind";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
@@ -16,47 +11,28 @@ import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 import { DocumentTable } from "./document-table";
 
-vi.mock("sonner", () => ({
-	toast: {
-		success: vi.fn(),
-		error: vi.fn(),
-	},
-}));
-
 const documentId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 
 const tableKinds = [
 	{
 		kind: "expense",
 		apiSegment: "expenses",
-		deleteMessage: EXPENSE_DELETED_MESSAGE,
 	},
 	{
 		kind: "income",
 		apiSegment: "incomes",
-		deleteMessage: INCOME_DELETED_MESSAGE,
 	},
 ] as const satisfies readonly {
 	kind: RecordKind;
 	apiSegment: string;
-	deleteMessage: string;
 }[];
 
-describe.each(tableKinds)("$kind DocumentTable", ({
-	kind,
-	apiSegment,
-	deleteMessage,
-}) => {
+describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
 	const config = DOCUMENT_CONFIG[kind];
 	let t: TFunction;
 
 	beforeAll(async () => {
 		t = (await init18nWeb({ lng: "en" })) as TFunction;
-	});
-
-	beforeEach(() => {
-		vi.mocked(toast.success).mockClear();
-		vi.mocked(toast.error).mockClear();
 	});
 
 	it("shows error state when the list request fails", async () => {
@@ -112,7 +88,30 @@ describe.each(tableKinds)("$kind DocumentTable", ({
 		expect(editLink).toHaveAttribute("href", config.editRoute(documentId));
 	});
 
-	it("deletes a document and refreshes the list", async () => {
+	it("opens delete dialog without deleting yet", async () => {
+		const user = userEvent.setup();
+		let deleteCallCount = 0;
+
+		server.use(
+			http.delete(`*/${apiSegment}/:id`, () => {
+				deleteCallCount += 1;
+				return HttpResponse.json({ data: { message: "deleted" } });
+			}),
+		);
+
+		renderWithProviders(<DocumentTable kind={kind} />);
+		const deleteButtonLabel = t("action.delete", { ns: "common" });
+		const deleteButton = await screen.findByRole("button", {
+			name: deleteButtonLabel,
+		});
+
+		await user.click(deleteButton);
+
+		expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+		expect(deleteCallCount).toBe(0);
+	});
+
+	it("refreshes the list after confirmed delete", async () => {
 		const user = userEvent.setup();
 		let listCallCount = 0;
 
@@ -134,11 +133,6 @@ describe.each(tableKinds)("$kind DocumentTable", ({
 
 				return HttpResponse.json({ data: [], pagination: {} });
 			}),
-			http.delete(`*/${apiSegment}/:id`, () =>
-				HttpResponse.json({
-					data: { message: deleteMessage },
-				}),
-			),
 		);
 
 		const { queryClient } = renderWithProviders(<DocumentTable kind={kind} />);
@@ -146,47 +140,24 @@ describe.each(tableKinds)("$kind DocumentTable", ({
 
 		const deleteButtonLabel = t("action.delete", { ns: "common" });
 		const noResultsMessage = t("list.no-results", { ns: config.i18nNamespace });
-		const successToastMessage = t(config.toast.deleted, { ns: "common" });
 		const deleteButton = await screen.findByRole("button", {
 			name: deleteButtonLabel,
 		});
 
-		expect(deleteButton).toBeInTheDocument();
 		await user.click(deleteButton);
 
+		const dialog = screen.getByRole("alertdialog");
+		await user.click(
+			within(dialog).getByRole("button", { name: deleteButtonLabel }),
+		);
+
 		await waitFor(() => {
-			const noResultsElement = screen.getByText(noResultsMessage);
-			expect(toast.success).toHaveBeenCalledWith(successToastMessage);
-			expect(noResultsElement).toBeInTheDocument();
+			expect(screen.getByText(noResultsMessage)).toBeInTheDocument();
 		});
 
 		expect(listCallCount).toBeGreaterThanOrEqual(2);
 		expect(invalidateSpy).toHaveBeenCalledWith({
 			queryKey: queryKeys.dashboard.all(),
-		});
-	});
-
-	it("shows error toast when delete fails", async () => {
-		const user = userEvent.setup();
-
-		server.use(
-			http.delete(`*/${apiSegment}/:id`, () =>
-				HttpResponse.json({ message: "Delete failed" }, { status: 500 }),
-			),
-		);
-
-		renderWithProviders(<DocumentTable kind={kind} />);
-		const deleteButtonLabel = t("action.delete", { ns: "common" });
-		const errorToastMessage = t(config.toast.deleteError, { ns: "common" });
-		const deleteButton = await screen.findByRole("button", {
-			name: deleteButtonLabel,
-		});
-
-		expect(deleteButton).toBeInTheDocument();
-		await user.click(deleteButton);
-
-		await waitFor(() => {
-			expect(toast.error).toHaveBeenCalledWith(errorToastMessage);
 		});
 	});
 });

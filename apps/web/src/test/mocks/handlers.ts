@@ -1,3 +1,7 @@
+import {
+	EXPENSE_DELETED_MESSAGE,
+	INCOME_DELETED_MESSAGE,
+} from "@repo/api/schemas";
 import { HttpResponse, http } from "msw";
 
 const postAuthSignInHandler = () => {
@@ -48,6 +52,12 @@ const putExpenseUpdateHandler = () => {
 	});
 };
 
+const deleteExpenseHandler = () => {
+	return HttpResponse.json({
+		data: { message: EXPENSE_DELETED_MESSAGE },
+	});
+};
+
 const getIncomesListHandler = () => {
 	return HttpResponse.json({
 		data: [
@@ -81,6 +91,12 @@ const getIncomeByIdHandler = () => {
 const putIncomeUpdateHandler = () => {
 	return HttpResponse.json({
 		data: { message: "income_updated" as const },
+	});
+};
+
+const deleteIncomeHandler = () => {
+	return HttpResponse.json({
+		data: { message: INCOME_DELETED_MESSAGE },
 	});
 };
 
@@ -126,10 +142,12 @@ export const HANDLERS = [
 	http.get("*/expenses/:id", getExpenseByIdHandler),
 	http.post("*/expenses", postExpenseCreateHandler),
 	http.put("*/expenses/:id", putExpenseUpdateHandler),
+	http.delete("*/expenses/:id", deleteExpenseHandler),
 	http.get("*/incomes", getIncomesListHandler),
 	http.get("*/incomes/:id", getIncomeByIdHandler),
 	http.post("*/incomes", postIncomeCreateHandler),
 	http.put("*/incomes/:id", putIncomeUpdateHandler),
+	http.delete("*/incomes/:id", deleteIncomeHandler),
 	http.get("*/dashboard/widgets", getDashboardWidgetsHandler),
 	http.get("*/dashboard/chart", getDashboardChartHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),

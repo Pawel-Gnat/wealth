@@ -1,3 +1,4 @@
+export * from "./alert-modal";
 export * from "./badge";
 export * from "./breadcrumbs";
 export * from "./button";
