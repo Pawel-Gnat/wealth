@@ -8,5 +8,9 @@
 		"title": "Manage your incomes",
 		"no-results": "No incomes found.",
 		"error": "Could not load incomes."
+	},
+	"delete": {
+		"title": "Delete income?",
+		"description": "Deleting an income cannot be undone."
 	}
 }

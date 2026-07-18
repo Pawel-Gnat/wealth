@@ -9,6 +9,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/shared/lib/ui/alert-dialog";
+import { Icon } from "../icons";
 
 type AlertModalProps = {
 	open?: boolean;
@@ -33,10 +34,17 @@ export const AlertModal = ({
 	isConfirming = false,
 	className,
 }: AlertModalProps) => {
+	const handleOpenChange = (nextOpen: boolean) => {
+		if (isConfirming && !nextOpen) {
+			return;
+		}
+		onOpenChange?.(nextOpen);
+	};
+
 	return (
 		<AlertDialog
 			{...(open !== undefined && { open })}
-			{...(onOpenChange && { onOpenChange })}
+			{...(onOpenChange && { onOpenChange: handleOpenChange })}
 		>
 			<AlertDialogContent className={cn("rounded-lg", className)}>
 				<AlertDialogHeader>
@@ -57,7 +65,11 @@ export const AlertModal = ({
 						disabled={isConfirming}
 						className="rounded-lg"
 					>
-						{confirmText}
+						{isConfirming ? (
+							<Icon name="loader" className="animate-spin" />
+						) : (
+							confirmText
+						)}
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
