@@ -1,16 +1,5 @@
 import type { DocumentCreatePayload } from "@repo/api/schemas";
 
-export const DEFAULT_DOCUMENT_VALUES: DocumentCreatePayload = {
-	date: new Date(),
-	lineItems: [{ title: "", singleAmount: 1, quantity: 1 }],
-};
-
-export const EMPTY_LINE_ITEM: DocumentCreatePayload["lineItems"][number] = {
-	title: "",
-	singleAmount: 1,
-	quantity: 1,
-};
-
 export function calculateLineTotal(
 	singleAmount: number | undefined,
 	quantity: number | undefined,

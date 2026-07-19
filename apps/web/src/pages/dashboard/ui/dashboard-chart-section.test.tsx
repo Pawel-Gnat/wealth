@@ -1,16 +1,11 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { TFunction } from "i18next";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
+import { server } from "@/test/servers";
 import { DashboardChartSection } from "./dashboard-chart-section";
-
-vi.mock("@/features/dashboard/ui/dashboard-chart", () => ({
-	DashboardChart: ({ chartPeriod }: { chartPeriod: string }) => (
-		<div data-testid="dashboard-chart">{chartPeriod}</div>
-	),
-}));
 
 describe("DashboardChartSection", () => {
 	let t: TFunction;
@@ -19,24 +14,35 @@ describe("DashboardChartSection", () => {
 		t = (await init18nWeb({ lng: "en" })) as TFunction;
 	});
 
-	it("loads month chart by default and switches to week", async () => {
+	it("requests week chart when week is selected", async () => {
 		const user = userEvent.setup();
+		let chartPeriod: string | null = null;
+
+		const trackChartRequest = ({ request }: { request: Request }) => {
+			const url = new URL(request.url);
+
+			if (!url.pathname.endsWith("/dashboard/chart")) {
+				return;
+			}
+
+			chartPeriod = url.searchParams.get("chartPeriod");
+		};
+
+		server.events.on("request:start", trackChartRequest);
 
 		renderWithProviders(<DashboardChartSection />);
 
-		expect(await screen.findByTestId("dashboard-chart")).toHaveTextContent(
-			"month",
-		);
-
 		await user.click(
-			screen.getByRole("radio", {
+			await screen.findByRole("radio", {
 				name: t("common.week", { ns: "common" }),
 			}),
 		);
 
 		await waitFor(() => {
-			expect(screen.getByTestId("dashboard-chart")).toHaveTextContent("week");
+			expect(chartPeriod).toBe("week");
 		});
+
+		server.events.removeListener("request:start", trackChartRequest);
 	});
 
 	it("renders period toggle and legend labels", async () => {

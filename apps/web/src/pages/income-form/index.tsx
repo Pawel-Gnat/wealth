@@ -1,3 +1,3 @@
-import { DocumentFormPage } from "@/widgets/document-form-page";
+import { DocumentFormPage } from "@/features/document-form-page";
 
 export const IncomeFormPage = () => <DocumentFormPage kind="income" />;

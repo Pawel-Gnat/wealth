@@ -1,3 +1,3 @@
-import { DocumentListPage } from "@/widgets/document-list-page";
+import { DocumentListPage } from "@/features/document-list-page";
 
 export const IncomesListPage = () => <DocumentListPage kind="income" />;

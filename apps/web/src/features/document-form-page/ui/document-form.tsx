@@ -14,12 +14,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import {
-	calculateDocumentTotal,
-	calculateLineTotal,
-	DEFAULT_DOCUMENT_VALUES,
-	EMPTY_LINE_ITEM,
-} from "@/features/document/model/defaults";
-import {
 	Form,
 	FormDatePicker,
 	Icon,
@@ -30,6 +24,10 @@ import { getDocumentConfig } from "@/shared/config/document-config";
 import { formatPrice } from "@/shared/helpers/price";
 import { Button } from "@/shared/lib/ui/button";
 import type { RecordKind } from "@/shared/types/record-kind";
+import {
+	calculateDocumentTotal,
+	calculateLineTotal,
+} from "../helpers/document-totals";
 import { useUpsertDocument } from "../hooks/use-upsert-document";
 import { DocumentLineItem } from "./document-line-item";
 
@@ -37,6 +35,17 @@ export type DocumentFormProps = {
 	kind: RecordKind;
 	documentId?: string;
 	initialValues?: DocumentCreatePayload;
+};
+
+export const DEFAULT_DOCUMENT_VALUES: DocumentCreatePayload = {
+	date: new Date(),
+	lineItems: [{ title: "", singleAmount: 1, quantity: 1 }],
+};
+
+export const EMPTY_LINE_ITEM: DocumentCreatePayload["lineItems"][number] = {
+	title: "",
+	singleAmount: 1,
+	quantity: 1,
 };
 
 export const DocumentForm = ({
