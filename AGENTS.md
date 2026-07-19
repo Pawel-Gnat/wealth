@@ -21,6 +21,35 @@
 
 - Read and follow `docs/ADR.md` for accepted architecture decisions (e.g. auth session / logout scope). Do not contradict an ADR without updating that file.
 
+## Frontend structure (`apps/web`)
+
+Layered layout inspired by FSD, with **page-centric** ownership of screen logic. Imports flow downward only (higher layers may import lower ones; never the reverse).
+
+Layers (top → bottom):
+
+- **`app`** — `src/app/` — router, route constants, auth layouts.
+- **`pages`** — `src/pages/<slice>/` — route entry points. **Own the full screen logic** (hooks, helpers, UI) unless that logic is reused elsewhere.
+- **`features`** — `src/features/<slice>/` — reused slices that contain **behavior / data logic** (API hooks, forms, tables). Example: `document-list-page`, `document-form-page` shared by incomes and expenses via `kind`.
+- **`widgets`** — `src/widgets/<slice>/` — reused **presentational** composites (little or no domain logic). Example: `dashboard-layout`, `page-loader`.
+- **`shared`** — `src/shared/` — UI kit, config, helpers, oRPC, i18n.
+
+There is **no `entities` layer**. Domain types and Zod schemas live in `@repo/api` (`packages/api`).
+
+Placement rules:
+
+1. Logic used by **one** route/domain → keep it in that **`pages`** slice.
+2. Reused + has logic → extract to **`features`**.
+3. Reused + mostly presentation → extract to **`widgets`**.
+4. Cross-cutting primitives / config / clients → **`shared`**.
+5. API contracts and schemas → **`packages/api`**, not `apps/web`.
+
+Conventions:
+
+- Slice names: kebab-case.
+- Prefer public API via slice `index.ts` / `index.tsx`; other layers import from the barrel, not deep `ui/` paths.
+- Alias: `@/` → `src/`.
+- Income and expense share document UI via `kind: 'income' | 'expense'` and `getDocumentConfig(kind)` — do not add separate `expense-*` / `income-*` feature wrappers for the same behavior.
+
 ## ShadCN UI
 
 - Try to use components from /shared folder, shadcn library keeps raw components inside /ui folder.
