@@ -10,6 +10,7 @@ import { DashboardModule } from "./dashboard-service/dashboard.module.js";
 import { DatabaseModule } from "./database-service/database.module.js";
 import { ExpensesModule } from "./expenses-service/expenses.module.js";
 import { IncomesModule } from "./incomes-service/incomes.module.js";
+import { RedisModule } from "./redis-service/redis.module.js";
 import { UsersModule } from "./users-service/users.module.js";
 
 declare module "@orpc/nest" {
@@ -49,6 +50,7 @@ declare module "@orpc/nest" {
 		DashboardModule,
 		AuthModule,
 		DatabaseModule,
+		RedisModule,
 	],
 	providers: [
 		{

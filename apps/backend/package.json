@@ -41,6 +41,7 @@
 		"date-fns": "catalog:",
 		"date-fns-tz": "^3.2.0",
 		"drizzle-orm": "^0.45.2",
+		"ioredis": "^5.11.1",
 		"passport-jwt": "^4.0.1",
 		"pg": "^8.20.0",
 		"reflect-metadata": "^0.2.2",
