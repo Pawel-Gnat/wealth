@@ -12,7 +12,7 @@ import { refreshTokensTable } from "../database-service/tables/index.js";
 import { createAuthTestingModule } from "../test/helpers/modules.js";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
 import { UsersService } from "../users-service/users.service.js";
-import { AuthService } from "./auth.service.js";
+import { AuthService, RefreshTokenReuseError } from "./auth.service.js";
 
 const hashToken = (token: string) =>
 	createHash("sha256").update(token).digest("hex");
@@ -100,6 +100,16 @@ describe("Auth service", () => {
 			expect(result.refreshToken).toBeTypeOf("string");
 			expect(result.refreshToken.length).toBeGreaterThan(0);
 			expect(result.refreshExpiresAt).toBeInstanceOf(Date);
+			expect(result.sessionId).toBeTypeOf("string");
+			expect(result.sessionId.length).toBeGreaterThan(0);
+
+			const [row] = await db
+				.select()
+				.from(refreshTokensTable)
+				.where(eq(refreshTokensTable.tokenHash, hashToken(result.refreshToken)))
+				.limit(1);
+
+			expect(row?.sessionId).toBe(result.sessionId);
 		});
 
 		it("deletes expired refresh tokens for the user", async () => {
@@ -145,10 +155,21 @@ describe("Auth service", () => {
 			const refreshed = await authService.refreshSession(session.refreshToken);
 
 			expect(refreshed.refreshToken).not.toBe(session.refreshToken);
+			expect(refreshed.sessionId).toBe(session.sessionId);
+
+			const [active] = await db
+				.select()
+				.from(refreshTokensTable)
+				.where(
+					eq(refreshTokensTable.tokenHash, hashToken(refreshed.refreshToken)),
+				)
+				.limit(1);
+
+			expect(active?.sessionId).toBe(session.sessionId);
 
 			await expect(
 				authService.refreshSession(session.refreshToken),
-			).rejects.toThrow(UnauthorizedException);
+			).rejects.toThrow(RefreshTokenReuseError);
 		});
 
 		it("keeps unexpired revoked tokens so reuse can be detected", async () => {
@@ -237,7 +258,15 @@ describe("Auth service", () => {
 
 			await expect(
 				authService.refreshSession(firstSession.refreshToken),
-			).rejects.toThrow(UnauthorizedException);
+			).rejects.toSatisfy((error: unknown) => {
+				expect(error).toBeInstanceOf(RefreshTokenReuseError);
+				if (!(error instanceof RefreshTokenReuseError)) {
+					return false;
+				}
+				expect(error.userId).toBe(user.id);
+				expect(error.sessionId).toBe(firstSession.sessionId);
+				return true;
+			});
 
 			await expect(
 				authService.refreshSession(rotated.refreshToken),
@@ -264,7 +293,14 @@ describe("Auth service", () => {
 				email: user.email,
 			});
 
-			await authService.logoutSession(firstSession.refreshToken);
+			const capture = await authService.logoutSession(
+				firstSession.refreshToken,
+			);
+
+			expect(capture).toEqual({
+				userId: user.id,
+				sessionId: firstSession.sessionId,
+			});
 
 			const [revoked] = await db
 				.select()
@@ -283,6 +319,25 @@ describe("Auth service", () => {
 				secondSession.refreshToken,
 			);
 			expect(stillActive.refreshToken).not.toBe(secondSession.refreshToken);
+			expect(stillActive.sessionId).toBe(secondSession.sessionId);
+		});
+
+		it("returns null when the refresh token is missing or already revoked", async () => {
+			await expect(authService.logoutSession(null)).resolves.toBeNull();
+
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-logout-idempotent",
+			});
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+
+			await authService.logoutSession(session.refreshToken);
+			await expect(
+				authService.logoutSession(session.refreshToken),
+			).resolves.toBeNull();
 		});
 	});
 

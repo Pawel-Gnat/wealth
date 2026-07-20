@@ -22,6 +22,7 @@ import { addDays } from "date-fns";
 import { and, eq, gt, isNull, lt } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Request, Response } from "express";
+import { ulid } from "ulid";
 import { DBS } from "../database-service/constants.js";
 import { refreshTokensTable } from "../database-service/tables/index.js";
 import { UsersService } from "../users-service/users.service.js";
@@ -34,7 +35,24 @@ type AuthSessionResult = {
 	accessToken: string;
 	refreshToken: string;
 	refreshExpiresAt: Date;
+	sessionId: string;
 };
+
+export type SessionRevocationCapture = {
+	userId: string;
+	sessionId: string;
+};
+
+export class RefreshTokenReuseError extends UnauthorizedException {
+	readonly userId: string;
+	readonly sessionId: string;
+
+	constructor(capture: SessionRevocationCapture) {
+		super("Invalid refresh token");
+		this.userId = capture.userId;
+		this.sessionId = capture.sessionId;
+	}
+}
 
 @Injectable()
 export class AuthService {
@@ -102,11 +120,13 @@ export class AuthService {
 		const accessToken = await this.createAccessToken(user);
 		const refreshToken = this.generateRefreshToken();
 		const refreshExpiresAt = this.getRefreshTokenExpiresAt();
+		const sessionId = ulid();
 		const now = new Date();
 
 		await this.db.transaction(async (tx) => {
 			await tx.insert(refreshTokensTable).values({
 				userId: user.id,
+				sessionId,
 				tokenHash: this.hashRefreshToken(refreshToken),
 				expiresAt: refreshExpiresAt,
 			});
@@ -117,6 +137,7 @@ export class AuthService {
 			accessToken,
 			refreshToken,
 			refreshExpiresAt,
+			sessionId,
 		};
 	}
 
@@ -141,6 +162,7 @@ export class AuthService {
 				const [existing] = await tx
 					.select({
 						userId: refreshTokensTable.userId,
+						sessionId: refreshTokensTable.sessionId,
 						revokedAt: refreshTokensTable.revokedAt,
 					})
 					.from(refreshTokensTable)
@@ -157,6 +179,14 @@ export class AuthService {
 								isNull(refreshTokensTable.revokedAt),
 							),
 						);
+
+					return {
+						ok: false as const,
+						reuseRevocation: {
+							userId: existing.userId,
+							sessionId: existing.sessionId,
+						} satisfies SessionRevocationCapture,
+					};
 				}
 
 				return { ok: false as const };
@@ -173,11 +203,12 @@ export class AuthService {
 			});
 			const nextRefreshToken = this.generateRefreshToken();
 			const refreshExpiresAt = this.getRefreshTokenExpiresAt();
-
 			const userId = String(user.id);
+			const sessionId = storedToken.sessionId;
 
 			await tx.insert(refreshTokensTable).values({
 				userId,
+				sessionId,
 				tokenHash: this.hashRefreshToken(nextRefreshToken),
 				expiresAt: refreshExpiresAt,
 			});
@@ -189,25 +220,31 @@ export class AuthService {
 					accessToken,
 					refreshToken: nextRefreshToken,
 					refreshExpiresAt,
+					sessionId,
 				},
 			};
 		});
 
 		if (!result.ok) {
+			if (result.reuseRevocation) {
+				throw new RefreshTokenReuseError(result.reuseRevocation);
+			}
 			throw new UnauthorizedException("Invalid refresh token");
 		}
 
 		return result.session;
 	}
 
-	async logoutSession(refreshToken: string | null): Promise<void> {
+	async logoutSession(
+		refreshToken: string | null,
+	): Promise<SessionRevocationCapture | null> {
 		if (!refreshToken) {
-			return;
+			return null;
 		}
 
 		const tokenHash = this.hashRefreshToken(refreshToken);
 
-		await this.db
+		const [revoked] = await this.db
 			.update(refreshTokensTable)
 			.set({ revokedAt: new Date() })
 			.where(
@@ -215,7 +252,20 @@ export class AuthService {
 					eq(refreshTokensTable.tokenHash, tokenHash),
 					isNull(refreshTokensTable.revokedAt),
 				),
-			);
+			)
+			.returning({
+				userId: refreshTokensTable.userId,
+				sessionId: refreshTokensTable.sessionId,
+			});
+
+		if (!revoked) {
+			return null;
+		}
+
+		return {
+			userId: revoked.userId,
+			sessionId: revoked.sessionId,
+		};
 	}
 
 	private async cleanupStaleRefreshTokens(
