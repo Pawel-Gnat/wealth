@@ -1,6 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
 import {
-	forwardRef,
 	Inject,
 	Injectable,
 	Logger,
@@ -70,7 +69,6 @@ export class AuthService {
 		private jwtService: JwtService,
 		private configService: ConfigService,
 		@Inject(DBS.APP) private readonly db: NodePgDatabase,
-		@Inject(forwardRef(() => SsePublisher))
 		private readonly ssePublisher: SsePublisher,
 	) {}
 
@@ -247,6 +245,11 @@ export class AuthService {
 
 		if (!result.ok) {
 			if (result.reuseRevocation) {
+				await this.publishSessionRevokedBestEffort({
+					userId: result.reuseRevocation.userId,
+					scope: "user",
+					targetId: result.reuseRevocation.userId,
+				});
 				throw new RefreshTokenReuseError(result.reuseRevocation);
 			}
 			throw new UnauthorizedException("Invalid refresh token");

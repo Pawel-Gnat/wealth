@@ -252,6 +252,9 @@ describe("Auth service", () => {
 		});
 
 		it("revokes all active sessions when a rotated refresh token is reused", async () => {
+			publishAuthSessionRevoked.mockClear();
+			publishAuthSessionRevoked.mockResolvedValue(true);
+
 			const user = await createTestUser(usersService, {
 				passwordHash: await bcrypt.hash("secret", 10),
 				emailTag: "auth-refresh-reuse",
@@ -282,12 +285,38 @@ describe("Auth service", () => {
 				return true;
 			});
 
+			expect(publishAuthSessionRevoked).toHaveBeenCalledWith({
+				userId: user.id,
+				scope: "user",
+				targetId: user.id,
+			});
+
 			await expect(
 				authService.refreshSession(rotated.refreshToken),
 			).rejects.toThrow(UnauthorizedException);
 			await expect(
 				authService.refreshSession(secondSession.refreshToken),
 			).rejects.toThrow(UnauthorizedException);
+		});
+
+		it("still rejects reuse when SSE publish fails", async () => {
+			publishAuthSessionRevoked.mockClear();
+			publishAuthSessionRevoked.mockRejectedValueOnce(new Error("redis down"));
+
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-refresh-reuse-publish-fail",
+			});
+
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+			await authService.refreshSession(session.refreshToken);
+
+			await expect(
+				authService.refreshSession(session.refreshToken),
+			).rejects.toThrow(RefreshTokenReuseError);
 		});
 	});
 

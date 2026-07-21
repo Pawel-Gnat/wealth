@@ -11,7 +11,8 @@ import { DatabaseModule } from "./database-service/database.module.js";
 import { ExpensesModule } from "./expenses-service/expenses.module.js";
 import { IncomesModule } from "./incomes-service/incomes.module.js";
 import { RedisModule } from "./redis-service/redis.module.js";
-import { SseModule } from "./sse-service/sse.module.js";
+import { SseHttpModule } from "./sse-service/sse-http.module.js";
+import { SseRealtimeModule } from "./sse-service/sse-realtime.module.js";
 import { UsersModule } from "./users-service/users.module.js";
 
 declare module "@orpc/nest" {
@@ -52,7 +53,8 @@ declare module "@orpc/nest" {
 		AuthModule,
 		DatabaseModule,
 		RedisModule,
-		SseModule,
+		SseRealtimeModule,
+		SseHttpModule,
 	],
 	providers: [
 		{

@@ -1,9 +1,9 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { ACCESS_TOKEN_EXPIRES_IN } from "@repo/common/constants";
-import { SseModule } from "../sse-service/sse.module.js";
+import { SseRealtimeModule } from "../sse-service/sse-realtime.module.js";
 import { UsersModule } from "../users-service/users.module.js";
 import { AuthController } from "./auth.controller.js";
 import { AuthService } from "./auth.service.js";
@@ -12,7 +12,7 @@ import { JwtStrategy } from "./strategies/jwt.strategy.js";
 @Module({
 	imports: [
 		UsersModule,
-		forwardRef(() => SseModule),
+		SseRealtimeModule,
 		JwtModule.registerAsync({
 			global: true,
 			imports: [ConfigModule],
