@@ -268,6 +268,35 @@ export class AuthService {
 		};
 	}
 
+	async resolveActiveRefreshSession(
+		request: Request,
+	): Promise<SessionRevocationCapture | null> {
+		const refreshToken = this.readRefreshTokenFromRequest(request);
+		if (!refreshToken) {
+			return null;
+		}
+
+		const tokenHash = this.hashRefreshToken(refreshToken);
+		const now = new Date();
+
+		const [row] = await this.db
+			.select({
+				userId: refreshTokensTable.userId,
+				sessionId: refreshTokensTable.sessionId,
+			})
+			.from(refreshTokensTable)
+			.where(
+				and(
+					eq(refreshTokensTable.tokenHash, tokenHash),
+					isNull(refreshTokensTable.revokedAt),
+					gt(refreshTokensTable.expiresAt, now),
+				),
+			)
+			.limit(1);
+
+		return row ?? null;
+	}
+
 	private async cleanupStaleRefreshTokens(
 		db: RefreshTokensDb,
 		userId: string,

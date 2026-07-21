@@ -341,6 +341,63 @@ describe("Auth service", () => {
 		});
 	});
 
+	describe("resolve active refresh session", () => {
+		it("returns userId and sessionId for a valid refresh cookie", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-resolve-session",
+			});
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+
+			const resolved = await authService.resolveActiveRefreshSession({
+				cookies: { "wealth.auth.refresh": session.refreshToken },
+			} as never);
+
+			expect(resolved).toEqual({
+				userId: user.id,
+				sessionId: session.sessionId,
+			});
+		});
+
+		it("returns null for missing, revoked, or expired refresh tokens", async () => {
+			await expect(
+				authService.resolveActiveRefreshSession({ cookies: {} } as never),
+			).resolves.toBeNull();
+
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-resolve-invalid",
+			});
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+
+			await authService.logoutSession(session.refreshToken);
+			await expect(
+				authService.resolveActiveRefreshSession({
+					cookies: { "wealth.auth.refresh": session.refreshToken },
+				} as never),
+			).resolves.toBeNull();
+
+			await db.insert(refreshTokensTable).values({
+				userId: user.id,
+				sessionId: session.sessionId,
+				tokenHash: hashToken("expired-resolve-token"),
+				expiresAt: subDays(new Date(), 1),
+			});
+
+			await expect(
+				authService.resolveActiveRefreshSession({
+					cookies: { "wealth.auth.refresh": "expired-resolve-token" },
+				} as never),
+			).resolves.toBeNull();
+		});
+	});
+
 	describe("sign up", () => {
 		it("rejects when email is already registered", async () => {
 			const existing = await createTestUser(usersService, {
