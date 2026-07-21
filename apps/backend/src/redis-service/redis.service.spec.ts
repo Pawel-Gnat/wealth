@@ -12,12 +12,16 @@ const {
 	publisherPublish,
 	publisherQuit,
 	subscriberQuit,
+	subscriberSubscribe,
+	subscriberUnsubscribe,
 } = vi.hoisted(() => {
 	const publisherConnect = vi.fn();
 	const subscriberConnect = vi.fn();
 	const publisherPublish = vi.fn();
 	const publisherQuit = vi.fn();
 	const subscriberQuit = vi.fn();
+	const subscriberSubscribe = vi.fn();
+	const subscriberUnsubscribe = vi.fn();
 
 	const mockPublisher = {
 		connect: publisherConnect,
@@ -28,6 +32,8 @@ const {
 
 	const mockSubscriber = {
 		connect: subscriberConnect,
+		subscribe: subscriberSubscribe,
+		unsubscribe: subscriberUnsubscribe,
 		quit: subscriberQuit,
 		on: vi.fn(),
 	};
@@ -43,6 +49,8 @@ const {
 		publisherPublish,
 		publisherQuit,
 		subscriberQuit,
+		subscriberSubscribe,
+		subscriberUnsubscribe,
 	};
 });
 
@@ -66,6 +74,8 @@ describe("RedisService", () => {
 		publisherPublish.mockResolvedValue(1);
 		publisherQuit.mockResolvedValue("OK");
 		subscriberQuit.mockResolvedValue("OK");
+		subscriberSubscribe.mockResolvedValue(undefined);
+		subscriberUnsubscribe.mockResolvedValue(undefined);
 
 		configGet = vi.fn();
 		moduleRef = await Test.createTestingModule({
@@ -133,6 +143,20 @@ describe("RedisService", () => {
 
 		publisherPublish.mockRejectedValueOnce(new Error("disconnected"));
 		await expect(redisService.publish("sse:user:1", "{}")).resolves.toBe(false);
+	});
+
+	it("subscribes and unsubscribes when available", async () => {
+		configGet.mockReturnValue("redis://localhost:6379");
+		await redisService.onModuleInit();
+
+		await expect(redisService.subscribe("sse:user:1")).resolves.toBe(true);
+		expect(subscriberSubscribe).toHaveBeenCalledWith("sse:user:1");
+
+		await expect(redisService.unsubscribe("sse:user:1")).resolves.toBe(true);
+		expect(subscriberUnsubscribe).toHaveBeenCalledWith("sse:user:1");
+
+		subscriberSubscribe.mockRejectedValueOnce(new Error("disconnected"));
+		await expect(redisService.subscribe("sse:user:1")).resolves.toBe(false);
 	});
 
 	it("quits clients on destroy", async () => {

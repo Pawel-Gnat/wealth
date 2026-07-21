@@ -86,6 +86,42 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 		}
 	}
 
+	async subscribe(channel: string) {
+		if (!this.subscriber) {
+			return false;
+		}
+
+		try {
+			await this.subscriber.subscribe(channel);
+			return true;
+		} catch (error) {
+			this.logger.warn(
+				`Failed to subscribe to ${channel}: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			);
+			return false;
+		}
+	}
+
+	async unsubscribe(channel: string) {
+		if (!this.subscriber) {
+			return false;
+		}
+
+		try {
+			await this.subscriber.unsubscribe(channel);
+			return true;
+		} catch (error) {
+			this.logger.warn(
+				`Failed to unsubscribe from ${channel}: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			);
+			return false;
+		}
+	}
+
 	private attachErrorHandlers(client: Redis, label: string) {
 		client.on("error", (error) => {
 			this.logger.warn(
