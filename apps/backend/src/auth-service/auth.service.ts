@@ -1,5 +1,11 @@
 import { createHash, randomBytes } from "node:crypto";
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+	forwardRef,
+	Inject,
+	Injectable,
+	Logger,
+	UnauthorizedException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { ORPCError } from "@orpc/server";
@@ -25,6 +31,7 @@ import type { Request, Response } from "express";
 import { ulid } from "ulid";
 import { DBS } from "../database-service/constants.js";
 import { refreshTokensTable } from "../database-service/tables/index.js";
+import { SsePublisher } from "../sse-service/sse-publisher.service.js";
 import { UsersService } from "../users-service/users.service.js";
 
 const BCRYPT_ROUNDS = 10;
@@ -56,11 +63,15 @@ export class RefreshTokenReuseError extends UnauthorizedException {
 
 @Injectable()
 export class AuthService {
+	private readonly logger = new Logger(AuthService.name);
+
 	constructor(
 		private usersService: UsersService,
 		private jwtService: JwtService,
 		private configService: ConfigService,
 		@Inject(DBS.APP) private readonly db: NodePgDatabase,
+		@Inject(forwardRef(() => SsePublisher))
+		private readonly ssePublisher: SsePublisher,
 	) {}
 
 	async validateUser(payload: SignInPayload): Promise<User> {
@@ -110,7 +121,16 @@ export class AuthService {
 
 	async logout(request: Request, response: Response): Promise<LogoutResponse> {
 		const refreshToken = this.readRefreshTokenFromRequest(request);
-		await this.logoutSession(refreshToken);
+		const capture = await this.logoutSession(refreshToken);
+
+		if (capture) {
+			await this.publishSessionRevokedBestEffort({
+				userId: capture.userId,
+				scope: "session",
+				targetId: capture.sessionId,
+			});
+		}
+
 		this.clearRefreshTokenCookie(response);
 
 		return { data: { message: "logged_out" } };
@@ -382,5 +402,21 @@ export class AuthService {
 
 	private getRefreshTokenExpiresAt(): Date {
 		return addDays(new Date(), REFRESH_TOKEN_EXPIRES_IN_DAYS);
+	}
+
+	private async publishSessionRevokedBestEffort(input: {
+		userId: string;
+		scope: "session" | "user";
+		targetId: string;
+	}) {
+		try {
+			await this.ssePublisher.publishAuthSessionRevoked(input);
+		} catch (error) {
+			this.logger.warn(
+				`Failed to publish auth.session-revoked: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			);
+		}
 	}
 }

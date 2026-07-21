@@ -1,14 +1,24 @@
 import { createHash } from "node:crypto";
 import { UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { REFRESH_TOKEN_COOKIE_NAME } from "@repo/common/constants";
 import * as bcrypt from "bcrypt";
 import { subDays } from "date-fns";
 import { and, eq, isNull } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from "vitest";
 
 import { DBS } from "../database-service/constants.js";
 import { refreshTokensTable } from "../database-service/tables/index.js";
+import { SsePublisher } from "../sse-service/sse-publisher.service.js";
 import { createAuthTestingModule } from "../test/helpers/modules.js";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
 import { UsersService } from "../users-service/users.service.js";
@@ -23,6 +33,7 @@ describe("Auth service", () => {
 	let usersService: UsersService;
 	let jwtService: JwtService;
 	let db: NodePgDatabase;
+	let publishAuthSessionRevoked: ReturnType<typeof vi.fn>;
 
 	beforeAll(async () => {
 		moduleRef = await createAuthTestingModule();
@@ -30,6 +41,9 @@ describe("Auth service", () => {
 		usersService = moduleRef.get(UsersService);
 		jwtService = moduleRef.get(JwtService);
 		db = moduleRef.get(DBS.APP);
+		publishAuthSessionRevoked = vi.mocked(
+			moduleRef.get(SsePublisher).publishAuthSessionRevoked,
+		);
 	});
 
 	afterAll(async () => {
@@ -338,6 +352,78 @@ describe("Auth service", () => {
 			await expect(
 				authService.logoutSession(session.refreshToken),
 			).resolves.toBeNull();
+		});
+	});
+
+	describe("logout", () => {
+		beforeEach(() => {
+			publishAuthSessionRevoked.mockClear();
+			publishAuthSessionRevoked.mockResolvedValue(true);
+		});
+
+		it("publishes session-scoped revoke after logout and clears the cookie", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-logout-publish",
+			});
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+			const clearCookie = vi.fn();
+
+			await expect(
+				authService.logout(
+					{
+						cookies: {
+							[REFRESH_TOKEN_COOKIE_NAME]: session.refreshToken,
+						},
+					} as never,
+					{ clearCookie } as never,
+				),
+			).resolves.toEqual({ data: { message: "logged_out" } });
+
+			expect(publishAuthSessionRevoked).toHaveBeenCalledWith({
+				userId: user.id,
+				scope: "session",
+				targetId: session.sessionId,
+			});
+			expect(clearCookie).toHaveBeenCalled();
+		});
+
+		it("still returns success when SSE publish fails", async () => {
+			publishAuthSessionRevoked.mockRejectedValueOnce(new Error("redis down"));
+
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-logout-publish-fail",
+			});
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+
+			await expect(
+				authService.logout(
+					{
+						cookies: {
+							[REFRESH_TOKEN_COOKIE_NAME]: session.refreshToken,
+						},
+					} as never,
+					{ clearCookie: vi.fn() } as never,
+				),
+			).resolves.toEqual({ data: { message: "logged_out" } });
+		});
+
+		it("does not publish when there is no active refresh session", async () => {
+			await expect(
+				authService.logout(
+					{ cookies: {} } as never,
+					{ clearCookie: vi.fn() } as never,
+				),
+			).resolves.toEqual({ data: { message: "logged_out" } });
+
+			expect(publishAuthSessionRevoked).not.toHaveBeenCalled();
 		});
 	});
 
