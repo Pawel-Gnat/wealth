@@ -122,6 +122,17 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 		}
 	}
 
+	onMessage(listener: (channel: string, message: string) => void) {
+		if (!this.subscriber) {
+			return () => {};
+		}
+
+		this.subscriber.on("message", listener);
+		return () => {
+			this.subscriber?.off("message", listener);
+		};
+	}
+
 	private attachErrorHandlers(client: Redis, label: string) {
 		client.on("error", (error) => {
 			this.logger.warn(

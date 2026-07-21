@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ulid } from "ulid";
 import { RedisService } from "../redis-service/redis.service.js";
-import { sseUserChannel } from "./sse-channels.js";
+import { sseUserChannel } from "./helpers/sse-channels.js";
 
 export type SseConnectionSink = {
 	next: (data: unknown) => void;

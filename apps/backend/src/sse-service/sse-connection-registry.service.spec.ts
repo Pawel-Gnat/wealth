@@ -1,7 +1,7 @@
 import { Test, type TestingModule } from "@nestjs/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RedisService } from "../redis-service/redis.service.js";
-import { sseUserChannel } from "./sse-channels.js";
+import { sseUserChannel } from "./helpers/sse-channels.js";
 import { SseConnectionRegistry } from "./sse-connection-registry.service.js";
 
 describe("SseConnectionRegistry", () => {
