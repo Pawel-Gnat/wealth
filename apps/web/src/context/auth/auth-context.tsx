@@ -13,6 +13,7 @@ import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
 import { bootstrapSession, logoutSession } from "@/shared/lib/auth/auth-api";
 import { configureAuthSession } from "@/shared/lib/auth/auth-session";
 import { initAuthTabSync } from "@/shared/lib/auth/refresh-access-token";
+import { startSseGateway, stopSseGateway } from "@/shared/lib/sse";
 
 type AuthContextValue = {
 	isAuthenticated: boolean;
@@ -32,31 +33,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	});
 
 	useEffect(() => {
+		let cancelled = false;
+
 		configureAuthSession({
 			onTokenRefreshed: () => {
 				setIsAuthenticated(true);
+				startSseGateway();
 			},
 			onUnauthorized: () => {
+				stopSseGateway();
 				setIsAuthenticated(false);
 				queryClient.clear();
 			},
 		});
 
-		return initAuthTabSync();
-	}, [queryClient]);
+		const stopTabSync = initAuthTabSync();
 
-	useEffect(() => {
 		const initializeAuth = async () => {
 			try {
 				const hasSession = await bootstrapSession();
-				setIsAuthenticated(hasSession);
+				if (!cancelled) {
+					setIsAuthenticated(hasSession);
+				}
 			} finally {
-				setIsResolvingSession(false);
+				if (!cancelled) {
+					setIsResolvingSession(false);
+				}
 			}
 		};
 
 		void initializeAuth();
-	}, []);
+
+		return () => {
+			cancelled = true;
+			configureAuthSession({});
+			stopTabSync();
+			stopSseGateway();
+		};
+	}, [queryClient]);
 
 	const logout = useCallback(async () => {
 		await logoutSession();
