@@ -444,6 +444,30 @@ describe("Auth service", () => {
 			).resolves.toEqual({ data: { message: "logged_out" } });
 		});
 
+		it("still returns success when SSE publish reports unavailable", async () => {
+			publishAuthSessionRevoked.mockResolvedValueOnce(false);
+
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-logout-publish-false",
+			});
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+
+			await expect(
+				authService.logout(
+					{
+						cookies: {
+							[REFRESH_TOKEN_COOKIE_NAME]: session.refreshToken,
+						},
+					} as never,
+					{ clearCookie: vi.fn() } as never,
+				),
+			).resolves.toEqual({ data: { message: "logged_out" } });
+		});
+
 		it("does not publish when there is no active refresh session", async () => {
 			await expect(
 				authService.logout(

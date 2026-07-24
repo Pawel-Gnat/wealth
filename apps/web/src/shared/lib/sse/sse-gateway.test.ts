@@ -7,52 +7,11 @@ import {
 } from "@/shared/lib/auth/auth-session";
 import {
 	configureSseGateway,
-	type EventSourceFactory,
-	type EventSourceLike,
 	resetSseGatewayForTests,
 	startSseGateway,
 	stopSseGateway,
 } from "@/shared/lib/sse/sse-gateway";
-
-type MockEventSource = EventSourceLike & {
-	url: string;
-	init?: EventSourceInit;
-	emitOpen: () => void;
-	emitError: () => void;
-	emitMessage: (data: string) => void;
-};
-
-const createMockEventSourceFactory = () => {
-	const instances: MockEventSource[] = [];
-
-	const createEventSource: EventSourceFactory = (url, init) => {
-		const instance: MockEventSource = {
-			url,
-			onopen: null,
-			onerror: null,
-			onmessage: null,
-			close: vi.fn(),
-			emitOpen: () => {
-				instance.onopen?.(new Event("open"));
-			},
-			emitError: () => {
-				instance.onerror?.(new Event("error"));
-			},
-			emitMessage: (data) => {
-				instance.onmessage?.(new MessageEvent("message", { data }));
-			},
-		};
-
-		if (init) {
-			instance.init = init;
-		}
-
-		instances.push(instance);
-		return instance;
-	};
-
-	return { createEventSource, instances };
-};
+import { createMockEventSourceFactory } from "@/test/mocks/event-source";
 
 describe("sse-gateway", () => {
 	beforeEach(() => {
@@ -109,6 +68,23 @@ describe("sse-gateway", () => {
 		expect(first?.close).toHaveBeenCalledOnce();
 
 		first?.emitError();
+		await vi.advanceTimersByTimeAsync(60_000);
+
+		expect(instances).toHaveLength(1);
+	});
+
+	it("cancels a pending reconnect when stopped intentionally", async () => {
+		const { createEventSource, instances } = createMockEventSourceFactory();
+		configureSseGateway({
+			getUrl: () => "http://backend.test/sse",
+			createEventSource,
+		});
+
+		startSseGateway();
+		instances[0]?.emitError();
+
+		await vi.advanceTimersByTimeAsync(500);
+		stopSseGateway();
 		await vi.advanceTimersByTimeAsync(60_000);
 
 		expect(instances).toHaveLength(1);

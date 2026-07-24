@@ -45,6 +45,24 @@ describe("dispatchSseMessage", () => {
 		expect(onUnauthorized).toHaveBeenCalledTimes(2);
 	});
 
+	it("clears the session for user-scoped auth.session-revoked", () => {
+		persistAccessToken("token");
+
+		const event = dispatchSseMessage(
+			JSON.stringify({
+				type: "auth.session-revoked",
+				payload: {},
+				scope: "user",
+				targetId: "user-1",
+				occurredAt: "2026-07-21T12:00:00.000Z",
+				id: "evt-2",
+			}),
+		);
+
+		expect(event?.scope).toBe("user");
+		expect(getAccessToken()).toBeNull();
+	});
+
 	it("ignores malformed JSON", () => {
 		persistAccessToken("token");
 

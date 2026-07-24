@@ -49,4 +49,16 @@ describe("SsePublisher", () => {
 		expect(envelope.id).toBeTypeOf("string");
 		expect(envelope.occurredAt).toBeTypeOf("string");
 	});
+
+	it("returns false when Redis publish is unavailable", async () => {
+		publish.mockResolvedValueOnce(false);
+
+		await expect(
+			publisher.publishAuthSessionRevoked({
+				userId: "user-1",
+				scope: "user",
+				targetId: "user-1",
+			}),
+		).resolves.toBe(false);
+	});
 });
