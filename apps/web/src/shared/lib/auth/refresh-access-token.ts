@@ -1,33 +1,14 @@
 import * as Sentry from "@sentry/react";
-import { createBroadcastBus } from "@/shared/helpers/broadcast-bus";
 import { delay } from "@/shared/helpers/delay";
-import { clearAuthSession } from "@/shared/lib/auth/auth-session";
+import {
+	publishAuthTabSyncMessage,
+	subscribeAuthTabSync,
+} from "@/shared/lib/auth/auth-tab-sync";
 import { refreshAccessTokenRaw } from "@/shared/lib/auth/refresh-access-token-raw";
 
 const LOCK_NAME = "wealth.auth.refresh";
-const CHANNEL_NAME = "wealth.auth";
 const PEER_FRESH_MS = 5_000;
 const REFRESH_RETRY_DELAY_MS = 150;
-
-type AuthBusMessage =
-	| { type: "refresh-done" }
-	| { type: "session-ready" }
-	| { type: "clear" };
-
-const isAuthBusMessage = (data: unknown): data is AuthBusMessage => {
-	if (typeof data !== "object" || data === null) {
-		return false;
-	}
-
-	const message = data as Partial<AuthBusMessage>;
-	return (
-		message.type === "refresh-done" ||
-		message.type === "session-ready" ||
-		message.type === "clear"
-	);
-};
-
-const authBus = createBroadcastBus(CHANNEL_NAME, isAuthBusMessage);
 
 let refreshPromise: Promise<string | null> | null = null;
 let lastPeerRefreshAt = 0;
@@ -39,7 +20,7 @@ const hasFreshPeerRefresh = (): boolean => {
 
 const markRefreshDone = (): void => {
 	lastPeerRefreshAt = Date.now();
-	authBus.publish({ type: "refresh-done" });
+	publishAuthTabSyncMessage({ type: "refresh-done" });
 };
 
 const attemptRefresh = async (): Promise<string | null> => {
@@ -67,18 +48,13 @@ const refreshWithRetry = async (): Promise<string | null> => {
 
 export const initAuthTabSync = (): (() => void) => {
 	if (!stopListening) {
-		stopListening = authBus.subscribe((message) => {
+		stopListening = subscribeAuthTabSync((message) => {
 			if (message.type === "refresh-done") {
 				lastPeerRefreshAt = Date.now();
 				return;
 			}
 
-			if (message.type === "session-ready") {
-				void refreshAccessToken();
-				return;
-			}
-
-			clearAuthSession();
+			void refreshAccessToken();
 		});
 	}
 
@@ -86,15 +62,6 @@ export const initAuthTabSync = (): (() => void) => {
 		stopListening?.();
 		stopListening = null;
 	};
-};
-
-export const notifySessionReadyAcrossTabs = (): void => {
-	authBus.publish({ type: "session-ready" });
-};
-
-export const clearAuthSessionAcrossTabs = (): void => {
-	clearAuthSession();
-	authBus.publish({ type: "clear" });
 };
 
 export const resetRefreshMutex = (): void => {
