@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Card, Form, FormInput, Text } from "@/shared/components";
 import { persistAccessToken } from "@/shared/lib/auth/auth-session";
-import { notifySessionReadyAcrossTabs } from "@/shared/lib/auth/refresh-access-token";
+import { notifySessionReadyAcrossTabs } from "@/shared/lib/auth/auth-tab-sync";
 import { useSignIn } from "../../../pages/auth/hooks/use-sign-in";
 
 export function SigninForm() {

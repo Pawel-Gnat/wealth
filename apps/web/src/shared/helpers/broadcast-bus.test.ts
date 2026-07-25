@@ -1,9 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-	type BroadcastChannelFactory,
-	type BroadcastChannelLike,
-	createBroadcastBus,
-} from "./broadcast-bus";
+import { createBroadcastBus } from "@/shared/helpers/broadcast-bus";
+import { createMemoryBroadcastChannelFactory } from "@/test/mocks/broadcast";
 
 type TestMessage = {
 	type: "ping";
@@ -11,37 +8,13 @@ type TestMessage = {
 };
 
 const isTestMessage = (data: unknown): data is TestMessage => {
-	if (typeof data !== "object" || data === null) {
+	if (typeof data !== "object" || data === null || !("type" in data)) {
 		return false;
 	}
 
-	const message = data as Partial<TestMessage>;
-	return message.type === "ping" && typeof message.value === "string";
-};
-
-const createMemoryBroadcastChannelFactory = (): BroadcastChannelFactory => {
-	const hubs = new Map<string, Set<BroadcastChannelLike>>();
-
-	return (name) => {
-		const hub = hubs.get(name) ?? new Set<BroadcastChannelLike>();
-		hubs.set(name, hub);
-
-		const channel: BroadcastChannelLike = {
-			onmessage: null,
-			postMessage: (message) => {
-				for (const peer of hub) {
-					if (peer === channel) {
-						continue;
-					}
-
-					peer.onmessage?.({ data: message });
-				}
-			},
-		};
-
-		hub.add(channel);
-		return channel;
-	};
+	return (
+		data.type === "ping" && "value" in data && typeof data.value === "string"
+	);
 };
 
 describe("createBroadcastBus", () => {

@@ -1,9 +1,9 @@
 import { reportClientError } from "@/shared/helpers/controlled-fetch";
-import { getAccessToken } from "@/shared/lib/auth/auth-session";
 import {
-	clearAuthSessionAcrossTabs,
-	refreshAccessToken,
-} from "@/shared/lib/auth/refresh-access-token";
+	clearAuthSession,
+	getAccessToken,
+} from "@/shared/lib/auth/auth-session";
+import { refreshAccessToken } from "@/shared/lib/auth/refresh-access-token";
 
 const PUBLIC_AUTH_PATHS = new Set([
 	"/auth/signin",
@@ -70,14 +70,14 @@ export const orpcTransportFetch = async (
 			if (refreshedToken) {
 				response = await fetch(input, createRequestInit(init));
 			} else if (!isPublicAuthRoute(requestUrl)) {
-				clearAuthSessionAcrossTabs();
+				clearAuthSession();
 			}
 		} else if (
 			response.status === 401 &&
 			!isPublicAuthRoute(requestUrl) &&
 			typeof window !== "undefined"
 		) {
-			clearAuthSessionAcrossTabs();
+			clearAuthSession();
 		}
 
 		return response;

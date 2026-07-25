@@ -1,5 +1,10 @@
 import { createHash, randomBytes } from "node:crypto";
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+	Inject,
+	Injectable,
+	Logger,
+	UnauthorizedException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { ORPCError } from "@orpc/server";
@@ -22,8 +27,10 @@ import { addDays } from "date-fns";
 import { and, eq, gt, isNull, lt } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Request, Response } from "express";
+import { ulid } from "ulid";
 import { DBS } from "../database-service/constants.js";
 import { refreshTokensTable } from "../database-service/tables/index.js";
+import { SsePublisher } from "../sse-service/sse-publisher.service.js";
 import { UsersService } from "../users-service/users.service.js";
 
 const BCRYPT_ROUNDS = 10;
@@ -34,15 +41,35 @@ type AuthSessionResult = {
 	accessToken: string;
 	refreshToken: string;
 	refreshExpiresAt: Date;
+	sessionId: string;
 };
+
+export type SessionRevocationCapture = {
+	userId: string;
+	sessionId: string;
+};
+
+export class RefreshTokenReuseError extends UnauthorizedException {
+	readonly userId: string;
+	readonly sessionId: string;
+
+	constructor(capture: SessionRevocationCapture) {
+		super("Invalid refresh token");
+		this.userId = capture.userId;
+		this.sessionId = capture.sessionId;
+	}
+}
 
 @Injectable()
 export class AuthService {
+	private readonly logger = new Logger(AuthService.name);
+
 	constructor(
 		private usersService: UsersService,
 		private jwtService: JwtService,
 		private configService: ConfigService,
 		@Inject(DBS.APP) private readonly db: NodePgDatabase,
+		private readonly ssePublisher: SsePublisher,
 	) {}
 
 	async validateUser(payload: SignInPayload): Promise<User> {
@@ -92,7 +119,16 @@ export class AuthService {
 
 	async logout(request: Request, response: Response): Promise<LogoutResponse> {
 		const refreshToken = this.readRefreshTokenFromRequest(request);
-		await this.logoutSession(refreshToken);
+		const capture = await this.logoutSession(refreshToken);
+
+		if (capture) {
+			await this.publishSessionRevokedBestEffort({
+				userId: capture.userId,
+				scope: "session",
+				targetId: capture.sessionId,
+			});
+		}
+
 		this.clearRefreshTokenCookie(response);
 
 		return { data: { message: "logged_out" } };
@@ -102,11 +138,13 @@ export class AuthService {
 		const accessToken = await this.createAccessToken(user);
 		const refreshToken = this.generateRefreshToken();
 		const refreshExpiresAt = this.getRefreshTokenExpiresAt();
+		const sessionId = ulid();
 		const now = new Date();
 
 		await this.db.transaction(async (tx) => {
 			await tx.insert(refreshTokensTable).values({
 				userId: user.id,
+				sessionId,
 				tokenHash: this.hashRefreshToken(refreshToken),
 				expiresAt: refreshExpiresAt,
 			});
@@ -117,6 +155,7 @@ export class AuthService {
 			accessToken,
 			refreshToken,
 			refreshExpiresAt,
+			sessionId,
 		};
 	}
 
@@ -141,6 +180,7 @@ export class AuthService {
 				const [existing] = await tx
 					.select({
 						userId: refreshTokensTable.userId,
+						sessionId: refreshTokensTable.sessionId,
 						revokedAt: refreshTokensTable.revokedAt,
 					})
 					.from(refreshTokensTable)
@@ -157,6 +197,14 @@ export class AuthService {
 								isNull(refreshTokensTable.revokedAt),
 							),
 						);
+
+					return {
+						ok: false as const,
+						reuseRevocation: {
+							userId: existing.userId,
+							sessionId: existing.sessionId,
+						} satisfies SessionRevocationCapture,
+					};
 				}
 
 				return { ok: false as const };
@@ -173,11 +221,12 @@ export class AuthService {
 			});
 			const nextRefreshToken = this.generateRefreshToken();
 			const refreshExpiresAt = this.getRefreshTokenExpiresAt();
-
 			const userId = String(user.id);
+			const sessionId = storedToken.sessionId;
 
 			await tx.insert(refreshTokensTable).values({
 				userId,
+				sessionId,
 				tokenHash: this.hashRefreshToken(nextRefreshToken),
 				expiresAt: refreshExpiresAt,
 			});
@@ -189,25 +238,36 @@ export class AuthService {
 					accessToken,
 					refreshToken: nextRefreshToken,
 					refreshExpiresAt,
+					sessionId,
 				},
 			};
 		});
 
 		if (!result.ok) {
+			if (result.reuseRevocation) {
+				await this.publishSessionRevokedBestEffort({
+					userId: result.reuseRevocation.userId,
+					scope: "user",
+					targetId: result.reuseRevocation.userId,
+				});
+				throw new RefreshTokenReuseError(result.reuseRevocation);
+			}
 			throw new UnauthorizedException("Invalid refresh token");
 		}
 
 		return result.session;
 	}
 
-	async logoutSession(refreshToken: string | null): Promise<void> {
+	async logoutSession(
+		refreshToken: string | null,
+	): Promise<SessionRevocationCapture | null> {
 		if (!refreshToken) {
-			return;
+			return null;
 		}
 
 		const tokenHash = this.hashRefreshToken(refreshToken);
 
-		await this.db
+		const [revoked] = await this.db
 			.update(refreshTokensTable)
 			.set({ revokedAt: new Date() })
 			.where(
@@ -215,7 +275,49 @@ export class AuthService {
 					eq(refreshTokensTable.tokenHash, tokenHash),
 					isNull(refreshTokensTable.revokedAt),
 				),
-			);
+			)
+			.returning({
+				userId: refreshTokensTable.userId,
+				sessionId: refreshTokensTable.sessionId,
+			});
+
+		if (!revoked) {
+			return null;
+		}
+
+		return {
+			userId: revoked.userId,
+			sessionId: revoked.sessionId,
+		};
+	}
+
+	async resolveActiveRefreshSession(
+		request: Request,
+	): Promise<SessionRevocationCapture | null> {
+		const refreshToken = this.readRefreshTokenFromRequest(request);
+		if (!refreshToken) {
+			return null;
+		}
+
+		const tokenHash = this.hashRefreshToken(refreshToken);
+		const now = new Date();
+
+		const [row] = await this.db
+			.select({
+				userId: refreshTokensTable.userId,
+				sessionId: refreshTokensTable.sessionId,
+			})
+			.from(refreshTokensTable)
+			.where(
+				and(
+					eq(refreshTokensTable.tokenHash, tokenHash),
+					isNull(refreshTokensTable.revokedAt),
+					gt(refreshTokensTable.expiresAt, now),
+				),
+			)
+			.limit(1);
+
+		return row ?? null;
 	}
 
 	private async cleanupStaleRefreshTokens(
@@ -303,5 +405,21 @@ export class AuthService {
 
 	private getRefreshTokenExpiresAt(): Date {
 		return addDays(new Date(), REFRESH_TOKEN_EXPIRES_IN_DAYS);
+	}
+
+	private async publishSessionRevokedBestEffort(input: {
+		userId: string;
+		scope: "session" | "user";
+		targetId: string;
+	}) {
+		try {
+			await this.ssePublisher.publishAuthSessionRevoked(input);
+		} catch (error) {
+			this.logger.warn(
+				`Failed to publish auth.session-revoked: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			);
+		}
 	}
 }
