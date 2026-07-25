@@ -27,7 +27,7 @@ export const DashboardChart = ({ chartPeriod }: DashboardChartProps) => {
 		return <DashboardChartSkeleton />;
 	}
 
-	if (isError || !data) {
+	if (isError || !data?.points.length) {
 		return <ErrorState text={t("chart.error", { ns: "dashboard" })} />;
 	}
 
