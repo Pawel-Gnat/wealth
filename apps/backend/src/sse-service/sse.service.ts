@@ -1,8 +1,16 @@
-import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import {
+	Injectable,
+	Logger,
+	ServiceUnavailableException,
+	UnauthorizedException,
+} from "@nestjs/common";
 import { SSE_HEARTBEAT_INTERVAL_MS } from "@repo/common/constants";
 import type { Request, Response } from "express";
 import { AuthService } from "../auth-service/auth.service.js";
-import { SseConnectionRegistry } from "./sse-connection-registry.service.js";
+import {
+	SseConnectionRegistry,
+	SseFanOutUnavailableError,
+} from "./sse-connection-registry.service.js";
 
 @Injectable()
 export class SseService {
@@ -19,13 +27,6 @@ export class SseService {
 			throw new UnauthorizedException("Invalid refresh token");
 		}
 
-		response.status(200);
-		response.setHeader("Content-Type", "text/event-stream; charset=utf-8");
-		response.setHeader("Cache-Control", "no-cache, no-transform");
-		response.setHeader("Connection", "keep-alive");
-		response.setHeader("X-Accel-Buffering", "no");
-		response.flushHeaders();
-
 		const sink = {
 			next: (data: unknown) => {
 				this.writeData(response, data);
@@ -37,11 +38,25 @@ export class SseService {
 			},
 		};
 
-		const connection = await this.connectionRegistry.register({
-			userId: session.userId,
-			sessionId: session.sessionId,
-			sink,
-		});
+		const connection = await this.connectionRegistry
+			.register({
+				userId: session.userId,
+				sessionId: session.sessionId,
+				sink,
+			})
+			.catch((error: unknown) => {
+				if (error instanceof SseFanOutUnavailableError) {
+					throw new ServiceUnavailableException("SSE unavailable");
+				}
+				throw error;
+			});
+
+		response.status(200);
+		response.setHeader("Content-Type", "text/event-stream; charset=utf-8");
+		response.setHeader("Cache-Control", "no-cache, no-transform");
+		response.setHeader("Connection", "keep-alive");
+		response.setHeader("X-Accel-Buffering", "no");
+		response.flushHeaders();
 
 		const heartbeat = setInterval(() => {
 			this.writeComment(response, "ping");
@@ -87,9 +102,20 @@ export class SseService {
 		}
 
 		const payload = typeof data === "string" ? data : JSON.stringify(data);
+		const eventId =
+			typeof data === "object" &&
+			data !== null &&
+			"id" in data &&
+			typeof data.id === "string"
+				? data.id
+				: null;
 
 		try {
-			response.write(`data: ${payload}\n\n`);
+			const frame =
+				eventId === null
+					? `data: ${payload}\n\n`
+					: `id: ${eventId}\ndata: ${payload}\n\n`;
+			response.write(frame);
 		} catch (error) {
 			this.logger.warn(
 				`Failed to write SSE data: ${

@@ -1,4 +1,5 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, type OnModuleDestroy } from "@nestjs/common";
+import { SSE_MAX_CONNECTIONS_PER_USER } from "@repo/common/constants";
 import { ulid } from "ulid";
 import { RedisService } from "../redis-service/redis.service.js";
 import { sseUserChannel } from "./helpers/sse-channels.js";
@@ -15,8 +16,15 @@ export type SseConnection = {
 	sink: SseConnectionSink;
 };
 
+export class SseFanOutUnavailableError extends Error {
+	constructor() {
+		super("SSE Redis subscribe unavailable");
+		this.name = "SseFanOutUnavailableError";
+	}
+}
+
 @Injectable()
-export class SseConnectionRegistry {
+export class SseConnectionRegistry implements OnModuleDestroy {
 	private readonly logger = new Logger(SseConnectionRegistry.name);
 	private readonly connectionsByUser = new Map<
 		string,
@@ -24,8 +32,17 @@ export class SseConnectionRegistry {
 	>();
 	private readonly subscribedUsers = new Set<string>();
 	private readonly subscribeInFlight = new Map<string, Promise<void>>();
+	private readonly unsubscribeReady: (() => void) | null;
 
-	constructor(private readonly redisService: RedisService) {}
+	constructor(private readonly redisService: RedisService) {
+		this.unsubscribeReady = this.redisService.onReady(() => {
+			void this.resubscribeAllActive();
+		});
+	}
+
+	onModuleDestroy() {
+		this.unsubscribeReady?.();
+	}
 
 	async register(input: {
 		userId: string;
@@ -46,28 +63,38 @@ export class SseConnectionRegistry {
 			this.connectionsByUser.set(input.userId, userConnections);
 		}
 
+		while (userConnections.size >= SSE_MAX_CONNECTIONS_PER_USER) {
+			const oldestId = userConnections.keys().next().value;
+			if (!oldestId) {
+				break;
+			}
+
+			const oldest = userConnections.get(oldestId);
+			userConnections.delete(oldestId);
+			oldest?.sink.complete();
+		}
+
 		const isFirstForUser = userConnections.size === 0;
 		userConnections.set(connection.connectionId, connection);
 
-		if (isFirstForUser) {
-			await this.ensureSubscribed(input.userId);
+		try {
+			if (isFirstForUser || !this.subscribedUsers.has(input.userId)) {
+				await this.ensureSubscribed(input.userId);
+			}
+
+			if (!this.subscribedUsers.has(input.userId)) {
+				throw new SseFanOutUnavailableError();
+			}
+		} catch (error) {
+			await this.removeConnection(input.userId, connection.connectionId);
+			throw error;
 		}
 
 		return connection;
 	}
 
 	async unregister(userId: string, connectionId: string) {
-		const userConnections = this.connectionsByUser.get(userId);
-		if (!userConnections?.delete(connectionId)) {
-			return;
-		}
-
-		if (userConnections.size > 0) {
-			return;
-		}
-
-		this.connectionsByUser.delete(userId);
-		await this.ensureUnsubscribed(userId);
+		await this.removeConnection(userId, connectionId);
 	}
 
 	getConnections(userId: string): readonly SseConnection[] {
@@ -84,6 +111,45 @@ export class SseConnectionRegistry {
 
 	isSubscribed(userId: string) {
 		return this.subscribedUsers.has(userId);
+	}
+
+	private async removeConnection(userId: string, connectionId: string) {
+		const userConnections = this.connectionsByUser.get(userId);
+		if (!userConnections?.delete(connectionId)) {
+			return;
+		}
+
+		if (userConnections.size > 0) {
+			return;
+		}
+
+		this.connectionsByUser.delete(userId);
+		await this.ensureUnsubscribed(userId);
+	}
+
+	private async resubscribeAllActive() {
+		const userIds = [...this.connectionsByUser.keys()];
+		for (const userId of userIds) {
+			this.subscribedUsers.delete(userId);
+			await this.ensureSubscribed(userId);
+
+			if (this.subscribedUsers.has(userId)) {
+				continue;
+			}
+
+			this.logger.warn(
+				`Closing SSE connections for ${userId}; Redis subscribe unavailable after reconnect`,
+			);
+			await this.closeAllForUser(userId);
+		}
+	}
+
+	private async closeAllForUser(userId: string) {
+		const connections = this.getConnections(userId);
+		for (const connection of connections) {
+			connection.sink.complete();
+			await this.removeConnection(userId, connection.connectionId);
+		}
 	}
 
 	private async ensureSubscribed(userId: string) {
@@ -112,9 +178,7 @@ export class SseConnectionRegistry {
 		const channel = sseUserChannel(userId);
 		const subscribed = await this.redisService.subscribe(channel);
 		if (!subscribed) {
-			this.logger.warn(
-				`Skipped Redis subscribe for ${channel}; local registry still active`,
-			);
+			this.logger.warn(`Failed Redis subscribe for ${channel}`);
 			return;
 		}
 

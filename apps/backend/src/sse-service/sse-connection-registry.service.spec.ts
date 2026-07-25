@@ -1,8 +1,12 @@
 import { Test, type TestingModule } from "@nestjs/testing";
+import { SSE_MAX_CONNECTIONS_PER_USER } from "@repo/common/constants";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RedisService } from "../redis-service/redis.service.js";
 import { sseUserChannel } from "./helpers/sse-channels.js";
-import { SseConnectionRegistry } from "./sse-connection-registry.service.js";
+import {
+	SseConnectionRegistry,
+	SseFanOutUnavailableError,
+} from "./sse-connection-registry.service.js";
 
 describe("SseConnectionRegistry", () => {
 	let moduleRef: TestingModule;
@@ -27,6 +31,7 @@ describe("SseConnectionRegistry", () => {
 					useValue: {
 						subscribe,
 						unsubscribe,
+						onReady: () => () => {},
 					},
 				},
 			],
@@ -92,17 +97,59 @@ describe("SseConnectionRegistry", () => {
 		expect(registry.getConnections("user-1")).toEqual([]);
 	});
 
-	it("keeps the local registry when Redis subscribe fails", async () => {
+	it("rejects registration when Redis subscribe fails", async () => {
 		subscribe.mockResolvedValueOnce(false);
 
-		const connection = await registry.register({
-			userId: "user-1",
-			sessionId: "session-a",
-			sink,
-		});
+		await expect(
+			registry.register({
+				userId: "user-1",
+				sessionId: "session-a",
+				sink,
+			}),
+		).rejects.toBeInstanceOf(SseFanOutUnavailableError);
 
-		expect(registry.getConnections("user-1")).toEqual([connection]);
+		expect(registry.getConnections("user-1")).toEqual([]);
 		expect(registry.isSubscribed("user-1")).toBe(false);
+	});
+
+	it("drops the oldest connection when the per-user cap is reached", async () => {
+		const sinks = Array.from(
+			{ length: SSE_MAX_CONNECTIONS_PER_USER + 1 },
+			() => ({
+				next: vi.fn(),
+				complete: vi.fn(),
+			}),
+		);
+
+		const connections = [];
+		for (const [index, connectionSink] of sinks.entries()) {
+			connections.push(
+				await registry.register({
+					userId: "user-1",
+					sessionId: `session-${index}`,
+					sink: connectionSink,
+					connectionId: `conn-${index}`,
+				}),
+			);
+		}
+
+		expect(registry.getConnectionCount("user-1")).toBe(
+			SSE_MAX_CONNECTIONS_PER_USER,
+		);
+		expect(sinks[0]?.complete).toHaveBeenCalledOnce();
+		expect(registry.getConnections("user-1")).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ connectionId: "conn-0" }),
+			]),
+		);
+		expect(registry.getConnections("user-1")).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					connectionId: `conn-${SSE_MAX_CONNECTIONS_PER_USER}`,
+				}),
+			]),
+		);
+		expect(connections).toHaveLength(SSE_MAX_CONNECTIONS_PER_USER + 1);
 	});
 
 	it("ignores unregister for unknown connections", async () => {

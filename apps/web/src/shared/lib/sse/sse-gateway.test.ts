@@ -1,3 +1,4 @@
+import { SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES } from "@repo/common/constants";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	clearAuthSession,
@@ -164,5 +165,31 @@ describe("sse-gateway", () => {
 		instances[0]?.emitError();
 		await vi.advanceTimersByTimeAsync(60_000);
 		expect(instances).toHaveLength(1);
+	});
+
+	it("clears the session after consecutive SSE failures without a successful open", async () => {
+		const { createEventSource, instances } = createMockEventSourceFactory();
+		configureSseGateway({
+			getUrl: () => "http://backend.test/sse",
+			createEventSource,
+		});
+		persistAccessToken("token");
+
+		startSseGateway();
+
+		for (
+			let index = 0;
+			index < SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES;
+			index += 1
+		) {
+			instances[index]?.emitError();
+			if (index < SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES - 1) {
+				await vi.advanceTimersByTimeAsync(30_000);
+			}
+		}
+
+		expect(getAccessToken()).toBeNull();
+		await vi.advanceTimersByTimeAsync(60_000);
+		expect(instances).toHaveLength(SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES);
 	});
 });

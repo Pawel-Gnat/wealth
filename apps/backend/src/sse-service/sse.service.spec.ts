@@ -1,10 +1,16 @@
-import { UnauthorizedException } from "@nestjs/common";
+import {
+	ServiceUnavailableException,
+	UnauthorizedException,
+} from "@nestjs/common";
 import { Test, type TestingModule } from "@nestjs/testing";
 import type { Request, Response } from "express";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AuthService } from "../auth-service/auth.service.js";
 import { SseService } from "./sse.service.js";
-import { SseConnectionRegistry } from "./sse-connection-registry.service.js";
+import {
+	SseConnectionRegistry,
+	SseFanOutUnavailableError,
+} from "./sse-connection-registry.service.js";
 
 describe("SseService", () => {
 	let moduleRef: TestingModule;
@@ -74,6 +80,20 @@ describe("SseService", () => {
 		expect(register).not.toHaveBeenCalled();
 	});
 
+	it("rejects with 503 when Redis fan-out registration fails", async () => {
+		resolveActiveRefreshSession.mockResolvedValue({
+			userId: "user-1",
+			sessionId: "session-1",
+		});
+		register.mockRejectedValueOnce(new SseFanOutUnavailableError());
+		const response = createResponse();
+
+		await expect(sseService.connect({} as Request, response)).rejects.toThrow(
+			ServiceUnavailableException,
+		);
+		expect(response.flushHeaders).not.toHaveBeenCalled();
+	});
+
 	it("opens the stream, registers the connection, and heartbeats", async () => {
 		vi.useFakeTimers();
 		resolveActiveRefreshSession.mockResolvedValue({
@@ -115,9 +135,12 @@ describe("SseService", () => {
 		);
 
 		const registeredSink = register.mock.calls[0]?.[0]?.sink;
-		registeredSink.next({ type: "auth.session-revoked" });
+		registeredSink.next({
+			type: "auth.session-revoked",
+			id: "evt-1",
+		});
 		expect(response.write).toHaveBeenCalledWith(
-			'data: {"type":"auth.session-revoked"}\n\n',
+			'id: evt-1\ndata: {"type":"auth.session-revoked","id":"evt-1"}\n\n',
 		);
 
 		await vi.advanceTimersByTimeAsync(20_000);

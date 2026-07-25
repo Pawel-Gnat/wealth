@@ -14,6 +14,8 @@ const {
 	subscriberQuit,
 	subscriberSubscribe,
 	subscriberUnsubscribe,
+	subscriberOn,
+	subscriberOff,
 } = vi.hoisted(() => {
 	const publisherConnect = vi.fn();
 	const subscriberConnect = vi.fn();
@@ -22,6 +24,8 @@ const {
 	const subscriberQuit = vi.fn();
 	const subscriberSubscribe = vi.fn();
 	const subscriberUnsubscribe = vi.fn();
+	const subscriberOn = vi.fn();
+	const subscriberOff = vi.fn();
 
 	const mockPublisher = {
 		connect: publisherConnect,
@@ -35,7 +39,8 @@ const {
 		subscribe: subscriberSubscribe,
 		unsubscribe: subscriberUnsubscribe,
 		quit: subscriberQuit,
-		on: vi.fn(),
+		on: subscriberOn,
+		off: subscriberOff,
 	};
 
 	const RedisMock = vi.fn();
@@ -51,12 +56,20 @@ const {
 		subscriberQuit,
 		subscriberSubscribe,
 		subscriberUnsubscribe,
+		subscriberOn,
+		subscriberOff,
 	};
 });
 
 vi.mock("ioredis", () => ({
 	Redis: RedisMock,
 }));
+
+const mockRedisPair = () => {
+	RedisMock.mockImplementationOnce(() => mockPublisher).mockImplementationOnce(
+		() => mockSubscriber,
+	);
+};
 
 describe("RedisService", () => {
 	let moduleRef: TestingModule;
@@ -66,16 +79,14 @@ describe("RedisService", () => {
 	beforeEach(async () => {
 		vi.clearAllMocks();
 		RedisMock.mockReset();
-		RedisMock.mockImplementationOnce(
-			() => mockPublisher,
-		).mockImplementationOnce(() => mockSubscriber);
+		mockRedisPair();
 		publisherConnect.mockResolvedValue(undefined);
 		subscriberConnect.mockResolvedValue(undefined);
 		publisherPublish.mockResolvedValue(1);
 		publisherQuit.mockResolvedValue("OK");
 		subscriberQuit.mockResolvedValue("OK");
 		subscriberSubscribe.mockResolvedValue(undefined);
-		subscriberUnsubscribe.mockResolvedValue(undefined);
+		subscriberUnsubscribe.mockResolvedValue("OK");
 
 		configGet = vi.fn();
 		moduleRef = await Test.createTestingModule({
@@ -92,6 +103,7 @@ describe("RedisService", () => {
 
 	afterEach(async () => {
 		await moduleRef.close();
+		vi.useRealTimers();
 	});
 
 	it("stays unavailable when REDIS_URL is missing", async () => {
@@ -117,16 +129,47 @@ describe("RedisService", () => {
 		expect(redisService.getSubscriber()).toBe(mockSubscriber);
 	});
 
-	it("degrades when Redis connect fails", async () => {
+	it("degrades when Redis connect fails and recovers on later ensureConnected", async () => {
 		configGet.mockReturnValue("redis://localhost:6379");
-		publisherConnect.mockRejectedValue(new Error("ECONNREFUSED"));
+		publisherConnect.mockRejectedValueOnce(new Error("ECONNREFUSED"));
 
 		await redisService.onModuleInit();
 
 		expect(redisService.isAvailable()).toBe(false);
 		expect(publisherQuit).toHaveBeenCalledOnce();
 		expect(subscriberQuit).toHaveBeenCalledOnce();
+
+		mockRedisPair();
+		publisherConnect.mockRejectedValueOnce(new Error("still down"));
 		await expect(redisService.publish("sse:user:1", "{}")).resolves.toBe(false);
+
+		mockRedisPair();
+		publisherConnect.mockResolvedValue(undefined);
+		subscriberConnect.mockResolvedValue(undefined);
+
+		await expect(redisService.publish("sse:user:1", "{}")).resolves.toBe(true);
+		expect(redisService.isAvailable()).toBe(true);
+		expect(publisherPublish).toHaveBeenCalledWith("sse:user:1", "{}");
+	});
+
+	it("stores message listeners before connect and attaches them after recovery", async () => {
+		configGet.mockReturnValue("redis://localhost:6379");
+		publisherConnect.mockRejectedValueOnce(new Error("ECONNREFUSED"));
+		await redisService.onModuleInit();
+
+		const listener = vi.fn();
+		const unsubscribe = redisService.onMessage(listener);
+		expect(subscriberOn).not.toHaveBeenCalledWith("message", listener);
+
+		mockRedisPair();
+		publisherConnect.mockResolvedValue(undefined);
+		subscriberConnect.mockResolvedValue(undefined);
+
+		await expect(redisService.ensureConnected()).resolves.toBe(true);
+		expect(subscriberOn).toHaveBeenCalledWith("message", listener);
+
+		unsubscribe();
+		expect(subscriberOff).toHaveBeenCalledWith("message", listener);
 	});
 
 	it("publishes when available and returns false on publish errors", async () => {

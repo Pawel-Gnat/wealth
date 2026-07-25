@@ -3,3 +3,5 @@ export const REFRESH_TOKEN_EXPIRES_IN_DAYS = 5;
 export const REFRESH_TOKEN_COOKIE_NAME = "wealth.auth.refresh";
 export const REFRESH_TOKEN_COOKIE_PATH = "/";
 export const SSE_HEARTBEAT_INTERVAL_MS = 20_000;
+export const SSE_MAX_CONNECTIONS_PER_USER = 10;
+export const SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES = 5;
