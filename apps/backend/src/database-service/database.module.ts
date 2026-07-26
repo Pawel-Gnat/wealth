@@ -23,6 +23,6 @@ import { PgPoolShutdown } from "./pg-pool.shutdown.js";
 		},
 		PgPoolShutdown,
 	],
-	exports: [DBS.APP],
+	exports: [DBS.APP, PG_POOL_APP],
 })
 export class DatabaseModule {}

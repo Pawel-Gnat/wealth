@@ -382,25 +382,28 @@ export class AuthService {
 		expiresAt: Date,
 	): void {
 		response.cookie(REFRESH_TOKEN_COOKIE_NAME, token, {
-			httpOnly: true,
-			secure: this.isSecureCookie(),
-			sameSite: "lax",
-			path: REFRESH_TOKEN_COOKIE_PATH,
+			...this.getRefreshTokenCookieOptions(),
 			expires: expiresAt,
 		});
 	}
 
 	private clearRefreshTokenCookie(response: Response): void {
-		response.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
-			httpOnly: true,
-			secure: this.isSecureCookie(),
-			sameSite: "lax",
-			path: REFRESH_TOKEN_COOKIE_PATH,
-		});
+		response.clearCookie(
+			REFRESH_TOKEN_COOKIE_NAME,
+			this.getRefreshTokenCookieOptions(),
+		);
 	}
 
-	private isSecureCookie(): boolean {
-		return this.configService.get<string>("NODE_ENV") === "production";
+	private getRefreshTokenCookieOptions() {
+		const isProduction =
+			this.configService.get<string>("NODE_ENV") === "production";
+
+		return {
+			httpOnly: true,
+			secure: isProduction,
+			sameSite: isProduction ? ("none" as const) : ("lax" as const),
+			path: REFRESH_TOKEN_COOKIE_PATH,
+		};
 	}
 
 	private getRefreshTokenExpiresAt(): Date {
