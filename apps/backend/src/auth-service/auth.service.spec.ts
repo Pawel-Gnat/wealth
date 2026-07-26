@@ -1,7 +1,11 @@
 import { createHash } from "node:crypto";
 import { UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { REFRESH_TOKEN_COOKIE_NAME } from "@repo/common/constants";
+import {
+	REFRESH_TOKEN_COOKIE_NAME,
+	REFRESH_TOKEN_COOKIE_PATH,
+} from "@repo/common/constants";
 import * as bcrypt from "bcrypt";
 import { subDays } from "date-fns";
 import { and, eq, isNull } from "drizzle-orm";
@@ -32,6 +36,7 @@ describe("Auth service", () => {
 	let authService: AuthService;
 	let usersService: UsersService;
 	let jwtService: JwtService;
+	let configService: ConfigService;
 	let db: NodePgDatabase;
 	let publishAuthSessionRevoked: ReturnType<typeof vi.fn>;
 
@@ -40,6 +45,7 @@ describe("Auth service", () => {
 		authService = moduleRef.get(AuthService);
 		usersService = moduleRef.get(UsersService);
 		jwtService = moduleRef.get(JwtService);
+		configService = moduleRef.get(ConfigService);
 		db = moduleRef.get(DBS.APP);
 		publishAuthSessionRevoked = vi.mocked(
 			moduleRef.get(SsePublisher).publishAuthSessionRevoked,
@@ -87,6 +93,113 @@ describe("Auth service", () => {
 				id: expect.any(String),
 				email: user.email,
 			});
+		});
+	});
+
+	describe("refresh token cookie", () => {
+		it("sets SameSite=Lax and Secure=false outside production", async () => {
+			const plain = "secret-cookie-dev";
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash(plain, 10),
+				emailTag: "auth-cookie-dev",
+			});
+			const cookie = vi.fn();
+
+			await authService.signIn({ email: user.email, password: plain }, {
+				cookie,
+			} as never);
+
+			expect(cookie).toHaveBeenCalledWith(
+				REFRESH_TOKEN_COOKIE_NAME,
+				expect.any(String),
+				expect.objectContaining({
+					httpOnly: true,
+					secure: false,
+					sameSite: "lax",
+					path: REFRESH_TOKEN_COOKIE_PATH,
+					expires: expect.any(Date),
+				}),
+			);
+		});
+
+		it("sets SameSite=None and Secure=true in production", async () => {
+			const plain = "secret-cookie-prod";
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash(plain, 10),
+				emailTag: "auth-cookie-prod",
+			});
+			const cookie = vi.fn();
+			const getSpy = vi.spyOn(configService, "get").mockImplementation(((
+				key: string,
+			) => {
+				if (key === "NODE_ENV") {
+					return "production";
+				}
+				return undefined;
+			}) as ConfigService["get"]);
+
+			try {
+				await authService.signIn({ email: user.email, password: plain }, {
+					cookie,
+				} as never);
+
+				expect(cookie).toHaveBeenCalledWith(
+					REFRESH_TOKEN_COOKIE_NAME,
+					expect.any(String),
+					expect.objectContaining({
+						httpOnly: true,
+						secure: true,
+						sameSite: "none",
+						path: REFRESH_TOKEN_COOKIE_PATH,
+						expires: expect.any(Date),
+					}),
+				);
+			} finally {
+				getSpy.mockRestore();
+			}
+		});
+
+		it("clears the cookie with SameSite=None in production", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: await bcrypt.hash("secret", 10),
+				emailTag: "auth-cookie-clear-prod",
+			});
+			const session = await authService.createSession({
+				id: user.id,
+				email: user.email,
+			});
+			const clearCookie = vi.fn();
+			const getSpy = vi.spyOn(configService, "get").mockImplementation(((
+				key: string,
+			) => {
+				if (key === "NODE_ENV") {
+					return "production";
+				}
+				return undefined;
+			}) as ConfigService["get"]);
+
+			try {
+				await authService.logout(
+					{
+						cookies: {
+							[REFRESH_TOKEN_COOKIE_NAME]: session.refreshToken,
+						},
+					} as never,
+					{ clearCookie } as never,
+				);
+
+				expect(clearCookie).toHaveBeenCalledWith(
+					REFRESH_TOKEN_COOKIE_NAME,
+					expect.objectContaining({
+						httpOnly: true,
+						secure: true,
+						sameSite: "none",
+						path: REFRESH_TOKEN_COOKIE_PATH,
+					}),
+				);
+			} finally {
+				getSpy.mockRestore();
+			}
 		});
 	});
 
@@ -417,7 +530,15 @@ describe("Auth service", () => {
 				scope: "session",
 				targetId: session.sessionId,
 			});
-			expect(clearCookie).toHaveBeenCalled();
+			expect(clearCookie).toHaveBeenCalledWith(
+				REFRESH_TOKEN_COOKIE_NAME,
+				expect.objectContaining({
+					httpOnly: true,
+					secure: false,
+					sameSite: "lax",
+					path: REFRESH_TOKEN_COOKIE_PATH,
+				}),
+			);
 		});
 
 		it("still returns success when SSE publish fails", async () => {

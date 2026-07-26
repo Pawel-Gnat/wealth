@@ -3,6 +3,11 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"files": [
+		"dist",
+		"drizzle",
+		"scripts"
+	],
 	"scripts": {
 		"build": "nest build",
 		"check-types": "tsc -p tsconfig.json --noEmit",
@@ -10,7 +15,8 @@
 		"start": "nest start",
 		"dev": "nest start --watch",
 		"start:debug": "nest start --debug --watch",
-		"start:prod": "node dist/main",
+		"start:prod": "node dist/main.js",
+		"start:docker": "node scripts/docker-entrypoint.mjs",
 		"lint": "biome check .",
 		"db:generate": "drizzle-kit generate --config src/drizzle.config.ts",
 		"db:migrate": "drizzle-kit migrate --config src/drizzle.config.ts",

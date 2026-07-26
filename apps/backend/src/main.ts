@@ -6,6 +6,7 @@ import { rpcContract } from "@repo/api/contracts";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import { AppModule } from "./app.module.js";
+import { isProduction } from "./shared/http/is-production.js";
 
 const resolveCorsOrigin = (): boolean | string[] => {
 	const corsOriginEnv = process.env.CORS_ORIGIN;
@@ -40,21 +41,28 @@ async function bootstrap() {
 	app.enableCors({
 		origin: resolveCorsOrigin(),
 		credentials: true,
-		allowedHeaders: ["Authorization", "Content-Type", "X-Timezone"],
+		allowedHeaders: [
+			"Authorization",
+			"Content-Type",
+			"X-Timezone",
+			"X-Requested-With",
+		],
 	});
 
-	const generator = new OpenAPIGenerator({
-		schemaConverters: [new ZodToJsonSchemaConverter()],
-	});
-	const spec = await generator.generate(rpcContract, {
-		info: {
-			title: "Wealth API",
-			version: "1.0.0",
-		},
-	});
+	if (!isProduction()) {
+		const generator = new OpenAPIGenerator({
+			schemaConverters: [new ZodToJsonSchemaConverter()],
+		});
+		const spec = await generator.generate(rpcContract, {
+			info: {
+				title: "Wealth API",
+				version: "1.0.0",
+			},
+		});
 
-	const expressApp = app.getHttpAdapter().getInstance();
-	expressApp.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
+		const expressApp = app.getHttpAdapter().getInstance();
+		expressApp.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
+	}
 
 	const port = process.env.PORT;
 	if (!port) {

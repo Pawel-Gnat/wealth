@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { ChartPeriod } from "@/pages/dashboard/model/chart-period";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
@@ -18,6 +18,7 @@ export const useDashboardChart = ({ chartPeriod }: UseDashboardChartProps) => {
 			);
 		},
 		select: (response) => response.data,
+		placeholderData: keepPreviousData,
 	});
 
 	return {

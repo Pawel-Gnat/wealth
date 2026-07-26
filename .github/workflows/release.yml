@@ -1,0 +1,139 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: release-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: read
+  deployments: write
+
+jobs:
+  guard:
+    name: Guard main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Ensure release commit is on main
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "Release commit $GITHUB_SHA is not on origin/main"
+            exit 1
+          fi
+
+  checks:
+    name: Checks
+    needs: guard
+    runs-on: ubuntu-latest
+    env:
+      VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Require VITE_BACKEND_URL
+        run: |
+          if [ -z "${VITE_BACKEND_URL}" ]; then
+            echo "VITE_BACKEND_URL secret must be set"
+            exit 1
+          fi
+
+      - name: Configure node
+        uses: ./.github/actions/setup-project
+        with:
+          node-auth-token: ${{ secrets.NODE_AUTH_TOKEN }}
+
+      - name: Format & Lint code
+        uses: ./.github/actions/format-code
+
+      - name: Run tests
+        uses: ./.github/actions/run-tests
+
+      - name: Build app
+        run: pnpm run build
+
+  deploy:
+    name: Deploy
+    needs: checks
+    runs-on: ubuntu-latest
+    env:
+      VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_PAGES_PROJECT_NAME: ${{ secrets.CLOUDFLARE_PAGES_PROJECT_NAME }}
+      NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Require deploy secrets
+        run: |
+          missing=0
+          for name in VITE_BACKEND_URL FLY_API_TOKEN CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_PAGES_PROJECT_NAME NODE_AUTH_TOKEN; do
+            if [ -z "${!name}" ]; then
+              echo "$name secret must be set"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
+
+      - name: Deploy API to Fly.io
+        id: deploy_api
+        run: flyctl deploy --remote-only --build-secret "NODE_AUTH_TOKEN=$NODE_AUTH_TOKEN"
+
+      - name: Wait for API readiness
+        run: |
+          url="${VITE_BACKEND_URL%/}/ready"
+          for attempt in $(seq 1 30); do
+            if curl -fsS "$url"; then
+              echo
+              echo "API ready after ${attempt} attempt(s)"
+              exit 0
+            fi
+            echo "Attempt ${attempt}/30 failed; retrying in 2s..."
+            sleep 2
+          done
+          echo "API did not become ready in time"
+          exit 1
+
+      - name: Configure node
+        uses: ./.github/actions/setup-project
+        with:
+          node-auth-token: ${{ secrets.NODE_AUTH_TOKEN }}
+
+      - name: Build web
+        run: pnpm --filter web build
+
+      - name: Deploy web to Cloudflare Pages
+        id: deploy_web
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy apps/web/dist --project-name=${{ secrets.CLOUDFLARE_PAGES_PROJECT_NAME }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rollback API after web deploy failure
+        if: failure() && steps.deploy_api.outcome == 'success' && steps.deploy_web.outcome == 'failure'
+        run: |
+          previous_image="$(flyctl releases -j --image | jq -r '.[1].ImageRef // empty')"
+          if [ -z "$previous_image" ] || [ "$previous_image" = "null" ]; then
+            echo "No previous Fly release image available to roll back to"
+            exit 1
+          fi
+          echo "Rolling back API to ${previous_image}"
+          flyctl deploy --remote-only --image "$previous_image"
