@@ -116,7 +116,10 @@ jobs:
           node-auth-token: ${{ secrets.NODE_AUTH_TOKEN }}
 
       - name: Build web
-        run: pnpm exec turbo run build --filter=web
+        run: |
+          pnpm --filter @repo/common build
+          pnpm --filter @repo/api build
+          pnpm --filter web build
 
       - name: Deploy web to Cloudflare Pages
         id: deploy_web
