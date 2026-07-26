@@ -17,8 +17,9 @@ COPY packages/typescript-config/package.json ./packages/typescript-config/
 COPY packages/emails/package.json ./packages/emails/
 
 RUN --mount=type=secret,id=NODE_AUTH_TOKEN \
-	NODE_AUTH_TOKEN="$(cat /run/secrets/NODE_AUTH_TOKEN)" \
-	pnpm install --frozen-lockfile --filter backend...
+	TOKEN="$(cat /run/secrets/NODE_AUTH_TOKEN)" \
+	&& test -n "$TOKEN" \
+	&& CI=true NODE_AUTH_TOKEN="$TOKEN" pnpm install --frozen-lockfile --filter backend...
 
 COPY apps/backend ./apps/backend
 COPY packages/api ./packages/api
@@ -30,7 +31,7 @@ RUN pnpm --filter @repo/common build \
 	&& pnpm --filter @repo/api build \
 	&& pnpm --filter backend build
 
-RUN pnpm --filter backend --prod deploy --legacy /prod/backend
+RUN CI=true pnpm --filter backend --prod deploy --legacy /prod/backend
 
 FROM base AS runner
 WORKDIR /app
