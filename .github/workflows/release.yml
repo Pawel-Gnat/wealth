@@ -92,11 +92,12 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@1.5
 
       - name: Deploy API to Fly.io
+        id: deploy_api
         run: flyctl deploy --remote-only --build-secret "NODE_AUTH_TOKEN=$NODE_AUTH_TOKEN"
 
       - name: Wait for API readiness
         run: |
-          url="https://wealth-api.fly.dev/ready"
+          url="${VITE_BACKEND_URL%/}/ready"
           for attempt in $(seq 1 30); do
             if curl -fsS "$url"; then
               echo
@@ -118,9 +119,21 @@ jobs:
         run: pnpm --filter web build
 
       - name: Deploy web to Cloudflare Pages
+        id: deploy_web
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy apps/web/dist --project-name=${{ secrets.CLOUDFLARE_PAGES_PROJECT_NAME }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rollback API after web deploy failure
+        if: failure() && steps.deploy_api.outcome == 'success' && steps.deploy_web.outcome == 'failure'
+        run: |
+          previous_image="$(flyctl releases -j --image | jq -r '.[1].ImageRef // empty')"
+          if [ -z "$previous_image" ] || [ "$previous_image" = "null" ]; then
+            echo "No previous Fly release image available to roll back to"
+            exit 1
+          fi
+          echo "Rolling back API to ${previous_image}"
+          flyctl deploy --remote-only --image "$previous_image"

@@ -5,6 +5,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import pg from "pg";
 import { waitForDatabase } from "../dist/database-service/wait-for-database.js";
+import { withMigrationLock } from "../dist/database-service/with-migration-lock.js";
 
 const appRoot = path.resolve(
 	path.dirname(fileURLToPath(import.meta.url)),
@@ -28,10 +29,14 @@ await waitForDatabase(async () => {
 });
 
 const pool = new pg.Pool({ connectionString: databaseUrl });
+const lockClient = await pool.connect();
 try {
-	const db = drizzle(pool);
-	await migrate(db, { migrationsFolder });
+	await withMigrationLock(lockClient, async () => {
+		const db = drizzle(pool);
+		await migrate(db, { migrationsFolder });
+	});
 } finally {
+	lockClient.release();
 	await pool.end();
 }
 

@@ -1,3 +1,7 @@
+import {
+	AUTH_CSRF_HEADER_NAME,
+	AUTH_CSRF_HEADER_VALUE,
+} from "@repo/common/constants";
 import { persistAccessToken } from "@/shared/lib/auth/auth-session";
 
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
@@ -10,6 +14,9 @@ export const refreshAccessTokenRaw = async (): Promise<string | null> => {
 	const response = await fetch(`${baseUrl}/auth/refresh`, {
 		method: "POST",
 		credentials: "include",
+		headers: {
+			[AUTH_CSRF_HEADER_NAME]: AUTH_CSRF_HEADER_VALUE,
+		},
 	});
 
 	if (!response.ok) {

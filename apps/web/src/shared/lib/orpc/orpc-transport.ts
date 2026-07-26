@@ -1,3 +1,7 @@
+import {
+	AUTH_CSRF_HEADER_NAME,
+	AUTH_CSRF_HEADER_VALUE,
+} from "@repo/common/constants";
 import { reportClientError } from "@/shared/helpers/controlled-fetch";
 import {
 	clearAuthSession,
@@ -11,6 +15,8 @@ const PUBLIC_AUTH_PATHS = new Set([
 	"/auth/refresh",
 	"/auth/logout",
 ]);
+
+const COOKIE_AUTH_CSRF_PATHS = new Set(["/auth/refresh", "/auth/logout"]);
 
 const getRequestPathname = (requestUrl: string): string => {
 	try {
@@ -32,12 +38,19 @@ const shouldAttemptRefresh = (requestUrl: string): boolean => {
 	return !isPublicAuthRoute(requestUrl);
 };
 
-const createRequestInit = (init?: RequestInit): RequestInit => {
+const createRequestInit = (
+	requestUrl: string,
+	init?: RequestInit,
+): RequestInit => {
 	const headers = new Headers(init?.headers);
 	const token = getAccessToken();
 
 	if (token) {
 		headers.set("Authorization", `Bearer ${token}`);
+	}
+
+	if (COOKIE_AUTH_CSRF_PATHS.has(getRequestPathname(requestUrl))) {
+		headers.set(AUTH_CSRF_HEADER_NAME, AUTH_CSRF_HEADER_VALUE);
 	}
 
 	if (typeof window !== "undefined") {
@@ -58,7 +71,7 @@ export const orpcTransportFetch = async (
 	const requestUrl = String(input);
 
 	try {
-		let response = await fetch(input, createRequestInit(init));
+		let response = await fetch(input, createRequestInit(requestUrl, init));
 
 		if (
 			response.status === 401 &&
@@ -68,7 +81,7 @@ export const orpcTransportFetch = async (
 			const refreshedToken = await refreshAccessToken();
 
 			if (refreshedToken) {
-				response = await fetch(input, createRequestInit(init));
+				response = await fetch(input, createRequestInit(requestUrl, init));
 			} else if (!isPublicAuthRoute(requestUrl)) {
 				clearAuthSession();
 			}

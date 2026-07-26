@@ -10,6 +10,7 @@ const {
 	publisherConnect,
 	subscriberConnect,
 	publisherPublish,
+	publisherPing,
 	publisherQuit,
 	subscriberQuit,
 	subscriberSubscribe,
@@ -20,6 +21,7 @@ const {
 	const publisherConnect = vi.fn();
 	const subscriberConnect = vi.fn();
 	const publisherPublish = vi.fn();
+	const publisherPing = vi.fn();
 	const publisherQuit = vi.fn();
 	const subscriberQuit = vi.fn();
 	const subscriberSubscribe = vi.fn();
@@ -30,6 +32,7 @@ const {
 	const mockPublisher = {
 		connect: publisherConnect,
 		publish: publisherPublish,
+		ping: publisherPing,
 		quit: publisherQuit,
 		on: vi.fn(),
 	};
@@ -52,6 +55,7 @@ const {
 		publisherConnect,
 		subscriberConnect,
 		publisherPublish,
+		publisherPing,
 		publisherQuit,
 		subscriberQuit,
 		subscriberSubscribe,
@@ -83,6 +87,7 @@ describe("RedisService", () => {
 		publisherConnect.mockResolvedValue(undefined);
 		subscriberConnect.mockResolvedValue(undefined);
 		publisherPublish.mockResolvedValue(1);
+		publisherPing.mockResolvedValue("PONG");
 		publisherQuit.mockResolvedValue("OK");
 		subscriberQuit.mockResolvedValue("OK");
 		subscriberSubscribe.mockResolvedValue(undefined);
@@ -114,6 +119,7 @@ describe("RedisService", () => {
 		expect(RedisMock).not.toHaveBeenCalled();
 		expect(redisService.isAvailable()).toBe(false);
 		await expect(redisService.publish("sse:user:1", "{}")).resolves.toBe(false);
+		await expect(redisService.ping()).resolves.toBe(false);
 	});
 
 	it("connects publisher and subscriber when REDIS_URL is set", async () => {
@@ -127,6 +133,8 @@ describe("RedisService", () => {
 		expect(redisService.isAvailable()).toBe(true);
 		expect(redisService.getPublisher()).toBe(mockPublisher);
 		expect(redisService.getSubscriber()).toBe(mockSubscriber);
+		await expect(redisService.ping()).resolves.toBe(true);
+		expect(publisherPing).toHaveBeenCalledOnce();
 	});
 
 	it("degrades when Redis connect fails and recovers on later ensureConnected", async () => {

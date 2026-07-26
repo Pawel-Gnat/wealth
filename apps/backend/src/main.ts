@@ -6,7 +6,7 @@ import { rpcContract } from "@repo/api/contracts";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import { AppModule } from "./app.module.js";
-import { shouldMountInProduction } from "./shared/http/should-mount-in-production.js";
+import { isProduction } from "./shared/http/is-production.js";
 
 const resolveCorsOrigin = (): boolean | string[] => {
 	const corsOriginEnv = process.env.CORS_ORIGIN;
@@ -41,10 +41,15 @@ async function bootstrap() {
 	app.enableCors({
 		origin: resolveCorsOrigin(),
 		credentials: true,
-		allowedHeaders: ["Authorization", "Content-Type", "X-Timezone"],
+		allowedHeaders: [
+			"Authorization",
+			"Content-Type",
+			"X-Timezone",
+			"X-Requested-With",
+		],
 	});
 
-	if (!shouldMountInProduction()) {
+	if (!isProduction()) {
 		const generator = new OpenAPIGenerator({
 			schemaConverters: [new ZodToJsonSchemaConverter()],
 		});

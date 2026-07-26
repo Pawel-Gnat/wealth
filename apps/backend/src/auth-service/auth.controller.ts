@@ -1,6 +1,7 @@
 import { Controller, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Implement, implement, ORPCError } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
+import { AuthCookieCsrfGuard } from "../guards/auth-cookie-csrf.guard.js";
 import { PassportJwtGuard } from "../guards/passport-jwt.guard.js";
 import { AuthService } from "./auth.service.js";
 
@@ -40,6 +41,7 @@ export class AuthController {
 		);
 	}
 
+	@UseGuards(AuthCookieCsrfGuard)
 	@Implement(rpcContract.user.refresh)
 	refreshRpc() {
 		return implement(rpcContract.user.refresh).handler(async ({ context }) => {
@@ -57,6 +59,7 @@ export class AuthController {
 		});
 	}
 
+	@UseGuards(AuthCookieCsrfGuard)
 	@Implement(rpcContract.user.logout)
 	logoutRpc() {
 		return implement(rpcContract.user.logout).handler(async ({ context }) => {

@@ -56,6 +56,24 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 		return this.publisher !== null && this.subscriber !== null;
 	}
 
+	async ping(): Promise<boolean> {
+		if (!(await this.ensureConnected())) {
+			return false;
+		}
+
+		try {
+			const result = await this.publisher?.ping();
+			return result === "PONG";
+		} catch (error) {
+			this.logger.warn(
+				`Redis ping failed: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			);
+			return false;
+		}
+	}
+
 	getPublisher() {
 		return this.publisher;
 	}
