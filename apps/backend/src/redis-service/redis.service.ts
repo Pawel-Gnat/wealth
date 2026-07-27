@@ -100,6 +100,48 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 		}
 	}
 
+	async get(key: string): Promise<string | null> {
+		if (!(await this.ensureConnected()) || !this.publisher) {
+			throw new Error("Redis is unavailable");
+		}
+
+		return this.publisher.get(key);
+	}
+
+	async set(
+		key: string,
+		value: string,
+		options?: { ex?: number },
+	): Promise<void> {
+		if (!(await this.ensureConnected()) || !this.publisher) {
+			throw new Error("Redis is unavailable");
+		}
+
+		if (options?.ex !== undefined) {
+			await this.publisher.set(key, value, "EX", options.ex);
+			return;
+		}
+
+		await this.publisher.set(key, value);
+	}
+
+	async setNxEx(key: string, value: string, seconds: number): Promise<boolean> {
+		if (!(await this.ensureConnected()) || !this.publisher) {
+			throw new Error("Redis is unavailable");
+		}
+
+		const result = await this.publisher.set(key, value, "EX", seconds, "NX");
+		return result === "OK";
+	}
+
+	async del(key: string): Promise<void> {
+		if (!(await this.ensureConnected()) || !this.publisher) {
+			throw new Error("Redis is unavailable");
+		}
+
+		await this.publisher.del(key);
+	}
+
 	async subscribe(channel: string) {
 		if (!(await this.ensureConnected())) {
 			return false;

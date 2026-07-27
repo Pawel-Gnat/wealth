@@ -11,6 +11,9 @@ const {
 	subscriberConnect,
 	publisherPublish,
 	publisherPing,
+	publisherGet,
+	publisherSet,
+	publisherDel,
 	publisherQuit,
 	subscriberQuit,
 	subscriberSubscribe,
@@ -22,6 +25,9 @@ const {
 	const subscriberConnect = vi.fn();
 	const publisherPublish = vi.fn();
 	const publisherPing = vi.fn();
+	const publisherGet = vi.fn();
+	const publisherSet = vi.fn();
+	const publisherDel = vi.fn();
 	const publisherQuit = vi.fn();
 	const subscriberQuit = vi.fn();
 	const subscriberSubscribe = vi.fn();
@@ -33,6 +39,9 @@ const {
 		connect: publisherConnect,
 		publish: publisherPublish,
 		ping: publisherPing,
+		get: publisherGet,
+		set: publisherSet,
+		del: publisherDel,
 		quit: publisherQuit,
 		on: vi.fn(),
 	};
@@ -56,6 +65,9 @@ const {
 		subscriberConnect,
 		publisherPublish,
 		publisherPing,
+		publisherGet,
+		publisherSet,
+		publisherDel,
 		publisherQuit,
 		subscriberQuit,
 		subscriberSubscribe,
@@ -88,6 +100,9 @@ describe("RedisService", () => {
 		subscriberConnect.mockResolvedValue(undefined);
 		publisherPublish.mockResolvedValue(1);
 		publisherPing.mockResolvedValue("PONG");
+		publisherGet.mockResolvedValue(null);
+		publisherSet.mockResolvedValue("OK");
+		publisherDel.mockResolvedValue(1);
 		publisherQuit.mockResolvedValue("OK");
 		subscriberQuit.mockResolvedValue("OK");
 		subscriberSubscribe.mockResolvedValue(undefined);
@@ -194,6 +209,72 @@ describe("RedisService", () => {
 
 		publisherPublish.mockRejectedValueOnce(new Error("disconnected"));
 		await expect(redisService.publish("sse:user:1", "{}")).resolves.toBe(false);
+	});
+
+	it("supports get, set, setNxEx and del through publisher", async () => {
+		configGet.mockReturnValue("redis://localhost:6379");
+		await redisService.onModuleInit();
+
+		publisherGet.mockResolvedValueOnce("value-1");
+		await expect(redisService.get("bots:daily:2026-07-27")).resolves.toBe(
+			"value-1",
+		);
+		expect(publisherGet).toHaveBeenCalledWith("bots:daily:2026-07-27");
+
+		await expect(redisService.set("bots:daily:2026-07-27", "{}")).resolves.toBe(
+			undefined,
+		);
+		expect(publisherSet).toHaveBeenCalledWith("bots:daily:2026-07-27", "{}");
+
+		await expect(
+			redisService.set("bots:daily:2026-07-27", "{}", { ex: 120 }),
+		).resolves.toBe(undefined);
+		expect(publisherSet).toHaveBeenCalledWith(
+			"bots:daily:2026-07-27",
+			"{}",
+			"EX",
+			120,
+		);
+
+		publisherSet.mockResolvedValueOnce("OK");
+		await expect(
+			redisService.setNxEx("bots:claim:2026-07-27:bot1", "1", 300),
+		).resolves.toBe(true);
+		expect(publisherSet).toHaveBeenCalledWith(
+			"bots:claim:2026-07-27:bot1",
+			"1",
+			"EX",
+			300,
+			"NX",
+		);
+
+		publisherSet.mockResolvedValueOnce(null);
+		await expect(
+			redisService.setNxEx("bots:claim:2026-07-27:bot2", "1", 300),
+		).resolves.toBe(false);
+
+		await expect(redisService.del("bots:claim:2026-07-27:bot1")).resolves.toBe(
+			undefined,
+		);
+		expect(publisherDel).toHaveBeenCalledWith("bots:claim:2026-07-27:bot1");
+	});
+
+	it("throws on kv calls when Redis is unavailable", async () => {
+		configGet.mockReturnValue(undefined);
+		await redisService.onModuleInit();
+
+		await expect(redisService.get("bots:daily:2026-07-27")).rejects.toThrow(
+			"Redis is unavailable",
+		);
+		await expect(
+			redisService.set("bots:daily:2026-07-27", "{}", { ex: 120 }),
+		).rejects.toThrow("Redis is unavailable");
+		await expect(
+			redisService.setNxEx("bots:claim:2026-07-27:bot1", "1", 300),
+		).rejects.toThrow("Redis is unavailable");
+		await expect(
+			redisService.del("bots:claim:2026-07-27:bot1"),
+		).rejects.toThrow("Redis is unavailable");
 	});
 
 	it("subscribes and unsubscribes when available", async () => {

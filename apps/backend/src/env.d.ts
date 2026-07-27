@@ -6,6 +6,7 @@ declare namespace NodeJS {
 		/** Redis connection URL for SSE pub/sub. Optional — API degrades without live fan-out. */
 		REDIS_URL?: string;
 		JWT_SECRET: string;
+		BOT_PASSWORD?: string;
 		/** Comma-separated browser origins for CORS. Required in production. */
 		CORS_ORIGIN?: string;
 		SENTRY_DSN?: string;
