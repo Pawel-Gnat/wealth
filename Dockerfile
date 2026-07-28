@@ -14,7 +14,6 @@ COPY packages/api/package.json ./packages/api/
 COPY packages/common/package.json ./packages/common/
 COPY packages/biome-config/package.json ./packages/biome-config/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
-COPY packages/emails/package.json ./packages/emails/
 
 RUN --mount=type=secret,id=NODE_AUTH_TOKEN \
 	TOKEN="$(cat /run/secrets/NODE_AUTH_TOKEN)" \

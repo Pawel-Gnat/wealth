@@ -7,8 +7,6 @@ node_modules
 **/.tsbuildinfo
 apps/web
 apps/e2e
-packages/emails/src
-packages/emails/emails
 **/*.md
 .env
 .env.*
