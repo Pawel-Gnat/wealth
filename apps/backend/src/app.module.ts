@@ -1,13 +1,11 @@
-import { Logger, Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 import { APP_FILTER, REQUEST } from "@nestjs/core";
-import { ScheduleModule } from "@nestjs/schedule";
 import { ORPCModule, onError } from "@orpc/nest";
 import * as Sentry from "@sentry/nestjs";
 import { SentryGlobalFilter, SentryModule } from "@sentry/nestjs/setup";
 import type { Request, Response } from "express";
 import { AuthModule } from "./auth-service/auth.module.js";
-import { BotsModule } from "./bots-service/bots.module.js";
 import { DashboardModule } from "./dashboard-service/dashboard.module.js";
 import { DatabaseModule } from "./database-service/database.module.js";
 import { ExpensesModule } from "./expenses-service/expenses.module.js";
@@ -31,7 +29,6 @@ declare module "@orpc/nest" {
 		ConfigModule.forRoot({
 			isGlobal: true,
 		}),
-		ScheduleModule.forRoot(),
 		ORPCModule.forRootAsync({
 			useFactory: (request: Request) => {
 				if (!request.res) {
@@ -55,7 +52,6 @@ declare module "@orpc/nest" {
 		IncomesModule,
 		DashboardModule,
 		AuthModule,
-		BotsModule,
 		DatabaseModule,
 		RedisModule,
 		HealthModule,
@@ -69,19 +65,4 @@ declare module "@orpc/nest" {
 		},
 	],
 })
-export class AppModule {
-	private readonly logger = new Logger(AppModule.name);
-
-	constructor(private readonly configService: ConfigService) {}
-
-	onModuleInit() {
-		const botPassword = this.configService.get<string>("BOT_PASSWORD")?.trim();
-
-		if (!botPassword) {
-			this.logger.log("Daily activity bots disabled: BOT_PASSWORD is missing");
-			return;
-		}
-
-		this.logger.log("Daily activity bots enabled");
-	}
-}
+export class AppModule {}

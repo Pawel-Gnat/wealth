@@ -6,11 +6,14 @@
 	"scripts": {
 		"check-types": "tsc --noEmit",
 		"test:e2e": "playwright test",
-		"test:e2e:ui": "playwright test --ui"
+		"test:e2e:ui": "playwright test --ui",
+		"test:bots": "playwright test --config playwright.bots.config.ts"
 	},
 	"devDependencies": {
-		"@repo/common": "workspace:*",
+		"@faker-js/faker": "^10.5.0",
 		"@playwright/test": "^1.59.1",
+		"@repo/api": "workspace:*",
+		"@repo/common": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
 		"@types/node": "^22.10.7",
 		"typescript": "catalog:"
