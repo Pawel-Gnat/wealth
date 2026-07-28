@@ -44,6 +44,11 @@ jobs:
         with:
           node-auth-token: ${{ secrets.NODE_AUTH_TOKEN }}
 
+      - name: Build workspace packages
+        run: |
+          pnpm --filter @repo/common build
+          pnpm --filter @repo/api build
+
       - name: Install Playwright Chromium
         working-directory: apps/e2e
         run: pnpm exec playwright install --with-deps chromium
