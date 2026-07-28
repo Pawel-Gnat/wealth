@@ -15,6 +15,7 @@ const isCi = !!process.env["CI"];
 
 export default defineConfig({
     testDir: "./src/specs",
+	testIgnore: "**/bots/**",
 	forbidOnly: isCi,
 	retries: isCi ? 2 : 0,
 	timeout: 45_000,

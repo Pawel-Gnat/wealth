@@ -1,0 +1,52 @@
+name: Daily Activity Bots
+
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: daily-activity-bots
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  bots:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        botId: [bot1, bot2, bot3, bot4, bot5]
+    env:
+      BOT_ID: ${{ matrix.botId }}
+      BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+      FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Require bot secrets
+        run: |
+          missing=0
+          for name in BOT_PASSWORD FRONTEND_URL; do
+            if [ -z "${!name}" ]; then
+              echo "$name secret must be set"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Configure node
+        uses: ./.github/actions/setup-project
+        with:
+          node-auth-token: ${{ secrets.NODE_AUTH_TOKEN }}
+
+      - name: Install Playwright Chromium
+        working-directory: apps/e2e
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run daily activity bot
+        run: pnpm --filter e2e test:bots
