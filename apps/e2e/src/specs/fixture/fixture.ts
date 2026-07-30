@@ -27,9 +27,7 @@ export const test = base.extend<Fixtures>({
 			await page.getByLabel(passwordLabel, { exact: true }).fill(password)
 
 			const signInResponse = page.waitForResponse(
-				(response) =>
-					response.request().method() === 'POST' &&
-					response.url().includes('/auth/signin'),
+				response => response.request().method() === 'POST' && response.url().includes('/auth/signin'),
 				{ timeout: 30_000 },
 			)
 
