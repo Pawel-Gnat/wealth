@@ -1,20 +1,20 @@
-import * as Sentry from "@sentry/nestjs";
+import { init } from "@repo/observability/node";
 
-const dsn = process.env.SENTRY_DSN;
-const nodeEnv = process.env.NODE_ENV ?? "development";
-const isDeployedEnv = nodeEnv === "production";
-const isSentryEnabled = Boolean(dsn) && isDeployedEnv;
+const environment = process.env.NODE_ENV ?? "development";
+const sourceToken = process.env.BETTER_STACK_SOURCE_TOKEN;
+const ingestingHost = process.env.BETTER_STACK_INGESTING_HOST;
+const errorsDsn = process.env.BETTER_STACK_ERRORS_DSN;
 
-if (isSentryEnabled && dsn) {
-	const { nodeProfilingIntegration } = await import("@sentry/profiling-node");
-	Sentry.init({
-		dsn,
-		environment: nodeEnv,
-		sendDefaultPii: true,
-		tracesSampleRate: nodeEnv === "production" ? 0.1 : 1,
-		profilesSampleRate: 1.0,
-		integrations: [nodeProfilingIntegration()],
-	});
-} else {
-	Sentry.init({ enabled: false });
-}
+init({
+	service: "backend",
+	environment,
+	...(sourceToken && ingestingHost && errorsDsn
+		? {
+				betterStack: {
+					sourceToken,
+					ingestingHost,
+					errorsDsn,
+				},
+			}
+		: {}),
+});

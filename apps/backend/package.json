@@ -41,8 +41,6 @@
 		"@repo/api": "workspace:*",
 		"@repo/common": "workspace:*",
 		"@repo/observability": "workspace:*",
-		"@sentry/nestjs": "^9.47.1",
-		"@sentry/profiling-node": "^9.47.1",
 		"bcrypt": "^6.0.0",
 		"cookie-parser": "^1.4.7",
 		"date-fns": "catalog:",

@@ -6,13 +6,13 @@ import {
 import { ConfigModule } from "@nestjs/config";
 import { APP_FILTER, REQUEST } from "@nestjs/core";
 import { ORPCModule, onError } from "@orpc/nest";
-import * as Sentry from "@sentry/nestjs";
-import { SentryGlobalFilter, SentryModule } from "@sentry/nestjs/setup";
+import { captureException } from "@repo/observability/node";
 import type { Request, Response } from "express";
 import { AuthModule } from "./auth-service/auth.module.js";
 import { DashboardModule } from "./dashboard-service/dashboard.module.js";
 import { DatabaseModule } from "./database-service/database.module.js";
 import { ExpensesModule } from "./expenses-service/expenses.module.js";
+import { ObservabilityExceptionFilter } from "./filters/observability-exception.filter.js";
 import { HealthModule } from "./health-service/health.module.js";
 import { IncomesModule } from "./incomes-service/incomes.module.js";
 import { RequestIdMiddleware } from "./middleware/request-id.middleware.js";
@@ -30,7 +30,6 @@ declare module "@orpc/nest" {
 
 @Module({
 	imports: [
-		SentryModule.forRoot(),
 		ConfigModule.forRoot({
 			isGlobal: true,
 		}),
@@ -45,7 +44,7 @@ declare module "@orpc/nest" {
 					interceptors: [
 						onError((error: unknown) => {
 							console.error("[oRPC]", error);
-							Sentry.captureException(error);
+							captureException(error);
 						}),
 					],
 				};
@@ -66,7 +65,7 @@ declare module "@orpc/nest" {
 	providers: [
 		{
 			provide: APP_FILTER,
-			useClass: SentryGlobalFilter,
+			useClass: ObservabilityExceptionFilter,
 		},
 	],
 })

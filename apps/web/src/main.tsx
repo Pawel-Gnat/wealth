@@ -1,5 +1,5 @@
 import "./instrument";
-import * as Sentry from "@sentry/react";
+import { captureException } from "@repo/observability/browser";
 import { StrictMode } from "react";
 import { createRoot, type RootOptions } from "react-dom/client";
 import "./index.css";
@@ -18,9 +18,9 @@ const root = document.getElementById("root");
 
 if (root) {
 	createRoot(root, {
-		onUncaughtError: Sentry.reactErrorHandler(),
-		onCaughtError: Sentry.reactErrorHandler(),
-		onRecoverableError: Sentry.reactErrorHandler(),
+		onUncaughtError: (error) => captureException(error),
+		onCaughtError: (error) => captureException(error),
+		onRecoverableError: (error) => captureException(error),
 	} as RootOptions).render(
 		<StrictMode>
 			<App />
