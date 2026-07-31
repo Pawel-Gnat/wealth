@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/react";
+import { logger } from "@repo/observability/browser";
 import { useQueryClient } from "@tanstack/react-query";
 import {
 	createContext,
@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const logout = useCallback(async () => {
 		await logoutSession();
-		Sentry.logger.info("User logged out", { log_source: "auth_session" });
+		logger.info("auth.logout.succeeded");
 	}, []);
 
 	const value = useMemo<AuthContextValue>(

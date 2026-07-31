@@ -7,7 +7,7 @@ import type {
 	IncomeDocumentUpdateResponse,
 } from "@repo/api/schemas";
 import { normalizeDocumentDateForApi } from "@repo/common/helpers";
-import * as Sentry from "@sentry/react";
+import { logger } from "@repo/observability/browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/shared/config/document-config";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
@@ -58,14 +58,7 @@ export function useUpsertDocument({
 		},
 		onSuccess: (data) => {
 			const isUpdated = data.data.message === config.updatedMessage;
-			Sentry.logger.info(
-				isUpdated ? `${kind} update succeeded` : `${kind} create succeeded`,
-				{
-					log_source: isUpdated
-						? config.logSource.update
-						: config.logSource.create,
-				},
-			);
+			logger.info(isUpdated ? config.events.update : config.events.create);
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.dashboard.all(),
 			});

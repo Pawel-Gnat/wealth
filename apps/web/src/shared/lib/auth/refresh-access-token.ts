@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/react";
+import { logger } from "@repo/observability/browser";
 import { delay } from "@/shared/helpers/delay";
 import {
 	publishAuthTabSyncMessage,
@@ -85,12 +85,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 		return navigator.locks.request(LOCK_NAME, refreshWithRetry);
 	}
 
-	Sentry.logger.warn(
-		"Web Locks API unavailable; auth refresh uses per-tab mutex",
-		{
-			log_source: "auth_refresh",
-		},
-	);
+	logger.warn("auth.refresh.web-locks-unavailable");
 
 	return withRefreshMutex(refreshWithRetry);
 };
