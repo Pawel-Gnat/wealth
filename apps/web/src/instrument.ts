@@ -5,11 +5,12 @@ const environment = import.meta.env.MODE;
 const sourceToken = import.meta.env.VITE_BETTER_STACK_SOURCE_TOKEN;
 const ingestingHost = import.meta.env.VITE_BETTER_STACK_INGESTING_HOST;
 const errorsDsn = import.meta.env.VITE_BETTER_STACK_ERRORS_DSN;
+const isProd = import.meta.env.PROD;
 
 init({
 	service: "web",
 	environment,
-	...(sourceToken && ingestingHost && errorsDsn
+	...(isProd && sourceToken && ingestingHost && errorsDsn
 		? {
 				betterStack: {
 					sourceToken,
