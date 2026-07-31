@@ -3,8 +3,9 @@ import {
 	Catch,
 	type ExceptionFilter,
 	HttpException,
+	Inject,
 } from "@nestjs/common";
-import { BaseExceptionFilter, type HttpAdapterHost } from "@nestjs/core";
+import { BaseExceptionFilter, HttpAdapterHost } from "@nestjs/core";
 import { ORPCError } from "@orpc/nest";
 import { captureException } from "@repo/observability/node";
 
@@ -25,7 +26,7 @@ export class ObservabilityExceptionFilter
 	extends BaseExceptionFilter
 	implements ExceptionFilter
 {
-	constructor(httpAdapterHost: HttpAdapterHost) {
+	constructor(@Inject(HttpAdapterHost) httpAdapterHost: HttpAdapterHost) {
 		super(httpAdapterHost.httpAdapter);
 	}
 
