@@ -5,7 +5,6 @@ allowBuilds:
   '@nestjs/core': true
   '@pawel-gnat/ai-toolkit': true
   '@scarf/scarf': true
-  '@sentry-internal/node-cpu-profiler': true
   '@swc/core': true
   bcrypt: true
   cpu-features: true
@@ -20,6 +19,7 @@ catalog:
   '@hookform/resolvers': '^5.2.2'
   '@types/react': '^19.2.14'
   '@types/react-dom': '^19.2.3'
+  '@types/node': '^24.12.2'
   date-fns: '^4.1.0'
   react: '^19.2.5'
   react-dom: '^19.2.5'

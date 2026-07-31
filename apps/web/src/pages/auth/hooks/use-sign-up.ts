@@ -1,5 +1,5 @@
 import type { SignUpPayload, SignUpResponse } from "@repo/api/schemas";
-import * as Sentry from "@sentry/react";
+import { logger, runWithRequestId } from "@repo/observability/browser";
 import { useMutation } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 
@@ -14,9 +14,14 @@ type UseSignUpProps = {
 export const useSignUp = ({ onSuccess, onError }: UseSignUpProps = {}) => {
 	const mutation = useMutation<SignUpResponse, Error, SignUpPayload>({
 		mutationFn: (payload) =>
-			controlledAsync(() => orpcClient.user.signUp(payload)),
+			runWithRequestId(async () => {
+				const data = await controlledAsync(() =>
+					orpcClient.user.signUp(payload),
+				);
+				logger.info("auth.sign-up.succeeded");
+				return data;
+			}),
 		onSuccess: (data) => {
-			Sentry.logger.info("Sign up succeeded", { log_source: "auth_sign_up" });
 			onSuccess?.(data);
 		},
 		onError: (error) => {

@@ -1,46 +1,24 @@
-import * as Sentry from "@sentry/react";
-import * as React from "react";
-import {
-	createRoutesFromChildren,
-	matchRoutes,
-	useLocation,
-	useNavigationType,
-} from "react-router";
+import { captureException, init } from "@repo/observability/browser";
 import { configureWebHttp } from "@/shared/helpers/controlled-fetch";
 
-const dsn = import.meta.env.VITE_SENTRY_DSN;
-const mode = import.meta.env.MODE;
+const environment = import.meta.env.MODE;
+const sourceToken = import.meta.env.VITE_BETTER_STACK_SOURCE_TOKEN;
+const ingestingHost = import.meta.env.VITE_BETTER_STACK_INGESTING_HOST;
+const errorsDsn = import.meta.env.VITE_BETTER_STACK_ERRORS_DSN;
+const isProd = import.meta.env.PROD;
 
-if (dsn && import.meta.env.PROD) {
-	const tracePropagationTargets = import.meta.env.VITE_BACKEND_URL
-		? [import.meta.env.VITE_BACKEND_URL, /^\//]
-		: [/^\//];
-
-	Sentry.init({
-		dsn,
-		environment: mode,
-		tracesSampleRate: mode === "production" ? 0.1 : 1,
-		sendDefaultPii: true,
-		enableLogs: true,
-		integrations: [
-			Sentry.reactRouterV7BrowserTracingIntegration({
-				useEffect: React.useEffect,
-				useLocation,
-				useNavigationType,
-				createRoutesFromChildren,
-				matchRoutes,
-			}),
-			Sentry.replayIntegration(),
-			Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
-		],
-		tracePropagationTargets,
-		replaysSessionSampleRate: 0.1,
-		replaysOnErrorSampleRate: 1.0,
-	});
-} else {
-	Sentry.init({ enabled: false });
-}
-
-configureWebHttp((error) => {
-	Sentry.captureException(error);
+init({
+	service: "web",
+	environment,
+	...(isProd && sourceToken && ingestingHost && errorsDsn
+		? {
+				betterStack: {
+					sourceToken,
+					ingestingHost,
+					errorsDsn,
+				},
+			}
+		: {}),
 });
+
+configureWebHttp(captureException);

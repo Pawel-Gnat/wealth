@@ -48,6 +48,7 @@ jobs:
         run: |
           pnpm --filter @repo/common build
           pnpm --filter @repo/api build
+          pnpm --filter @repo/observability build
 
       - name: Install Playwright Chromium
         working-directory: apps/e2e

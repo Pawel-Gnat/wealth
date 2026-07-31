@@ -8,6 +8,8 @@ declare namespace NodeJS {
 		JWT_SECRET: string;
 		/** Comma-separated browser origins for CORS. Required in production. */
 		CORS_ORIGIN?: string;
-		SENTRY_DSN?: string;
+		BETTER_STACK_SOURCE_TOKEN?: string;
+		BETTER_STACK_INGESTING_HOST?: string;
+		BETTER_STACK_ERRORS_DSN?: string;
 	}
 }

@@ -19,10 +19,10 @@ export const DOCUMENT_CONFIG = {
 		queryKeys: queryKeys.expenses,
 		client: orpcClient.expenses,
 		updatedMessage: EXPENSE_UPDATED_MESSAGE,
-		logSource: {
-			create: "expenses_create",
-			update: "expenses_update",
-			delete: "expenses_delete",
+		events: {
+			create: "expense.create.succeeded",
+			update: "expense.update.succeeded",
+			delete: "expense.delete.succeeded",
 		},
 		toast: {
 			created: "toast.success.expense_created",
@@ -43,10 +43,10 @@ export const DOCUMENT_CONFIG = {
 		queryKeys: queryKeys.incomes,
 		client: orpcClient.incomes,
 		updatedMessage: INCOME_UPDATED_MESSAGE,
-		logSource: {
-			create: "incomes_create",
-			update: "incomes_update",
-			delete: "incomes_delete",
+		events: {
+			create: "income.create.succeeded",
+			update: "income.update.succeeded",
+			delete: "income.delete.succeeded",
 		},
 		toast: {
 			created: "toast.success.income_created",

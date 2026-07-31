@@ -12,6 +12,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY apps/backend/package.json ./apps/backend/
 COPY packages/api/package.json ./packages/api/
 COPY packages/common/package.json ./packages/common/
+COPY packages/observability/package.json ./packages/observability/
 COPY packages/biome-config/package.json ./packages/biome-config/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 
@@ -23,11 +24,13 @@ RUN --mount=type=secret,id=NODE_AUTH_TOKEN \
 COPY apps/backend ./apps/backend
 COPY packages/api ./packages/api
 COPY packages/common ./packages/common
+COPY packages/observability ./packages/observability
 COPY packages/biome-config ./packages/biome-config
 COPY packages/typescript-config ./packages/typescript-config
 
 RUN pnpm --filter @repo/common build \
 	&& pnpm --filter @repo/api build \
+	&& pnpm --filter @repo/observability build \
 	&& pnpm --filter backend build
 
 RUN CI=true pnpm --filter backend --prod deploy --legacy /prod/backend

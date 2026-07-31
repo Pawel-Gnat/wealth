@@ -1,0 +1,39 @@
+{
+	"name": "@repo/observability",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./browser": {
+			"types": "./dist/browser/index.d.ts",
+			"import": "./dist/browser/index.js",
+			"default": "./dist/browser/index.js"
+		},
+		"./node": {
+			"types": "./dist/node/index.d.ts",
+			"import": "./dist/node/index.js",
+			"default": "./dist/node/index.js"
+		}
+	},
+	"scripts": {
+		"dev": "tsup --watch",
+		"build": "tsup --clean",
+		"lint": "biome check .",
+		"format": "biome check --write .",
+		"check-types": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@logtail/browser": "^0.5.8",
+		"@logtail/node": "^0.5.8",
+		"@sentry/browser": "^9.47.1",
+		"@sentry/node": "^9.47.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "catalog:",
+		"@repo/biome-config": "workspace:*",
+		"@repo/typescript-config": "workspace:*",
+		"@types/node": "catalog:",
+		"tsup": "catalog:",
+		"typescript": "catalog:"
+	}
+}

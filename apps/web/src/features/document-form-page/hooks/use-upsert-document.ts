@@ -7,7 +7,7 @@ import type {
 	IncomeDocumentUpdateResponse,
 } from "@repo/api/schemas";
 import { normalizeDocumentDateForApi } from "@repo/common/helpers";
-import * as Sentry from "@sentry/react";
+import { logger, runWithRequestId } from "@repo/observability/browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/shared/config/document-config";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
@@ -40,32 +40,28 @@ export function useUpsertDocument({
 		Error,
 		DocumentCreatePayload | DocumentUpdatePayload
 	>({
-		mutationFn: async (payload) => {
-			const normalizedPayload = {
-				...payload,
-				date: normalizeDocumentDateForApi(payload.date),
-			};
+		mutationFn: (payload) =>
+			runWithRequestId(async () => {
+				const normalizedPayload = {
+					...payload,
+					date: normalizeDocumentDateForApi(payload.date),
+				};
 
-			if ("id" in normalizedPayload) {
-				const { id, ...updatePayload } = normalizedPayload;
-				return controlledAsync<DocumentUpsertResponse>(async () =>
-					config.client.update({ id, ...updatePayload }),
-				);
-			}
-			return controlledAsync<DocumentUpsertResponse>(async () =>
-				config.client.create(normalizedPayload),
-			);
-		},
+				const data =
+					"id" in normalizedPayload
+						? await controlledAsync<DocumentUpsertResponse>(async () => {
+								const { id, ...updatePayload } = normalizedPayload;
+								return config.client.update({ id, ...updatePayload });
+							})
+						: await controlledAsync<DocumentUpsertResponse>(async () =>
+								config.client.create(normalizedPayload),
+							);
+
+				const isUpdated = data.data.message === config.updatedMessage;
+				logger.info(isUpdated ? config.events.update : config.events.create);
+				return data;
+			}),
 		onSuccess: (data) => {
-			const isUpdated = data.data.message === config.updatedMessage;
-			Sentry.logger.info(
-				isUpdated ? `${kind} update succeeded` : `${kind} create succeeded`,
-				{
-					log_source: isUpdated
-						? config.logSource.update
-						: config.logSource.create,
-				},
-			);
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.dashboard.all(),
 			});
