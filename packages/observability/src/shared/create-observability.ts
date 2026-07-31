@@ -31,18 +31,47 @@ export const createObservability = (store: ContextStore): Observability => {
 		return state;
 	};
 
-	const emit = (level: LogLevel, event: string) => {
-		const runtime = ensureInitialized();
+	const withRequestId = <T>(fn: () => T): T => {
+		const existingRequestId = store.get().requestId;
+		const ownedRequestId =
+			existingRequestId === undefined ? crypto.randomUUID() : undefined;
+
+		if (ownedRequestId !== undefined) {
+			store.setRequestId(ownedRequestId);
+		}
+
+		try {
+			return fn();
+		} finally {
+			if (
+				ownedRequestId !== undefined &&
+				store.get().requestId === ownedRequestId
+			) {
+				store.clearRequestId();
+			}
+		}
+	};
+
+	const buildMeta = (runtime: RuntimeState) => {
 		const context = store.get();
-		runtime.logSink.write({
+		return {
 			service: runtime.service,
 			environment: runtime.environment,
-			level,
-			event,
 			...(context.requestId !== undefined
 				? { requestId: context.requestId }
 				: {}),
 			...(context.userId !== undefined ? { userId: context.userId } : {}),
+		};
+	};
+
+	const emit = (level: LogLevel, event: string) => {
+		withRequestId(() => {
+			const runtime = ensureInitialized();
+			runtime.logSink.write({
+				...buildMeta(runtime),
+				level,
+				event,
+			});
 		});
 	};
 
@@ -61,21 +90,26 @@ export const createObservability = (store: ContextStore): Observability => {
 			error: (event) => emit("error", event),
 		},
 		captureException: (error) => {
-			const runtime = ensureInitialized();
-			const context = store.get();
-			runtime.errorSink.captureException(error, {
-				service: runtime.service,
-				environment: runtime.environment,
-				...(context.requestId !== undefined
-					? { requestId: context.requestId }
-					: {}),
-				...(context.userId !== undefined ? { userId: context.userId } : {}),
+			withRequestId(() => {
+				const runtime = ensureInitialized();
+				const meta = buildMeta(runtime);
+
+				runtime.errorSink.captureException(error, meta);
+				runtime.logSink.write({
+					...meta,
+					level: "error",
+					event: "exception.captured",
+				});
 			});
 		},
+		getRequestId: () => store.get().requestId,
 		setRequestId: (requestId) => {
 			store.setRequestId(requestId);
 		},
-		clearRequestId: () => {
+		clearRequestId: (requestId) => {
+			if (requestId !== undefined && store.get().requestId !== requestId) {
+				return;
+			}
 			store.clearRequestId();
 		},
 		setUserId: (userId) => {

@@ -62,8 +62,9 @@ export type Observability = {
 	init: (config: ObservabilityInitConfig) => void;
 	logger: Logger;
 	captureException: (error: unknown) => void;
+	getRequestId: () => string | undefined;
 	setRequestId: (requestId: string) => void;
-	clearRequestId: () => void;
+	clearRequestId: (requestId?: string) => void;
 	setUserId: (userId: string) => void;
 	clearUserId: () => void;
 };

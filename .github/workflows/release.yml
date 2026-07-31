@@ -81,7 +81,7 @@ jobs:
       - name: Require deploy secrets
         run: |
           missing=0
-          for name in VITE_BACKEND_URL FLY_API_TOKEN CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID NODE_AUTH_TOKEN; do
+          for name in VITE_BACKEND_URL VITE_BETTER_STACK_SOURCE_TOKEN VITE_BETTER_STACK_INGESTING_HOST VITE_BETTER_STACK_ERRORS_DSN FLY_API_TOKEN CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID NODE_AUTH_TOKEN; do
             if [ -z "${!name}" ]; then
               echo "$name secret must be set"
               missing=1

@@ -2,7 +2,7 @@ import type {
 	ExpenseDocumentDeleteResponse,
 	IncomeDocumentDeleteResponse,
 } from "@repo/api/schemas";
-import { logger } from "@repo/observability/browser";
+import { logger, runWithRequestId } from "@repo/observability/browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/shared/config/document-config";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
@@ -29,11 +29,14 @@ export function useDeleteDocument({
 
 	const mutation = useMutation<DocumentDeleteResponse, Error, string>({
 		mutationFn: (documentId) =>
-			controlledAsync<DocumentDeleteResponse>(async () =>
-				config.client.delete({ id: documentId }),
-			),
+			runWithRequestId(async () => {
+				const data = await controlledAsync<DocumentDeleteResponse>(async () =>
+					config.client.delete({ id: documentId }),
+				);
+				logger.info(config.events.delete);
+				return data;
+			}),
 		onSuccess: (data) => {
-			logger.info(config.events.delete);
 			void queryClient.invalidateQueries({
 				queryKey: config.queryKeys.all(),
 			});

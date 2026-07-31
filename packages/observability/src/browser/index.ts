@@ -4,6 +4,7 @@ import { createModuleContextStore } from "../shared/context-store.js";
 import { createObservability } from "../shared/create-observability.js";
 import { createLogtailLogSink } from "../shared/logtail-sink.js";
 import { resolveInitConfig } from "../shared/resolve-init-config.js";
+import { createRunWithRequestId } from "../shared/run-with-request-id.js";
 import { createSentryErrorSink } from "../shared/sentry-error-sink.js";
 import type { ObservabilityInitConfig } from "../shared/types.js";
 
@@ -24,11 +25,14 @@ export const init = (config: ObservabilityInitConfig) => {
 export const {
 	logger,
 	captureException,
+	getRequestId,
 	setRequestId,
 	clearRequestId,
 	setUserId,
 	clearUserId,
 } = observability;
+
+export const runWithRequestId = createRunWithRequestId(observability);
 
 export type {
 	BetterStackConfig,

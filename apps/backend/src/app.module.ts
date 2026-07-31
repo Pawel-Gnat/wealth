@@ -12,7 +12,10 @@ import { AuthModule } from "./auth-service/auth.module.js";
 import { DashboardModule } from "./dashboard-service/dashboard.module.js";
 import { DatabaseModule } from "./database-service/database.module.js";
 import { ExpensesModule } from "./expenses-service/expenses.module.js";
-import { ObservabilityExceptionFilter } from "./filters/observability-exception.filter.js";
+import {
+	ObservabilityExceptionFilter,
+	shouldCaptureException,
+} from "./filters/observability-exception.filter.js";
 import { HealthModule } from "./health-service/health.module.js";
 import { IncomesModule } from "./incomes-service/incomes.module.js";
 import { RequestIdMiddleware } from "./middleware/request-id.middleware.js";
@@ -44,7 +47,9 @@ declare module "@orpc/nest" {
 					interceptors: [
 						onError((error: unknown) => {
 							console.error("[oRPC]", error);
-							captureException(error);
+							if (shouldCaptureException(error)) {
+								captureException(error);
+							}
 						}),
 					],
 				};

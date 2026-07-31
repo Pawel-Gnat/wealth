@@ -27,6 +27,7 @@ export const init = (config: ObservabilityInitConfig) => {
 export const {
 	logger,
 	captureException,
+	getRequestId,
 	setRequestId,
 	clearRequestId,
 	setUserId,

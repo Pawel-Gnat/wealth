@@ -3,7 +3,11 @@ import {
 	AUTH_CSRF_HEADER_VALUE,
 	REQUEST_ID_HEADER_NAME,
 } from "@repo/common/constants";
-import { clearRequestId, setRequestId } from "@repo/observability/browser";
+import {
+	clearRequestId,
+	getRequestId,
+	setRequestId,
+} from "@repo/observability/browser";
 import { reportClientError } from "@/shared/helpers/controlled-fetch";
 import {
 	clearAuthSession,
@@ -74,9 +78,13 @@ export const orpcTransportFetch = async (
 	init?: RequestInit,
 ): Promise<Response> => {
 	const requestUrl = String(input);
-	const requestId = crypto.randomUUID();
+	const existingRequestId = getRequestId();
+	const requestId = existingRequestId ?? crypto.randomUUID();
+	const ownsRequestId = existingRequestId === undefined;
 
-	setRequestId(requestId);
+	if (ownsRequestId) {
+		setRequestId(requestId);
+	}
 
 	try {
 		let response = await fetch(
@@ -112,6 +120,8 @@ export const orpcTransportFetch = async (
 		reportClientError(error);
 		throw error;
 	} finally {
-		clearRequestId();
+		if (ownsRequestId) {
+			clearRequestId(requestId);
+		}
 	}
 };
