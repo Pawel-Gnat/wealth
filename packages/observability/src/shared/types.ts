@@ -30,9 +30,16 @@ export type ErrorSink = {
 	) => void;
 };
 
+export type BetterStackConfig = {
+	sourceToken: string;
+	ingestingHost: string;
+	errorsDsn: string;
+};
+
 export type ObservabilityInitConfig = {
 	service: ObservabilityService;
 	environment: string;
+	betterStack?: BetterStackConfig;
 	logSink?: LogSink;
 	errorSink?: ErrorSink;
 };

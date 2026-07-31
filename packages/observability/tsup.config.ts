@@ -8,4 +8,11 @@ export default defineConfig({
 	sourcemap: true,
 	dts: true,
 	treeshake: true,
+	external: [
+		"@logtail/browser",
+		"@logtail/node",
+		"@sentry/browser",
+		"@sentry/node",
+		"node:async_hooks",
+	],
 });

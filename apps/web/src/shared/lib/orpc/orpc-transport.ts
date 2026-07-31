@@ -1,7 +1,9 @@
 import {
 	AUTH_CSRF_HEADER_NAME,
 	AUTH_CSRF_HEADER_VALUE,
+	REQUEST_ID_HEADER_NAME,
 } from "@repo/common/constants";
+import { clearRequestId, setRequestId } from "@repo/observability/browser";
 import { reportClientError } from "@/shared/helpers/controlled-fetch";
 import {
 	clearAuthSession,
@@ -40,6 +42,7 @@ const shouldAttemptRefresh = (requestUrl: string): boolean => {
 
 const createRequestInit = (
 	requestUrl: string,
+	requestId: string,
 	init?: RequestInit,
 ): RequestInit => {
 	const headers = new Headers(init?.headers);
@@ -52,6 +55,8 @@ const createRequestInit = (
 	if (COOKIE_AUTH_CSRF_PATHS.has(getRequestPathname(requestUrl))) {
 		headers.set(AUTH_CSRF_HEADER_NAME, AUTH_CSRF_HEADER_VALUE);
 	}
+
+	headers.set(REQUEST_ID_HEADER_NAME, requestId);
 
 	if (typeof window !== "undefined") {
 		headers.set("X-Timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -69,9 +74,15 @@ export const orpcTransportFetch = async (
 	init?: RequestInit,
 ): Promise<Response> => {
 	const requestUrl = String(input);
+	const requestId = crypto.randomUUID();
+
+	setRequestId(requestId);
 
 	try {
-		let response = await fetch(input, createRequestInit(requestUrl, init));
+		let response = await fetch(
+			input,
+			createRequestInit(requestUrl, requestId, init),
+		);
 
 		if (
 			response.status === 401 &&
@@ -81,7 +92,10 @@ export const orpcTransportFetch = async (
 			const refreshedToken = await refreshAccessToken();
 
 			if (refreshedToken) {
-				response = await fetch(input, createRequestInit(requestUrl, init));
+				response = await fetch(
+					input,
+					createRequestInit(requestUrl, requestId, init),
+				);
 			} else if (!isPublicAuthRoute(requestUrl)) {
 				clearAuthSession();
 			}
@@ -97,5 +111,7 @@ export const orpcTransportFetch = async (
 	} catch (error) {
 		reportClientError(error);
 		throw error;
+	} finally {
+		clearRequestId();
 	}
 };

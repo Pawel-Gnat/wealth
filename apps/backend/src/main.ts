@@ -3,6 +3,7 @@ import { NestFactory } from "@nestjs/core";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { rpcContract } from "@repo/api/contracts";
+import { REQUEST_ID_HEADER_NAME } from "@repo/common/constants";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import { AppModule } from "./app.module.js";
@@ -46,6 +47,7 @@ async function bootstrap() {
 			"Content-Type",
 			"X-Timezone",
 			"X-Requested-With",
+			REQUEST_ID_HEADER_NAME,
 		],
 	});
 

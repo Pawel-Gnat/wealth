@@ -40,6 +40,7 @@
 		"@orpc/zod": "^1.14.0",
 		"@repo/api": "workspace:*",
 		"@repo/common": "workspace:*",
+		"@repo/observability": "workspace:*",
 		"@sentry/nestjs": "^9.47.1",
 		"@sentry/profiling-node": "^9.47.1",
 		"bcrypt": "^6.0.0",

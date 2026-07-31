@@ -22,6 +22,12 @@
 		"format": "biome check --write .",
 		"check-types": "tsc --noEmit"
 	},
+	"dependencies": {
+		"@logtail/browser": "^0.5.8",
+		"@logtail/node": "^0.5.8",
+		"@sentry/browser": "^9.47.1",
+		"@sentry/node": "^9.47.1"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
 		"@repo/biome-config": "workspace:*",
