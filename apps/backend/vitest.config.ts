@@ -14,6 +14,7 @@ export default defineConfig({
 		root: "./",
 		include: ["src/**/*.spec.ts"],
 		globalSetup: ["./src/test/setup.ts"],
+		setupFiles: ["./src/test/setup-observability.ts"],
 	},
 	plugins: [
 		swc.vite({

@@ -1,4 +1,4 @@
-import { logger } from "@repo/observability/browser";
+import { AUTH_OBSERVABILITY_EVENTS, logger } from "@repo/observability/browser";
 import { delay } from "@/shared/helpers/delay";
 import {
 	publishAuthTabSyncMessage,
@@ -85,7 +85,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 		return navigator.locks.request(LOCK_NAME, refreshWithRetry);
 	}
 
-	logger.warn("auth.refresh.web-locks-unavailable");
+	logger.warn(AUTH_OBSERVABILITY_EVENTS.refreshWebLocksUnavailable);
 
 	return withRefreshMutex(refreshWithRetry);
 };

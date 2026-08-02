@@ -1,18 +1,18 @@
 import {
 	Injectable,
-	Logger,
 	type OnModuleDestroy,
 	type OnModuleInit,
 } from "@nestjs/common";
 import { sseEventSchema } from "@repo/api/schemas";
+import { SSE_OBSERVABILITY_EVENTS } from "@repo/observability/node";
 import { RedisService } from "../redis-service/redis.service.js";
+import { logSseEvent } from "../shared/observability/log-event.js";
 import { userIdFromSseChannel } from "./helpers/sse-channels.js";
 import { filterConnectionsForEvent } from "./helpers/sse-event-filter.js";
 import { SseConnectionRegistry } from "./sse-connection-registry.service.js";
 
 @Injectable()
 export class SseSubscriber implements OnModuleInit, OnModuleDestroy {
-	private readonly logger = new Logger(SseSubscriber.name);
 	private unsubscribeMessage: (() => void) | null = null;
 
 	constructor(
@@ -43,13 +43,13 @@ export class SseSubscriber implements OnModuleInit, OnModuleDestroy {
 		try {
 			parsed = JSON.parse(message);
 		} catch {
-			this.logger.warn(`Ignored malformed SSE JSON on ${channel}`);
+			logSseEvent(SSE_OBSERVABILITY_EVENTS.frameMalformed);
 			return;
 		}
 
 		const result = sseEventSchema.safeParse(parsed);
 		if (!result.success) {
-			this.logger.warn(`Ignored invalid SSE envelope on ${channel}`);
+			logSseEvent(SSE_OBSERVABILITY_EVENTS.envelopeInvalid);
 			return;
 		}
 

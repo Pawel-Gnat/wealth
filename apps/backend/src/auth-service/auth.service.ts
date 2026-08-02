@@ -1,10 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import {
-	Inject,
-	Injectable,
-	Logger,
-	UnauthorizedException,
-} from "@nestjs/common";
+import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { ORPCError } from "@orpc/server";
@@ -22,6 +17,7 @@ import {
 	REFRESH_TOKEN_COOKIE_PATH,
 	REFRESH_TOKEN_EXPIRES_IN_DAYS,
 } from "@repo/common/constants";
+import { AUTH_OBSERVABILITY_EVENTS } from "@repo/observability/node";
 import * as bcrypt from "bcrypt";
 import { addDays } from "date-fns";
 import { and, eq, gt, isNull, lt } from "drizzle-orm";
@@ -30,6 +26,7 @@ import type { Request, Response } from "express";
 import { ulid } from "ulid";
 import { DBS } from "../database-service/constants.js";
 import { refreshTokensTable } from "../database-service/tables/index.js";
+import { logAuthEvent } from "../shared/observability/log-event.js";
 import { SsePublisher } from "../sse-service/sse-publisher.service.js";
 import { UsersService } from "../users-service/users.service.js";
 
@@ -62,8 +59,6 @@ export class RefreshTokenReuseError extends UnauthorizedException {
 
 @Injectable()
 export class AuthService {
-	private readonly logger = new Logger(AuthService.name);
-
 	constructor(
 		private usersService: UsersService,
 		private jwtService: JwtService,
@@ -98,6 +93,7 @@ export class AuthService {
 			session.refreshExpiresAt,
 		);
 
+		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.signInSucceeded);
 		return { data: { token: session.accessToken } };
 	}
 
@@ -114,6 +110,7 @@ export class AuthService {
 			session.refreshExpiresAt,
 		);
 
+		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.refreshSucceeded);
 		return { data: { token: session.accessToken } };
 	}
 
@@ -131,6 +128,7 @@ export class AuthService {
 
 		this.clearRefreshTokenCookie(response);
 
+		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.logoutSucceeded);
 		return { data: { message: "logged_out" } };
 	}
 
@@ -357,6 +355,7 @@ export class AuthService {
 		}
 		const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
 		await this.usersService.createUser(input.email, passwordHash);
+		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.signUpSucceeded);
 		return { data: { message: "user_created" } };
 	}
 
@@ -417,11 +416,10 @@ export class AuthService {
 	}) {
 		try {
 			await this.ssePublisher.publishAuthSessionRevoked(input);
-		} catch (error) {
-			this.logger.warn(
-				`Failed to publish auth.session-revoked: ${
-					error instanceof Error ? error.message : String(error)
-				}`,
+		} catch {
+			logAuthEvent(
+				AUTH_OBSERVABILITY_EVENTS.sessionRevokedPublishFailed,
+				"warn",
 			);
 		}
 	}

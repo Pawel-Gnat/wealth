@@ -26,6 +26,7 @@ import {
 	calculateDocumentTotalAmount,
 	mapPayloadLineItemsToInsertRows,
 } from "../shared/document/document-line-items.helpers.js";
+import { logDocumentSucceeded } from "../shared/observability/log-event.js";
 
 @Injectable()
 export class IncomesService {
@@ -123,6 +124,7 @@ export class IncomesService {
 			);
 		});
 
+		logDocumentSucceeded("income", "create");
 		return {
 			data: {
 				message: INCOME_CREATED_MESSAGE,
@@ -186,6 +188,7 @@ export class IncomesService {
 			);
 		});
 
+		logDocumentSucceeded("income", "update");
 		return {
 			data: {
 				message: INCOME_UPDATED_MESSAGE,
@@ -211,6 +214,7 @@ export class IncomesService {
 			throw new Error("Income not found");
 		}
 
+		logDocumentSucceeded("income", "delete");
 		return {
 			data: {
 				message: INCOME_DELETED_MESSAGE,

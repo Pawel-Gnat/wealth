@@ -2,6 +2,7 @@ import {
 	EXPENSE_UPDATED_MESSAGE,
 	INCOME_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
+import { getDocumentObservabilityEvents } from "@repo/observability/browser";
 import { APP_ROUTES } from "@/app/routes";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
@@ -19,11 +20,7 @@ export const DOCUMENT_CONFIG = {
 		queryKeys: queryKeys.expenses,
 		client: orpcClient.expenses,
 		updatedMessage: EXPENSE_UPDATED_MESSAGE,
-		events: {
-			create: "expense.create.succeeded",
-			update: "expense.update.succeeded",
-			delete: "expense.delete.succeeded",
-		},
+		events: getDocumentObservabilityEvents("expense"),
 		toast: {
 			created: "toast.success.expense_created",
 			updated: "toast.success.expense_updated",
@@ -43,11 +40,7 @@ export const DOCUMENT_CONFIG = {
 		queryKeys: queryKeys.incomes,
 		client: orpcClient.incomes,
 		updatedMessage: INCOME_UPDATED_MESSAGE,
-		events: {
-			create: "income.create.succeeded",
-			update: "income.update.succeeded",
-			delete: "income.delete.succeeded",
-		},
+		events: getDocumentObservabilityEvents("income"),
 		toast: {
 			created: "toast.success.income_created",
 			updated: "toast.success.income_updated",

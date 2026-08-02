@@ -1,5 +1,9 @@
 import type { SignUpPayload, SignUpResponse } from "@repo/api/schemas";
-import { logger, runWithRequestId } from "@repo/observability/browser";
+import {
+	AUTH_OBSERVABILITY_EVENTS,
+	logger,
+	runWithRequestId,
+} from "@repo/observability/browser";
 import { useMutation } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 
@@ -18,7 +22,7 @@ export const useSignUp = ({ onSuccess, onError }: UseSignUpProps = {}) => {
 				const data = await controlledAsync(() =>
 					orpcClient.user.signUp(payload),
 				);
-				logger.info("auth.sign-up.succeeded");
+				logger.info(AUTH_OBSERVABILITY_EVENTS.signUpSucceeded);
 				return data;
 			}),
 		onSuccess: (data) => {

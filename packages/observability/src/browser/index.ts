@@ -35,6 +35,19 @@ export const {
 export const runWithRequestId = createRunWithRequestId(observability);
 
 export type {
+	AuthObservabilityEvent,
+	DocumentMutationEvent,
+	DocumentRecordKind,
+	SseObservabilityEvent,
+} from "../shared/observability-events.js";
+
+export {
+	AUTH_OBSERVABILITY_EVENTS,
+	DOCUMENT_OBSERVABILITY_EVENTS,
+	getDocumentObservabilityEvents,
+	SSE_OBSERVABILITY_EVENTS,
+} from "../shared/observability-events.js";
+export type {
 	BetterStackConfig,
 	ObservabilityInitConfig,
 	ObservabilityService,

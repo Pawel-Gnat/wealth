@@ -1,6 +1,6 @@
 import type { SseEvent } from "@repo/api/schemas";
 import { sseEventSchema } from "@repo/api/schemas";
-import { logger } from "@repo/observability/browser";
+import { logger, SSE_OBSERVABILITY_EVENTS } from "@repo/observability/browser";
 import { clearAuthSession } from "@/shared/lib/auth/auth-session";
 
 export const dispatchSseMessage = (raw: string): SseEvent | null => {
@@ -8,13 +8,13 @@ export const dispatchSseMessage = (raw: string): SseEvent | null => {
 	try {
 		parsed = JSON.parse(raw);
 	} catch {
-		logger.warn("sse.frame.malformed");
+		logger.warn(SSE_OBSERVABILITY_EVENTS.frameMalformed);
 		return null;
 	}
 
 	const result = sseEventSchema.safeParse(parsed);
 	if (!result.success) {
-		logger.warn("sse.envelope.invalid");
+		logger.warn(SSE_OBSERVABILITY_EVENTS.envelopeInvalid);
 		return null;
 	}
 

@@ -26,6 +26,7 @@ import {
 	calculateDocumentTotalAmount,
 	mapPayloadLineItemsToInsertRows,
 } from "../shared/document/document-line-items.helpers.js";
+import { logDocumentSucceeded } from "../shared/observability/log-event.js";
 
 @Injectable()
 export class ExpensesService {
@@ -123,6 +124,7 @@ export class ExpensesService {
 			);
 		});
 
+		logDocumentSucceeded("expense", "create");
 		return {
 			data: {
 				message: EXPENSE_CREATED_MESSAGE,
@@ -186,6 +188,7 @@ export class ExpensesService {
 			);
 		});
 
+		logDocumentSucceeded("expense", "update");
 		return {
 			data: {
 				message: EXPENSE_UPDATED_MESSAGE,
@@ -211,6 +214,7 @@ export class ExpensesService {
 			throw new Error("Expense not found");
 		}
 
+		logDocumentSucceeded("expense", "delete");
 		return {
 			data: {
 				message: EXPENSE_DELETED_MESSAGE,
