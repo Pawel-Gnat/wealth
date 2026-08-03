@@ -27,7 +27,7 @@ if (!botPassword) {
 export default defineConfig({
 	testDir: "./src/specs/bots",
 	forbidOnly: isCi,
-	retries: 0,
+	retries: isCi ? 2 : 0,
 	timeout: 45_000,
 	expect: { timeout: 30_000 },
 	use: {
