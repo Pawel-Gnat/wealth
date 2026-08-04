@@ -81,11 +81,12 @@ export const withRefreshMutex = async (
 };
 
 export const refreshAccessToken = async (): Promise<string | null> => {
-	if (typeof navigator !== "undefined" && navigator.locks?.request) {
-		return navigator.locks.request(LOCK_NAME, refreshWithRetry);
-	}
+	return withRefreshMutex(async () => {
+		if (typeof navigator !== "undefined" && navigator.locks?.request) {
+			return navigator.locks.request(LOCK_NAME, refreshWithRetry);
+		}
 
-	logger.warn(AUTH_OBSERVABILITY_EVENTS.refreshWebLocksUnavailable);
-
-	return withRefreshMutex(refreshWithRetry);
+		logger.warn(AUTH_OBSERVABILITY_EVENTS.refreshWebLocksUnavailable);
+		return refreshWithRetry();
+	});
 };

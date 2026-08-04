@@ -11,6 +11,7 @@
   - `session-ready` — after sign-in, peer tabs (often still on the login screen, without SSE) refresh under the Web Lock to pick up the shared cookie session
   - `refresh-done` — hints peers that a refresh already succeeded (retry without long delay)
   - Do **not** broadcast local `clear` for logout; peer logout / revocation UI sync is SSE-only.
+- **Refresh single-flight:** In-tab parallel refresh callers share one promise (`withRefreshMutex`). Web Lock serializes refresh across tabs of the same origin; the mutex always wraps the lock so one tab does not run N full refresh attempts for N concurrent 401s.
 - **Degradation:** Redis or SSE unavailable must not fail logout HTTP. Peers without a live stream converge on page reload or when the access JWT expires (≤15m) and refresh fails / returns 401.
 
 **Consequences:**
