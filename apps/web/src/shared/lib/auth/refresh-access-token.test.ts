@@ -1,3 +1,4 @@
+import { AUTH_OBSERVABILITY_EVENTS, logger } from "@repo/observability/browser";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	refreshAccessToken,
@@ -41,42 +42,83 @@ const createExclusiveLockStub = () => {
 describe("refreshAccessToken", () => {
 	const parallelCallers = 5;
 
-	beforeEach(() => {
-		Object.defineProperty(navigator, "locks", {
-			configurable: true,
-			value: createExclusiveLockStub(),
-			writable: true,
-		});
-		refreshAccessTokenRawMock.mockReset();
-	});
-
 	afterEach(() => {
 		resetRefreshMutex();
 	});
 
-	it("shares one raw refresh across parallel callers when locks exist", async () => {
-		refreshAccessTokenRawMock.mockResolvedValue("token-1");
+	describe("when navigator.locks is available", () => {
+		let locks: ReturnType<typeof createExclusiveLockStub>;
 
-		const results = await Promise.all(
-			Array.from({ length: parallelCallers }, () => refreshAccessToken()),
-		);
+		beforeEach(() => {
+			locks = createExclusiveLockStub();
+			Object.defineProperty(navigator, "locks", {
+				configurable: true,
+				value: locks,
+				writable: true,
+			});
+			refreshAccessTokenRawMock.mockReset();
+		});
 
-		expect(results).toEqual(
-			Array.from({ length: parallelCallers }, () => "token-1"),
-		);
-		expect(refreshAccessTokenRawMock).toHaveBeenCalledTimes(1);
+		it("shares one raw refresh across parallel callers", async () => {
+			refreshAccessTokenRawMock.mockResolvedValue("token-1");
+
+			const results = await Promise.all(
+				Array.from({ length: parallelCallers }, () => refreshAccessToken()),
+			);
+
+			expect(results).toEqual(
+				Array.from({ length: parallelCallers }, () => "token-1"),
+			);
+			expect(refreshAccessTokenRawMock).toHaveBeenCalledTimes(1);
+			expect(locks.request).toHaveBeenCalledTimes(1);
+		});
+
+		it("retries at most twice for a dead session across parallel callers", async () => {
+			refreshAccessTokenRawMock.mockResolvedValue(null);
+
+			const results = await Promise.all(
+				Array.from({ length: parallelCallers }, () => refreshAccessToken()),
+			);
+
+			expect(results).toEqual(
+				Array.from({ length: parallelCallers }, () => null),
+			);
+			expect(refreshAccessTokenRawMock.mock.calls.length).toBeLessThanOrEqual(
+				2,
+			);
+		});
 	});
 
-	it("retries at most twice for a dead session across parallel callers", async () => {
-		refreshAccessTokenRawMock.mockResolvedValue(null);
+	describe("when navigator.locks is unavailable", () => {
+		beforeEach(() => {
+			Object.defineProperty(navigator, "locks", {
+				configurable: true,
+				value: undefined,
+				writable: true,
+			});
+			refreshAccessTokenRawMock.mockReset();
+			vi.spyOn(logger, "warn").mockImplementation(() => undefined);
+		});
 
-		const results = await Promise.all(
-			Array.from({ length: parallelCallers }, () => refreshAccessToken()),
-		);
+		afterEach(() => {
+			vi.mocked(logger.warn).mockRestore();
+		});
 
-		expect(results).toEqual(
-			Array.from({ length: parallelCallers }, () => null),
-		);
-		expect(refreshAccessTokenRawMock.mock.calls.length).toBeLessThanOrEqual(2);
+		it("shares one raw refresh and warns once across parallel callers", async () => {
+			refreshAccessTokenRawMock.mockResolvedValue("token-1");
+
+			const results = await Promise.all(
+				Array.from({ length: parallelCallers }, () => refreshAccessToken()),
+			);
+
+			expect(results).toEqual(
+				Array.from({ length: parallelCallers }, () => "token-1"),
+			);
+			expect(refreshAccessTokenRawMock).toHaveBeenCalledTimes(1);
+			expect(logger.warn).toHaveBeenCalledTimes(1);
+			expect(logger.warn).toHaveBeenCalledWith(
+				AUTH_OBSERVABILITY_EVENTS.refreshWebLocksUnavailable,
+			);
+		});
 	});
 });

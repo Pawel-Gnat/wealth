@@ -20,6 +20,10 @@ export const persistAccessToken = (token: string): void => {
 };
 
 export const clearAuthSession = (): void => {
+	if (accessToken === null) {
+		return;
+	}
+
 	accessToken = null;
 	onUnauthorized?.();
 };

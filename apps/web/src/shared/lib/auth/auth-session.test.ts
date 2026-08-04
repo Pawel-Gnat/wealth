@@ -35,5 +35,16 @@ describe("auth-session", () => {
 			expect(getAccessToken()).toBeNull();
 			expect(onUnauthorized).toHaveBeenCalledOnce();
 		});
+
+		it("does not notify again when session is already cleared", () => {
+			const onUnauthorized = vi.fn();
+			persistAccessToken("token");
+			configureAuthSession({ onUnauthorized });
+
+			clearAuthSession();
+			clearAuthSession();
+
+			expect(onUnauthorized).toHaveBeenCalledOnce();
+		});
 	});
 });
