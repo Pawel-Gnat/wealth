@@ -34,15 +34,16 @@ describe("dispatchSseMessage", () => {
 		expect(onUnauthorized).toHaveBeenCalledOnce();
 	});
 
-	it("is safe when auth.session-revoked arrives after the session is already cleared", () => {
+	it("does not notify again when auth.session-revoked arrives after the session is already cleared", () => {
 		const onUnauthorized = vi.fn();
+		persistAccessToken("token");
 		configureAuthSession({ onUnauthorized });
 
 		dispatchSseMessage(sessionRevokedPayload);
 		dispatchSseMessage(sessionRevokedPayload);
 
 		expect(getAccessToken()).toBeNull();
-		expect(onUnauthorized).toHaveBeenCalledTimes(2);
+		expect(onUnauthorized).toHaveBeenCalledOnce();
 	});
 
 	it("clears the session for user-scoped auth.session-revoked", () => {
