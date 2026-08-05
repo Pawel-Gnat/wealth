@@ -460,6 +460,58 @@ describe("Dashboard service", () => {
 			expect(incomesByDate.get("2026-07-02")).toBe(200);
 			expect(incomesByDate.get("2026-07-03")).toBe(0);
 		});
+
+		it("excludes documents before the rolling window", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const user = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "dash-daily-outside",
+			});
+
+			await db.insert(expenseDocumentsTable).values([
+				{
+					userId: user.id,
+					totalAmount: "999",
+					expenseDate: "2026-07-08",
+				},
+				{
+					userId: user.id,
+					totalAmount: "50",
+					expenseDate: "2026-07-10",
+				},
+			]);
+
+			await db.insert(incomeDocumentsTable).values({
+				userId: user.id,
+				totalAmount: "400",
+				incomeDate: "2026-07-08",
+			});
+
+			const result = await dashboardService.getDailyChart(user.id, 7, "UTC");
+
+			const expensesByDate = new Map(
+				result.data.points.map((point) => [
+					point.date.toISOString().slice(0, 10),
+					point.expenses,
+				]),
+			);
+			const incomesByDate = new Map(
+				result.data.points.map((point) => [
+					point.date.toISOString().slice(0, 10),
+					point.incomes,
+				]),
+			);
+
+			expect(result.data.points.length).toBe(7);
+			expect(expensesByDate.has("2026-07-08")).toBe(false);
+			expect(incomesByDate.has("2026-07-08")).toBe(false);
+			expect(expensesByDate.get("2026-07-10")).toBe(50);
+			expect(
+				result.data.points.every(
+					(point) => point.expenses !== 999 && point.incomes !== 400,
+				),
+			).toBe(true);
+		});
 	});
 
 	describe("integration smoke", () => {

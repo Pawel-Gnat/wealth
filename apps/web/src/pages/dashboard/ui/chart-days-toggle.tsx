@@ -1,4 +1,8 @@
-import { type ChartDays, chartDaysValues } from "@repo/api/schemas";
+import {
+	type ChartDays,
+	chartDaysSchema,
+	chartDaysValues,
+} from "@repo/api/schemas";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ToggleGroup } from "@/shared/components";
@@ -38,8 +42,13 @@ export const ChartDaysToggle = ({
 			spacing={0}
 			value={String(value)}
 			onValueChange={(next) => {
-				if (next) {
-					onValueChange(Number(next) as ChartDays);
+				if (!next) {
+					return;
+				}
+
+				const parsed = chartDaysSchema.safeParse(Number(next));
+				if (parsed.success) {
+					onValueChange(parsed.data);
 				}
 			}}
 			items={items}
