@@ -124,6 +124,20 @@ const getDashboardCumulativeChartHandler = () => {
 	});
 };
 
+const getDashboardDailyChartHandler = () => {
+	return HttpResponse.json({
+		data: {
+			points: [
+				{
+					date: "2024-07-01T00:00:00.000Z",
+					expenses: 40,
+					incomes: 25,
+				},
+			],
+		},
+	});
+};
+
 const postAuthRefreshHandler = () => {
 	return HttpResponse.json(
 		{ error: { message: "Unauthorized" } },
@@ -150,6 +164,7 @@ export const HANDLERS = [
 	http.delete("*/incomes/:id", deleteIncomeHandler),
 	http.get("*/dashboard/widgets", getDashboardWidgetsHandler),
 	http.get("*/dashboard/cumulative-chart", getDashboardCumulativeChartHandler),
+	http.get("*/dashboard/daily-chart", getDashboardDailyChartHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),
 	http.post("*/auth/refresh", postAuthRefreshHandler),

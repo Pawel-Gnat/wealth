@@ -1,46 +1,28 @@
-import {
-	type ChartDays,
-	chartDaysValues,
-	DEFAULT_CHART_DAYS,
-} from "@repo/api/schemas";
-import { lazy, Suspense, useMemo, useState } from "react";
-import { ToggleGroup } from "@/shared/components";
+import type { ChartDays } from "@repo/api/schemas";
+import type { ReactNode } from "react";
+import { Heading2 } from "@/shared/components";
+import { ChartDaysToggle } from "./chart-days-toggle";
 import { DashboardChartLegend } from "./dashboard-chart-legend";
-import { DashboardChartSkeleton } from "./dashboard-chart-skeleton";
 
-const DashboardChart = lazy(async () => {
-	const module = await import("./dashboard-chart");
+type DashboardChartSectionProps = {
+	title: string;
+	days: ChartDays;
+	onDaysChange: (days: ChartDays) => void;
+	children: ReactNode;
+};
 
-	return { default: module.DashboardChart };
-});
-
-export const DashboardChartSection = () => {
-	const [days, setDays] = useState<ChartDays>(DEFAULT_CHART_DAYS);
-
-	const daysToggleItems = useMemo(
-		() =>
-			chartDaysValues.map((value) => ({
-				value: String(value),
-				content: String(value),
-				ariaLabel: String(value),
-			})),
-		[],
-	);
-
+export const DashboardChartSection = ({
+	title,
+	days,
+	onDaysChange,
+	children,
+}: DashboardChartSectionProps) => {
 	return (
 		<section className="flex flex-col gap-4">
-			<ToggleGroup
-				type="single"
-				variant="outline"
-				spacing={0}
-				value={String(days)}
-				onValueChange={(value) => setDays(Number(value) as ChartDays)}
-				items={daysToggleItems}
-			/>
+			<Heading2>{title}</Heading2>
+			<ChartDaysToggle value={days} onValueChange={onDaysChange} />
 			<DashboardChartLegend />
-			<Suspense fallback={<DashboardChartSkeleton />}>
-				<DashboardChart days={days} />
-			</Suspense>
+			{children}
 		</section>
 	);
 };
