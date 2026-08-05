@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import {
-	type ChartPeriod,
+	type ChartDays,
 	type DashboardChartResponse,
 	type DashboardWidgetsResponse,
 } from "@repo/api/schemas";
@@ -90,39 +90,66 @@ export class DashboardService {
 		};
 	}
 
-	async getChart(
+	async getCumulativeChart(
 		userId: string,
-		chartPeriod: ChartPeriod,
+		days: ChartDays,
 		timeZone: string,
 	): Promise<DashboardChartResponse> {
-		const today = getTodayInTimeZone(timeZone);
-		const periodStart =
-			chartPeriod === "week"
-				? this.getCurrentWeekStart(today)
-				: this.getCurrentMonthStart(today);
+		const { dates, expenseDailyTotals, incomeDailyTotals } =
+			await this.fetchChartDailySeries(userId, days, timeZone);
 
-		const [expenseDailyTotals, incomeDailyTotals] = await Promise.all([
-			this.fetchDailyTotals(userId, periodStart, today, "expense"),
-			this.fetchDailyTotals(userId, periodStart, today, "income"),
-		]);
-
-		const dates = this.enumerateDates(periodStart, today);
-
-		let expensesCumulative = 0;
-		let incomesCumulative = 0;
+		let expenses = 0;
+		let incomes = 0;
 
 		const points = dates.map((date) => {
-			expensesCumulative += expenseDailyTotals.get(date) ?? 0;
-			incomesCumulative += incomeDailyTotals.get(date) ?? 0;
+			expenses += expenseDailyTotals.get(date) ?? 0;
+			incomes += incomeDailyTotals.get(date) ?? 0;
 
 			return {
 				date: decodeDocumentDateFromStorage(date),
-				expensesCumulative,
-				incomesCumulative,
+				expenses,
+				incomes,
 			};
 		});
 
 		return { data: { points } };
+	}
+
+	async getDailyChart(
+		userId: string,
+		days: ChartDays,
+		timeZone: string,
+	): Promise<DashboardChartResponse> {
+		const { dates, expenseDailyTotals, incomeDailyTotals } =
+			await this.fetchChartDailySeries(userId, days, timeZone);
+
+		const points = dates.map((date) => ({
+			date: decodeDocumentDateFromStorage(date),
+			expenses: expenseDailyTotals.get(date) ?? 0,
+			incomes: incomeDailyTotals.get(date) ?? 0,
+		}));
+
+		return { data: { points } };
+	}
+
+	private async fetchChartDailySeries(
+		userId: string,
+		days: ChartDays,
+		timeZone: string,
+	) {
+		const today = getTodayInTimeZone(timeZone);
+		const rangeStart = this.getRollingRangeStart(today, days);
+
+		const [expenseDailyTotals, incomeDailyTotals] = await Promise.all([
+			this.fetchDailyTotals(userId, rangeStart, today, "expense"),
+			this.fetchDailyTotals(userId, rangeStart, today, "income"),
+		]);
+
+		return {
+			dates: this.enumerateDates(rangeStart, today),
+			expenseDailyTotals,
+			incomeDailyTotals,
+		};
 	}
 
 	private async fetchSumInRange(
@@ -204,12 +231,8 @@ export class DashboardService {
 		return `${today.slice(0, 7)}-01`;
 	}
 
-	private getCurrentWeekStart(today: string): string {
-		const date = decodeDocumentDateFromStorage(today);
-		const dayOfWeek = date.getUTCDay();
-		const daysFromMonday = (dayOfWeek + 6) % 7;
-
-		return this.addDaysToStoredDate(today, -daysFromMonday);
+	private getRollingRangeStart(today: string, days: ChartDays): string {
+		return this.addDaysToStoredDate(today, -(days - 1));
 	}
 
 	private getPreviousPeriodBounds(today: string): {

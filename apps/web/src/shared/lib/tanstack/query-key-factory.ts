@@ -1,4 +1,4 @@
-import type { ChartPeriod } from "@repo/api/schemas";
+import type { ChartDays } from "@repo/api/schemas";
 
 export const queryKeys = {
 	expenses: {
@@ -12,6 +12,9 @@ export const queryKeys = {
 	dashboard: {
 		all: () => ["dashboard"] as const,
 		widgets: () => ["dashboard", "widgets"] as const,
-		chart: (period: ChartPeriod) => ["dashboard", "chart", period] as const,
+		cumulativeChart: (days: ChartDays) =>
+			["dashboard", "cumulative-chart", days] as const,
+		dailyChart: (days: ChartDays) =>
+			["dashboard", "daily-chart", days] as const,
 	},
 };

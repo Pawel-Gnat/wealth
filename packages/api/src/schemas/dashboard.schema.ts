@@ -1,15 +1,21 @@
 import { z } from "zod";
 import { apiPayload } from "./common.schema";
 
-export const chartPeriodEnumSchema = z.enum(["month", "week"]);
-export const chartPeriodSchema = chartPeriodEnumSchema.default("month");
-export type ChartPeriod = z.infer<typeof chartPeriodEnumSchema>;
-export const chartPeriodValues = chartPeriodEnumSchema.options;
+export const DEFAULT_CHART_DAYS = 30;
+export const chartDaysValues = [7, DEFAULT_CHART_DAYS] as const;
+export type ChartDays = (typeof chartDaysValues)[number];
 
-export const dashboardChartInputSchema = z.object({
-	chartPeriod: chartPeriodSchema,
+export const chartDaysEnumSchema = z.coerce
+	.number()
+	.pipe(z.literal(chartDaysValues));
+export const chartDaysSchema = chartDaysEnumSchema.default(DEFAULT_CHART_DAYS);
+
+export const dashboardChartDaysInputSchema = z.object({
+	days: chartDaysSchema,
 });
-export type DashboardChartInput = z.infer<typeof dashboardChartInputSchema>;
+export type DashboardChartDaysInput = z.infer<
+	typeof dashboardChartDaysInputSchema
+>;
 
 export const dashboardWidgetSchema = z.object({
 	amount: z.number(),
@@ -39,8 +45,8 @@ export type DashboardWidgetsResponse = z.infer<
 
 export const dashboardChartPointSchema = z.object({
 	date: z.coerce.date(),
-	expensesCumulative: z.number(),
-	incomesCumulative: z.number(),
+	expenses: z.number(),
+	incomes: z.number(),
 });
 export type DashboardChartPoint = z.infer<typeof dashboardChartPointSchema>;
 

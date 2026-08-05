@@ -1,10 +1,10 @@
-import type { ChartPeriod } from "@repo/api/schemas";
+import type { ChartDays } from "@repo/api/schemas";
 import { useTranslation } from "react-i18next";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { getChartConfig } from "@/pages/dashboard/helpers/get-chart-config";
 import { getChartYAxisMax } from "@/pages/dashboard/helpers/get-chart-y-axis-max";
 import { toChartData } from "@/pages/dashboard/helpers/to-chart-data";
-import { useDashboardChart } from "@/pages/dashboard/hooks/use-dashboard-chart";
+import { useDashboardCumulativeChart } from "@/pages/dashboard/hooks/use-dashboard-cumulative-chart";
 import { Card, ErrorState, Text } from "@/shared/components";
 import { formatPrice } from "@/shared/helpers/price";
 import {
@@ -15,12 +15,12 @@ import {
 import { DashboardChartSkeleton } from "./dashboard-chart-skeleton";
 
 type DashboardChartProps = {
-	chartPeriod: ChartPeriod;
+	days: ChartDays;
 };
 
-export const DashboardChart = ({ chartPeriod }: DashboardChartProps) => {
+export const DashboardChart = ({ days }: DashboardChartProps) => {
 	const { t, i18n } = useTranslation();
-	const { data, isLoading, isError } = useDashboardChart({ chartPeriod });
+	const { data, isLoading, isError } = useDashboardCumulativeChart({ days });
 	const chartConfig = getChartConfig(t);
 
 	if (isLoading) {
@@ -98,15 +98,15 @@ export const DashboardChart = ({ chartPeriod }: DashboardChartProps) => {
 						/>
 						<Line
 							type="monotone"
-							dataKey="expensesCumulative"
-							stroke="var(--color-expensesCumulative)"
+							dataKey="expenses"
+							stroke="var(--color-expenses)"
 							strokeWidth={2}
 							dot={false}
 						/>
 						<Line
 							type="monotone"
-							dataKey="incomesCumulative"
-							stroke="var(--color-incomesCumulative)"
+							dataKey="incomes"
+							stroke="var(--color-incomes)"
 							strokeWidth={2}
 							dot={false}
 						/>

@@ -1,8 +1,10 @@
-import { type ChartPeriod, chartPeriodValues } from "@repo/api/schemas";
+import {
+	type ChartDays,
+	chartDaysValues,
+	DEFAULT_CHART_DAYS,
+} from "@repo/api/schemas";
 import { lazy, Suspense, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { ToggleGroup } from "@/shared/components";
-import { DEFAULT_CHART_PERIOD } from "../model/chart-period";
 import { DashboardChartLegend } from "./dashboard-chart-legend";
 import { DashboardChartSkeleton } from "./dashboard-chart-skeleton";
 
@@ -13,18 +15,16 @@ const DashboardChart = lazy(async () => {
 });
 
 export const DashboardChartSection = () => {
-	const { t } = useTranslation();
-	const [chartPeriod, setChartPeriod] =
-		useState<ChartPeriod>(DEFAULT_CHART_PERIOD);
+	const [days, setDays] = useState<ChartDays>(DEFAULT_CHART_DAYS);
 
-	const periodToggleItems = useMemo(
+	const daysToggleItems = useMemo(
 		() =>
-			chartPeriodValues.map((period) => ({
-				value: period,
-				content: t(`common.${period}`, { ns: "common" }),
-				ariaLabel: t(`common.${period}`, { ns: "common" }),
+			chartDaysValues.map((value) => ({
+				value: String(value),
+				content: String(value),
+				ariaLabel: String(value),
 			})),
-		[t],
+		[],
 	);
 
 	return (
@@ -33,17 +33,13 @@ export const DashboardChartSection = () => {
 				type="single"
 				variant="outline"
 				spacing={0}
-				value={chartPeriod}
-				onValueChange={(value) => {
-					if (value) {
-						setChartPeriod(value as ChartPeriod);
-					}
-				}}
-				items={periodToggleItems}
+				value={String(days)}
+				onValueChange={(value) => setDays(Number(value) as ChartDays)}
+				items={daysToggleItems}
 			/>
 			<DashboardChartLegend />
 			<Suspense fallback={<DashboardChartSkeleton />}>
-				<DashboardChart chartPeriod={chartPeriod} />
+				<DashboardChart days={days} />
 			</Suspense>
 		</section>
 	);

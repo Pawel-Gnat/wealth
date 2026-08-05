@@ -21,7 +21,7 @@ describe("DashboardChartSection", () => {
 		const trackChartRequest = ({ request }: { request: Request }) => {
 			const url = new URL(request.url);
 
-			if (!url.pathname.endsWith("/dashboard/chart")) {
+			if (!url.pathname.endsWith("/dashboard/cumulative-chart")) {
 				return;
 			}
 

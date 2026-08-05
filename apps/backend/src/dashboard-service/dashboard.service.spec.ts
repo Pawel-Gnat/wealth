@@ -276,22 +276,26 @@ describe("Dashboard service", () => {
 		});
 	});
 
-	describe("getChart", () => {
-		it("returns a flat zero line for month when there is no data", async () => {
+	describe("getCumulativeChart", () => {
+		it("returns a flat zero line when there is no data", async () => {
 			const user = await createTestUser(usersService, {
 				passwordHash: "hash",
 				emailTag: "dash-chart-empty",
 			});
 
-			const result = await dashboardService.getChart(user.id, "month", "UTC");
+			const result = await dashboardService.getCumulativeChart(
+				user.id,
+				30,
+				"UTC",
+			);
 
-			expect(result.data.points.length).toBe(15);
-			expect(
-				result.data.points.every((point) => point.expensesCumulative === 0),
-			).toBe(true);
-			expect(
-				result.data.points.every((point) => point.incomesCumulative === 0),
-			).toBe(true);
+			expect(result.data.points.length).toBe(30);
+			expect(result.data.points.every((point) => point.expenses === 0)).toBe(
+				true,
+			);
+			expect(result.data.points.every((point) => point.incomes === 0)).toBe(
+				true,
+			);
 		});
 
 		it("builds cumulative series with flat days between entries", async () => {
@@ -320,18 +324,22 @@ describe("Dashboard service", () => {
 				incomeDate: "2026-07-02",
 			});
 
-			const result = await dashboardService.getChart(user.id, "month", "UTC");
+			const result = await dashboardService.getCumulativeChart(
+				user.id,
+				30,
+				"UTC",
+			);
 
 			const expensesByDate = new Map(
 				result.data.points.map((point) => [
 					point.date.toISOString().slice(0, 10),
-					point.expensesCumulative,
+					point.expenses,
 				]),
 			);
 			const incomesByDate = new Map(
 				result.data.points.map((point) => [
 					point.date.toISOString().slice(0, 10),
-					point.incomesCumulative,
+					point.incomes,
 				]),
 			);
 
@@ -343,33 +351,42 @@ describe("Dashboard service", () => {
 			expect(incomesByDate.get("2026-07-03")).toBe(200);
 		});
 
-		it("limits month chart to the current calendar month through today", async () => {
+		it("uses a rolling last-30-days window through today", async () => {
 			const user = await createTestUser(usersService, {
 				passwordHash: "hash",
-				emailTag: "dash-chart-month",
+				emailTag: "dash-chart-30",
 			});
 
-			const result = await dashboardService.getChart(user.id, "month", "UTC");
+			const result = await dashboardService.getCumulativeChart(
+				user.id,
+				30,
+				"UTC",
+			);
 
+			expect(result.data.points.length).toBe(30);
 			expect(result.data.points[0]?.date).toEqual(
-				decodeDocumentDateFromStorage("2026-07-01"),
+				decodeDocumentDateFromStorage("2026-06-16"),
 			);
 			expect(result.data.points.at(-1)?.date).toEqual(
 				decodeDocumentDateFromStorage("2026-07-15"),
 			);
 		});
 
-		it("limits week chart to Monday through today", async () => {
+		it("uses a rolling last-7-days window through today", async () => {
 			const user = await createTestUser(usersService, {
 				passwordHash: "hash",
-				emailTag: "dash-chart-week",
+				emailTag: "dash-chart-7",
 			});
 
-			const result = await dashboardService.getChart(user.id, "week", "UTC");
+			const result = await dashboardService.getCumulativeChart(
+				user.id,
+				7,
+				"UTC",
+			);
 
-			expect(result.data.points.length).toBe(3);
+			expect(result.data.points.length).toBe(7);
 			expect(result.data.points[0]?.date).toEqual(
-				decodeDocumentDateFromStorage("2026-07-13"),
+				decodeDocumentDateFromStorage("2026-07-09"),
 			);
 			expect(result.data.points.at(-1)?.date).toEqual(
 				decodeDocumentDateFromStorage("2026-07-15"),
@@ -377,8 +394,76 @@ describe("Dashboard service", () => {
 		});
 	});
 
+	describe("getDailyChart", () => {
+		it("returns flat zeros when there is no data", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "dash-daily-empty",
+			});
+
+			const result = await dashboardService.getDailyChart(user.id, 7, "UTC");
+
+			expect(result.data.points.length).toBe(7);
+			expect(result.data.points.every((point) => point.expenses === 0)).toBe(
+				true,
+			);
+			expect(result.data.points.every((point) => point.incomes === 0)).toBe(
+				true,
+			);
+		});
+
+		it("returns daily amounts without accumulation", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const user = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "dash-daily-sums",
+			});
+
+			await db.insert(expenseDocumentsTable).values([
+				{
+					userId: user.id,
+					totalAmount: "100",
+					expenseDate: "2026-07-01",
+				},
+				{
+					userId: user.id,
+					totalAmount: "50",
+					expenseDate: "2026-07-03",
+				},
+			]);
+
+			await db.insert(incomeDocumentsTable).values({
+				userId: user.id,
+				totalAmount: "200",
+				incomeDate: "2026-07-02",
+			});
+
+			const result = await dashboardService.getDailyChart(user.id, 30, "UTC");
+
+			const expensesByDate = new Map(
+				result.data.points.map((point) => [
+					point.date.toISOString().slice(0, 10),
+					point.expenses,
+				]),
+			);
+			const incomesByDate = new Map(
+				result.data.points.map((point) => [
+					point.date.toISOString().slice(0, 10),
+					point.incomes,
+				]),
+			);
+
+			expect(expensesByDate.get("2026-07-01")).toBe(100);
+			expect(expensesByDate.get("2026-07-02")).toBe(0);
+			expect(expensesByDate.get("2026-07-03")).toBe(50);
+			expect(incomesByDate.get("2026-07-01")).toBe(0);
+			expect(incomesByDate.get("2026-07-02")).toBe(200);
+			expect(incomesByDate.get("2026-07-03")).toBe(0);
+		});
+	});
+
 	describe("integration smoke", () => {
-		it("returns expected response shapes for widgets and month chart", async () => {
+		it("returns expected response shapes for widgets and both charts", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
 				passwordHash: "hash",
@@ -398,7 +483,16 @@ describe("Dashboard service", () => {
 			});
 
 			const widgets = await dashboardService.getWidgets(user.id, "UTC");
-			const chart = await dashboardService.getChart(user.id, "month", "UTC");
+			const cumulativeChart = await dashboardService.getCumulativeChart(
+				user.id,
+				30,
+				"UTC",
+			);
+			const dailyChart = await dashboardService.getDailyChart(
+				user.id,
+				30,
+				"UTC",
+			);
 
 			expect(widgets.data).toMatchObject({
 				expenses: { amount: 75 },
@@ -406,10 +500,19 @@ describe("Dashboard service", () => {
 				netBalance: { amount: 50 },
 			});
 			expect(widgets.data.expenses).toHaveProperty("percentChange");
-			expect(chart.data.points.length).toBeGreaterThan(0);
-			expect(chart.data.points.at(-1)).toMatchObject({
-				expensesCumulative: 75,
-				incomesCumulative: 125,
+			expect(cumulativeChart.data.points.length).toBe(30);
+			expect(cumulativeChart.data.points.at(-1)).toMatchObject({
+				expenses: 75,
+				incomes: 125,
+			});
+			expect(dailyChart.data.points.length).toBe(30);
+			expect(
+				dailyChart.data.points.find(
+					(point) => point.date.toISOString().slice(0, 10) === "2026-07-14",
+				),
+			).toMatchObject({
+				expenses: 75,
+				incomes: 125,
 			});
 		});
 	});

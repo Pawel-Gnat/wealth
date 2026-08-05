@@ -2,13 +2,10 @@ import { describe, expect, it } from "vitest";
 import { getChartYAxisMax } from "./get-chart-y-axis-max";
 import type { DashboardChartDataPoint } from "./to-chart-data";
 
-const point = (
-	expensesCumulative: number,
-	incomesCumulative: number,
-): DashboardChartDataPoint => ({
+const point = (expenses: number, incomes: number): DashboardChartDataPoint => ({
 	label: "Jul 1",
-	expensesCumulative,
-	incomesCumulative,
+	expenses,
+	incomes,
 });
 
 describe("getChartYAxisMax", () => {
