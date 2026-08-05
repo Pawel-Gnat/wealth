@@ -110,14 +110,28 @@ const getDashboardWidgetsHandler = () => {
 	});
 };
 
-const getDashboardChartHandler = () => {
+const getDashboardCumulativeChartHandler = () => {
 	return HttpResponse.json({
 		data: {
 			points: [
 				{
 					date: "2024-07-01T00:00:00.000Z",
-					expensesCumulative: 100,
-					incomesCumulative: 50,
+					expenses: 100,
+					incomes: 50,
+				},
+			],
+		},
+	});
+};
+
+const getDashboardDailyChartHandler = () => {
+	return HttpResponse.json({
+		data: {
+			points: [
+				{
+					date: "2024-07-01T00:00:00.000Z",
+					expenses: 40,
+					incomes: 25,
 				},
 			],
 		},
@@ -149,7 +163,8 @@ export const HANDLERS = [
 	http.put("*/incomes/:id", putIncomeUpdateHandler),
 	http.delete("*/incomes/:id", deleteIncomeHandler),
 	http.get("*/dashboard/widgets", getDashboardWidgetsHandler),
-	http.get("*/dashboard/chart", getDashboardChartHandler),
+	http.get("*/dashboard/cumulative-chart", getDashboardCumulativeChartHandler),
+	http.get("*/dashboard/daily-chart", getDashboardDailyChartHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),
 	http.post("*/auth/refresh", postAuthRefreshHandler),

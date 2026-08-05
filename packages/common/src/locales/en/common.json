@@ -7,8 +7,8 @@
 		"expenses": "Expenses",
 		"incomes": "Incomes",
 		"net_balance": "Net balance",
-		"month": "Month",
-		"week": "Week"
+		"last_n_days_one": "Last {{count}} day",
+		"last_n_days_other": "Last {{count}} days"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",

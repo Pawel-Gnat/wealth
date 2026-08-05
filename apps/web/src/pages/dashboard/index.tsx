@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Heading } from "@/shared/components";
-import { DashboardChartSection } from "./ui/dashboard-chart-section";
+import { DashboardCumulativeChartSection } from "./ui/dashboard-cumulative-chart-section";
+import { DashboardDailyChartSection } from "./ui/dashboard-daily-chart-section";
 import { DashboardWidgets } from "./ui/dashboard-widgets";
 
 export const DashboardPage = () => {
@@ -10,7 +11,8 @@ export const DashboardPage = () => {
 		<div className="flex flex-col gap-6">
 			<Heading>{t("title", { ns: "dashboard" })}</Heading>
 			<DashboardWidgets />
-			<DashboardChartSection />
+			<DashboardDailyChartSection />
+			<DashboardCumulativeChartSection />
 		</div>
 	);
 };

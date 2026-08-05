@@ -23,13 +23,13 @@ describe("toChartData", () => {
 			[
 				{
 					date: new Date("2024-07-01T00:00:00.000Z"),
-					expensesCumulative: 100,
-					incomesCumulative: 50,
+					expenses: 100,
+					incomes: 50,
 				},
 				{
 					date: new Date("2024-07-02T00:00:00.000Z"),
-					expensesCumulative: 150,
-					incomesCumulative: 50,
+					expenses: 150,
+					incomes: 50,
 				},
 			],
 			"en-US",
@@ -41,16 +41,16 @@ describe("toChartData", () => {
 					"en-US",
 					{ month: "short", day: "numeric" },
 				),
-				expensesCumulative: 100,
-				incomesCumulative: 50,
+				expenses: 100,
+				incomes: 50,
 			},
 			{
 				label: new Date("2024-07-02T00:00:00.000Z").toLocaleDateString(
 					"en-US",
 					{ month: "short", day: "numeric" },
 				),
-				expensesCumulative: 150,
-				incomesCumulative: 50,
+				expenses: 150,
+				incomes: 50,
 			},
 		]);
 	});

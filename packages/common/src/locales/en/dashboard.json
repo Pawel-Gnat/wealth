@@ -4,6 +4,8 @@
 		"error": "Could not load summary."
 	},
 	"chart": {
-		"error": "Could not load chart."
+		"error": "Could not load chart.",
+		"daily_title": "Daily income & expenses",
+		"running_title": "Running totals"
 	}
 }

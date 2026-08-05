@@ -3,10 +3,7 @@ import type { DashboardChartDataPoint } from "./to-chart-data";
 export const getChartYAxisMax = (points: DashboardChartDataPoint[]) => {
 	const maxValue = Math.max(
 		0,
-		...points.flatMap((point) => [
-			point.expensesCumulative,
-			point.incomesCumulative,
-		]),
+		...points.flatMap((point) => [point.expenses, point.incomes]),
 	);
 
 	if (maxValue === 0) {

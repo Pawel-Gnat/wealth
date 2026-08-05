@@ -3,8 +3,8 @@ import { toDate } from "./to-date";
 
 export type DashboardChartDataPoint = {
 	label: string;
-	expensesCumulative: number;
-	incomesCumulative: number;
+	expenses: number;
+	incomes: number;
 };
 
 export const toChartData = (
@@ -19,7 +19,7 @@ export const toChartData = (
 				month: "short",
 				day: "numeric",
 			}),
-			expensesCumulative: point.expensesCumulative,
-			incomesCumulative: point.incomesCumulative,
+			expenses: point.expenses,
+			incomes: point.incomes,
 		};
 	});
