@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"types": ["node"],
 		"module": "esnext",
-		"moduleResolution": "bundler",
+		"moduleResolution": "bundler"
 	},
 	"include": ["src/**/*.ts", "playwright.config.ts", "playwright.bots.config.ts"]
 }

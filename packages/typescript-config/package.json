@@ -7,6 +7,7 @@
 		"access": "public"
 	},
 	"exports": {
-		"./base.json": "./base.json"
+		"./base.json": "./base.json",
+		"./library.json": "./library.json"
 	}
 }

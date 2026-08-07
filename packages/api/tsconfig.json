@@ -1,15 +1,4 @@
 {
-	"extends": "@repo/typescript-config/base.json",
-	"compilerOptions": {
-		"lib": ["ES2023"],
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"resolvePackageJsonExports": true,
-		"declaration": true,
-		"declarationMap": true,
-		"sourceMap": true,
-		"rootDir": "./src",
-		"outDir": "./dist"
-	},
-	"include": ["src/**/*.ts"]
+	"extends": "@repo/typescript-config/library.json",
+	"include": ["src"]
 }
