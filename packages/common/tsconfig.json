@@ -1,10 +1,6 @@
 {
-	"extends": "@repo/typescript-config/base.json",
+	"extends": "@repo/typescript-config/library.json",
 	"compilerOptions": {
-		"lib": ["ES2023"],
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"noEmit": true,
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"]

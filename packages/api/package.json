@@ -16,8 +16,8 @@
 		}
 	},
 	"scripts": {
-		"dev": "tsup --watch",
-		"build": "tsup --clean",
+		"dev": "tsdown --watch",
+		"build": "tsdown",
 		"lint": "biome check .",
 		"format": "biome check --write .",
 		"check-types": "tsc --noEmit"
@@ -29,8 +29,9 @@
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
 		"@repo/biome-config": "workspace:*",
+		"@repo/tsdown-config": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
-		"tsup": "catalog:",
+		"tsdown": "catalog:",
 		"typescript": "catalog:"
 	}
 }
