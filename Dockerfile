@@ -14,6 +14,7 @@ COPY packages/api/package.json ./packages/api/
 COPY packages/common/package.json ./packages/common/
 COPY packages/observability/package.json ./packages/observability/
 COPY packages/biome-config/package.json ./packages/biome-config/
+COPY packages/tsdown-config/package.json ./packages/tsdown-config/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 
 RUN --mount=type=secret,id=NODE_AUTH_TOKEN \
@@ -26,6 +27,7 @@ COPY packages/api ./packages/api
 COPY packages/common ./packages/common
 COPY packages/observability ./packages/observability
 COPY packages/biome-config ./packages/biome-config
+COPY packages/tsdown-config ./packages/tsdown-config
 COPY packages/typescript-config ./packages/typescript-config
 
 RUN pnpm --filter @repo/common build \
