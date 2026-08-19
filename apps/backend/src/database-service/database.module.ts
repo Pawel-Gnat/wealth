@@ -13,6 +13,10 @@ import { PgPoolShutdown } from "./pg-pool.shutdown.js";
 			useFactory: (configService: ConfigService) =>
 				new Pool({
 					connectionString: configService.getOrThrow("DATABASE_URL"),
+					max: 5,
+					idleTimeoutMillis: 20_000,
+					connectionTimeoutMillis: 10_000,
+					allowExitOnIdle: true,
 				}),
 			inject: [ConfigService],
 		},

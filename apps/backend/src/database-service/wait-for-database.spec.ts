@@ -43,4 +43,22 @@ describe("waitForDatabase", () => {
 		expect(ping).toHaveBeenCalledTimes(2);
 		expect(sleep).toHaveBeenCalledTimes(1);
 	});
+
+	it("fails fast when compute quota is exceeded", async () => {
+		const quotaError = Object.assign(
+			new Error(
+				"Your account or project has exceeded the compute time quota. Upgrade your plan to increase limits.",
+			),
+			{ code: "53000" },
+		);
+		const ping = vi.fn().mockRejectedValue(quotaError);
+		const sleep = vi.fn().mockResolvedValue(undefined);
+
+		await expect(
+			waitForDatabase(ping, { retries: 5, delayMs: 10, sleep }),
+		).rejects.toThrow("Database compute quota exceeded");
+
+		expect(ping).toHaveBeenCalledTimes(1);
+		expect(sleep).not.toHaveBeenCalled();
+	});
 });

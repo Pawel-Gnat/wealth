@@ -4,6 +4,38 @@ export type WaitForDatabaseOptions = {
 	sleep?: (ms: number) => Promise<void>;
 };
 
+const isDatabaseQuotaExceededError = (error: unknown): boolean => {
+	let current: unknown = error;
+
+	while (current != null) {
+		if (typeof current === "object") {
+			const candidate = current as {
+				code?: unknown;
+				message?: unknown;
+				cause?: unknown;
+			};
+
+			if (candidate.code === "53000") {
+				return true;
+			}
+
+			if (
+				typeof candidate.message === "string" &&
+				/compute time quota/i.test(candidate.message)
+			) {
+				return true;
+			}
+
+			current = candidate.cause;
+			continue;
+		}
+
+		break;
+	}
+
+	return false;
+};
+
 export const waitForDatabase = async (
 	ping: () => Promise<void>,
 	options: WaitForDatabaseOptions = {},
@@ -22,6 +54,13 @@ export const waitForDatabase = async (
 			return;
 		} catch (error) {
 			lastError = error;
+
+			if (isDatabaseQuotaExceededError(error)) {
+				throw new Error("Database compute quota exceeded", {
+					cause: error,
+				});
+			}
+
 			if (attempt < retries) {
 				await sleep(delayMs);
 			}
