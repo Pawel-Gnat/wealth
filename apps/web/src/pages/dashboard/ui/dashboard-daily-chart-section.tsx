@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import { DashboardChartSection } from "./dashboard-chart-section";
 import { DashboardChartSkeleton } from "./dashboard-chart-skeleton";
 
-const DashboardDailyChart = lazy(async () => {
-	const module = await import("./dashboard-daily-chart");
+const DailyChart = lazy(async () => {
+	const module = await import("./daily-chart/daily-chart");
 
-	return { default: module.DashboardDailyChart };
+	return { default: module.DailyChart };
 });
 
 export const DashboardDailyChartSection = () => {
@@ -21,7 +21,7 @@ export const DashboardDailyChartSection = () => {
 			onDaysChange={setDays}
 		>
 			<Suspense fallback={<DashboardChartSkeleton />}>
-				<DashboardDailyChart days={days} />
+				<DailyChart days={days} />
 			</Suspense>
 		</DashboardChartSection>
 	);

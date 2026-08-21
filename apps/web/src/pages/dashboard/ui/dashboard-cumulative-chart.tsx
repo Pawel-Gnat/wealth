@@ -5,9 +5,9 @@ import { getChartConfig } from "@/pages/dashboard/helpers/get-chart-config";
 import { getChartYAxisMax } from "@/pages/dashboard/helpers/get-chart-y-axis-max";
 import { toChartData } from "@/pages/dashboard/helpers/to-chart-data";
 import { useDashboardCumulativeChart } from "@/pages/dashboard/hooks/use-dashboard-cumulative-chart";
+import { ChartState } from "./chart-state/chart-state";
 import { DashboardChartCard } from "./dashboard-chart-card";
 import { DashboardChartGridAxes } from "./dashboard-chart-grid-axes";
-import { DashboardChartQueryState } from "./dashboard-chart-query-state";
 import { DashboardChartTooltip } from "./dashboard-chart-tooltip";
 
 type DashboardCumulativeChartProps = {
@@ -24,11 +24,7 @@ export const DashboardCumulativeChart = ({
 	const yAxisMax = getChartYAxisMax(chartData);
 
 	return (
-		<DashboardChartQueryState
-			isLoading={isLoading}
-			isError={isError}
-			hasData={Boolean(data)}
-		>
+		<ChartState isLoading={isLoading} isError={isError} hasData={Boolean(data)}>
 			<DashboardChartCard config={chartConfig}>
 				<LineChart accessibilityLayer data={chartData}>
 					<DashboardChartGridAxes
@@ -55,6 +51,6 @@ export const DashboardCumulativeChart = ({
 					/>
 				</LineChart>
 			</DashboardChartCard>
-		</DashboardChartQueryState>
+		</ChartState>
 	);
 };

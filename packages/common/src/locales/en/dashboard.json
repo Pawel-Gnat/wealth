@@ -1,6 +1,6 @@
 {
 	"title": "Dashboard",
-	"widgets": {
+	"summary": {
 		"error": "Could not load summary."
 	},
 	"chart": {

@@ -1,21 +1,21 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { ErrorState } from "@/shared/components";
-import { DashboardChartSkeleton } from "./dashboard-chart-skeleton";
+import { DashboardChartSkeleton } from "../dashboard-chart-skeleton";
 
-type DashboardChartQueryStateProps = {
+type ChartStateProps = {
 	isLoading: boolean;
 	isError: boolean;
 	hasData: boolean;
 	children: ReactNode;
 };
 
-export const DashboardChartQueryState = ({
+export const ChartState = ({
 	isLoading,
 	isError,
 	hasData,
 	children,
-}: DashboardChartQueryStateProps) => {
+}: ChartStateProps) => {
 	const { t } = useTranslation();
 
 	if (isLoading) {

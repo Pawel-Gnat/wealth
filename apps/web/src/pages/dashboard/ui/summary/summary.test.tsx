@@ -6,31 +6,31 @@ import { formatPrice } from "@/shared/helpers/price";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
-import { DashboardWidgets } from "./dashboard-widgets";
+import { Summary } from "./summary";
 
-describe("DashboardWidgets", () => {
+describe("Summary", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
 		t = (await init18nWeb({ lng: "en" })) as TFunction;
 	});
 
-	it("shows error state when widgets request fails", async () => {
+	it("shows error state when summary request fails", async () => {
 		server.use(
-			http.get("*/dashboard/widgets", () =>
+			http.get("*/dashboard/summary", () =>
 				HttpResponse.json({ message: "Server error" }, { status: 500 }),
 			),
 		);
 
-		renderWithProviders(<DashboardWidgets />);
+		renderWithProviders(<Summary />);
 
 		expect(
-			await screen.findByText(t("widgets.error", { ns: "dashboard" })),
+			await screen.findByText(t("summary.error", { ns: "dashboard" })),
 		).toBeInTheDocument();
 	});
 
-	it("renders widget amounts and percent badges", async () => {
-		renderWithProviders(<DashboardWidgets />);
+	it("renders summary amounts and percent badges", async () => {
+		renderWithProviders(<Summary />);
 
 		await waitFor(() => {
 			expect(screen.getByText(formatPrice(100, "en"))).toBeInTheDocument();
@@ -52,15 +52,15 @@ describe("DashboardWidgets", () => {
 		).toBeInTheDocument();
 	});
 
-	it("shows skeleton while widgets are loading", async () => {
+	it("shows skeleton while summary is loading", async () => {
 		server.use(
-			http.get("*/dashboard/widgets", async () => {
+			http.get("*/dashboard/summary", async () => {
 				await new Promise(() => undefined);
 				return HttpResponse.json({ data: {} });
 			}),
 		);
 
-		const { container } = renderWithProviders(<DashboardWidgets />);
+		const { container } = renderWithProviders(<Summary />);
 
 		await waitFor(() => {
 			expect(

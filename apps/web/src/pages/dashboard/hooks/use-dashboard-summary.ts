@@ -4,11 +4,11 @@ import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
-export const useDashboardWidgets = () => {
+export const useDashboardSummary = () => {
 	const query = useQuery({
-		queryKey: queryKeys.dashboard.widgets(),
+		queryKey: queryKeys.dashboard.summary(),
 		queryFn: async () => {
-			return controlledAsync(() => orpcClient.dashboard.getWidgets());
+			return controlledAsync(() => orpcClient.dashboard.getSummary());
 		},
 		select: (response) => response.data,
 	});

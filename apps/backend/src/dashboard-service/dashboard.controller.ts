@@ -10,9 +10,9 @@ export class DashboardController {
 	constructor(private readonly dashboardService: DashboardService) {}
 
 	@UseGuards(PassportJwtGuard)
-	@Implement(rpcContract.dashboard.getWidgets)
-	getWidgetsRpc() {
-		return implement(rpcContract.dashboard.getWidgets).handler(
+	@Implement(rpcContract.dashboard.getSummary)
+	getSummaryRpc() {
+		return implement(rpcContract.dashboard.getSummary).handler(
 			({ context }) => {
 				const user = context.request.user;
 				if (!user?.userId) {
@@ -21,7 +21,7 @@ export class DashboardController {
 
 				const timeZone = getClientTimeZoneFromHeaders(context.request.headers);
 
-				return this.dashboardService.getWidgets(user.userId, timeZone);
+				return this.dashboardService.getSummary(user.userId, timeZone);
 			},
 		);
 	}

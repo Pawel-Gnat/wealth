@@ -6,17 +6,17 @@ import { getChartConfig } from "@/pages/dashboard/helpers/get-chart-config";
 import { getChartYAxisMax } from "@/pages/dashboard/helpers/get-chart-y-axis-max";
 import { toChartData } from "@/pages/dashboard/helpers/to-chart-data";
 import { useDashboardDailyChart } from "@/pages/dashboard/hooks/use-dashboard-daily-chart";
-import { DashboardChartAreaGradients } from "./dashboard-chart-area-gradients";
-import { DashboardChartCard } from "./dashboard-chart-card";
-import { DashboardChartGridAxes } from "./dashboard-chart-grid-axes";
-import { DashboardChartQueryState } from "./dashboard-chart-query-state";
-import { DashboardChartTooltip } from "./dashboard-chart-tooltip";
+import { ChartState } from "../chart-state/chart-state";
+import { DashboardChartAreaGradients } from "../dashboard-chart-area-gradients";
+import { DashboardChartCard } from "../dashboard-chart-card";
+import { DashboardChartGridAxes } from "../dashboard-chart-grid-axes";
+import { DashboardChartTooltip } from "../dashboard-chart-tooltip";
 
-type DashboardDailyChartProps = {
+type DailyChartProps = {
 	days: ChartDays;
 };
 
-export const DashboardDailyChart = ({ days }: DashboardDailyChartProps) => {
+export const DailyChart = ({ days }: DailyChartProps) => {
 	const gradientId = useId().replace(/:/g, "");
 	const { t, i18n } = useTranslation();
 	const { data, isLoading, isError } = useDashboardDailyChart({ days });
@@ -27,11 +27,7 @@ export const DashboardDailyChart = ({ days }: DashboardDailyChartProps) => {
 	const yAxisMax = getChartYAxisMax(chartData);
 
 	return (
-		<DashboardChartQueryState
-			isLoading={isLoading}
-			isError={isError}
-			hasData={Boolean(data)}
-		>
+		<ChartState isLoading={isLoading} isError={isError} hasData={Boolean(data)}>
 			<DashboardChartCard config={chartConfig}>
 				<AreaChart accessibilityLayer data={chartData}>
 					<DashboardChartAreaGradients
@@ -62,6 +58,6 @@ export const DashboardDailyChart = ({ days }: DashboardDailyChartProps) => {
 					/>
 				</AreaChart>
 			</DashboardChartCard>
-		</DashboardChartQueryState>
+		</ChartState>
 	);
 };
