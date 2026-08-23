@@ -1,22 +1,18 @@
-import { Text } from "@/shared/components";
-import { formatPrice } from "@/shared/helpers/price";
+import { Price, Text } from "@/shared/components";
 import {
 	type ChartConfig,
-	ChartTooltip,
 	ChartTooltipContent,
+	ChartTooltip as ChartTooltipUI,
 } from "@/shared/lib/ui/chart";
 
-type DashboardChartTooltipProps = {
+type ChartTooltipProps = {
 	chartConfig: ChartConfig;
 	language: string;
 };
 
-export const DashboardChartTooltip = ({
-	chartConfig,
-	language,
-}: DashboardChartTooltipProps) => {
+export const ChartTooltip = ({ chartConfig, language }: ChartTooltipProps) => {
 	return (
-		<ChartTooltip
+		<ChartTooltipUI
 			content={
 				<ChartTooltipContent
 					indicator="line"
@@ -32,14 +28,14 @@ export const DashboardChartTooltip = ({
 								<Text as="span" size="xs" className="text-muted-foreground">
 									{chartConfig[name as keyof typeof chartConfig]?.label ?? name}
 								</Text>
-								<Text
+								<Price
 									as="span"
 									size="xs"
 									weight="medium"
 									className="font-mono text-foreground tabular-nums"
-								>
-									{formatPrice(Number(value), language)}
-								</Text>
+									amount={Number(value)}
+									language={language}
+								/>
 							</div>
 						</>
 					)}

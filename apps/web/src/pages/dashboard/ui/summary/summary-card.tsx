@@ -1,6 +1,5 @@
 import type { Summary, SummaryKind } from "@repo/api/schemas";
-import { Badge, Card, Text } from "@/shared/components";
-import { formatPrice } from "@/shared/helpers/price";
+import { Badge, Card, Price, Text } from "@/shared/components";
 import { Skeleton } from "@/shared/lib/ui/skeleton";
 import { formatPercentChange } from "../../helpers/format-percent-change";
 import { getTrendBadgeVariant } from "../../helpers/get-trend-badge-variant";
@@ -34,9 +33,12 @@ export const SummaryCard = ({
 							</Badge>
 						)}
 					</div>
-					<Text size="lg" weight="bold">
-						{formatPrice(summary.amount, language)}
-					</Text>
+					<Price
+						size="lg"
+						weight="bold"
+						amount={summary.amount}
+						language={language}
+					/>
 				</div>
 			}
 		/>

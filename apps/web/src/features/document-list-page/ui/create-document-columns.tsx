@@ -7,10 +7,10 @@ import {
 	ButtonDestructive,
 	ButtonSecondary,
 	Icon,
+	Price,
 	Text,
 	Tooltip,
 } from "@/shared/components";
-import { formatPrice } from "@/shared/helpers/price";
 
 type CreateDocumentColumnsProps = {
 	t: TFunction<"common">;
@@ -52,7 +52,7 @@ export function createDocumentColumns({
 			),
 			cell: ({ row }) => {
 				const amount = row.getValue<number>("totalAmount");
-				return <Text size="sm">{formatPrice(amount, language)}</Text>;
+				return <Price size="sm" amount={amount} language={language} />;
 			},
 		},
 		{

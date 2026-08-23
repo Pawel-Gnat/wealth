@@ -17,11 +17,11 @@ import {
 	Form,
 	FormDatePicker,
 	Icon,
+	Price,
 	Separator,
 	Text,
 } from "@/shared/components";
 import { getDocumentConfig } from "@/shared/config/document-config";
-import { formatPrice } from "@/shared/helpers/price";
 import { Button } from "@/shared/lib/ui/button";
 import type { RecordKind } from "@/shared/types/record-kind";
 import {
@@ -157,9 +157,13 @@ export const DocumentForm = ({
 				})}
 			</div>
 
-			<Text size="lg" weight="medium" className="text-right">
-				{formatPrice(totalAmount, i18n.language)}
-			</Text>
+			<Price
+				size="lg"
+				weight="medium"
+				className="text-right"
+				amount={totalAmount}
+				language={i18n.language}
+			/>
 		</Form>
 	);
 };

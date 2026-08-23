@@ -6,9 +6,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
-import { DashboardDailyChartSection } from "./dashboard-daily-chart-section";
+import { DailyChartSection } from "./daily-chart-section";
 
-describe("DashboardDailyChartSection", () => {
+describe("DailyChartSection", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -37,7 +37,7 @@ describe("DashboardDailyChartSection", () => {
 			}),
 		);
 
-		renderWithProviders(<DashboardDailyChartSection />);
+		renderWithProviders(<DailyChartSection />);
 
 		await user.click(
 			await screen.findByRole("radio", {
@@ -51,7 +51,7 @@ describe("DashboardDailyChartSection", () => {
 	});
 
 	it("renders days toggle, section title, and legend labels", async () => {
-		renderWithProviders(<DashboardDailyChartSection />);
+		renderWithProviders(<DailyChartSection />);
 
 		expect(
 			await screen.findByRole("heading", {

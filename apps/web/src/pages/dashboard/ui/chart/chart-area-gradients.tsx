@@ -1,12 +1,12 @@
-type DashboardChartAreaGradientsProps = {
+type ChartAreaGradientsProps = {
 	expensesGradientId: string;
 	incomesGradientId: string;
 };
 
-export const DashboardChartAreaGradients = ({
+export const ChartAreaGradients = ({
 	expensesGradientId,
 	incomesGradientId,
-}: DashboardChartAreaGradientsProps) => {
+}: ChartAreaGradientsProps) => {
 	return (
 		<defs>
 			<linearGradient id={expensesGradientId} x1="0" y1="0" x2="0" y2="1">

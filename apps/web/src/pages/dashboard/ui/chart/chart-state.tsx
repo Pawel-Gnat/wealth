@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { ErrorState } from "@/shared/components";
-import { DashboardChartSkeleton } from "../dashboard-chart-skeleton";
+import { ChartSkeleton } from "./chart-skeleton";
 
 type ChartStateProps = {
 	isLoading: boolean;
@@ -19,7 +19,7 @@ export const ChartState = ({
 	const { t } = useTranslation();
 
 	if (isLoading) {
-		return <DashboardChartSkeleton />;
+		return <ChartSkeleton />;
 	}
 
 	if (isError || !hasData) {

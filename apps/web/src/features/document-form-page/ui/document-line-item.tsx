@@ -1,8 +1,7 @@
 import type { DocumentCreatePayload } from "@repo/api/schemas";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { ButtonDestructive, FormInput, Icon, Text } from "@/shared/components";
-import { formatPrice } from "@/shared/helpers/price";
+import { ButtonDestructive, FormInput, Icon, Price } from "@/shared/components";
 import type { LineItemTitleLabelKey } from "../../../shared/model/line-item-title-label-key";
 
 type DocumentLineItemProps = {
@@ -53,9 +52,12 @@ export const DocumentLineItem = ({
 				/>
 
 				<div className="py-2 px-4 bg-input/50 rounded-3xl">
-					<Text size="sm" weight="medium">
-						{formatPrice(lineTotal, i18n.language)}
-					</Text>
+					<Price
+						size="sm"
+						weight="medium"
+						amount={lineTotal}
+						language={i18n.language}
+					/>
 				</div>
 
 				<ButtonDestructive size="icon" onClick={() => remove(index)}>

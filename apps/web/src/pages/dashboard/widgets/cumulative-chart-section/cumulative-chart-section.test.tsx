@@ -6,9 +6,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
-import { DashboardCumulativeChartSection } from "./dashboard-cumulative-chart-section";
+import { CumulativeChartSection } from "./cumulative-chart-section";
 
-describe("DashboardCumulativeChartSection", () => {
+describe("CumulativeChartSection", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -37,7 +37,7 @@ describe("DashboardCumulativeChartSection", () => {
 			}),
 		);
 
-		renderWithProviders(<DashboardCumulativeChartSection />);
+		renderWithProviders(<CumulativeChartSection />);
 
 		await user.click(
 			await screen.findByRole("radio", {
@@ -51,7 +51,7 @@ describe("DashboardCumulativeChartSection", () => {
 	});
 
 	it("renders days toggle, section title, and legend labels", async () => {
-		renderWithProviders(<DashboardCumulativeChartSection />);
+		renderWithProviders(<CumulativeChartSection />);
 
 		expect(
 			await screen.findByRole("heading", {

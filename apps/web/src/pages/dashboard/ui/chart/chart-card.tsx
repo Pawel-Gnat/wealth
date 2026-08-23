@@ -3,15 +3,12 @@ import { Card } from "@/shared/components";
 import type { ChartConfig } from "@/shared/lib/ui/chart";
 import { ChartContainer } from "@/shared/lib/ui/chart";
 
-type DashboardChartCardProps = {
+type ChartCardProps = {
 	config: ChartConfig;
 	children: ReactNode;
 };
 
-export const DashboardChartCard = ({
-	config,
-	children,
-}: DashboardChartCardProps) => {
+export const ChartCard = ({ config, children }: ChartCardProps) => {
 	return (
 		<Card
 			content={

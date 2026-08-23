@@ -14,48 +14,33 @@ const LEGEND_ITEMS = [
 	},
 ] satisfies { label: ParseKeys<"common">; className: string }[];
 
-export const DashboardChartLegend = () => {
+export const ChartLegend = () => {
 	return (
 		<div className="flex flex-wrap items-center gap-4">
 			{LEGEND_ITEMS.map((item) => (
-				<DashboardChartLegendItem key={item.label} {...item} />
+				<ChartLegendItem key={item.label} {...item} />
 			))}
 		</div>
 	);
 };
 
-type DashboardChartLegendItemProps = {
+type ChartLegendItemProps = {
 	label: (typeof LEGEND_ITEMS)[number]["label"];
 	className: (typeof LEGEND_ITEMS)[number]["className"];
 };
 
-const DashboardChartLegendItem = ({
-	label,
-	className,
-}: DashboardChartLegendItemProps) => {
+const ChartLegendItem = ({ label, className }: ChartLegendItemProps) => {
 	const { t } = useTranslation();
 
 	return (
 		<div className="flex items-center gap-2">
-			<DashboardChartLegendItemIcon className={className} />
+			<span
+				className={cn("size-2 shrink-0 rounded-[2px]", className)}
+				aria-hidden="true"
+			/>
 			<Text as="span" size="sm">
 				{t(label, { ns: "common" })}
 			</Text>
 		</div>
-	);
-};
-
-type DashboardChartLegendItemIconProps = {
-	className: (typeof LEGEND_ITEMS)[number]["className"];
-};
-
-const DashboardChartLegendItemIcon = ({
-	className,
-}: DashboardChartLegendItemIconProps) => {
-	return (
-		<span
-			className={cn("size-2 shrink-0 rounded-[2px]", className)}
-			aria-hidden="true"
-		/>
 	);
 };

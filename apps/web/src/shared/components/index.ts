@@ -7,6 +7,7 @@ export * from "./error-state";
 export * from "./form";
 export * from "./icons";
 export * from "./link";
+export * from "./price";
 export * from "./separator";
 export * from "./table";
 export * from "./toggle-group";

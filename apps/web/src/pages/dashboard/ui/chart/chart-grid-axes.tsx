@@ -1,15 +1,12 @@
 import { CartesianGrid, XAxis, YAxis } from "recharts";
-import { formatPrice } from "@/shared/helpers/price";
+import { formatPrice } from "@/shared/components/price/helpers/price.helpers";
 
-type DashboardChartGridAxesProps = {
+type ChartGridAxesProps = {
 	yAxisMax: number;
 	language: string;
 };
 
-export const DashboardChartGridAxes = ({
-	yAxisMax,
-	language,
-}: DashboardChartGridAxesProps) => {
+export const ChartGridAxes = ({ yAxisMax, language }: ChartGridAxesProps) => {
 	return (
 		<>
 			<CartesianGrid vertical={false} />

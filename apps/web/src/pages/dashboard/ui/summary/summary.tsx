@@ -3,16 +3,23 @@ import { useTranslation } from "react-i18next";
 
 import { useDashboardSummary } from "@/pages/dashboard/hooks/use-dashboard-summary";
 import { ErrorState } from "@/shared/components";
-import { SummaryCard } from "../summary-card/summary-card";
 import { getSummaryTitle } from "./helpers/summary-label.helpers";
-import { SummarySkeleton } from "./summary-skeleton";
+import { SummaryCard, SummaryCardSkeleton } from "./summary-card";
+
+const GRID_CLASS_NAME = "grid grid-cols-1 gap-4 md:grid-cols-3";
 
 export const Summary = () => {
 	const { t, i18n } = useTranslation();
 	const { data, isLoading, isError } = useDashboardSummary();
 
 	if (isLoading) {
-		return <SummarySkeleton />;
+		return (
+			<div className={GRID_CLASS_NAME}>
+				{summaryKinds.map((kind) => (
+					<SummaryCardSkeleton key={kind} />
+				))}
+			</div>
+		);
 	}
 
 	if (isError || !data) {
@@ -20,7 +27,7 @@ export const Summary = () => {
 	}
 
 	return (
-		<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+		<div className={GRID_CLASS_NAME}>
 			{summaryKinds.map((kind) => (
 				<SummaryCard
 					key={kind}

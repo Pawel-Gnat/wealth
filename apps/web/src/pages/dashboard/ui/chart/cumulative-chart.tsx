@@ -5,18 +5,16 @@ import { getChartConfig } from "@/pages/dashboard/helpers/get-chart-config";
 import { getChartYAxisMax } from "@/pages/dashboard/helpers/get-chart-y-axis-max";
 import { toChartData } from "@/pages/dashboard/helpers/to-chart-data";
 import { useDashboardCumulativeChart } from "@/pages/dashboard/hooks/use-dashboard-cumulative-chart";
-import { ChartState } from "./chart-state/chart-state";
-import { DashboardChartCard } from "./dashboard-chart-card";
-import { DashboardChartGridAxes } from "./dashboard-chart-grid-axes";
-import { DashboardChartTooltip } from "./dashboard-chart-tooltip";
+import { ChartCard } from "./chart-card";
+import { ChartGridAxes } from "./chart-grid-axes";
+import { ChartState } from "./chart-state";
+import { ChartTooltip } from "./chart-tooltip";
 
-type DashboardCumulativeChartProps = {
+type CumulativeChartProps = {
 	days: ChartDays;
 };
 
-export const DashboardCumulativeChart = ({
-	days,
-}: DashboardCumulativeChartProps) => {
+export const CumulativeChart = ({ days }: CumulativeChartProps) => {
 	const { t, i18n } = useTranslation();
 	const { data, isLoading, isError } = useDashboardCumulativeChart({ days });
 	const chartConfig = getChartConfig(t);
@@ -25,16 +23,10 @@ export const DashboardCumulativeChart = ({
 
 	return (
 		<ChartState isLoading={isLoading} isError={isError} hasData={Boolean(data)}>
-			<DashboardChartCard config={chartConfig}>
+			<ChartCard config={chartConfig}>
 				<LineChart accessibilityLayer data={chartData}>
-					<DashboardChartGridAxes
-						yAxisMax={yAxisMax}
-						language={i18n.language}
-					/>
-					<DashboardChartTooltip
-						chartConfig={chartConfig}
-						language={i18n.language}
-					/>
+					<ChartGridAxes yAxisMax={yAxisMax} language={i18n.language} />
+					<ChartTooltip chartConfig={chartConfig} language={i18n.language} />
 					<Line
 						type="monotone"
 						dataKey="expenses"
@@ -50,7 +42,7 @@ export const DashboardCumulativeChart = ({
 						dot={false}
 					/>
 				</LineChart>
-			</DashboardChartCard>
+			</ChartCard>
 		</ChartState>
 	);
 };

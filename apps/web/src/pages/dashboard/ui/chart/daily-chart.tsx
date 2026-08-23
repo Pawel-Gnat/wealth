@@ -2,15 +2,15 @@ import type { ChartDays } from "@repo/api/schemas";
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { Area, AreaChart } from "recharts";
-import { getChartConfig } from "@/pages/dashboard/helpers/get-chart-config";
-import { getChartYAxisMax } from "@/pages/dashboard/helpers/get-chart-y-axis-max";
-import { toChartData } from "@/pages/dashboard/helpers/to-chart-data";
-import { useDashboardDailyChart } from "@/pages/dashboard/hooks/use-dashboard-daily-chart";
-import { ChartState } from "../chart-state/chart-state";
-import { DashboardChartAreaGradients } from "../dashboard-chart-area-gradients";
-import { DashboardChartCard } from "../dashboard-chart-card";
-import { DashboardChartGridAxes } from "../dashboard-chart-grid-axes";
-import { DashboardChartTooltip } from "../dashboard-chart-tooltip";
+import { getChartConfig } from "../../helpers/get-chart-config";
+import { getChartYAxisMax } from "../../helpers/get-chart-y-axis-max";
+import { toChartData } from "../../helpers/to-chart-data";
+import { useDashboardDailyChart } from "../../hooks/use-dashboard-daily-chart";
+import { ChartAreaGradients } from "./chart-area-gradients";
+import { ChartCard } from "./chart-card";
+import { ChartGridAxes } from "./chart-grid-axes";
+import { ChartState } from "./chart-state";
+import { ChartTooltip } from "./chart-tooltip";
 
 type DailyChartProps = {
 	days: ChartDays;
@@ -28,20 +28,14 @@ export const DailyChart = ({ days }: DailyChartProps) => {
 
 	return (
 		<ChartState isLoading={isLoading} isError={isError} hasData={Boolean(data)}>
-			<DashboardChartCard config={chartConfig}>
+			<ChartCard config={chartConfig}>
 				<AreaChart accessibilityLayer data={chartData}>
-					<DashboardChartAreaGradients
+					<ChartAreaGradients
 						expensesGradientId={expensesGradientId}
 						incomesGradientId={incomesGradientId}
 					/>
-					<DashboardChartGridAxes
-						yAxisMax={yAxisMax}
-						language={i18n.language}
-					/>
-					<DashboardChartTooltip
-						chartConfig={chartConfig}
-						language={i18n.language}
-					/>
+					<ChartGridAxes yAxisMax={yAxisMax} language={i18n.language} />
+					<ChartTooltip chartConfig={chartConfig} language={i18n.language} />
 					<Area
 						type="monotone"
 						dataKey="expenses"
@@ -57,7 +51,7 @@ export const DailyChart = ({ days }: DailyChartProps) => {
 						strokeWidth={2}
 					/>
 				</AreaChart>
-			</DashboardChartCard>
+			</ChartCard>
 		</ChartState>
 	);
 };
