@@ -49,7 +49,7 @@ describe("Dashboard service", () => {
 		vi.useRealTimers();
 	});
 
-	describe("getWidgets", () => {
+	describe("getSummary", () => {
 		it("returns zero amounts and null percentChange when the user has no documents", async () => {
 			const user = await createTestUser(usersService, {
 				passwordHash: "hashed-password",
@@ -57,7 +57,7 @@ describe("Dashboard service", () => {
 			});
 
 			await expect(
-				dashboardService.getWidgets(user.id, "UTC"),
+				dashboardService.getSummary(user.id, "UTC"),
 			).resolves.toEqual({
 				data: {
 					expenses: { amount: 0, percentChange: null },
@@ -71,7 +71,7 @@ describe("Dashboard service", () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
 				passwordHash: "hash",
-				emailTag: "dash-widgets-sum",
+				emailTag: "dash-summary-sum",
 			});
 
 			await db.insert(expenseDocumentsTable).values([
@@ -93,7 +93,7 @@ describe("Dashboard service", () => {
 				incomeDate: "2026-07-05",
 			});
 
-			const result = await dashboardService.getWidgets(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, "UTC");
 
 			expect(result.data.expenses.amount).toBe(150);
 			expect(result.data.incomes.amount).toBe(300);
@@ -113,7 +113,7 @@ describe("Dashboard service", () => {
 				expenseDate: "2026-07-10",
 			});
 
-			const result = await dashboardService.getWidgets(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, "UTC");
 
 			expect(result.data.expenses.percentChange).toBeNull();
 		});
@@ -138,7 +138,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getWidgets(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, "UTC");
 
 			const previousDays = 15;
 			const currentDays = 15;
@@ -170,7 +170,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getWidgets(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, "UTC");
 
 			const previousDays = 15;
 			const currentDays = 15;
@@ -206,7 +206,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getWidgets(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, "UTC");
 
 			const previousDays = 28;
 			const currentDays = 31;
@@ -238,7 +238,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getWidgets(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, "UTC");
 
 			expect(result.data.expenses.amount).toBe(100);
 		});
@@ -265,8 +265,8 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const utcResult = await dashboardService.getWidgets(user.id, "UTC");
-			const warsawResult = await dashboardService.getWidgets(
+			const utcResult = await dashboardService.getSummary(user.id, "UTC");
+			const warsawResult = await dashboardService.getSummary(
 				user.id,
 				"Europe/Warsaw",
 			);
@@ -515,7 +515,7 @@ describe("Dashboard service", () => {
 	});
 
 	describe("integration smoke", () => {
-		it("returns expected response shapes for widgets and both charts", async () => {
+		it("returns expected response shapes for summary and both charts", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
 				passwordHash: "hash",
@@ -534,7 +534,7 @@ describe("Dashboard service", () => {
 				incomeDate: "2026-07-14",
 			});
 
-			const widgets = await dashboardService.getWidgets(user.id, "UTC");
+			const summary = await dashboardService.getSummary(user.id, "UTC");
 			const cumulativeChart = await dashboardService.getCumulativeChart(
 				user.id,
 				30,
@@ -546,12 +546,12 @@ describe("Dashboard service", () => {
 				"UTC",
 			);
 
-			expect(widgets.data).toMatchObject({
+			expect(summary.data).toMatchObject({
 				expenses: { amount: 75 },
 				incomes: { amount: 125 },
 				netBalance: { amount: 50 },
 			});
-			expect(widgets.data.expenses).toHaveProperty("percentChange");
+			expect(summary.data.expenses).toHaveProperty("percentChange");
 			expect(cumulativeChart.data.points.length).toBe(30);
 			expect(cumulativeChart.data.points.at(-1)).toMatchObject({
 				expenses: 75,

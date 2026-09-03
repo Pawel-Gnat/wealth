@@ -100,7 +100,7 @@ const deleteIncomeHandler = () => {
 	});
 };
 
-const getDashboardWidgetsHandler = () => {
+const getDashboardSummaryHandler = () => {
 	return HttpResponse.json({
 		data: {
 			expenses: { amount: 100, percentChange: 12.5 },
@@ -162,7 +162,7 @@ export const HANDLERS = [
 	http.post("*/incomes", postIncomeCreateHandler),
 	http.put("*/incomes/:id", putIncomeUpdateHandler),
 	http.delete("*/incomes/:id", deleteIncomeHandler),
-	http.get("*/dashboard/widgets", getDashboardWidgetsHandler),
+	http.get("*/dashboard/summary", getDashboardSummaryHandler),
 	http.get("*/dashboard/cumulative-chart", getDashboardCumulativeChartHandler),
 	http.get("*/dashboard/daily-chart", getDashboardDailyChartHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),

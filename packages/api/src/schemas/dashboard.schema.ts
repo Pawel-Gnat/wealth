@@ -17,31 +17,27 @@ export type DashboardChartDaysInput = z.infer<
 	typeof dashboardChartDaysInputSchema
 >;
 
-export const dashboardWidgetSchema = z.object({
+export const summarySchema = z.object({
 	amount: z.number(),
 	percentChange: z.number().nullable(),
 });
-export type DashboardWidget = z.infer<typeof dashboardWidgetSchema>;
+export type Summary = z.infer<typeof summarySchema>;
 
-const dashboardWidgetsDataShape = {
-	expenses: dashboardWidgetSchema,
-	incomes: dashboardWidgetSchema,
-	netBalance: dashboardWidgetSchema,
+const summaryDataShape = {
+	expenses: summarySchema,
+	incomes: summarySchema,
+	netBalance: summarySchema,
 } as const;
 
-export const dashboardWidgetsDataSchema = z.object(dashboardWidgetsDataShape);
-export type DashboardWidgetsData = z.infer<typeof dashboardWidgetsDataSchema>;
+export const summaryDataSchema = z.object(summaryDataShape);
+export type SummaryData = z.infer<typeof summaryDataSchema>;
 
-export const dashboardWidgetKindSchema = dashboardWidgetsDataSchema.keyof();
-export type DashboardWidgetKind = z.infer<typeof dashboardWidgetKindSchema>;
-export const dashboardWidgetKinds = dashboardWidgetKindSchema.options;
+export const summaryKindSchema = summaryDataSchema.keyof();
+export type SummaryKind = z.infer<typeof summaryKindSchema>;
+export const summaryKinds = summaryKindSchema.options;
 
-export const dashboardWidgetsResponseSchema = apiPayload(
-	dashboardWidgetsDataSchema,
-);
-export type DashboardWidgetsResponse = z.infer<
-	typeof dashboardWidgetsResponseSchema
->;
+export const summaryResponseSchema = apiPayload(summaryDataSchema);
+export type SummaryResponse = z.infer<typeof summaryResponseSchema>;
 
 export const dashboardChartPointSchema = z.object({
 	date: z.coerce.date(),

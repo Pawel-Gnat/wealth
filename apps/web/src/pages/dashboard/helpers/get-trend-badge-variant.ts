@@ -1,8 +1,8 @@
-import type { DashboardWidgetKind } from "@repo/api/schemas";
+import type { SummaryKind } from "@repo/api/schemas";
 import type { TrendBadgeVariant } from "@/shared/components/badge";
 
 export const getTrendBadgeVariant = (
-	kind: DashboardWidgetKind,
+	kind: SummaryKind,
 	percentChange: number,
 ): TrendBadgeVariant => {
 	if (percentChange === 0) {

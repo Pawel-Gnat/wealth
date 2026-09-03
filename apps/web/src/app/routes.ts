@@ -1,14 +1,16 @@
+export const NEW_DOCUMENT_SEGMENT = "new" as const;
+
 export const APP_ROUTES = {
 	auth: "/auth",
 	dashboard: "/",
 	incomes: {
 		list: "/incomes",
-		add: "/incomes/new",
+		add: `/incomes/${NEW_DOCUMENT_SEGMENT}`,
 		edit: (id: string): `/incomes/${string}` => `/incomes/${id}`,
 	},
 	expenses: {
 		list: "/expenses",
-		add: "/expenses/new",
+		add: `/expenses/${NEW_DOCUMENT_SEGMENT}`,
 		edit: (id: string): `/expenses/${string}` => `/expenses/${id}`,
 	},
 } as const;

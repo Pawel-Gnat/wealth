@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import {
 	type ChartDays,
 	type DashboardChartResponse,
-	type DashboardWidgetsResponse,
+	type SummaryResponse,
 } from "@repo/api/schemas";
 import {
 	decodeDocumentDateFromStorage,
@@ -22,10 +22,7 @@ import type { AmountRow } from "./types/amount-row.js";
 export class DashboardService {
 	constructor(@Inject(DBS.APP) private readonly db: NodePgDatabase) {}
 
-	async getWidgets(
-		userId: string,
-		timeZone: string,
-	): Promise<DashboardWidgetsResponse> {
+	async getSummary(userId: string, timeZone: string): Promise<SummaryResponse> {
 		const today = getTodayInTimeZone(timeZone);
 		const currentMonthStart = this.getCurrentMonthStart(today);
 		const previousPeriod = this.getPreviousPeriodBounds(today);
