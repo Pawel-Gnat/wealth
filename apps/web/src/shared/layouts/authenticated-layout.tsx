@@ -1,9 +1,9 @@
 import { Navigate, Outlet } from "react-router";
 import { useAuth } from "@/context/auth";
 import { PageLoader } from "@/widgets/page-loader";
-import { APP_ROUTES } from "./router";
+import { APP_ROUTES } from "../../app/router";
 
-export function AuthenticatedLayout() {
+export const AuthenticatedLayout = () => {
 	const { isAuthenticated, isAuthLoading } = useAuth();
 
 	if (isAuthLoading) {
@@ -15,4 +15,4 @@ export function AuthenticatedLayout() {
 	}
 
 	return <Outlet />;
-}
+};

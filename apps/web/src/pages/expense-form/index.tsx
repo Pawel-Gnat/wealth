@@ -1,3 +1,3 @@
-import { DocumentFormPage } from "@/features/document-form-page";
+import { DocumentForm } from "@/features/document-form";
 
-export const ExpenseFormPage = () => <DocumentFormPage kind="expense" />;
+export const ExpenseFormPage = () => <DocumentForm kind="expense" />;

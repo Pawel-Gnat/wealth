@@ -5,11 +5,11 @@ import { getDocumentConfig } from "@/shared/config/document-config";
 import type { RecordKind } from "@/shared/types/record-kind";
 import { DocumentTable } from "./ui/document-table";
 
-type DocumentListPageProps = {
+type DocumentListProps = {
 	kind: RecordKind;
 };
 
-export function DocumentListPage({ kind }: DocumentListPageProps) {
+export function DocumentList({ kind }: DocumentListProps) {
 	const { t } = useTranslation();
 	const config = getDocumentConfig(kind);
 

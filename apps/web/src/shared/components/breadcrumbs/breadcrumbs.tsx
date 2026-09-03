@@ -1,7 +1,8 @@
+import { I18N_RESOURCES } from "@repo/common/i18n";
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
-import { APP_ROUTES } from "@/app/router";
+import { APP_ROUTES, NEW_DOCUMENT_SEGMENT } from "@/app/routes";
 import {
 	BreadcrumbItem,
 	BreadcrumbLink,
@@ -11,66 +12,33 @@ import {
 	Breadcrumb as BreadcrumbUI,
 } from "@/shared/lib/ui/breadcrumb";
 
+type NavigationSegment =
+	keyof (typeof I18N_RESOURCES)["en"]["common"]["navigation"];
+
+const isNavigationSegment = (segment: string): segment is NavigationSegment =>
+	Object.hasOwn(I18N_RESOURCES.en.common.navigation, segment);
+
 export const Breadcrumbs = () => {
 	const { pathname } = useLocation();
 	const { t } = useTranslation();
 
 	const segments = pathname.split("/").filter(Boolean);
-	const segmentPaths = segments.map(
-		(_, index) => `/${segments.slice(0, index + 1).join("/")}`,
-	);
 
 	const breadcrumbItems = [
 		{
 			to: APP_ROUTES.dashboard,
 			label: t("navigation.dashboard", { ns: "common" }),
 		},
-		...segmentPaths.map((path) => {
-			if (path === APP_ROUTES.incomes.list) {
-				return {
-					to: APP_ROUTES.incomes.list,
-					label: t("navigation.incomes", { ns: "common" }),
-				};
-			}
-
-			if (path === APP_ROUTES.incomes.add) {
-				return {
-					to: APP_ROUTES.incomes.add,
-					label: "Add",
-				};
-			}
-
-			if (path.startsWith("/incomes/")) {
-				return {
-					to: path,
-					label: "Details",
-				};
-			}
-
-			if (path === APP_ROUTES.expenses.list) {
-				return {
-					to: APP_ROUTES.expenses.list,
-					label: t("navigation.expenses", { ns: "common" }),
-				};
-			}
-
-			if (path === APP_ROUTES.expenses.add) {
-				return {
-					to: APP_ROUTES.expenses.add,
-					label: "Add",
-				};
-			}
-
-			if (path.startsWith("/expenses/")) {
-				return {
-					to: path,
-					label: "Details",
-				};
-			}
+		...segments.map((segment, index) => {
+			const to = `/${segments.slice(0, index + 1).join("/")}`;
 
 			return {
-				to: path,
-				label: segments[segmentPaths.indexOf(path)] ?? path,
+				to,
+				label: isNavigationSegment(segment)
+					? t(`navigation.${segment}`, { ns: "common" })
+					: t(segment === NEW_DOCUMENT_SEGMENT ? "action.add" : "action.edit", {
+							ns: "common",
+						}),
 			};
 		}),
 	];

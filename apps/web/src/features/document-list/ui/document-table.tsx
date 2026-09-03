@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { ErrorState, Table } from "@/shared/components";
 import { getDocumentConfig } from "@/shared/config/document-config";
 import type { RecordKind } from "@/shared/types/record-kind";
+import { createDocumentColumns } from "../config/create-document-columns";
 import { useDocumentsList } from "../hooks/use-documents-list";
-import { createDocumentColumns } from "./create-document-columns";
 import { DocumentDeleteDialog } from "./document-delete-dialog";
 
 type DocumentTableProps = {

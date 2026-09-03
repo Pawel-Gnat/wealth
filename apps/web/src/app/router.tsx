@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router";
-import { AuthenticatedLayout } from "@/app/authenticated-layout";
-import { UnauthenticatedLayout } from "@/app/unauthenticated-layout";
 import { AuthPage } from "@/pages/auth";
+import { AuthenticatedLayout, UnauthenticatedLayout } from "@/shared/layouts";
 
 export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";
 
@@ -11,7 +10,7 @@ import { ExpensesListPage } from "@/pages/expenses";
 import { IncomeFormPage } from "@/pages/income-form";
 import { IncomesListPage } from "@/pages/incomes";
 import { DashboardLayout } from "@/widgets/dashboard-layout";
-import { APP_ROUTES } from "./routes";
+import { APP_ROUTES, NEW_DOCUMENT_SEGMENT } from "./routes";
 
 export function AppRouter() {
 	return (
@@ -22,21 +21,16 @@ export function AppRouter() {
 			<Route element={<AuthenticatedLayout />}>
 				<Route element={<DashboardLayout />}>
 					<Route path={APP_ROUTES.dashboard} element={<DashboardPage />} />
-					<Route path={APP_ROUTES.incomes.list} element={<IncomesListPage />} />
-					<Route path={APP_ROUTES.incomes.add} element={<IncomeFormPage />} />
-					<Route
-						path={APP_ROUTES.incomes.edit(":id")}
-						element={<IncomeFormPage />}
-					/>
-					<Route
-						path={APP_ROUTES.expenses.list}
-						element={<ExpensesListPage />}
-					/>
-					<Route path={APP_ROUTES.expenses.add} element={<ExpenseFormPage />} />
-					<Route
-						path={APP_ROUTES.expenses.edit(":id")}
-						element={<ExpenseFormPage />}
-					/>
+					<Route path={APP_ROUTES.incomes.list}>
+						<Route index element={<IncomesListPage />} />
+						<Route path={NEW_DOCUMENT_SEGMENT} element={<IncomeFormPage />} />
+						<Route path=":id" element={<IncomeFormPage />} />
+					</Route>
+					<Route path={APP_ROUTES.expenses.list}>
+						<Route index element={<ExpensesListPage />} />
+						<Route path={NEW_DOCUMENT_SEGMENT} element={<ExpenseFormPage />} />
+						<Route path=":id" element={<ExpenseFormPage />} />
+					</Route>
 				</Route>
 			</Route>
 		</Routes>

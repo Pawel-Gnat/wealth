@@ -4,14 +4,14 @@ import { Card, ErrorState, Heading } from "@/shared/components";
 import { getDocumentConfig } from "@/shared/config/document-config";
 import type { RecordKind } from "@/shared/types/record-kind";
 import { useDocument } from "./hooks/use-document";
-import { DocumentForm } from "./ui/document-form";
+import { DocumentForm as DocumentFormUI } from "./ui/document-form";
 import { DocumentFormSkeleton } from "./ui/document-form-skeleton";
 
-type DocumentFormPageProps = {
+type DocumentFormProps = {
 	kind: RecordKind;
 };
 
-export function DocumentFormPage({ kind }: DocumentFormPageProps) {
+export function DocumentForm({ kind }: DocumentFormProps) {
 	const { t } = useTranslation();
 	const { id } = useParams();
 	const config = getDocumentConfig(kind);
@@ -56,7 +56,7 @@ export function DocumentFormPage({ kind }: DocumentFormPageProps) {
 			</Heading>
 			<Card
 				content={
-					<DocumentForm
+					<DocumentFormUI
 						kind={kind}
 						{...(id ? { documentId: id } : {})}
 						{...(data ? { initialValues: data } : {})}

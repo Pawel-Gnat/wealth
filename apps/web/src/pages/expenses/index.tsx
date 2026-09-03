@@ -1,3 +1,3 @@
-import { DocumentListPage } from "@/features/document-list-page";
+import { DocumentList } from "@/features/document-list";
 
-export const ExpensesListPage = () => <DocumentListPage kind="expense" />;
+export const ExpensesListPage = () => <DocumentList kind="expense" />;
