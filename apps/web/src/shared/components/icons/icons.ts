@@ -10,6 +10,7 @@ import {
 	Trash,
 	TrendingDown,
 	TrendingUp,
+	Users,
 } from "lucide-react";
 
 export const icons = {
@@ -24,6 +25,7 @@ export const icons = {
 	arrowLeft: ChevronLeft,
 	arrowRight: ChevronRight,
 	calendar: CalendarIcon,
+	group: Users,
 };
 
 export type IconName = keyof typeof icons;

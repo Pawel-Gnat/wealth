@@ -13,7 +13,8 @@
 	"navigation": {
 		"dashboard": "Dashboard",
 		"incomes": "Incomes",
-		"expenses": "Expenses"
+		"expenses": "Expenses",
+		"group": "Group"
 	},
 	"pagination": {
 		"rows-per-page": "Rows per page",

@@ -9,6 +9,7 @@ export * from "./icons";
 export * from "./link";
 export * from "./price";
 export * from "./separator";
+export * from "./sidebar";
 export * from "./table";
 export * from "./toggle-group";
 export * from "./tooltip";

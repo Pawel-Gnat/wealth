@@ -13,6 +13,9 @@ export const APP_ROUTES = {
 		add: `/expenses/${NEW_DOCUMENT_SEGMENT}`,
 		edit: (id: string): `/expenses/${string}` => `/expenses/${id}`,
 	},
+	group: {
+		list: "/group",
+	},
 } as const;
 
 export type AppRoutes = typeof APP_ROUTES;
