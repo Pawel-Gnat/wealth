@@ -14,7 +14,7 @@
 		"dashboard": "Dashboard",
 		"incomes": "Incomes",
 		"expenses": "Expenses",
-		"group": "Group"
+		"group": "Group budgets"
 	},
 	"pagination": {
 		"rows-per-page": "Rows per page",

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { ButtonSecondary, Card, Heading, Icon } from "@/shared/components";
+import { BudgetsList } from "./ui/budgets-list";
 
 export const GroupDocumentsPage = () => {
 	const { t } = useTranslation();
@@ -13,11 +14,11 @@ export const GroupDocumentsPage = () => {
 					<ButtonSecondary className="w-fit ml-auto" asChild>
 						<Link to={"/"}>
 							<Icon name="add" />
-							{t("action.add", { ns: "common" })}
+							{t("action.create", { ns: "common" })}
 						</Link>
 					</ButtonSecondary>
 				}
-				content={<div>test</div>}
+				content={<BudgetsList />}
 			/>
 		</div>
 	);
