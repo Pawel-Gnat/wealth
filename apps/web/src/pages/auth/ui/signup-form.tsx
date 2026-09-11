@@ -3,8 +3,8 @@ import { type SignUpPayload, signUpPayloadSchema } from "@repo/api/schemas";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Card, Form, FormInput, Text } from "@/shared/components";
-import { useSignUp } from "../../../pages/auth/hooks/use-sign-up";
+import { Card, Form, FormInput } from "@/shared/components";
+import { useSignUp } from "../hooks/use-sign-up";
 
 type SignupFormProps = {
 	onSignedUp: () => void;
@@ -14,12 +14,12 @@ export function SignupForm({ onSignedUp }: SignupFormProps) {
 	const { t } = useTranslation();
 	const { signUp, isLoading } = useSignUp({
 		onSuccess: () => {
-			toast.success(t("toast.success.account_created", { ns: "common" }));
+			toast.success(t("toast.success.account-created", { ns: "common" }));
 			form.reset();
 			onSignedUp();
 		},
 		onError: () => {
-			toast.error(t("toast.error.account_created", { ns: "common" }));
+			toast.error(t("toast.error.account-created", { ns: "common" }));
 		},
 	});
 
@@ -38,42 +38,37 @@ export function SignupForm({ onSignedUp }: SignupFormProps) {
 
 	return (
 		<Card
-			header={
-				<>
-					<Text weight="medium">{t("signup.title", { ns: "auth" })}</Text>
-					<Text size="sm">{t("signup.description", { ns: "auth" })}</Text>
-				</>
-			}
-			content={
-				<Form
-					onSubmit={form.handleSubmit(onSubmit)}
-					submitText={t("action.signup", { ns: "common" })}
-					submitDisabled={isLoading}
-					isLoading={isLoading}
-				>
-					<FormInput
-						name="email"
-						label={t("email.label", { ns: "form" })}
-						type="email"
-						placeholder={t("email.placeholder", { ns: "form" })}
-						control={form.control}
-					/>
-					<FormInput
-						name="password"
-						label={t("password.label", { ns: "form" })}
-						type="password"
-						placeholder={t("password.placeholder", { ns: "form" })}
-						control={form.control}
-					/>
-					<FormInput
-						name="confirmPassword"
-						label={t("confirm-password.label", { ns: "form" })}
-						type="password"
-						placeholder={t("password.placeholder", { ns: "form" })}
-						control={form.control}
-					/>
-				</Form>
-			}
-		/>
+			title={t("signup.title", { ns: "auth" })}
+			subtitle={t("signup.description", { ns: "auth" })}
+		>
+			<Form
+				onSubmit={form.handleSubmit(onSubmit)}
+				submitText={t("action.signup", { ns: "common" })}
+				submitDisabled={isLoading}
+				isLoading={isLoading}
+			>
+				<FormInput
+					name="email"
+					label={t("email.label", { ns: "form" })}
+					type="email"
+					placeholder={t("email.placeholder", { ns: "form" })}
+					control={form.control}
+				/>
+				<FormInput
+					name="password"
+					label={t("password.label", { ns: "form" })}
+					type="password"
+					placeholder={t("password.placeholder", { ns: "form" })}
+					control={form.control}
+				/>
+				<FormInput
+					name="confirmPassword"
+					label={t("confirm-password.label", { ns: "form" })}
+					type="password"
+					placeholder={t("password.placeholder", { ns: "form" })}
+					control={form.control}
+				/>
+			</Form>
+		</Card>
 	);
 }

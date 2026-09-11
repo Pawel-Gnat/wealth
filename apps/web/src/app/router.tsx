@@ -1,6 +1,10 @@
 import { Route, Routes } from "react-router";
 import { AuthPage } from "@/pages/auth";
-import { AuthenticatedLayout, UnauthenticatedLayout } from "@/shared/layouts";
+import {
+	AuthenticatedLayout,
+	DashboardLayout,
+	UnauthenticatedLayout,
+} from "@/shared/layouts";
 
 export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";
 
@@ -10,7 +14,6 @@ import { ExpensesListPage } from "@/pages/expenses";
 import { GroupDocumentsPage } from "@/pages/group";
 import { IncomeFormPage } from "@/pages/income-form";
 import { IncomesListPage } from "@/pages/incomes";
-import { DashboardLayout } from "@/widgets/dashboard-layout";
 import { APP_ROUTES, NEW_DOCUMENT_SEGMENT } from "./routes";
 
 export function AppRouter() {

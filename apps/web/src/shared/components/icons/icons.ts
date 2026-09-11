@@ -1,16 +1,25 @@
 import {
+	AlertCircle,
 	CalendarIcon,
+	ChartArea,
+	ChartColumn,
+	Check,
 	ChevronLeft,
 	ChevronRight,
+	DoorOpen,
 	LayoutDashboard,
 	LoaderCircle,
 	LogOut,
+	Mail,
 	Pencil,
 	PlusCircle,
+	Scale,
 	Trash,
 	TrendingDown,
 	TrendingUp,
+	UserPlus,
 	Users,
+	X,
 } from "lucide-react";
 
 export const icons = {
@@ -25,7 +34,16 @@ export const icons = {
 	arrowLeft: ChevronLeft,
 	arrowRight: ChevronRight,
 	calendar: CalendarIcon,
+	chartBar: ChartColumn,
+	chartArea: ChartArea,
 	group: Users,
+	leave: DoorOpen,
+	addUser: UserPlus,
+	reject: X,
+	accept: Check,
+	invitation: Mail,
+	error: AlertCircle,
+	balance: Scale,
 };
 
 export type IconName = keyof typeof icons;

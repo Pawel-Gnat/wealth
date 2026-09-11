@@ -8,6 +8,6 @@ export const getSummaryTitle = (t: TFunction, kind: SummaryKind): string => {
 		case "incomes":
 			return t("common.incomes", { ns: "common" });
 		case "netBalance":
-			return t("common.net_balance", { ns: "common" });
+			return t("common.net-balance", { ns: "common" });
 	}
 };

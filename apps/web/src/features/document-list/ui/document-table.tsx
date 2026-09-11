@@ -29,7 +29,12 @@ export const DocumentTable = ({ kind }: DocumentTableProps) => {
 	);
 
 	if (isError) {
-		return <ErrorState text={t("list.error", { ns: config.i18nNamespace })} />;
+		return (
+			<ErrorState
+				title={t("list.error.title", { ns: config.i18nNamespace })}
+				description={t("list.error.description", { ns: config.i18nNamespace })}
+			/>
+		);
 	}
 
 	return (
@@ -37,7 +42,13 @@ export const DocumentTable = ({ kind }: DocumentTableProps) => {
 			<Table
 				columns={columns}
 				data={data}
-				noResultsText={t("list.no-results", { ns: config.i18nNamespace })}
+				noResultsTitle={t("list.empty.title", { ns: config.i18nNamespace })}
+				noResultsDescription={t("list.empty.description", {
+					ns: config.i18nNamespace,
+				})}
+				noResultsIcon={
+					config.i18nNamespace === "expenses" ? "expense" : "income"
+				}
 				isLoading={isLoading}
 			/>
 			{pendingDeleteId && (

@@ -25,7 +25,7 @@ describe("Summary", () => {
 		renderWithProviders(<Summary />);
 
 		expect(
-			await screen.findByText(t("summary.error", { ns: "dashboard" })),
+			await screen.findByText(t("summary.error.title", { ns: "dashboard" })),
 		).toBeInTheDocument();
 	});
 
@@ -48,8 +48,36 @@ describe("Summary", () => {
 			screen.getByText(t("common.incomes", { ns: "common" })),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText(t("common.net_balance", { ns: "common" })),
+			screen.getByText(t("common.net-balance", { ns: "common" })),
 		).toBeInTheDocument();
+		expect(
+			screen.getAllByText(t("summary.vs-previous-period", { ns: "dashboard" })),
+		).toHaveLength(2);
+	});
+
+	it("shows empty copy and no percent badge when amount is 0", async () => {
+		server.use(
+			http.get("*/dashboard/summary", () =>
+				HttpResponse.json({
+					data: {
+						expenses: { amount: 0, percentChange: 12.5 },
+						incomes: { amount: 0, percentChange: null },
+						netBalance: { amount: 0, percentChange: -3.2 },
+					},
+				}),
+			),
+		);
+
+		renderWithProviders(<Summary />);
+
+		expect(
+			await screen.findAllByText(t("summary.empty", { ns: "dashboard" })),
+		).toHaveLength(3);
+		expect(screen.queryByText("+12.5%")).not.toBeInTheDocument();
+		expect(screen.queryByText("-3.2%")).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(t("summary.vs-previous-period", { ns: "dashboard" })),
+		).not.toBeInTheDocument();
 	});
 
 	it("shows skeleton while summary is loading", async () => {

@@ -57,7 +57,7 @@ describe("SignupForm", () => {
 
 			await waitFor(() => {
 				expect(toast.success).toHaveBeenCalledWith(
-					t("toast.success.account_created", { ns: "common" }),
+					t("toast.success.account-created", { ns: "common" }),
 				);
 			});
 			expect(onSignedUp).toHaveBeenCalledTimes(1);
@@ -96,7 +96,7 @@ describe("SignupForm", () => {
 
 			await waitFor(() => {
 				expect(toast.error).toHaveBeenCalledWith(
-					t("toast.error.account_created", { ns: "common" }),
+					t("toast.error.account-created", { ns: "common" }),
 				);
 			});
 			expect(onSignedUp).not.toHaveBeenCalled();

@@ -53,6 +53,10 @@ export const TextSecondary = (props: TextProps) => (
 	<BaseText {...props} toneClassName="text-primary" />
 );
 
+export const TextMuted = (props: TextProps) => (
+	<BaseText {...props} toneClassName="text-muted-foreground" />
+);
+
 export const TextError = ({ weight = "bold", ...props }: TextProps) => (
 	<BaseText {...props} weight={weight} toneClassName="text-destructive" />
 );

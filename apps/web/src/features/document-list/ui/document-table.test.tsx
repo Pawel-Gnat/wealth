@@ -43,7 +43,7 @@ describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
 		);
 
 		renderWithProviders(<DocumentTable kind={kind} />);
-		const errorMessage = t("list.error", { ns: config.i18nNamespace });
+		const errorMessage = t("list.error.title", { ns: config.i18nNamespace });
 
 		await waitFor(() => {
 			expect(screen.getByText(errorMessage)).toBeInTheDocument();
@@ -58,7 +58,9 @@ describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
 		);
 
 		renderWithProviders(<DocumentTable kind={kind} />);
-		const noResultsMessage = t("list.no-results", { ns: config.i18nNamespace });
+		const noResultsMessage = t("list.empty.title", {
+			ns: config.i18nNamespace,
+		});
 
 		await waitFor(() => {
 			expect(screen.getByText(noResultsMessage)).toBeInTheDocument();
@@ -67,7 +69,11 @@ describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
 
 	it("renders rows when data is returned", async () => {
 		const documentDate = new Date("2024-03-01T12:00:00.000Z");
-		const formattedDate = documentDate.toLocaleDateString("en");
+		const formattedDate = documentDate.toLocaleDateString("en", {
+			day: "numeric",
+			month: "long",
+			year: "numeric",
+		});
 		const formattedAmount = new Intl.NumberFormat("en", {
 			style: "currency",
 			currency: "USD",
@@ -139,7 +145,9 @@ describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
 		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
 		const deleteButtonLabel = t("action.delete", { ns: "common" });
-		const noResultsMessage = t("list.no-results", { ns: config.i18nNamespace });
+		const noResultsMessage = t("list.empty.title", {
+			ns: config.i18nNamespace,
+		});
 		const deleteButton = await screen.findByRole("button", {
 			name: deleteButtonLabel,
 		});

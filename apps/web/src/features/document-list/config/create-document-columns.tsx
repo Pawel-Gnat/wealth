@@ -1,5 +1,8 @@
 import type { DocumentListItem } from "@repo/api/schemas";
-import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
+import {
+	decodeDocumentDateFromStorage,
+	formatDocumentDate,
+} from "@repo/common/helpers";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TFunction } from "i18next";
 import { Link } from "react-router";
@@ -28,37 +31,48 @@ export function createDocumentColumns({
 	return [
 		{
 			accessorKey: "date",
+			meta: { className: "w-full" },
 			header: () => (
-				<Text size="sm" weight="medium">
+				<Text size="xs" weight="medium">
 					{t("common.date", { ns: "common" })}
 				</Text>
 			),
 			cell: ({ row }) => {
 				return (
 					<Text size="sm">
-						{decodeDocumentDateFromStorage(
-							row.original.date,
-						).toLocaleDateString(language)}
+						{formatDocumentDate(
+							decodeDocumentDateFromStorage(row.original.date),
+							language,
+						)}
 					</Text>
 				);
 			},
 		},
 		{
 			accessorKey: "totalAmount",
+			meta: { className: "w-[1%] whitespace-nowrap" },
 			header: () => (
-				<Text size="sm" weight="medium">
+				<Text size="xs" weight="medium">
 					{t("common.amount", { ns: "common" })}
 				</Text>
 			),
 			cell: ({ row }) => {
 				const amount = row.getValue<number>("totalAmount");
-				return <Price size="sm" amount={amount} language={language} />;
+				return (
+					<Price
+						size="sm"
+						weight="medium"
+						amount={amount}
+						language={language}
+					/>
+				);
 			},
 		},
 		{
 			accessorKey: "actions",
+			meta: { className: "w-[1%] whitespace-nowrap" },
 			header: () => (
-				<Text size="sm" weight="medium" className="text-right">
+				<Text size="xs" weight="medium" className="text-right">
 					-
 					<span className="sr-only">
 						{t("common.actions", { ns: "common" })}

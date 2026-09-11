@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import {
-	type ChartDays,
 	type DashboardChartResponse,
+	type Period,
 	type SummaryResponse,
 } from "@repo/api/schemas";
 import {
@@ -89,7 +89,7 @@ export class DashboardService {
 
 	async getCumulativeChart(
 		userId: string,
-		days: ChartDays,
+		days: Period,
 		timeZone: string,
 	): Promise<DashboardChartResponse> {
 		const { dates, expenseDailyTotals, incomeDailyTotals } =
@@ -114,7 +114,7 @@ export class DashboardService {
 
 	async getDailyChart(
 		userId: string,
-		days: ChartDays,
+		days: Period,
 		timeZone: string,
 	): Promise<DashboardChartResponse> {
 		const { dates, expenseDailyTotals, incomeDailyTotals } =
@@ -131,7 +131,7 @@ export class DashboardService {
 
 	private async fetchChartDailySeries(
 		userId: string,
-		days: ChartDays,
+		days: Period,
 		timeZone: string,
 	) {
 		const today = getTodayInTimeZone(timeZone);
@@ -228,7 +228,7 @@ export class DashboardService {
 		return `${today.slice(0, 7)}-01`;
 	}
 
-	private getRollingRangeStart(today: string, days: ChartDays): string {
+	private getRollingRangeStart(today: string, days: Period): string {
 		return this.addDaysToStoredDate(today, -(days - 1));
 	}
 

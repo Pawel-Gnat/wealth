@@ -2,41 +2,39 @@ import { summaryKinds } from "@repo/api/schemas";
 import { useTranslation } from "react-i18next";
 
 import { useDashboardSummary } from "@/pages/dashboard/hooks/use-dashboard-summary";
-import { ErrorState } from "@/shared/components";
+import { Card, ErrorState } from "@/shared/components";
 import { getSummaryTitle } from "./helpers/summary-label.helpers";
-import { SummaryCard, SummaryCardSkeleton } from "./summary-card";
-
-const GRID_CLASS_NAME = "grid grid-cols-1 gap-4 md:grid-cols-3";
+import { SummaryMetric } from "./summary-metric";
 
 export const Summary = () => {
-	const { t, i18n } = useTranslation();
+	const { t } = useTranslation();
 	const { data, isLoading, isError } = useDashboardSummary();
 
-	if (isLoading) {
+	if (isError || (!isLoading && !data)) {
 		return (
-			<div className={GRID_CLASS_NAME}>
-				{summaryKinds.map((kind) => (
-					<SummaryCardSkeleton key={kind} />
-				))}
-			</div>
+			<Card>
+				<ErrorState
+					title={t("summary.error.title", { ns: "dashboard" })}
+					description={t("summary.error.description", { ns: "dashboard" })}
+				/>
+			</Card>
 		);
 	}
 
-	if (isError || !data) {
-		return <ErrorState text={t("summary.error", { ns: "dashboard" })} />;
-	}
-
 	return (
-		<div className={GRID_CLASS_NAME}>
+		<Card
+			className="p-2"
+			contentClassName="grid grid-cols-1 gap-4 md:grid-cols-3 p-1"
+		>
 			{summaryKinds.map((kind) => (
-				<SummaryCard
+				<SummaryMetric
 					key={kind}
 					kind={kind}
-					label={getSummaryTitle(t, kind)}
-					summary={data[kind]}
-					language={i18n.language}
+					title={getSummaryTitle(t, kind)}
+					summary={data?.[kind]}
+					isLoading={isLoading}
 				/>
 			))}
-		</div>
+		</Card>
 	);
 };

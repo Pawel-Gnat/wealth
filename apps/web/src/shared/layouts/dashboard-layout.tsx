@@ -8,7 +8,7 @@ import {
 	SidebarTrigger,
 	Text,
 } from "@/shared/components";
-import { Navigation } from "../navigation";
+import { Navigation } from "../widgets/navigation";
 
 export function DashboardLayout() {
 	const { logout } = useAuth();
@@ -28,7 +28,7 @@ export function DashboardLayout() {
 				<Separator orientation="vertical" />
 				<Breadcrumbs />
 			</div>
-			<div className="px-2 flex flex-col gap-4">
+			<div className="px-2 flex flex-col gap-4 mb-4">
 				<Outlet />
 			</div>
 		</Sidebar>

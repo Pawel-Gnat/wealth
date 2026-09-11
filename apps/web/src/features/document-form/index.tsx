@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
-import { Card, ErrorState, Heading } from "@/shared/components";
 import { getDocumentConfig } from "@/shared/config/document-config";
+import { PageLayout } from "@/shared/layouts";
 import type { RecordKind } from "@/shared/types/record-kind";
+import { CardState } from "@/shared/widgets/card-state";
 import { useDocument } from "./hooks/use-document";
 import { DocumentForm as DocumentFormUI } from "./ui/document-form";
-import { DocumentFormSkeleton } from "./ui/document-form-skeleton";
 
 type DocumentFormProps = {
 	kind: RecordKind;
@@ -21,48 +21,36 @@ export function DocumentForm({ kind }: DocumentFormProps) {
 		...(id ? { documentId: id } : {}),
 	});
 
-	if (isEditMode && isLoading) {
-		return (
-			<>
-				<Heading>
-					{t("single.title-edit", { ns: config.i18nNamespace })}
-				</Heading>
-				<Card content={<DocumentFormSkeleton />} />
-			</>
-		);
-	}
-
-	if (isEditMode && (isError || !data)) {
-		return (
-			<>
-				<Heading>
-					{t("single.title-edit", { ns: config.i18nNamespace })}
-				</Heading>
-				<Card
-					content={
-						<ErrorState text={t("list.error", { ns: config.i18nNamespace })} />
-					}
-				/>
-			</>
-		);
-	}
+	const title = isEditMode
+		? t("single.title-edit", { ns: config.i18nNamespace })
+		: t("single.title-create", { ns: config.i18nNamespace });
+	const description = isEditMode
+		? t("single.description-edit", { ns: config.i18nNamespace })
+		: t("single.description-create", { ns: config.i18nNamespace });
+	const errorTitle = t("single.error.title", { ns: config.i18nNamespace });
+	const errorDescription = t("single.error.description", {
+		ns: config.i18nNamespace,
+	});
 
 	return (
-		<>
-			<Heading>
-				{isEditMode
-					? t("single.title-edit", { ns: config.i18nNamespace })
-					: t("single.title-create", { ns: config.i18nNamespace })}
-			</Heading>
-			<Card
-				content={
+		<PageLayout title={title} subtitle={description}>
+			<CardState
+				inEditMode
+				data={data}
+				isError={isError}
+				isLoading={isLoading}
+				errorTitle={errorTitle}
+				errorDescription={errorDescription}
+				skeletonClassName="h-100"
+			>
+				{(document) => (
 					<DocumentFormUI
 						kind={kind}
 						{...(id ? { documentId: id } : {})}
-						{...(data ? { initialValues: data } : {})}
+						initialValues={document}
 					/>
-				}
-			/>
-		</>
+				)}
+			</CardState>
+		</PageLayout>
 	);
 }

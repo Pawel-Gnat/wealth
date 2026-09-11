@@ -1,28 +1,35 @@
-import { type ChartDays, DEFAULT_CHART_DAYS } from "@repo/api/schemas";
-import { lazy, Suspense, useState } from "react";
+import type { Period } from "@repo/api/schemas";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChartSection } from "../../ui/chart/chart-section";
-import { ChartSkeleton } from "../../ui/chart/chart-skeleton";
+import { CardState } from "@/shared/widgets/card-state";
+import { useDashboardDailyChart } from "../../hooks/use-dashboard-daily-chart";
+import { ChartToggle, type ChartType } from "../../ui/chart/chart-toggle";
+import { DailyChart } from "../../ui/chart/daily-chart";
 
-const DailyChart = lazy(async () => {
-	const module = await import("../../ui/chart/daily-chart");
+type DailyChartSectionProps = {
+	days: Period;
+};
 
-	return { default: module.DailyChart };
-});
-
-export const DailyChartSection = () => {
+export const DailyChartSection = ({ days }: DailyChartSectionProps) => {
 	const { t } = useTranslation();
-	const [days, setDays] = useState<ChartDays>(DEFAULT_CHART_DAYS);
+	const [type, setType] = useState<ChartType>("area");
+	const { data, isLoading, isError } = useDashboardDailyChart({ days });
 
 	return (
-		<ChartSection
-			title={t("chart.daily_title", { ns: "dashboard" })}
-			days={days}
-			onDaysChange={setDays}
+		<CardState
+			title={t("chart.daily-title", { ns: "dashboard" })}
+			actions={<ChartToggle value={type} onValueChange={setType} />}
+			data={data}
+			isLoading={isLoading}
+			isError={isError}
+			skeletonClassName="aspect-video max-h-80 w-full"
+			errorTitle={t("chart.error.title", { ns: "dashboard" })}
+			errorDescription={t("chart.error.description-daily", { ns: "dashboard" })}
+			emptyTitle={t("chart.empty.title", { ns: "dashboard" })}
+			emptyDescription={t("chart.empty.description", { ns: "dashboard" })}
+			emptyIcon="dashboard"
 		>
-			<Suspense fallback={<ChartSkeleton />}>
-				<DailyChart days={days} />
-			</Suspense>
-		</ChartSection>
+			{(data) => <DailyChart points={data.points} type={type} />}
+		</CardState>
 	);
 };

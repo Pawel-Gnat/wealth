@@ -2,12 +2,24 @@ import {
 	EXPENSE_UPDATED_MESSAGE,
 	INCOME_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
+import type { ParseKeys } from "@repo/common/i18n";
 import { getDocumentObservabilityEvents } from "@repo/observability/browser";
 import { APP_ROUTES } from "@/app/routes";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import type { LineItemTitleLabelKey } from "../model/line-item-title-label-key";
 import type { RecordKind } from "../types/record-kind";
+
+type DocumentToast = {
+	created: ParseKeys<"common">;
+	updated: ParseKeys<"common">;
+	createError: ParseKeys<"common">;
+	updateError: ParseKeys<"common">;
+	deleted: ParseKeys<"common">;
+	deleteError: ParseKeys<"common">;
+};
+
+const documentToast = (toast: DocumentToast): DocumentToast => toast;
 
 export const DOCUMENT_CONFIG = {
 	expense: {
@@ -21,14 +33,14 @@ export const DOCUMENT_CONFIG = {
 		client: orpcClient.expenses,
 		updatedMessage: EXPENSE_UPDATED_MESSAGE,
 		events: getDocumentObservabilityEvents("expense"),
-		toast: {
-			created: "toast.success.expense_created",
-			updated: "toast.success.expense_updated",
-			createError: "toast.error.expense_created",
-			updateError: "toast.error.expense_updated",
-			deleted: "toast.success.expense_deleted",
-			deleteError: "toast.error.expense_deleted",
-		},
+		toast: documentToast({
+			created: "toast.success.expense-created",
+			updated: "toast.success.expense-updated",
+			createError: "toast.error.expense-created",
+			updateError: "toast.error.expense-updated",
+			deleted: "toast.success.expense-deleted",
+			deleteError: "toast.error.expense-deleted",
+		}),
 	},
 	income: {
 		i18nNamespace: "incomes",
@@ -41,14 +53,14 @@ export const DOCUMENT_CONFIG = {
 		client: orpcClient.incomes,
 		updatedMessage: INCOME_UPDATED_MESSAGE,
 		events: getDocumentObservabilityEvents("income"),
-		toast: {
-			created: "toast.success.income_created",
-			updated: "toast.success.income_updated",
-			createError: "toast.error.income_created",
-			updateError: "toast.error.income_updated",
-			deleted: "toast.success.income_deleted",
-			deleteError: "toast.error.income_deleted",
-		},
+		toast: documentToast({
+			created: "toast.success.income-created",
+			updated: "toast.success.income-updated",
+			createError: "toast.error.income-created",
+			updateError: "toast.error.income-updated",
+			deleted: "toast.success.income-deleted",
+			deleteError: "toast.error.income-deleted",
+		}),
 	},
 } as const;
 

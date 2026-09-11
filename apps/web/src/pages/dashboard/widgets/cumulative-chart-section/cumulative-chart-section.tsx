@@ -1,28 +1,39 @@
-import { type ChartDays, DEFAULT_CHART_DAYS } from "@repo/api/schemas";
-import { lazy, Suspense, useState } from "react";
+import type { Period } from "@repo/api/schemas";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChartSection } from "../../ui/chart/chart-section";
-import { ChartSkeleton } from "../../ui/chart/chart-skeleton";
+import { CardState } from "@/shared/widgets/card-state";
+import { useDashboardCumulativeChart } from "../../hooks/use-dashboard-cumulative-chart";
+import { ChartToggle, type ChartType } from "../../ui/chart/chart-toggle";
+import { CumulativeChart } from "../../ui/chart/cumulative-chart";
 
-const CumulativeChart = lazy(async () => {
-	const module = await import("../../ui/chart/cumulative-chart");
+type CumulativeChartSectionProps = {
+	days: Period;
+};
 
-	return { default: module.CumulativeChart };
-});
-
-export const CumulativeChartSection = () => {
+export const CumulativeChartSection = ({
+	days,
+}: CumulativeChartSectionProps) => {
 	const { t } = useTranslation();
-	const [days, setDays] = useState<ChartDays>(DEFAULT_CHART_DAYS);
+	const [type, setType] = useState<ChartType>("area");
+	const { data, isLoading, isError } = useDashboardCumulativeChart({ days });
 
 	return (
-		<ChartSection
-			title={t("chart.running_title", { ns: "dashboard" })}
-			days={days}
-			onDaysChange={setDays}
+		<CardState
+			title={t("chart.running-title", { ns: "dashboard" })}
+			actions={<ChartToggle value={type} onValueChange={setType} />}
+			data={data}
+			isLoading={isLoading}
+			isError={isError}
+			skeletonClassName="aspect-video max-h-80 w-full"
+			errorTitle={t("chart.error.title", { ns: "dashboard" })}
+			errorDescription={t("chart.error.description-running", {
+				ns: "dashboard",
+			})}
+			emptyTitle={t("chart.empty.title", { ns: "dashboard" })}
+			emptyDescription={t("chart.empty.description", { ns: "dashboard" })}
+			emptyIcon="dashboard"
 		>
-			<Suspense fallback={<ChartSkeleton />}>
-				<CumulativeChart days={days} />
-			</Suspense>
-		</ChartSection>
+			{(data) => <CumulativeChart points={data.points} type={type} />}
+		</CardState>
 	);
 };

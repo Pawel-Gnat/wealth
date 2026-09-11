@@ -1,13 +1,22 @@
+import type { GroupBudget } from "@repo/api/schemas";
 import { Budget } from "./budget";
 
-export const BudgetsList = () => {
+type BudgetsListProps = {
+	budgets: GroupBudget[];
+	userId: string;
+};
+
+export const BudgetsList = ({ budgets, userId }: BudgetsListProps) => {
 	return (
-		<div>
-			<Budget
-				title="Budget 1"
-				assignment="Assignment 1"
-				users={["User 1", "User 2", "User 3"]}
-			/>
+		<div className="space-y-4 *:not-last:border-b">
+			{budgets.map((budget) => (
+				<Budget
+					key={budget.id}
+					title={budget.title}
+					userId={userId}
+					members={budget.members}
+				/>
+			))}
 		</div>
 	);
 };
