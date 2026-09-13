@@ -79,4 +79,28 @@ describe("CumulativeChartSection", () => {
 			}),
 		).toHaveAttribute("data-state", "on");
 	});
+
+	it("shows the empty state when every point is zero", async () => {
+		server.use(
+			http.get("*/dashboard/cumulative-chart", () =>
+				HttpResponse.json({
+					data: {
+						points: [
+							{
+								date: "2024-07-01T00:00:00.000Z",
+								expenses: 0,
+								incomes: 0,
+							},
+						],
+					},
+				}),
+			),
+		);
+
+		renderWithProviders(<CumulativeChartSection days={DEFAULT_PERIOD} />);
+
+		expect(
+			await screen.findByText(t("chart.empty.title", { ns: "dashboard" })),
+		).toBeInTheDocument();
+	});
 });

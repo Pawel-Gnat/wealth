@@ -18,22 +18,19 @@ type CardStateBaseProps<T> = Omit<CardProps, "children"> & {
 	skeletonClassName?: string | undefined;
 };
 
-type CardStateEmptyProps = {
-	inEditMode?: false;
-	emptyTitle: string;
-	emptyDescription: string;
-	emptyIcon: IconName;
-};
+type CardStateEmptyProps =
+	| {
+			emptyTitle: string;
+			emptyDescription: string;
+			emptyIcon: IconName;
+	  }
+	| {
+			emptyTitle?: never;
+			emptyDescription?: never;
+			emptyIcon?: never;
+	  };
 
-type CardStateEditProps = {
-	inEditMode: true;
-	emptyTitle?: never;
-	emptyDescription?: never;
-	emptyIcon?: never;
-};
-
-type CardStateProps<T> = CardStateBaseProps<T> &
-	(CardStateEmptyProps | CardStateEditProps);
+type CardStateProps<T> = CardStateBaseProps<T> & CardStateEmptyProps;
 
 export const CardState = <T,>(props: CardStateProps<T>) => {
 	const {
@@ -72,7 +69,7 @@ export const CardState = <T,>(props: CardStateProps<T>) => {
 		);
 	}
 
-	if (props.inEditMode !== true && Array.isArray(data) && data.length === 0) {
+	if (props.emptyTitle != null && Array.isArray(data) && data.length === 0) {
 		return (
 			<Card
 				title={title}

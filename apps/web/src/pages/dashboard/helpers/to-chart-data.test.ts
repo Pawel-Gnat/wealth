@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toChartData } from "./to-chart-data";
+import { getChartCardPoints, toChartData } from "./to-chart-data";
 import { toDate } from "./to-date";
 
 describe("toDate", () => {
@@ -57,5 +57,35 @@ describe("toChartData", () => {
 
 	it("returns an empty array for empty points", () => {
 		expect(toChartData([], "en")).toEqual([]);
+	});
+});
+
+describe("getChartCardPoints", () => {
+	it("returns undefined when points are missing", () => {
+		expect(getChartCardPoints(undefined)).toBeUndefined();
+	});
+
+	it("returns an empty array when every point is zero", () => {
+		expect(
+			getChartCardPoints([
+				{
+					date: new Date("2024-07-01T00:00:00.000Z"),
+					expenses: 0,
+					incomes: 0,
+				},
+			]),
+		).toEqual([]);
+	});
+
+	it("returns the points when there is activity", () => {
+		const points = [
+			{
+				date: new Date("2024-07-01T00:00:00.000Z"),
+				expenses: 10,
+				incomes: 0,
+			},
+		];
+
+		expect(getChartCardPoints(points)).toBe(points);
 	});
 });

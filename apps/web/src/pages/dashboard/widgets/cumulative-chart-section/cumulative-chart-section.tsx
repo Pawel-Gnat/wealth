@@ -2,6 +2,7 @@ import type { Period } from "@repo/api/schemas";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CardState } from "@/shared/widgets/card-state";
+import { getChartCardPoints } from "../../helpers/to-chart-data";
 import { useDashboardCumulativeChart } from "../../hooks/use-dashboard-cumulative-chart";
 import { ChartToggle, type ChartType } from "../../ui/chart/chart-toggle";
 import { CumulativeChart } from "../../ui/chart/cumulative-chart";
@@ -21,7 +22,7 @@ export const CumulativeChartSection = ({
 		<CardState
 			title={t("chart.running-title", { ns: "dashboard" })}
 			actions={<ChartToggle value={type} onValueChange={setType} />}
-			data={data}
+			data={getChartCardPoints(data?.points)}
 			isLoading={isLoading}
 			isError={isError}
 			skeletonClassName="aspect-video max-h-80 w-full"
@@ -33,7 +34,7 @@ export const CumulativeChartSection = ({
 			emptyDescription={t("chart.empty.description", { ns: "dashboard" })}
 			emptyIcon="dashboard"
 		>
-			{(data) => <CumulativeChart points={data.points} type={type} />}
+			{(points) => <CumulativeChart points={points} type={type} />}
 		</CardState>
 	);
 };

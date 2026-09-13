@@ -18,7 +18,7 @@
 		},
 		"empty": {
 			"title": "No activity yet",
-			"description": "Chart will appear once you add incomes and expensess."
+			"description": "Chart will appear once you add incomes and expenses."
 		},
 		"error": {
 			"title": "Could not load chart",

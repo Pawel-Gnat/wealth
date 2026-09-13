@@ -7,6 +7,20 @@ export type DashboardChartDataPoint = {
 	incomes: number;
 };
 
+export const getChartCardPoints = (
+	points: DashboardChartPoint[] | undefined,
+): DashboardChartPoint[] | undefined => {
+	if (points == null) {
+		return points;
+	}
+
+	const hasActivity = points.some(
+		(point) => point.expenses !== 0 || point.incomes !== 0,
+	);
+
+	return hasActivity ? points : [];
+};
+
 export const toChartData = (
 	points: DashboardChartPoint[],
 	language: string,

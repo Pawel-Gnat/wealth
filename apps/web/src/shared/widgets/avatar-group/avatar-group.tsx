@@ -13,7 +13,7 @@ export const AvatarGroup = ({ users }: AvatarGroupProps) => {
 					key={user.id}
 					trigger={
 						<div>
-							<Avatar src={user.email} name={user.email} />
+							<Avatar name={user.email} src={user.image} />
 						</div>
 					}
 					text={user.email}
