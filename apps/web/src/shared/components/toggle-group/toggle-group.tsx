@@ -73,14 +73,14 @@ const renderItems = (items: ToggleGroupOption[]) =>
 
 export const ToggleGroup = (props: ToggleGroupProps) => {
 	if (props.type === "multiple") {
-		const { items, type: _type, className, ...toggleGroupProps } = props;
+		const { items, className, ...toggleGroupProps } = props;
 
 		return (
 			<ToggleGroupUI
-				type="multiple"
 				spacing={1}
 				size="sm"
 				{...toggleGroupProps}
+				type="multiple"
 				className={cn(GROUP_CLASS_NAME, className)}
 			>
 				{renderItems(items)}
@@ -88,14 +88,14 @@ export const ToggleGroup = (props: ToggleGroupProps) => {
 		);
 	}
 
-	const { items, type: _type, className, ...toggleGroupProps } = props;
+	const { items, className, ...toggleGroupProps } = props;
 
 	return (
 		<ToggleGroupUI
-			type="single"
 			spacing={1}
 			size="sm"
 			{...toggleGroupProps}
+			type="single"
 			className={cn(GROUP_CLASS_NAME, className)}
 		>
 			{renderItems(items)}
