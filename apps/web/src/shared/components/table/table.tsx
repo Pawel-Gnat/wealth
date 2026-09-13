@@ -14,7 +14,15 @@ import {
 	TableRow,
 	Table as TableUI,
 } from "@/shared/lib/ui/table";
+import { Empty } from "../empty";
+import type { IconName } from "../icons";
 import { Pagination } from "./pagination";
+
+declare module "@tanstack/react-table" {
+	interface ColumnMeta<TData, TValue> {
+		className?: string;
+	}
+}
 
 const SKELETON_ROW_COUNT = 10;
 const SKELETON_ROW_KEYS = Array.from(
@@ -26,14 +34,18 @@ type DataTableProps<TData, TValue> = {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
 	isLoading: boolean;
-	noResultsText: string;
+	noResultsTitle: string;
+	noResultsDescription: string;
+	noResultsIcon: IconName;
 };
 
 export const Table = <TData, TValue>({
 	columns,
 	data,
 	isLoading,
-	noResultsText,
+	noResultsTitle,
+	noResultsDescription,
+	noResultsIcon,
 }: DataTableProps<TData, TValue>) => {
 	const table = useReactTable({
 		data,
@@ -43,15 +55,18 @@ export const Table = <TData, TValue>({
 	});
 
 	return (
-		<div className="flex flex-col gap-2">
+		<div className="flex flex-col gap-4">
 			<div className="overflow-hidden rounded-md border">
 				<TableUI>
-					<TableHeader>
+					<TableHeader className="bg-muted">
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id}>
 								{headerGroup.headers.map((header) => {
 									return (
-										<TableHead key={header.id}>
+										<TableHead
+											key={header.id}
+											className={header.column.columnDef.meta?.className}
+										>
 											{header.isPlaceholder
 												? null
 												: flexRender(
@@ -69,7 +84,10 @@ export const Table = <TData, TValue>({
 							SKELETON_ROW_KEYS.map((rowKey) => (
 								<TableRow key={rowKey}>
 									{table.getVisibleFlatColumns().map((column) => (
-										<TableCell key={`${rowKey}-${column.id}`}>
+										<TableCell
+											key={`${rowKey}-${column.id}`}
+											className={column.columnDef.meta?.className}
+										>
 											<Skeleton className="h-4 w-full max-w-48" />
 										</TableCell>
 									))}
@@ -82,7 +100,10 @@ export const Table = <TData, TValue>({
 									data-state={row.getIsSelected() && "selected"}
 								>
 									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
+										<TableCell
+											key={cell.id}
+											className={cell.column.columnDef.meta?.className}
+										>
 											{flexRender(
 												cell.column.columnDef.cell,
 												cell.getContext(),
@@ -97,7 +118,11 @@ export const Table = <TData, TValue>({
 									colSpan={columns.length}
 									className="h-24 text-center"
 								>
-									{noResultsText}
+									<Empty
+										title={noResultsTitle}
+										description={noResultsDescription}
+										icon={noResultsIcon}
+									/>
 								</TableCell>
 							</TableRow>
 						)}

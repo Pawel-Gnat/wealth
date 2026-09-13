@@ -1,13 +1,26 @@
 {
 	"single": {
 		"title-create": "Create a new expense",
+		"description-create": "Add a date and line items, then save the record.",
 		"title-edit": "Edit expense",
-		"expenses": "Expenses"
+		"description-edit": "Update the date and line items for this record.",
+		"expenses": "Expenses",
+		"error": {
+			"title": "Could not load expense",
+			"description": "The expense could not be loaded."
+		}
 	},
 	"list": {
 		"title": "Manage your expenses",
-		"no-results": "No expenses found.",
-		"error": "Could not load expenses."
+		"subtitle": "Track and edit your personal expense records.",
+		"empty": {
+			"title": "No expenses found",
+			"description": "Create your first expense to start tracking your spending."
+		},
+		"error": {
+			"title": "Could not load expenses",
+			"description": "The expense list could not be loaded. Please try again later."
+		}
 	},
 	"delete": {
 		"title": "Delete expense?",

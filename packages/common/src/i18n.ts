@@ -11,6 +11,7 @@ import enCommon from "./locales/en/common.json" with { type: "json" };
 import enDashboard from "./locales/en/dashboard.json" with { type: "json" };
 import enExpenses from "./locales/en/expenses.json" with { type: "json" };
 import enForm from "./locales/en/form.json" with { type: "json" };
+import enGroup from "./locales/en/group.json" with { type: "json" };
 import enIncomes from "./locales/en/incomes.json" with { type: "json" };
 
 export type ParseNsKeys<Ns extends Namespace> =
@@ -21,6 +22,7 @@ export const I18N_RESOURCES = {
 	en: {
 		common: enCommon,
 		dashboard: enDashboard,
+		group: enGroup,
 		incomes: enIncomes,
 		expenses: enExpenses,
 		form: enForm,

@@ -1,21 +1,17 @@
 import { z } from "zod";
 import { apiPayload } from "./common.schema";
 
-export const DEFAULT_CHART_DAYS = 30;
-export const chartDaysValues = [7, DEFAULT_CHART_DAYS] as const;
-export type ChartDays = (typeof chartDaysValues)[number];
+export const DEFAULT_PERIOD = 30;
+export const periodValues = [7, DEFAULT_PERIOD] as const;
+export type Period = (typeof periodValues)[number];
 
-export const chartDaysEnumSchema = z.coerce
-	.number()
-	.pipe(z.literal(chartDaysValues));
-export const chartDaysSchema = chartDaysEnumSchema.default(DEFAULT_CHART_DAYS);
+export const periodEnumSchema = z.coerce.number().pipe(z.literal(periodValues));
+export const periodSchema = periodEnumSchema.default(DEFAULT_PERIOD);
 
-export const dashboardChartDaysInputSchema = z.object({
-	days: chartDaysSchema,
+export const dashboardPeriodInputSchema = z.object({
+	days: periodSchema,
 });
-export type DashboardChartDaysInput = z.infer<
-	typeof dashboardChartDaysInputSchema
->;
+export type DashboardPeriodInput = z.infer<typeof dashboardPeriodInputSchema>;
 
 export const summarySchema = z.object({
 	amount: z.number(),

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	decodeDocumentDateFromStorage,
 	encodeDocumentDateForStorage,
+	formatDocumentDate,
 	isSameCalendarDate,
 	isStoredDocumentDateEqual,
 	normalizeDocumentDateForApi,
@@ -49,5 +50,11 @@ describe("document date helpers", () => {
 
 		expect(isStoredDocumentDateEqual("2026-05-01", date)).toBe(true);
 		expect(isStoredDocumentDateEqual("2026-05-02", date)).toBe(false);
+	});
+
+	it("formats a date with a long month name", () => {
+		const date = new Date("2026-03-10T12:00:00.000Z");
+
+		expect(formatDocumentDate(date, "pl")).toBe("10 marca 2026");
 	});
 });

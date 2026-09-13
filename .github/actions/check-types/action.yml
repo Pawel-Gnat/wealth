@@ -1,0 +1,9 @@
+name: Check Types
+description: Check TypeScript types
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check types
+      run: pnpm run check-types
+      shell: bash

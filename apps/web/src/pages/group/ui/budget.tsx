@@ -1,0 +1,91 @@
+import type { BudgetMember } from "@repo/api/schemas";
+import { useTranslation } from "react-i18next";
+import {
+	Badge,
+	ButtonDestructive,
+	ButtonSecondary,
+	Icon,
+	Text,
+	Tooltip,
+} from "@/shared/components";
+import { AvatarGroup } from "@/shared/widgets/avatar-group";
+
+type BudgetProps = {
+	title: string;
+	members: BudgetMember[];
+	userId: string;
+};
+
+export const Budget = ({ title, members, userId }: BudgetProps) => {
+	const { t } = useTranslation();
+	const isOwner = members.some(
+		(member) => member.id === userId && member.role === "owner",
+	);
+
+	return (
+		<div className="flex items-center justify-between pb-4">
+			<div className="space-y-2">
+				<div className="flex items-center gap-2">
+					<Text weight="medium">{title}</Text>
+					<Badge variant={isOwner ? "default" : "secondary"}>
+						{isOwner
+							? t("common.owner", { ns: "common" })
+							: t("common.member", { ns: "common" })}
+					</Badge>
+				</div>
+				<AvatarGroup users={members} />
+			</div>
+			<div className="flex flex-row gap-2">
+				{isOwner ? (
+					<>
+						<Tooltip
+							trigger={
+								<ButtonSecondary size="icon">
+									<Icon name="addUser" />
+									<span className="sr-only">
+										{t("action.add", { ns: "common" })}
+									</span>
+								</ButtonSecondary>
+							}
+							text={t("action.add", { ns: "common" })}
+						/>
+						<Tooltip
+							trigger={
+								<ButtonSecondary size="icon">
+									<Icon name="edit" />
+									<span className="sr-only">
+										{t("action.edit", { ns: "common" })}
+									</span>
+								</ButtonSecondary>
+							}
+							text={t("action.edit", { ns: "common" })}
+						/>
+						<Tooltip
+							trigger={
+								<ButtonDestructive size="icon" onClick={() => {}}>
+									<Icon name="delete" />
+									<span className="sr-only">
+										{t("action.delete", { ns: "common" })}
+									</span>
+								</ButtonDestructive>
+							}
+							text={t("action.delete", { ns: "common" })}
+						/>
+					</>
+				) : (
+					<Tooltip
+						trigger={
+							<ButtonDestructive size="icon" onClick={() => {}}>
+								<Icon name="leave" />
+								<span className="sr-only">
+									{t("action.leave", { ns: "common" })}
+								</span>
+							</ButtonDestructive>
+						}
+						text={t("action.leave", { ns: "common" })}
+					/>
+				)}
+			</div>
+		</div>
+	);
+};

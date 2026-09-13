@@ -28,3 +28,11 @@ export function isSameCalendarDate(a: Date, b: Date): boolean {
 export function isStoredDocumentDateEqual(stored: string, date: Date): boolean {
 	return stored === encodeDocumentDateForStorage(date);
 }
+
+export function formatDocumentDate(date: Date, language: string): string {
+	return date.toLocaleDateString(language, {
+		day: "numeric",
+		month: "long",
+		year: "numeric",
+	});
+}

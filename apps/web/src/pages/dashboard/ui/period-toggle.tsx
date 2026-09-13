@@ -1,33 +1,26 @@
-import {
-	type ChartDays,
-	chartDaysSchema,
-	chartDaysValues,
-} from "@repo/api/schemas";
+import { type Period, periodSchema, periodValues } from "@repo/api/schemas";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ToggleGroup } from "@/shared/components";
 
-type ChartDaysToggleProps = {
-	value: ChartDays;
-	onValueChange: (days: ChartDays) => void;
+type PeriodToggleProps = {
+	value: Period;
+	onValueChange: (period: Period) => void;
 };
 
-export const ChartDaysToggle = ({
-	value,
-	onValueChange,
-}: ChartDaysToggleProps) => {
+export const PeriodToggle = ({ value, onValueChange }: PeriodToggleProps) => {
 	const { t } = useTranslation();
 
 	const items = useMemo(
 		() =>
-			chartDaysValues.map((days) => {
-				const label = t("common.last_n_days", {
+			periodValues.map((period) => {
+				const label = t("common.last-n-days-other", {
 					ns: "common",
-					count: days,
+					count: period,
 				});
 
 				return {
-					value: String(days),
+					value: String(period),
 					content: label,
 					ariaLabel: label,
 				};
@@ -38,15 +31,13 @@ export const ChartDaysToggle = ({
 	return (
 		<ToggleGroup
 			type="single"
-			variant="outline"
-			spacing={0}
 			value={String(value)}
 			onValueChange={(next) => {
 				if (!next) {
 					return;
 				}
 
-				const parsed = chartDaysSchema.safeParse(Number(next));
+				const parsed = periodSchema.safeParse(Number(next));
 				if (parsed.success) {
 					onValueChange(parsed.data);
 				}

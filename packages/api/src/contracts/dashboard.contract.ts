@@ -1,7 +1,7 @@
 import { oc } from "@orpc/contract";
 import {
-	dashboardChartDaysInputSchema,
 	dashboardChartResponseSchema,
+	dashboardPeriodInputSchema,
 	summaryResponseSchema,
 } from "../schemas/dashboard.schema";
 
@@ -11,10 +11,10 @@ export const getDashboardSummaryContract = oc
 
 export const getDashboardCumulativeChartContract = oc
 	.route({ method: "GET", path: "/dashboard/cumulative-chart" })
-	.input(dashboardChartDaysInputSchema)
+	.input(dashboardPeriodInputSchema)
 	.output(dashboardChartResponseSchema);
 
 export const getDashboardDailyChartContract = oc
 	.route({ method: "GET", path: "/dashboard/daily-chart" })
-	.input(dashboardChartDaysInputSchema)
+	.input(dashboardPeriodInputSchema)
 	.output(dashboardChartResponseSchema);

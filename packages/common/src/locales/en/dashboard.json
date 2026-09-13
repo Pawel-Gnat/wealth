@@ -1,11 +1,29 @@
 {
 	"title": "Dashboard",
+	"subtitle": "Cashflow for the selected period.",
 	"summary": {
-		"error": "Could not load summary."
+		"vs-previous-period": "vs previous period",
+		"empty": "No activity in this period",
+		"error": {
+			"title": "Could not load summary",
+			"description": "Totals for this period are unavailable. Please try again later."
+		}
 	},
 	"chart": {
-		"error": "Could not load chart.",
-		"daily_title": "Daily income & expenses",
-		"running_title": "Running totals"
+		"daily-title": "Daily income & expenses",
+		"running-title": "Running totals",
+		"switch": {
+			"bar": "Bar",
+			"area": "Area"
+		},
+		"empty": {
+			"title": "No activity yet",
+			"description": "Chart will appear once you add incomes and expenses."
+		},
+		"error": {
+			"title": "Could not load chart",
+			"description-daily": "Daily income and expenses could not be loaded.",
+			"description-running": "Running totals could not be loaded."
+		}
 	}
 }

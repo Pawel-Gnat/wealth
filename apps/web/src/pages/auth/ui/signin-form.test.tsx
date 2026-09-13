@@ -80,7 +80,7 @@ describe("SigninForm", () => {
 
 			await waitFor(() => {
 				expect(toast.error).toHaveBeenCalledWith(
-					t("toast.error.signed_in", { ns: "common" }),
+					t("toast.error.signed-in", { ns: "common" }),
 				);
 			});
 		});

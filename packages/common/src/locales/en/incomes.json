@@ -1,13 +1,26 @@
 {
 	"single": {
 		"title-create": "Create a new income",
+		"description-create": "Add a date and line items, then save the record.",
 		"title-edit": "Edit income",
-		"incomes": "Incomes"
+		"description-edit": "Update the date and line items for this record.",
+		"incomes": "Incomes",
+		"error": {
+			"title": "Could not load income",
+			"description": "The income could not be loaded."
+		}
 	},
 	"list": {
 		"title": "Manage your incomes",
-		"no-results": "No incomes found.",
-		"error": "Could not load incomes."
+		"subtitle": "Track and edit your personal income records.",
+		"empty": {
+			"title": "No incomes found",
+			"description": "Create your first income to start tracking your earnings."
+		},
+		"error": {
+			"title": "Could not load incomes",
+			"description": "The income list could not be loaded. Please try again later."
+		}
 	},
 	"delete": {
 		"title": "Delete income?",

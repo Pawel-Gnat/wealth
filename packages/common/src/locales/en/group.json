@@ -1,0 +1,27 @@
+{
+	"title": "Group budgets",
+	"budgets": {
+		"title": "Your budgets",
+		"empty": {
+			"title": "No group budgets yet",
+			"description": "Create a budget and invite others to track shared transactions."
+		},
+		"error": {
+			"title": "Could not load group budgets",
+			"description": "Your budgets could not be loaded. Please try again later."
+		}
+	},
+	"invitations": {
+		"title": "Invitations",
+		"invited-by": "Invited by {{email}}",
+		"waiting-for-acceptance": "Waiting for acceptance by {{email}}",
+		"empty": {
+			"title": "No invitations",
+			"description": "Invites you send or receive will appear here."
+		},
+		"error": {
+			"title": "Could not load invitations",
+			"description": "Your invitations could not be loaded. Please try again later."
+		}
+	}
+}

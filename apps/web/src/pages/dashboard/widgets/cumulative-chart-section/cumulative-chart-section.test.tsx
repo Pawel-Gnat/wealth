@@ -1,3 +1,4 @@
+import { DEFAULT_PERIOD } from "@repo/api/schemas";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { TFunction } from "i18next";
@@ -15,8 +16,7 @@ describe("CumulativeChartSection", () => {
 		t = (await init18nWeb({ lng: "en" })) as TFunction;
 	});
 
-	it("requests 7-day chart when last 7 days is selected", async () => {
-		const user = userEvent.setup();
+	it("requests chart data for the provided period", async () => {
 		let days: string | null = null;
 
 		server.use(
@@ -37,42 +37,70 @@ describe("CumulativeChartSection", () => {
 			}),
 		);
 
-		renderWithProviders(<CumulativeChartSection />);
-
-		await user.click(
-			await screen.findByRole("radio", {
-				name: t("common.last_n_days", { ns: "common", count: 7 }),
-			}),
-		);
+		renderWithProviders(<CumulativeChartSection days={7} />);
 
 		await waitFor(() => {
 			expect(days).toBe("7");
 		});
 	});
 
-	it("renders days toggle, section title, and legend labels", async () => {
-		renderWithProviders(<CumulativeChartSection />);
+	it("renders area/bar toggle and section title", async () => {
+		renderWithProviders(<CumulativeChartSection days={DEFAULT_PERIOD} />);
 
 		expect(
-			await screen.findByRole("heading", {
-				name: t("chart.running_title", { ns: "dashboard" }),
+			await screen.findByText(t("chart.running-title", { ns: "dashboard" })),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("radio", {
+				name: t("chart.switch.area", { ns: "dashboard" }),
 			}),
 		).toBeInTheDocument();
 		expect(
 			screen.getByRole("radio", {
-				name: t("common.last_n_days", { ns: "common", count: 30 }),
+				name: t("chart.switch.bar", { ns: "dashboard" }),
 			}),
 		).toBeInTheDocument();
+	});
+
+	it("switches the chart type when bar is selected", async () => {
+		const user = userEvent.setup();
+
+		renderWithProviders(<CumulativeChartSection days={DEFAULT_PERIOD} />);
+
+		await user.click(
+			await screen.findByRole("radio", {
+				name: t("chart.switch.bar", { ns: "dashboard" }),
+			}),
+		);
+
 		expect(
 			screen.getByRole("radio", {
-				name: t("common.last_n_days", { ns: "common", count: 7 }),
+				name: t("chart.switch.bar", { ns: "dashboard" }),
 			}),
-		).toBeInTheDocument();
+		).toHaveAttribute("data-state", "on");
+	});
+
+	it("shows the empty state when every point is zero", async () => {
+		server.use(
+			http.get("*/dashboard/cumulative-chart", () =>
+				HttpResponse.json({
+					data: {
+						points: [
+							{
+								date: "2024-07-01T00:00:00.000Z",
+								expenses: 0,
+								incomes: 0,
+							},
+						],
+					},
+				}),
+			),
+		);
+
+		renderWithProviders(<CumulativeChartSection days={DEFAULT_PERIOD} />);
+
 		expect(
-			screen.getByText(t("common.expenses", { ns: "common" })),
-		).toBeInTheDocument();
-		expect(
-			screen.getByText(t("common.incomes", { ns: "common" })),
+			await screen.findByText(t("chart.empty.title", { ns: "dashboard" })),
 		).toBeInTheDocument();
 	});
 });
