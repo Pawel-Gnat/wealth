@@ -55,6 +55,9 @@ jobs:
       - name: Format & Lint code
         uses: ./.github/actions/format-code
 
+      - name: Check types
+        uses: ./.github/actions/check-types
+
       - name: Run tests
         uses: ./.github/actions/run-tests
 
