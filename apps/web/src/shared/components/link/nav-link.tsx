@@ -1,7 +1,7 @@
+import { cn } from "cn";
 import type { ComponentProps } from "react";
 import { NavLink as RouterNavLink } from "react-router";
 import type { AppRoutePath } from "@/app/router";
-import { cn } from "@/shared/lib/tailwind/utils";
 
 type NavLinkProps = Omit<
 	ComponentProps<typeof RouterNavLink>,

@@ -1,6 +1,6 @@
 import type { VariantProps } from "class-variance-authority";
+import { cn } from "cn";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { cn } from "@/shared/lib/tailwind/utils";
 
 import { Button as ButtonUI, buttonVariants } from "@/shared/lib/ui/button";
 import { Icon } from "../icons";

@@ -2,7 +2,7 @@
 import * as React from "react"
 import { Dialog as SheetPrimitive } from "radix-ui"
 
-import { cn } from "@/shared/lib/tailwind/utils"
+import { cn } from "cn"
 import { Button } from "@/shared/lib/ui/button"
 import { XIcon } from "lucide-react"
 

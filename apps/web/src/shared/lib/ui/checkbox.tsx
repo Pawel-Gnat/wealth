@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Checkbox as CheckboxPrimitive } from "radix-ui";
 
-import { cn } from "@/shared/lib/tailwind/utils";
+import { cn } from "cn"
 import { CheckIcon } from "lucide-react";
 
 function Checkbox({

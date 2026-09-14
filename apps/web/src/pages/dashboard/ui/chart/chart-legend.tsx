@@ -1,7 +1,7 @@
 import type { ParseKeys } from "@repo/common/i18n";
+import { cn } from "cn";
 import { useTranslation } from "react-i18next";
 import { Text } from "@/shared/components";
-import { cn } from "@/shared/lib/tailwind/utils";
 
 const LEGEND_ITEMS = [
 	{

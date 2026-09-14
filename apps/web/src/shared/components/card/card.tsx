@@ -1,5 +1,5 @@
+import { cn } from "cn";
 import type { ReactNode } from "react";
-import { cn } from "@/shared/lib/tailwind/utils";
 import { CardContent, CardHeader, Card as CardUI } from "@/shared/lib/ui/card";
 import { Text } from "../typography";
 import { TextMuted } from "../typography/text";

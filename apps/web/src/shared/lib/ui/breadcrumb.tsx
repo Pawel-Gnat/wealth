@@ -2,7 +2,7 @@
 import * as React from "react"
 import { Slot } from "radix-ui"
 
-import { cn } from "@/shared/lib/tailwind/utils"
+import { cn } from "cn"
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {

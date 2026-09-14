@@ -3,7 +3,7 @@ import { type SignUpPayload, signUpPayloadSchema } from "@repo/api/schemas";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Card, Form, FormInput } from "@/shared/components";
+import { Form, FormInput } from "@/shared/components";
 import { useSignUp } from "../hooks/use-sign-up";
 
 type SignupFormProps = {
@@ -37,38 +37,36 @@ export function SignupForm({ onSignedUp }: SignupFormProps) {
 	}
 
 	return (
-		<Card
-			title={t("signup.title", { ns: "auth" })}
-			subtitle={t("signup.description", { ns: "auth" })}
+		<Form
+			onSubmit={form.handleSubmit(onSubmit)}
+			submitText={t("action.signup", { ns: "common" })}
+			submitDisabled={isLoading}
+			isLoading={isLoading}
 		>
-			<Form
-				onSubmit={form.handleSubmit(onSubmit)}
-				submitText={t("action.signup", { ns: "common" })}
-				submitDisabled={isLoading}
-				isLoading={isLoading}
-			>
-				<FormInput
-					name="email"
-					label={t("email.label", { ns: "form" })}
-					type="email"
-					placeholder={t("email.placeholder", { ns: "form" })}
-					control={form.control}
-				/>
-				<FormInput
-					name="password"
-					label={t("password.label", { ns: "form" })}
-					type="password"
-					placeholder={t("password.placeholder", { ns: "form" })}
-					control={form.control}
-				/>
-				<FormInput
-					name="confirmPassword"
-					label={t("confirm-password.label", { ns: "form" })}
-					type="password"
-					placeholder={t("password.placeholder", { ns: "form" })}
-					control={form.control}
-				/>
-			</Form>
-		</Card>
+			<FormInput
+				name="email"
+				label={t("email.label", { ns: "form" })}
+				type="email"
+				placeholder={t("email.placeholder", { ns: "form" })}
+				control={form.control}
+				icon="email"
+			/>
+			<FormInput
+				name="password"
+				label={t("password.label", { ns: "form" })}
+				type="password"
+				placeholder={t("password.placeholder", { ns: "form" })}
+				control={form.control}
+				icon="password"
+			/>
+			<FormInput
+				name="confirmPassword"
+				label={t("confirm-password.label", { ns: "form" })}
+				type="password"
+				placeholder={t("password.placeholder", { ns: "form" })}
+				control={form.control}
+				icon="password"
+			/>
+		</Form>
 	);
 }

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { DayPicker, getDefaultClassNames, type DayButton, type Locale } from 'react-day-picker'
 
-import { cn } from '@/shared/lib/tailwind/utils'
+import { cn } from "cn"
 import { Button, buttonVariants } from '@/shared/lib/ui/button'
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from 'lucide-react'
 

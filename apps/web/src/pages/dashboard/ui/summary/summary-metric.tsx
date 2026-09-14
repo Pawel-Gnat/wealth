@@ -1,9 +1,9 @@
 import type { Summary, SummaryKind } from "@repo/api/schemas";
+import { cn } from "cn";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge, Icon, Price, Skeleton } from "@/shared/components";
 import { TextMuted } from "@/shared/components/typography/text";
-import { cn } from "@/shared/lib/tailwind/utils";
 import { formatPercentChange } from "../../helpers/format-percent-change";
 import { getTrendBadgeVariant } from "../../helpers/get-trend-badge-variant";
 

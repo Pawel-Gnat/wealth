@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { cn } from '@/shared/lib/tailwind/utils'
+import { cn } from "cn"
 import { Button } from '@/shared/lib/ui/button'
 import { Input } from '@/shared/lib/ui/input'
 import { Textarea } from '@/shared/lib/ui/textarea'

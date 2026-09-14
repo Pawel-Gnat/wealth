@@ -1,7 +1,7 @@
 // @ts-nocheck
 import * as React from "react";
 
-import { cn } from "@/shared/lib/tailwind/utils";
+import { cn } from "cn"
 import { Button } from "@/shared/lib/ui/button";
 import {
 	ChevronLeftIcon,
