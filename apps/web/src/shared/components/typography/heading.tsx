@@ -1,6 +1,5 @@
+import { cn } from "cn";
 import type { HTMLAttributes, ReactNode } from "react";
-
-import { cn } from "@/shared/lib/tailwind/utils";
 
 export type HeadingProps = {
 	children: ReactNode;

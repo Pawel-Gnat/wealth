@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
 import { useIsMobile } from "@/shared/hooks/use-mobile"
-import { cn } from "@/shared/lib/tailwind/utils"
+import { cn } from "cn"
 import { Button } from "@/shared/lib/ui/button"
 import { Input } from "@/shared/lib/ui/input"
 import { Separator } from "@/shared/lib/ui/separator"

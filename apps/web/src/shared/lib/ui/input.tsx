@@ -1,7 +1,7 @@
 // @ts-nocheck
 import * as React from "react"
 
-import { cn } from "@/shared/lib/tailwind/utils"
+import { cn } from "cn"
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (

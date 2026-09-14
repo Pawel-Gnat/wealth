@@ -1,4 +1,4 @@
-import { cn } from "@/shared/lib/tailwind/utils";
+import { cn } from "cn";
 import {
 	AlertDialog,
 	AlertDialogAction,

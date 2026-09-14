@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router";
 import { useAuth } from "@/context/auth";
 import {
@@ -11,13 +12,14 @@ import {
 import { Navigation } from "../widgets/navigation";
 
 export function DashboardLayout() {
+	const { t } = useTranslation();
 	const { logout } = useAuth();
 
 	return (
 		<Sidebar
 			header={
 				<Text size="lg" weight="bold">
-					Wealth
+					{t("common.brand", { ns: "common" })}
 				</Text>
 			}
 			navigation={<Navigation />}

@@ -3,7 +3,7 @@ import { type SignInPayload, signInPayloadSchema } from "@repo/api/schemas";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Card, Form, FormInput } from "@/shared/components";
+import { Form, FormInput } from "@/shared/components";
 import { persistAccessToken } from "@/shared/lib/auth/auth-session";
 import { notifySessionReadyAcrossTabs } from "@/shared/lib/auth/auth-tab-sync";
 import { useSignIn } from "../hooks/use-sign-in";
@@ -33,32 +33,29 @@ export function SigninForm() {
 	}
 
 	return (
-		<Card
-			title={t("signin.title", { ns: "auth" })}
-			subtitle={t("signin.description", { ns: "auth" })}
+		<Form
+			onSubmit={form.handleSubmit(onSubmit)}
+			submitText={t("action.signin", { ns: "common" })}
+			submitDisabled={isLoading}
+			isLoading={isLoading}
 		>
-			<Form
-				onSubmit={form.handleSubmit(onSubmit)}
-				submitText={t("action.signin", { ns: "common" })}
-				submitDisabled={isLoading}
-				isLoading={isLoading}
-			>
-				<FormInput
-					name="email"
-					label={t("email.label", { ns: "form" })}
-					type="email"
-					placeholder={t("email.placeholder", { ns: "form" })}
-					control={form.control}
-				/>
+			<FormInput
+				name="email"
+				label={t("email.label", { ns: "form" })}
+				type="email"
+				placeholder={t("email.placeholder", { ns: "form" })}
+				control={form.control}
+				icon="email"
+			/>
 
-				<FormInput
-					name="password"
-					label={t("password.label", { ns: "form" })}
-					type="password"
-					placeholder={t("password.placeholder", { ns: "form" })}
-					control={form.control}
-				/>
-			</Form>
-		</Card>
+			<FormInput
+				name="password"
+				label={t("password.label", { ns: "form" })}
+				type="password"
+				placeholder={t("password.placeholder", { ns: "form" })}
+				control={form.control}
+				icon="password"
+			/>
+		</Form>
 	);
 }

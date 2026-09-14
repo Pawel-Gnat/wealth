@@ -113,7 +113,7 @@ export const GroupDocumentsPage = () => {
 				emptyDescription={t("invitations.empty.description", {
 					ns: "group",
 				})}
-				emptyIcon="invitation"
+				emptyIcon="email"
 			>
 				{(items) => (
 					<InvitationsList invitations={items} userId={CURRENT_USER_ID} />

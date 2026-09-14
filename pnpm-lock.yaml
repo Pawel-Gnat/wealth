@@ -30,12 +30,9 @@ catalogs:
     react-dom:
       specifier: ^19.2.5
       version: 19.2.5
-    tsdown:
-      specifier: ^0.22.14
-      version: 0.22.14
     typescript:
       specifier: 5.9.2
-      version: 5.9.2
+      version: 6.0.2
     vitest:
       specifier: ^3.2.4
       version: 3.2.4
@@ -279,9 +276,6 @@ importers:
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
       cn:
         specifier: ^0.2.5
         version: 0.2.5
@@ -333,9 +327,6 @@ importers:
       spin-delay:
         specifier: ^2.0.1
         version: 2.0.1(react@19.2.5)
-      tailwind-merge:
-        specifier: ^3.5.0
-        version: 3.5.0
       tailwindcss:
         specifier: ^4.2.2
         version: 4.2.2

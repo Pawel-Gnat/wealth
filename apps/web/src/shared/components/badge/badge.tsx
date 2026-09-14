@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "cn";
 import type { ComponentProps } from "react";
-import { cn } from "@/shared/lib/tailwind/utils";
 import { Badge as BadgeUI, type badgeVariants } from "@/shared/lib/ui/badge";
 
 const trendBadgeVariants = cva("", {

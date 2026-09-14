@@ -1,5 +1,5 @@
+import { cn } from "cn";
 import type { ComponentProps, ReactNode } from "react";
-import { cn } from "@/shared/lib/tailwind/utils";
 import {
 	ToggleGroupItem as ToggleGroupItemUI,
 	ToggleGroup as ToggleGroupUI,

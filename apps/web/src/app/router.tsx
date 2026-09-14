@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router";
 import { AuthPage } from "@/pages/auth";
+import { AuthLayout } from "@/pages/auth/layouts";
 import {
 	AuthenticatedLayout,
 	DashboardLayout,
@@ -20,7 +21,9 @@ export function AppRouter() {
 	return (
 		<Routes>
 			<Route element={<UnauthenticatedLayout />}>
-				<Route path={APP_ROUTES.auth} element={<AuthPage />} />
+				<Route element={<AuthLayout />}>
+					<Route path={APP_ROUTES.auth} element={<AuthPage />} />
+				</Route>
 			</Route>
 			<Route element={<AuthenticatedLayout />}>
 				<Route element={<DashboardLayout />}>

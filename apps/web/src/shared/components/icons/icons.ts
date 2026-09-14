@@ -9,6 +9,7 @@ import {
 	DoorOpen,
 	LayoutDashboard,
 	LoaderCircle,
+	Lock,
 	LogOut,
 	Mail,
 	Pencil,
@@ -41,9 +42,10 @@ export const icons = {
 	addUser: UserPlus,
 	reject: X,
 	accept: Check,
-	invitation: Mail,
 	error: AlertCircle,
 	balance: Scale,
+	email: Mail,
+	password: Lock,
 };
 
 export type IconName = keyof typeof icons;

@@ -1,6 +1,6 @@
+import { cn } from "cn";
 import type { ReactNode, SubmitEventHandler } from "react";
 import { ButtonPrimary } from "@/shared/components/button";
-import { cn } from "@/shared/lib/tailwind/utils";
 
 type FormProps = {
 	onSubmit: SubmitEventHandler<HTMLFormElement>;
