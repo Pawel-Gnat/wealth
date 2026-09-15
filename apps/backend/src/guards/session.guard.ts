@@ -22,7 +22,8 @@ export class SessionGuard implements CanActivate {
 		setUserId(session.userId);
 		request.user = {
 			userId: session.userId,
-			email: session.email,
+			sessionId: session.sessionId,
+			sessionExpiresAt: session.sessionExpiresAt,
 		};
 
 		return true;

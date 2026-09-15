@@ -1,18 +1,14 @@
 import { Navigate, Outlet } from "react-router";
 import { useAuth } from "@/context/auth";
-import { PageLoader } from "@/shared/widgets/page-loader";
 import { APP_ROUTES } from "../../app/router";
+import { AuthSessionStatus } from "./auth-session-status";
 
 export const AuthenticatedLayout = () => {
-	const { user, isAuthLoading } = useAuth();
+	const { user } = useAuth();
 
-	if (isAuthLoading) {
-		return <PageLoader />;
-	}
-
-	if (user === null) {
-		return <Navigate to={APP_ROUTES.auth} replace />;
-	}
-
-	return <Outlet />;
+	return (
+		<AuthSessionStatus>
+			{user === null ? <Navigate to={APP_ROUTES.auth} replace /> : <Outlet />}
+		</AuthSessionStatus>
+	);
 };

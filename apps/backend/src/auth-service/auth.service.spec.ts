@@ -26,7 +26,7 @@ import { SsePublisher } from "../sse-service/sse-publisher.service.js";
 import { createAuthTestingModule } from "../test/helpers/modules.js";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
 import { UsersService } from "../users-service/users.service.js";
-import { AuthService } from "./auth.service.js";
+import { AuthService, type RpcSession } from "./auth.service.js";
 
 const PASSWORD = "secret";
 
@@ -49,8 +49,10 @@ const createCookieJar = () => {
 
 type CookieJar = ReturnType<typeof createCookieJar>;
 
-const asRequest = (cookies: Record<string, string | undefined>): Request =>
-	({ cookies }) as Request;
+const asRequest = (
+	cookies: Record<string, string | undefined>,
+	user?: RpcSession,
+): Request => ({ cookies, user }) as unknown as Request;
 
 const asResponse = (jar: CookieJar): Response =>
 	({ cookie: jar.cookie, clearCookie: jar.clearCookie }) as unknown as Response;
@@ -301,27 +303,31 @@ describe("Auth service", () => {
 	});
 
 	describe("me", () => {
-		it("returns the same snapshot as sign-in for the session cookie", async () => {
+		it("returns the same snapshot as sign-in for the resolved session", async () => {
 			const user = await createUser("auth-me");
 			const jar = createCookieJar();
 			const signedIn = await signIn(user, jar);
+			const session = await authService.resolveRpcSession(
+				asRequest({
+					[SESSION_COOKIE_NAME]: jar.cookies[SESSION_COOKIE_NAME],
+				}),
+			);
 
+			expect(session).toMatchObject({ userId: user.id });
 			await expect(
-				authService.me(
-					asRequest({
-						[SESSION_COOKIE_NAME]: jar.cookies[SESSION_COOKIE_NAME],
-					}),
-				),
+				authService.me(asRequest({}, session ?? undefined)),
 			).resolves.toEqual(signedIn);
 		});
 
-		it("rejects when the session cookie is missing", async () => {
+		it("rejects when the request has no resolved session", async () => {
 			await expect(authService.me(asRequest({}))).rejects.toBeInstanceOf(
 				UnauthorizedException,
 			);
 		});
+	});
 
-		it("rejects when the session cookie has expired", async () => {
+	describe("resolveRpcSession", () => {
+		it("returns null when the session cookie has expired", async () => {
 			const user = await createUser("auth-me-expired");
 			const jar = createCookieJar();
 			await signIn(user, jar);
@@ -333,12 +339,12 @@ describe("Auth service", () => {
 				.where(eq(sessionsTable.id, row?.id ?? ""));
 
 			await expect(
-				authService.me(
+				authService.resolveRpcSession(
 					asRequest({
 						[SESSION_COOKIE_NAME]: jar.cookies[SESSION_COOKIE_NAME],
 					}),
 				),
-			).rejects.toBeInstanceOf(UnauthorizedException);
+			).resolves.toBeNull();
 		});
 	});
 

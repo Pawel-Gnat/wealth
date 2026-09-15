@@ -12,25 +12,26 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
 import {
+	applySessionSnapshot,
 	bootstrapSession,
+	configureAuth,
 	getSessionRefreshDelayMs,
 	logoutSession,
 	refreshSession,
 } from "@/shared/lib/auth/auth-api";
-import {
-	applySessionSnapshot,
-	configureAuthSession,
-} from "@/shared/lib/auth/auth-session";
-import { configureOrpcRefresh } from "@/shared/lib/orpc/orpc-transport";
 import { startSseGateway, stopSseGateway } from "@/shared/lib/sse";
 
 type AuthContextValue = {
 	user: User | null;
 	isAuthLoading: boolean;
+	isResolvingSession: boolean;
+	isBootstrapError: boolean;
+	retryBootstrap: () => void;
 	logout: () => Promise<void>;
 };
 
@@ -40,10 +41,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const queryClient = useQueryClient();
 	const [user, setUser] = useState<User | null>(null);
 	const [isResolvingSession, setIsResolvingSession] = useState(true);
+	const [isBootstrapError, setIsBootstrapError] = useState(false);
 	const isAuthLoading = useSkeletonLoader({
 		isLoading: isResolvingSession,
-		delay: 0,
 	});
+	const initializeAuthRef = useRef<(() => Promise<void>) | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -67,10 +69,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}, getSessionRefreshDelayMs(snapshot.sessionExpiresAt));
 		};
 
-		configureOrpcRefresh(refreshSession);
-		configureAuthSession({
-			onSessionApplied: applySnapshot,
-			onUnauthorized: () => {
+		configureAuth({
+			onApplied: applySnapshot,
+			onCleared: () => {
 				clearRefreshTimer();
 				stopSseGateway();
 				setUser(null);
@@ -84,6 +85,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				if (!cancelled && snapshot) {
 					applySessionSnapshot(snapshot);
 				}
+				if (!cancelled) {
+					setIsBootstrapError(false);
+				}
+			} catch {
+				if (!cancelled) {
+					setIsBootstrapError(true);
+				}
 			} finally {
 				if (!cancelled) {
 					setIsResolvingSession(false);
@@ -91,16 +99,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 		};
 
+		initializeAuthRef.current = initializeAuth;
 		void initializeAuth();
 
 		return () => {
 			cancelled = true;
+			initializeAuthRef.current = null;
 			clearRefreshTimer();
-			configureOrpcRefresh(null);
-			configureAuthSession({});
+			configureAuth({});
 			stopSseGateway();
 		};
 	}, [queryClient]);
+
+	const retryBootstrap = useCallback(() => {
+		setIsResolvingSession(true);
+		void initializeAuthRef.current?.();
+	}, []);
 
 	const logout = useCallback(async () => {
 		await runWithRequestId(async () => {
@@ -113,9 +127,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		() => ({
 			user,
 			isAuthLoading,
+			isResolvingSession,
+			isBootstrapError,
+			retryBootstrap,
 			logout,
 		}),
-		[user, isAuthLoading, logout],
+		[
+			user,
+			isAuthLoading,
+			isResolvingSession,
+			isBootstrapError,
+			retryBootstrap,
+			logout,
+		],
 	);
 
 	return <AuthContext value={value}>{children}</AuthContext>;

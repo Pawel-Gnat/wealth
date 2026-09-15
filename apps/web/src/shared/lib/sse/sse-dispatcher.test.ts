@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	applySessionSnapshot,
 	clearAuthSession,
-	configureAuthSession,
-} from "@/shared/lib/auth/auth-session";
+	configureAuth,
+} from "@/shared/lib/auth/auth-api";
 import { dispatchSseMessage } from "@/shared/lib/sse/sse-dispatcher";
 
 const sessionEndedPayload = JSON.stringify({
@@ -20,13 +20,13 @@ const snapshot = {
 
 describe("dispatchSseMessage", () => {
 	beforeEach(() => {
-		configureAuthSession({});
+		configureAuth({});
 		clearAuthSession();
 	});
 
 	it("clears the session on session-ended", () => {
 		const onUnauthorized = vi.fn();
-		configureAuthSession({ onUnauthorized });
+		configureAuth({ onCleared: onUnauthorized });
 		applySessionSnapshot(snapshot);
 
 		const event = dispatchSseMessage(sessionEndedPayload);
@@ -37,7 +37,7 @@ describe("dispatchSseMessage", () => {
 
 	it("does not notify again when session-ended arrives after the session is already cleared", () => {
 		const onUnauthorized = vi.fn();
-		configureAuthSession({ onUnauthorized });
+		configureAuth({ onCleared: onUnauthorized });
 		applySessionSnapshot(snapshot);
 
 		dispatchSseMessage(sessionEndedPayload);
@@ -48,7 +48,7 @@ describe("dispatchSseMessage", () => {
 
 	it("ignores malformed JSON", () => {
 		const onUnauthorized = vi.fn();
-		configureAuthSession({ onUnauthorized });
+		configureAuth({ onCleared: onUnauthorized });
 		applySessionSnapshot(snapshot);
 
 		expect(dispatchSseMessage("{not-json")).toBeNull();
@@ -57,7 +57,7 @@ describe("dispatchSseMessage", () => {
 
 	it("ignores envelopes that fail schema validation", () => {
 		const onUnauthorized = vi.fn();
-		configureAuthSession({ onUnauthorized });
+		configureAuth({ onCleared: onUnauthorized });
 		applySessionSnapshot(snapshot);
 
 		expect(

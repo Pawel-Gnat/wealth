@@ -1,15 +1,38 @@
 import type { SessionSnapshot } from "@repo/api/schemas";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
-import {
-	applySessionSnapshot,
-	clearAuthSession,
-} from "@/shared/lib/auth/auth-session";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
 export const SESSION_REFRESH_LEAD_MS = 60_000;
 const MAX_TIMEOUT_MS = 2 ** 31 - 1;
 
+type AuthHandlers = {
+	onApplied?: (snapshot: SessionSnapshot) => void;
+	onCleared?: () => void;
+};
+
 let refreshPromise: Promise<unknown> | null = null;
+let sessionActive = false;
+let onApplied: AuthHandlers["onApplied"];
+let onCleared: AuthHandlers["onCleared"];
+
+export const configureAuth = (next: AuthHandlers): void => {
+	onApplied = next.onApplied;
+	onCleared = next.onCleared;
+};
+
+export const applySessionSnapshot = (snapshot: SessionSnapshot): void => {
+	sessionActive = true;
+	onApplied?.(snapshot);
+};
+
+export const clearAuthSession = (): void => {
+	if (!sessionActive) {
+		return;
+	}
+
+	sessionActive = false;
+	onCleared?.();
+};
 
 export const resetRefreshMutex = (): void => {
 	refreshPromise = null;
@@ -46,9 +69,22 @@ export const bootstrapSession = async (): Promise<SessionSnapshot | null> => {
 	try {
 		const response = await orpcClient.user.me();
 		return response.data;
-	} catch {
-		return null;
+	} catch (error) {
+		if (isUnauthorizedStatus(error)) {
+			return null;
+		}
+
+		throw error;
 	}
+};
+
+const isUnauthorizedStatus = (error: unknown): boolean => {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"status" in error &&
+		error.status === 401
+	);
 };
 
 export const refreshSession = async (): Promise<SessionSnapshot | null> => {

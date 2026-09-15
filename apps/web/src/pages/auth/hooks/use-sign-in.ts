@@ -7,7 +7,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
-import { applySessionSnapshot } from "@/shared/lib/auth/auth-session";
+import { applySessionSnapshot } from "@/shared/lib/auth/auth-api";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
 type UseSignInProps = {

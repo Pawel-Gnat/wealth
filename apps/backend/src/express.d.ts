@@ -3,8 +3,9 @@ export {};
 declare global {
 	namespace Express {
 		interface User {
-			email: string;
 			userId: string;
+			sessionId: string;
+			sessionExpiresAt: Date;
 		}
 
 		interface Request {

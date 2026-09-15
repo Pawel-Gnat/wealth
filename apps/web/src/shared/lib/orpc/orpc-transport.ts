@@ -5,7 +5,6 @@ import {
 	setRequestId,
 } from "@repo/observability/browser";
 import { reportClientError } from "@/shared/helpers/controlled-fetch";
-import { clearAuthSession } from "@/shared/lib/auth/auth-session";
 
 const PUBLIC_AUTH_PATHS = new Set([
 	"/auth/signin",
@@ -13,14 +12,6 @@ const PUBLIC_AUTH_PATHS = new Set([
 	"/auth/refresh",
 	"/auth/logout",
 ]);
-
-type RefreshSession = () => Promise<unknown>;
-
-let refreshSession: RefreshSession | null = null;
-
-export const configureOrpcRefresh = (next: RefreshSession | null): void => {
-	refreshSession = next;
-};
 
 const toRequestUrl = (input: RequestInfo | URL): string => {
 	if (typeof input === "string") {
@@ -52,10 +43,6 @@ const getRequestPathname = (requestUrl: string): string => {
 
 const isPublicAuthRoute = (requestUrl: string): boolean => {
 	return PUBLIC_AUTH_PATHS.has(getRequestPathname(requestUrl));
-};
-
-const shouldAttemptRefresh = (requestUrl: string): boolean => {
-	return !isPublicAuthRoute(requestUrl);
 };
 
 const createRequestInit = (
@@ -94,22 +81,15 @@ export const orpcTransportFetch = async (
 
 		if (
 			response.status === 401 &&
-			shouldAttemptRefresh(requestUrl) &&
-			typeof window !== "undefined" &&
-			refreshSession
+			!isPublicAuthRoute(requestUrl) &&
+			typeof window !== "undefined"
 		) {
+			const { refreshSession } = await import("@/shared/lib/auth/auth-api");
 			const snapshot = await refreshSession();
 
 			if (snapshot) {
 				response = await fetch(input, createRequestInit(requestId, init));
 			}
-		} else if (
-			response.status === 401 &&
-			!isPublicAuthRoute(requestUrl) &&
-			typeof window !== "undefined" &&
-			!refreshSession
-		) {
-			clearAuthSession();
 		}
 
 		return response;

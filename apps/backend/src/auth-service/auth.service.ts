@@ -1,5 +1,10 @@
 import { createHash, randomBytes } from "node:crypto";
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+	Inject,
+	Injectable,
+	InternalServerErrorException,
+	UnauthorizedException,
+} from "@nestjs/common";
 import { ORPCError } from "@orpc/server";
 import {
 	type SessionSnapshotResponse,
@@ -38,7 +43,6 @@ const BCRYPT_ROUNDS = 10;
 
 export type RpcSession = {
 	userId: string;
-	email: string;
 	sessionId: string;
 	sessionExpiresAt: Date;
 };
@@ -185,13 +189,18 @@ export class AuthService {
 	}
 
 	async me(request: Request): Promise<SessionSnapshotResponse> {
-		const session = await this.resolveRpcSession(request);
-		if (!session) {
+		const session = request.user;
+		if (!session?.userId || !session.sessionExpiresAt) {
+			throw new UnauthorizedException("Unauthorized");
+		}
+
+		const user = await this.usersService.findUserById(session.userId);
+		if (!user) {
 			throw new UnauthorizedException("Unauthorized");
 		}
 
 		return this.toSnapshot(
-			{ id: session.userId, email: session.email },
+			{ id: String(user.id), email: user.email },
 			session.sessionExpiresAt,
 		);
 	}
@@ -292,7 +301,7 @@ export class AuthService {
 			.returning({ id: sessionsTable.id });
 
 		if (!row) {
-			throw new UnauthorizedException("Invalid credentials");
+			throw new InternalServerErrorException("Failed to create session");
 		}
 
 		return {
@@ -315,7 +324,11 @@ export class AuthService {
 				: sessionsTable.refreshExpiresAt;
 
 		const [row] = await this.db
-			.select()
+			.select({
+				id: sessionsTable.id,
+				userId: sessionsTable.userId,
+				sessionExpiresAt: sessionsTable.sessionExpiresAt,
+			})
 			.from(sessionsTable)
 			.where(and(eq(sessionsTable[column], tokenHash), gt(expiryColumn, now)))
 			.limit(1);
@@ -324,14 +337,8 @@ export class AuthService {
 			return null;
 		}
 
-		const user = await this.usersService.findUserById(row.userId);
-		if (!user) {
-			return null;
-		}
-
 		return {
-			userId: String(user.id),
-			email: user.email,
+			userId: row.userId,
 			sessionId: row.id,
 			sessionExpiresAt: row.sessionExpiresAt,
 		};

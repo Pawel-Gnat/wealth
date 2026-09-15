@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	applySessionSnapshot,
 	clearAuthSession,
-	configureAuthSession,
-} from "@/shared/lib/auth/auth-session";
+	configureAuth,
+} from "@/shared/lib/auth/auth-api";
 import {
 	configureSseGateway,
 	resetSseGatewayForTests,
@@ -15,7 +15,7 @@ import { createMockEventSourceFactory } from "@/test/mocks/event-source";
 describe("sse-gateway", () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
-		configureAuthSession({});
+		configureAuth({});
 		clearAuthSession();
 		resetSseGatewayForTests();
 	});
@@ -144,7 +144,7 @@ describe("sse-gateway", () => {
 			getUrl: () => "http://backend.test/sse",
 			createEventSource,
 		});
-		configureAuthSession({ onUnauthorized });
+		configureAuth({ onCleared: onUnauthorized });
 		applySessionSnapshot({
 			user: { id: "user-1", email: "ada@example.com" },
 			sessionExpiresAt: "2026-09-15T08:15:00.000Z",
@@ -175,7 +175,7 @@ describe("sse-gateway", () => {
 			getUrl: () => "http://backend.test/sse",
 			createEventSource,
 		});
-		configureAuthSession({ onUnauthorized });
+		configureAuth({ onCleared: onUnauthorized });
 		applySessionSnapshot({
 			user: { id: "user-1", email: "ada@example.com" },
 			sessionExpiresAt: "2026-09-15T08:15:00.000Z",

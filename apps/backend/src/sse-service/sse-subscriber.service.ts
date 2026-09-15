@@ -8,7 +8,6 @@ import { SSE_OBSERVABILITY_EVENTS } from "@repo/observability/node";
 import { RedisService } from "../redis-service/redis.service.js";
 import { logSseEvent } from "../shared/observability/log-event.js";
 import { userIdFromSseChannel } from "./helpers/sse-channels.js";
-import { filterConnectionsForEvent } from "./helpers/sse-event-filter.js";
 import { SseConnectionRegistry } from "./sse-connection-registry.service.js";
 
 @Injectable()
@@ -54,10 +53,9 @@ export class SseSubscriber implements OnModuleInit, OnModuleDestroy {
 		}
 
 		const event = result.data;
-		const matching = filterConnectionsForEvent(
-			this.connectionRegistry.getConnections(userId),
-			event,
-		);
+		const matching = this.connectionRegistry
+			.getConnections(userId)
+			.filter((connection) => connection.sessionId === event.targetId);
 
 		for (const connection of matching) {
 			connection.sink.next(event);

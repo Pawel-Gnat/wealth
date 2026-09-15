@@ -16,16 +16,19 @@ describe("SessionGuard", () => {
 		const authService = {
 			resolveRpcSession: vi.fn().mockResolvedValue({
 				userId: "user-1",
-				email: "ada@example.com",
 				sessionId: "session-1",
-				sessionExpiresAt: new Date(),
+				sessionExpiresAt: new Date("2026-09-15T08:15:00.000Z"),
 			}),
 		};
 		const guard = new SessionGuard(authService as unknown as AuthService);
 
 		await expect(guard.canActivate(createContext(request))).resolves.toBe(true);
 		expect(request).toMatchObject({
-			user: { userId: "user-1", email: "ada@example.com" },
+			user: {
+				userId: "user-1",
+				sessionId: "session-1",
+				sessionExpiresAt: new Date("2026-09-15T08:15:00.000Z"),
+			},
 		});
 	});
 

@@ -1,8 +1,5 @@
 import { z } from "zod";
 
-export const sseScopeSchema = z.enum(["session", "user", "group"]);
-export type SseScope = z.infer<typeof sseScopeSchema>;
-
 export const sessionEndedEventSchema = z.object({
 	type: z.literal("session-ended"),
 	targetId: z.string().min(1),

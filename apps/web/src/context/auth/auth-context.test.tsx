@@ -3,11 +3,11 @@ import userEvent from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAuth } from "@/context/auth";
-import { resetRefreshMutex } from "@/shared/lib/auth/auth-api";
 import {
 	applySessionSnapshot,
 	clearAuthSession,
-} from "@/shared/lib/auth/auth-session";
+	resetRefreshMutex,
+} from "@/shared/lib/auth/auth-api";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 
@@ -25,10 +25,22 @@ const unauthorizedMe = () =>
 	);
 
 const AuthProbe = () => {
-	const { user, isAuthLoading, logout } = useAuth();
+	const { user, isAuthLoading, isBootstrapError, retryBootstrap, logout } =
+		useAuth();
 
 	if (isAuthLoading) {
 		return <div data-testid="auth-loading">loading</div>;
+	}
+
+	if (isBootstrapError) {
+		return (
+			<div>
+				<div data-testid="auth-bootstrap-error">bootstrap-error</div>
+				<button type="button" onClick={retryBootstrap}>
+					retry
+				</button>
+			</div>
+		);
 	}
 
 	return (
@@ -120,5 +132,47 @@ describe("AuthProvider", () => {
 			expect(screen.getByTestId("auth-user")).toHaveTextContent("anonymous");
 		});
 		expect(stopSseGateway).toHaveBeenCalled();
+	});
+
+	it("shows a retryable error when GET /me fails with a non-auth error", async () => {
+		const user = userEvent.setup();
+		let meCalls = 0;
+		server.use(
+			http.get("*/auth/me", () => {
+				meCalls += 1;
+				if (meCalls === 1) {
+					return HttpResponse.json(
+						{ error: { message: "Internal Server Error" } },
+						{ status: 500 },
+					);
+				}
+
+				return HttpResponse.json({
+					data: {
+						user: {
+							id: "01JTZKQX2GT6PHGQER0M8FS6K8",
+							email: "test@example.com",
+						},
+						sessionExpiresAt: new Date(
+							Date.now() + 15 * 60 * 1000,
+						).toISOString(),
+					},
+				});
+			}),
+		);
+
+		renderWithProviders(<AuthProbe />);
+
+		expect(
+			await screen.findByTestId("auth-bootstrap-error"),
+		).toBeInTheDocument();
+		expect(startSseGateway).not.toHaveBeenCalled();
+
+		await user.click(screen.getByRole("button", { name: "retry" }));
+
+		expect(await screen.findByTestId("auth-user")).toHaveTextContent(
+			"test@example.com",
+		);
+		expect(startSseGateway).toHaveBeenCalled();
 	});
 });

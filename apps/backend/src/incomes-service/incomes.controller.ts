@@ -2,53 +2,42 @@ import { Controller, UseGuards } from "@nestjs/common";
 import { Implement, implement, ORPCError } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
 import { SessionGuard } from "../guards/session.guard.js";
+import { userIdFromRequest } from "../guards/user-id-from-request.js";
 import { IncomesService } from "./incomes.service.js";
 
 @Controller()
+@UseGuards(SessionGuard)
 export class IncomesController {
 	constructor(private readonly incomesService: IncomesService) {}
 
-	@UseGuards(SessionGuard)
 	@Implement(rpcContract.incomes.list)
 	listIncomeDocumentsRpc() {
 		return implement(rpcContract.incomes.list).handler(({ context }) => {
-			const user = context.request.user;
-			if (!user?.userId) {
-				throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
-			}
-
-			return this.incomesService.listIncomeDocumentsByUserId(user.userId);
+			return this.incomesService.listIncomeDocumentsByUserId(
+				userIdFromRequest(context.request),
+			);
 		});
 	}
 
-	@UseGuards(SessionGuard)
 	@Implement(rpcContract.incomes.create)
 	createIncomeRpc() {
 		return implement(rpcContract.incomes.create).handler(
 			({ context, input }) => {
-				const user = context.request.user;
-				if (!user?.userId) {
-					throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
-				}
-
-				return this.incomesService.createIncomeByUserId(user.userId, input);
+				return this.incomesService.createIncomeByUserId(
+					userIdFromRequest(context.request),
+					input,
+				);
 			},
 		);
 	}
 
-	@UseGuards(SessionGuard)
 	@Implement(rpcContract.incomes.get)
 	getIncomeRpc() {
 		return implement(rpcContract.incomes.get).handler(
 			async ({ context, input }) => {
-				const user = context.request.user;
-				if (!user?.userId) {
-					throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
-				}
-
 				try {
 					return await this.incomesService.getIncomeByUserId(
-						user.userId,
+						userIdFromRequest(context.request),
 						input.id,
 					);
 				} catch (error) {
@@ -61,15 +50,10 @@ export class IncomesController {
 		);
 	}
 
-	@UseGuards(SessionGuard)
 	@Implement(rpcContract.incomes.update)
 	updateIncomeRpc() {
 		return implement(rpcContract.incomes.update).handler(
 			async ({ context, input }) => {
-				const user = context.request.user;
-				if (!user?.userId) {
-					throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
-				}
 				try {
 					const incomeId = input.id;
 					if (incomeId === undefined) {
@@ -79,7 +63,7 @@ export class IncomesController {
 					}
 
 					return await this.incomesService.updateIncomeByUserId(
-						user.userId,
+						userIdFromRequest(context.request),
 						incomeId,
 						{ date: input.date, lineItems: input.lineItems },
 					);
@@ -93,19 +77,13 @@ export class IncomesController {
 		);
 	}
 
-	@UseGuards(SessionGuard)
 	@Implement(rpcContract.incomes.delete)
 	deleteIncomeRpc() {
 		return implement(rpcContract.incomes.delete).handler(
 			async ({ context, input }) => {
-				const user = context.request.user;
-				if (!user?.userId) {
-					throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
-				}
-
 				try {
 					return await this.incomesService.deleteIncomeByUserId(
-						user.userId,
+						userIdFromRequest(context.request),
 						input.id,
 					);
 				} catch (error) {

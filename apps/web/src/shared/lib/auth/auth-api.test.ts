@@ -1,14 +1,15 @@
 import { HttpResponse, http } from "msw";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+	applySessionSnapshot,
 	bootstrapSession,
+	clearAuthSession,
+	configureAuth,
 	getSessionRefreshDelayMs,
 	refreshSession,
 	resetRefreshMutex,
 	SESSION_REFRESH_LEAD_MS,
 } from "@/shared/lib/auth/auth-api";
-import { clearAuthSession } from "@/shared/lib/auth/auth-session";
-import { configureOrpcRefresh } from "@/shared/lib/orpc/orpc-transport";
 import { server } from "@/test/servers";
 
 const snapshot = {
@@ -30,9 +31,47 @@ describe("getSessionRefreshDelayMs", () => {
 	});
 });
 
+describe("configureAuth", () => {
+	beforeEach(() => {
+		configureAuth({});
+		resetRefreshMutex();
+		clearAuthSession();
+	});
+
+	it("notifies onApplied with the snapshot", () => {
+		const onApplied = vi.fn();
+		configureAuth({ onApplied });
+
+		applySessionSnapshot(snapshot);
+
+		expect(onApplied).toHaveBeenCalledWith(snapshot);
+	});
+
+	it("notifies onCleared when a session is active", () => {
+		const onCleared = vi.fn();
+		configureAuth({ onCleared });
+		applySessionSnapshot(snapshot);
+
+		clearAuthSession();
+
+		expect(onCleared).toHaveBeenCalledOnce();
+	});
+
+	it("does not notify again when session is already cleared", () => {
+		const onCleared = vi.fn();
+		configureAuth({ onCleared });
+		applySessionSnapshot(snapshot);
+
+		clearAuthSession();
+		clearAuthSession();
+
+		expect(onCleared).toHaveBeenCalledOnce();
+	});
+});
+
 describe("bootstrapSession", () => {
 	beforeEach(() => {
-		configureOrpcRefresh(null);
+		configureAuth({});
 		resetRefreshMutex();
 		clearAuthSession();
 	});
@@ -59,11 +98,24 @@ describe("bootstrapSession", () => {
 
 		await expect(bootstrapSession()).resolves.toBeNull();
 	});
+
+	it("rethrows when GET /me fails with a non-auth error", async () => {
+		server.use(
+			http.get("*/auth/me", () =>
+				HttpResponse.json(
+					{ error: { message: "Internal Server Error" } },
+					{ status: 500 },
+				),
+			),
+		);
+
+		await expect(bootstrapSession()).rejects.toMatchObject({ status: 500 });
+	});
 });
 
 describe("refreshSession", () => {
 	beforeEach(() => {
-		configureOrpcRefresh(null);
+		configureAuth({});
 		resetRefreshMutex();
 		clearAuthSession();
 	});

@@ -4,8 +4,10 @@ import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
 import { toast } from "sonner";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { resetRefreshMutex } from "@/shared/lib/auth/auth-api";
-import { clearAuthSession } from "@/shared/lib/auth/auth-session";
+import {
+	clearAuthSession,
+	resetRefreshMutex,
+} from "@/shared/lib/auth/auth-api";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { resetSseGatewayForTests } from "@/shared/lib/sse";
 import { renderWithProviders } from "@/test/render-with-providers";
