@@ -1,27 +1,25 @@
 import { Controller, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Implement, implement, ORPCError } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
-import { AuthCookieCsrfGuard } from "../guards/auth-cookie-csrf.guard.js";
-import { PassportJwtGuard } from "../guards/passport-jwt.guard.js";
+import { SessionGuard } from "../guards/session.guard.js";
 import { AuthService } from "./auth.service.js";
 
 @Controller()
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
-	@UseGuards(PassportJwtGuard)
+	@UseGuards(SessionGuard)
 	@Implement(rpcContract.user.me)
 	meRpc() {
-		return implement(rpcContract.user.me).handler(({ context }) => {
-			const user = context.request.user;
-			if (!user?.userId) {
-				throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
+		return implement(rpcContract.user.me).handler(async ({ context }) => {
+			try {
+				return await this.authService.me(context.request);
+			} catch (err) {
+				if (err instanceof UnauthorizedException) {
+					throw new ORPCError("UNAUTHORIZED", { message: err.message });
+				}
+				throw err;
 			}
-
-			return {
-				id: String(user.userId),
-				email: user.email,
-			};
 		});
 	}
 
@@ -30,7 +28,11 @@ export class AuthController {
 		return implement(rpcContract.user.signIn).handler(
 			async ({ input, context }) => {
 				try {
-					return await this.authService.signIn(input, context.response);
+					return await this.authService.signIn(
+						input,
+						context.request,
+						context.response,
+					);
 				} catch (err) {
 					if (err instanceof UnauthorizedException) {
 						throw new ORPCError("UNAUTHORIZED", { message: err.message });
@@ -41,7 +43,6 @@ export class AuthController {
 		);
 	}
 
-	@UseGuards(AuthCookieCsrfGuard)
 	@Implement(rpcContract.user.refresh)
 	refreshRpc() {
 		return implement(rpcContract.user.refresh).handler(async ({ context }) => {
@@ -59,11 +60,10 @@ export class AuthController {
 		});
 	}
 
-	@UseGuards(AuthCookieCsrfGuard)
 	@Implement(rpcContract.user.logout)
 	logoutRpc() {
 		return implement(rpcContract.user.logout).handler(async ({ context }) => {
-			return this.authService.logout(context.request, context.response);
+			await this.authService.logout(context.request, context.response);
 		});
 	}
 

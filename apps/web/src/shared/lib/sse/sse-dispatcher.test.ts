@@ -1,91 +1,75 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+	applySessionSnapshot,
 	clearAuthSession,
-	configureAuthSession,
-	getAccessToken,
-	persistAccessToken,
-} from "@/shared/lib/auth/auth-session";
+	configureAuth,
+} from "@/shared/lib/auth/auth-api";
 import { dispatchSseMessage } from "@/shared/lib/sse/sse-dispatcher";
 
-const sessionRevokedPayload = JSON.stringify({
-	type: "auth.session-revoked",
-	payload: {},
-	scope: "session",
+const sessionEndedPayload = JSON.stringify({
+	type: "session-ended",
 	targetId: "session-1",
 	occurredAt: "2026-07-21T12:00:00.000Z",
 	id: "evt-1",
 });
 
+const snapshot = {
+	user: { id: "user-1", email: "ada@example.com" },
+	sessionExpiresAt: "2026-09-15T08:15:00.000Z",
+};
+
 describe("dispatchSseMessage", () => {
 	beforeEach(() => {
-		configureAuthSession({});
+		configureAuth({});
 		clearAuthSession();
 	});
 
-	it("clears the session on auth.session-revoked", () => {
+	it("clears the session on session-ended", () => {
 		const onUnauthorized = vi.fn();
-		persistAccessToken("token");
-		configureAuthSession({ onUnauthorized });
+		configureAuth({ onCleared: onUnauthorized });
+		applySessionSnapshot(snapshot);
 
-		const event = dispatchSseMessage(sessionRevokedPayload);
+		const event = dispatchSseMessage(sessionEndedPayload);
 
-		expect(event?.type).toBe("auth.session-revoked");
-		expect(getAccessToken()).toBeNull();
+		expect(event?.type).toBe("session-ended");
 		expect(onUnauthorized).toHaveBeenCalledOnce();
 	});
 
-	it("does not notify again when auth.session-revoked arrives after the session is already cleared", () => {
+	it("does not notify again when session-ended arrives after the session is already cleared", () => {
 		const onUnauthorized = vi.fn();
-		persistAccessToken("token");
-		configureAuthSession({ onUnauthorized });
+		configureAuth({ onCleared: onUnauthorized });
+		applySessionSnapshot(snapshot);
 
-		dispatchSseMessage(sessionRevokedPayload);
-		dispatchSseMessage(sessionRevokedPayload);
+		dispatchSseMessage(sessionEndedPayload);
+		dispatchSseMessage(sessionEndedPayload);
 
-		expect(getAccessToken()).toBeNull();
 		expect(onUnauthorized).toHaveBeenCalledOnce();
-	});
-
-	it("clears the session for user-scoped auth.session-revoked", () => {
-		persistAccessToken("token");
-
-		const event = dispatchSseMessage(
-			JSON.stringify({
-				type: "auth.session-revoked",
-				payload: {},
-				scope: "user",
-				targetId: "user-1",
-				occurredAt: "2026-07-21T12:00:00.000Z",
-				id: "evt-2",
-			}),
-		);
-
-		expect(event?.scope).toBe("user");
-		expect(getAccessToken()).toBeNull();
 	});
 
 	it("ignores malformed JSON", () => {
-		persistAccessToken("token");
+		const onUnauthorized = vi.fn();
+		configureAuth({ onCleared: onUnauthorized });
+		applySessionSnapshot(snapshot);
 
 		expect(dispatchSseMessage("{not-json")).toBeNull();
-		expect(getAccessToken()).toBe("token");
+		expect(onUnauthorized).not.toHaveBeenCalled();
 	});
 
 	it("ignores envelopes that fail schema validation", () => {
-		persistAccessToken("token");
+		const onUnauthorized = vi.fn();
+		configureAuth({ onCleared: onUnauthorized });
+		applySessionSnapshot(snapshot);
 
 		expect(
 			dispatchSseMessage(
 				JSON.stringify({
 					type: "auth.session-revoked",
-					payload: {},
-					scope: "group",
 					targetId: "session-1",
 					occurredAt: "2026-07-21T12:00:00.000Z",
 					id: "evt-1",
 				}),
 			),
 		).toBeNull();
-		expect(getAccessToken()).toBe("token");
+		expect(onUnauthorized).not.toHaveBeenCalled();
 	});
 });

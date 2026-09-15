@@ -1,5 +1,3 @@
-import { SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES } from "@repo/common/constants";
-import { clearAuthSession } from "@/shared/lib/auth/auth-session";
 import { dispatchSseMessage } from "@/shared/lib/sse/sse-dispatcher";
 
 const RECONNECT_INITIAL_MS = 1_000;
@@ -43,7 +41,6 @@ let config: SseGatewayConfig = { ...defaultConfig };
 let source: EventSourceLike | null = null;
 let intentionalClose = false;
 let reconnectAttempt = 0;
-let consecutiveFailures = 0;
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 let isStarted = false;
 
@@ -82,12 +79,11 @@ const openConnection = (): void => {
 
 	nextSource.onopen = () => {
 		reconnectAttempt = 0;
-		consecutiveFailures = 0;
 	};
 
 	nextSource.onmessage = (event) => {
 		const sseEvent = dispatchSseMessage(String(event.data));
-		if (sseEvent?.type === "auth.session-revoked") {
+		if (sseEvent?.type === "session-ended") {
 			stopSseGateway();
 		}
 	};
@@ -98,14 +94,6 @@ const openConnection = (): void => {
 		}
 
 		detachSource();
-		consecutiveFailures += 1;
-
-		if (consecutiveFailures >= SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES) {
-			clearAuthSession();
-			stopSseGateway();
-			return;
-		}
-
 		scheduleReconnect();
 	};
 
@@ -144,7 +132,6 @@ export const startSseGateway = (): void => {
 
 	intentionalClose = false;
 	isStarted = true;
-	consecutiveFailures = 0;
 	openConnection();
 };
 
@@ -154,7 +141,6 @@ export const stopSseGateway = (): void => {
 	clearReconnectTimer();
 	detachSource();
 	reconnectAttempt = 0;
-	consecutiveFailures = 0;
 };
 
 export const resetSseGatewayForTests = (): void => {

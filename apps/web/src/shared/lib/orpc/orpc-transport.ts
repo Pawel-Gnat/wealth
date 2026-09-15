@@ -1,19 +1,10 @@
-import {
-	AUTH_CSRF_HEADER_NAME,
-	AUTH_CSRF_HEADER_VALUE,
-	REQUEST_ID_HEADER_NAME,
-} from "@repo/common/constants";
+import { REQUEST_ID_HEADER_NAME } from "@repo/common/constants";
 import {
 	clearRequestId,
 	getRequestId,
 	setRequestId,
 } from "@repo/observability/browser";
 import { reportClientError } from "@/shared/helpers/controlled-fetch";
-import {
-	clearAuthSession,
-	getAccessToken,
-} from "@/shared/lib/auth/auth-session";
-import { refreshAccessToken } from "@/shared/lib/auth/refresh-access-token";
 
 const PUBLIC_AUTH_PATHS = new Set([
 	"/auth/signin",
@@ -22,7 +13,21 @@ const PUBLIC_AUTH_PATHS = new Set([
 	"/auth/logout",
 ]);
 
-const COOKIE_AUTH_CSRF_PATHS = new Set(["/auth/refresh", "/auth/logout"]);
+const toRequestUrl = (input: RequestInfo | URL): string => {
+	if (typeof input === "string") {
+		return input;
+	}
+
+	if (input instanceof URL) {
+		return input.href;
+	}
+
+	if (typeof Request !== "undefined" && input instanceof Request) {
+		return input.url;
+	}
+
+	return String(input);
+};
 
 const getRequestPathname = (requestUrl: string): string => {
 	try {
@@ -40,26 +45,11 @@ const isPublicAuthRoute = (requestUrl: string): boolean => {
 	return PUBLIC_AUTH_PATHS.has(getRequestPathname(requestUrl));
 };
 
-const shouldAttemptRefresh = (requestUrl: string): boolean => {
-	return !isPublicAuthRoute(requestUrl);
-};
-
 const createRequestInit = (
-	requestUrl: string,
 	requestId: string,
 	init?: RequestInit,
 ): RequestInit => {
 	const headers = new Headers(init?.headers);
-	const token = getAccessToken();
-
-	if (token) {
-		headers.set("Authorization", `Bearer ${token}`);
-	}
-
-	if (COOKIE_AUTH_CSRF_PATHS.has(getRequestPathname(requestUrl))) {
-		headers.set(AUTH_CSRF_HEADER_NAME, AUTH_CSRF_HEADER_VALUE);
-	}
-
 	headers.set(REQUEST_ID_HEADER_NAME, requestId);
 
 	if (typeof window !== "undefined") {
@@ -77,7 +67,7 @@ export const orpcTransportFetch = async (
 	input: RequestInfo | URL,
 	init?: RequestInit,
 ): Promise<Response> => {
-	const requestUrl = String(input);
+	const requestUrl = toRequestUrl(input);
 	const existingRequestId = getRequestId();
 	const requestId = existingRequestId ?? crypto.randomUUID();
 	const ownsRequestId = existingRequestId === undefined;
@@ -87,32 +77,19 @@ export const orpcTransportFetch = async (
 	}
 
 	try {
-		let response = await fetch(
-			input,
-			createRequestInit(requestUrl, requestId, init),
-		);
+		let response = await fetch(input, createRequestInit(requestId, init));
 
 		if (
-			response.status === 401 &&
-			shouldAttemptRefresh(requestUrl) &&
-			typeof window !== "undefined"
-		) {
-			const refreshedToken = await refreshAccessToken();
-
-			if (refreshedToken) {
-				response = await fetch(
-					input,
-					createRequestInit(requestUrl, requestId, init),
-				);
-			} else if (!isPublicAuthRoute(requestUrl)) {
-				clearAuthSession();
-			}
-		} else if (
 			response.status === 401 &&
 			!isPublicAuthRoute(requestUrl) &&
 			typeof window !== "undefined"
 		) {
-			clearAuthSession();
+			const { refreshSession } = await import("@/shared/lib/auth/auth-api");
+			const snapshot = await refreshSession();
+
+			if (snapshot) {
+				response = await fetch(input, createRequestInit(requestId, init));
+			}
 		}
 
 		return response;

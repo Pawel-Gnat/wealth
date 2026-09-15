@@ -18,7 +18,6 @@ function startBackendWithLifecycle({
 		env: {
 			...process.env,
 			DATABASE_URL: databaseUrl,
-			JWT_SECRET: "test-only-jwt-secret",
 		},
 	});
 

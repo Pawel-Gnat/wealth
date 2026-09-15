@@ -4,9 +4,12 @@ import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
 import { toast } from "sonner";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { getAccessToken } from "@/shared/lib/auth/auth-session";
-import { resetRefreshMutex } from "@/shared/lib/auth/refresh-access-token";
+import {
+	clearAuthSession,
+	resetRefreshMutex,
+} from "@/shared/lib/auth/auth-api";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
+import { resetSseGatewayForTests } from "@/shared/lib/sse";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 import { SigninForm } from "./signin-form";
@@ -26,14 +29,16 @@ describe("SigninForm", () => {
 
 	beforeEach(() => {
 		vi.mocked(toast.error).mockClear();
+		clearAuthSession();
 		resetRefreshMutex();
+		resetSseGatewayForTests();
 	});
 
 	describe("form submission", () => {
-		it("persists token after successful sign in", async () => {
+		it("does not show an error toast after successful sign in", async () => {
 			const user = userEvent.setup();
 			renderWithProviders(<SigninForm />);
-			const emailInput = screen.getByLabelText(
+			const emailInput = await screen.findByLabelText(
 				t("email.label", { ns: "form" }),
 			);
 			const passwordInput = screen.getByLabelText(
@@ -48,8 +53,9 @@ describe("SigninForm", () => {
 			await user.click(signinButton);
 
 			await waitFor(() => {
-				expect(getAccessToken()).toBe("mock-jwt-access-token");
+				expect(signinButton).toBeEnabled();
 			});
+			expect(toast.error).not.toHaveBeenCalled();
 		});
 
 		it("shows error toast on API error", async () => {
@@ -64,7 +70,7 @@ describe("SigninForm", () => {
 			);
 
 			renderWithProviders(<SigninForm />);
-			const emailInput = screen.getByLabelText(
+			const emailInput = await screen.findByLabelText(
 				t("email.label", { ns: "form" }),
 			);
 			const passwordInput = screen.getByLabelText(
@@ -90,7 +96,7 @@ describe("SigninForm", () => {
 		it("shows field errors when submitting an empty form", async () => {
 			const user = userEvent.setup();
 			renderWithProviders(<SigninForm />);
-			const signinButton = screen.getByRole("button", {
+			const signinButton = await screen.findByRole("button", {
 				name: t("action.signin", { ns: "common" }),
 			});
 

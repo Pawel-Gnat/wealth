@@ -1,7 +1,7 @@
 import type { SseEvent } from "@repo/api/schemas";
 import { sseEventSchema } from "@repo/api/schemas";
 import { logger, SSE_OBSERVABILITY_EVENTS } from "@repo/observability/browser";
-import { clearAuthSession } from "@/shared/lib/auth/auth-session";
+import { clearAuthSession } from "@/shared/lib/auth/auth-api";
 
 export const dispatchSseMessage = (raw: string): SseEvent | null => {
 	let parsed: unknown;
@@ -21,7 +21,7 @@ export const dispatchSseMessage = (raw: string): SseEvent | null => {
 	const event = result.data;
 
 	switch (event.type) {
-		case "auth.session-revoked":
+		case "session-ended":
 			clearAuthSession();
 			break;
 	}

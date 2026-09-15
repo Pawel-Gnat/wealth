@@ -1,11 +1,9 @@
-import { SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES } from "@repo/common/constants";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+	applySessionSnapshot,
 	clearAuthSession,
-	configureAuthSession,
-	getAccessToken,
-	persistAccessToken,
-} from "@/shared/lib/auth/auth-session";
+	configureAuth,
+} from "@/shared/lib/auth/auth-api";
 import {
 	configureSseGateway,
 	resetSseGatewayForTests,
@@ -17,7 +15,7 @@ import { createMockEventSourceFactory } from "@/test/mocks/event-source";
 describe("sse-gateway", () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
-		configureAuthSession({});
+		configureAuth({});
 		clearAuthSession();
 		resetSseGatewayForTests();
 	});
@@ -139,27 +137,30 @@ describe("sse-gateway", () => {
 		expect(instances).toHaveLength(3);
 	});
 
-	it("clears the session and stops reconnecting on auth.session-revoked", async () => {
+	it("clears the session and stops reconnecting on session-ended", async () => {
+		const onUnauthorized = vi.fn();
 		const { createEventSource, instances } = createMockEventSourceFactory();
 		configureSseGateway({
 			getUrl: () => "http://backend.test/sse",
 			createEventSource,
 		});
-		persistAccessToken("token");
+		configureAuth({ onCleared: onUnauthorized });
+		applySessionSnapshot({
+			user: { id: "user-1", email: "ada@example.com" },
+			sessionExpiresAt: "2026-09-15T08:15:00.000Z",
+		});
 
 		startSseGateway();
 		instances[0]?.emitMessage(
 			JSON.stringify({
-				type: "auth.session-revoked",
-				payload: {},
-				scope: "session",
+				type: "session-ended",
 				targetId: "session-1",
 				occurredAt: "2026-07-21T12:00:00.000Z",
 				id: "evt-1",
 			}),
 		);
 
-		expect(getAccessToken()).toBeNull();
+		expect(onUnauthorized).toHaveBeenCalledOnce();
 		expect(instances[0]?.close).toHaveBeenCalledOnce();
 
 		instances[0]?.emitError();
@@ -167,29 +168,26 @@ describe("sse-gateway", () => {
 		expect(instances).toHaveLength(1);
 	});
 
-	it("clears the session after consecutive SSE failures without a successful open", async () => {
+	it("keeps reconnecting after repeated errors and does not clear the session", async () => {
+		const onUnauthorized = vi.fn();
 		const { createEventSource, instances } = createMockEventSourceFactory();
 		configureSseGateway({
 			getUrl: () => "http://backend.test/sse",
 			createEventSource,
 		});
-		persistAccessToken("token");
+		configureAuth({ onCleared: onUnauthorized });
+		applySessionSnapshot({
+			user: { id: "user-1", email: "ada@example.com" },
+			sessionExpiresAt: "2026-09-15T08:15:00.000Z",
+		});
 
 		startSseGateway();
+		instances[0]?.emitError();
+		await vi.advanceTimersByTimeAsync(30_000);
+		instances[1]?.emitError();
+		await vi.advanceTimersByTimeAsync(30_000);
 
-		for (
-			let index = 0;
-			index < SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES;
-			index += 1
-		) {
-			instances[index]?.emitError();
-			if (index < SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES - 1) {
-				await vi.advanceTimersByTimeAsync(30_000);
-			}
-		}
-
-		expect(getAccessToken()).toBeNull();
-		await vi.advanceTimersByTimeAsync(60_000);
-		expect(instances).toHaveLength(SSE_GATEWAY_MAX_CONSECUTIVE_FAILURES);
+		expect(onUnauthorized).not.toHaveBeenCalled();
+		expect(instances).toHaveLength(3);
 	});
 });

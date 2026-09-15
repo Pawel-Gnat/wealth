@@ -41,7 +41,7 @@ describe("SSE Redis pub/sub smoke", () => {
 		await redis?.stop();
 	});
 
-	it("delivers a published auth.session-revoked envelope to a subscriber", async () => {
+	it("delivers a published session-ended envelope to a subscriber", async () => {
 		expect(redisService.isAvailable()).toBe(true);
 
 		const channel = sseUserChannel("smoke-user");
@@ -56,18 +56,15 @@ describe("SSE Redis pub/sub smoke", () => {
 		await expect(redisService.subscribe(channel)).resolves.toBe(true);
 
 		await expect(
-			publisher.publishAuthSessionRevoked({
+			publisher.publishSessionEnded({
 				userId: "smoke-user",
-				scope: "session",
 				targetId: "smoke-session",
 			}),
 		).resolves.toBe(true);
 
 		const payload = JSON.parse(await received);
 		expect(payload).toMatchObject({
-			type: "auth.session-revoked",
-			payload: {},
-			scope: "session",
+			type: "session-ended",
 			targetId: "smoke-session",
 		});
 

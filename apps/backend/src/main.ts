@@ -42,13 +42,7 @@ async function bootstrap() {
 	app.enableCors({
 		origin: resolveCorsOrigin(),
 		credentials: true,
-		allowedHeaders: [
-			"Authorization",
-			"Content-Type",
-			"X-Timezone",
-			"X-Requested-With",
-			REQUEST_ID_HEADER_NAME,
-		],
+		allowedHeaders: ["Content-Type", "X-Timezone", REQUEST_ID_HEADER_NAME],
 	});
 
 	if (!isProduction()) {

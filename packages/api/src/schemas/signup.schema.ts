@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { apiPayload } from "./common.schema";
 
+export const USER_CREATED_MESSAGE = "user_created" as const;
+
 export const signUpPayloadSchema = z
 	.object({
 		email: z.email("form:email.invalid").trim().toLowerCase(),
@@ -20,7 +22,7 @@ export const signUpPayloadSchema = z
 export type SignUpPayload = z.infer<typeof signUpPayloadSchema>;
 
 export const signUpResponseDataSchema = z.object({
-	message: z.literal("user_created"),
+	message: z.literal(USER_CREATED_MESSAGE),
 });
 export type SignUpResponseData = z.infer<typeof signUpResponseDataSchema>;
 

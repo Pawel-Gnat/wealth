@@ -27,11 +27,10 @@ describe("SsePublisher", () => {
 		await moduleRef.close();
 	});
 
-	it("publishes auth.session-revoked envelopes on the user channel", async () => {
+	it("publishes session-ended envelopes on the user channel", async () => {
 		await expect(
-			publisher.publishAuthSessionRevoked({
+			publisher.publishSessionEnded({
 				userId: "user-1",
-				scope: "session",
 				targetId: "session-a",
 			}),
 		).resolves.toBe(true);
@@ -41,23 +40,21 @@ describe("SsePublisher", () => {
 
 		const envelope = JSON.parse(publish.mock.calls[0]?.[1] as string);
 		expect(envelope).toMatchObject({
-			type: "auth.session-revoked",
-			payload: {},
-			scope: "session",
+			type: "session-ended",
 			targetId: "session-a",
 		});
 		expect(envelope.id).toBeTypeOf("string");
 		expect(envelope.occurredAt).toBeTypeOf("string");
+		expect(envelope).not.toHaveProperty("scope");
 	});
 
 	it("returns false when Redis publish is unavailable", async () => {
 		publish.mockResolvedValueOnce(false);
 
 		await expect(
-			publisher.publishAuthSessionRevoked({
+			publisher.publishSessionEnded({
 				userId: "user-1",
-				scope: "user",
-				targetId: "user-1",
+				targetId: "session-a",
 			}),
 		).resolves.toBe(false);
 	});

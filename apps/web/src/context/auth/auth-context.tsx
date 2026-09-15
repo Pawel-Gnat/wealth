@@ -1,3 +1,4 @@
+import type { SessionSnapshot, User } from "@repo/api/schemas";
 import {
 	AUTH_OBSERVABILITY_EVENTS,
 	logger,
@@ -11,17 +12,26 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
-import { bootstrapSession, logoutSession } from "@/shared/lib/auth/auth-api";
-import { configureAuthSession } from "@/shared/lib/auth/auth-session";
-import { initAuthTabSync } from "@/shared/lib/auth/refresh-access-token";
+import {
+	applySessionSnapshot,
+	bootstrapSession,
+	configureAuth,
+	getSessionRefreshDelayMs,
+	logoutSession,
+	refreshSession,
+} from "@/shared/lib/auth/auth-api";
 import { startSseGateway, stopSseGateway } from "@/shared/lib/sse";
 
 type AuthContextValue = {
-	isAuthenticated: boolean;
+	user: User | null;
 	isAuthLoading: boolean;
+	isResolvingSession: boolean;
+	isBootstrapError: boolean;
+	retryBootstrap: () => void;
 	logout: () => Promise<void>;
 };
 
@@ -29,35 +39,58 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const queryClient = useQueryClient();
-	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [user, setUser] = useState<User | null>(null);
 	const [isResolvingSession, setIsResolvingSession] = useState(true);
+	const [isBootstrapError, setIsBootstrapError] = useState(false);
 	const isAuthLoading = useSkeletonLoader({
 		isLoading: isResolvingSession,
-		delay: 0,
 	});
+	const initializeAuthRef = useRef<(() => Promise<void>) | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
+		let refreshTimer: ReturnType<typeof setTimeout> | null = null;
 
-		configureAuthSession({
-			onTokenRefreshed: () => {
-				setIsAuthenticated(true);
-				startSseGateway();
-			},
-			onUnauthorized: () => {
+		const clearRefreshTimer = () => {
+			if (refreshTimer === null) {
+				return;
+			}
+
+			clearTimeout(refreshTimer);
+			refreshTimer = null;
+		};
+
+		const applySnapshot = (snapshot: SessionSnapshot) => {
+			setUser(snapshot.user);
+			startSseGateway();
+			clearRefreshTimer();
+			refreshTimer = setTimeout(() => {
+				void refreshSession();
+			}, getSessionRefreshDelayMs(snapshot.sessionExpiresAt));
+		};
+
+		configureAuth({
+			onApplied: applySnapshot,
+			onCleared: () => {
+				clearRefreshTimer();
 				stopSseGateway();
-				setIsAuthenticated(false);
+				setUser(null);
 				queryClient.clear();
 			},
 		});
 
-		const stopTabSync = initAuthTabSync();
-
 		const initializeAuth = async () => {
 			try {
-				const hasSession = await bootstrapSession();
+				const snapshot = await bootstrapSession();
+				if (!cancelled && snapshot) {
+					applySessionSnapshot(snapshot);
+				}
 				if (!cancelled) {
-					setIsAuthenticated(hasSession);
+					setIsBootstrapError(false);
+				}
+			} catch {
+				if (!cancelled) {
+					setIsBootstrapError(true);
 				}
 			} finally {
 				if (!cancelled) {
@@ -66,15 +99,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 		};
 
+		initializeAuthRef.current = initializeAuth;
 		void initializeAuth();
 
 		return () => {
 			cancelled = true;
-			configureAuthSession({});
-			stopTabSync();
+			initializeAuthRef.current = null;
+			clearRefreshTimer();
+			configureAuth({});
 			stopSseGateway();
 		};
 	}, [queryClient]);
+
+	const retryBootstrap = useCallback(() => {
+		setIsResolvingSession(true);
+		void initializeAuthRef.current?.();
+	}, []);
 
 	const logout = useCallback(async () => {
 		await runWithRequestId(async () => {
@@ -85,11 +125,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const value = useMemo<AuthContextValue>(
 		() => ({
-			isAuthenticated,
+			user,
 			isAuthLoading,
+			isResolvingSession,
+			isBootstrapError,
+			retryBootstrap,
 			logout,
 		}),
-		[isAuthenticated, isAuthLoading, logout],
+		[
+			user,
+			isAuthLoading,
+			isResolvingSession,
+			isBootstrapError,
+			retryBootstrap,
+			logout,
+		],
 	);
 
 	return <AuthContext value={value}>{children}</AuthContext>;
