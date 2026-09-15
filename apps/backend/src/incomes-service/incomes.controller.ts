@@ -1,14 +1,14 @@
 import { Controller, UseGuards } from "@nestjs/common";
 import { Implement, implement, ORPCError } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
-import { PassportJwtGuard } from "../guards/passport-jwt.guard.js";
+import { SessionGuard } from "../guards/session.guard.js";
 import { IncomesService } from "./incomes.service.js";
 
 @Controller()
 export class IncomesController {
 	constructor(private readonly incomesService: IncomesService) {}
 
-	@UseGuards(PassportJwtGuard)
+	@UseGuards(SessionGuard)
 	@Implement(rpcContract.incomes.list)
 	listIncomeDocumentsRpc() {
 		return implement(rpcContract.incomes.list).handler(({ context }) => {
@@ -21,7 +21,7 @@ export class IncomesController {
 		});
 	}
 
-	@UseGuards(PassportJwtGuard)
+	@UseGuards(SessionGuard)
 	@Implement(rpcContract.incomes.create)
 	createIncomeRpc() {
 		return implement(rpcContract.incomes.create).handler(
@@ -36,7 +36,7 @@ export class IncomesController {
 		);
 	}
 
-	@UseGuards(PassportJwtGuard)
+	@UseGuards(SessionGuard)
 	@Implement(rpcContract.incomes.get)
 	getIncomeRpc() {
 		return implement(rpcContract.incomes.get).handler(
@@ -61,7 +61,7 @@ export class IncomesController {
 		);
 	}
 
-	@UseGuards(PassportJwtGuard)
+	@UseGuards(SessionGuard)
 	@Implement(rpcContract.incomes.update)
 	updateIncomeRpc() {
 		return implement(rpcContract.incomes.update).handler(
@@ -93,7 +93,7 @@ export class IncomesController {
 		);
 	}
 
-	@UseGuards(PassportJwtGuard)
+	@UseGuards(SessionGuard)
 	@Implement(rpcContract.incomes.delete)
 	deleteIncomeRpc() {
 		return implement(rpcContract.incomes.delete).handler(

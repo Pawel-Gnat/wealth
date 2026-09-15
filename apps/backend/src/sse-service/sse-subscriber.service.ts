@@ -62,7 +62,7 @@ export class SseSubscriber implements OnModuleInit, OnModuleDestroy {
 		for (const connection of matching) {
 			connection.sink.next(event);
 
-			if (event.type === "auth.session-revoked") {
+			if (event.type === "session-ended") {
 				connection.sink.complete();
 				await this.connectionRegistry.unregister(
 					connection.userId,

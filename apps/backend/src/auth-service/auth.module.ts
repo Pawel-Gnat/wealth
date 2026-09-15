@@ -1,31 +1,14 @@
 import { Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { JwtModule } from "@nestjs/jwt";
-import { PassportModule } from "@nestjs/passport";
-import { ACCESS_TOKEN_EXPIRES_IN } from "@repo/common/constants";
+import { SessionGuard } from "../guards/session.guard.js";
 import { SseRealtimeModule } from "../sse-service/sse-realtime.module.js";
 import { UsersModule } from "../users-service/users.module.js";
 import { AuthController } from "./auth.controller.js";
 import { AuthService } from "./auth.service.js";
-import { JwtStrategy } from "./strategies/jwt.strategy.js";
 
 @Module({
-	imports: [
-		UsersModule,
-		SseRealtimeModule,
-		JwtModule.registerAsync({
-			global: true,
-			imports: [ConfigModule],
-			useFactory: (config: ConfigService) => ({
-				secret: config.getOrThrow<string>("JWT_SECRET"),
-				signOptions: { expiresIn: ACCESS_TOKEN_EXPIRES_IN },
-			}),
-			inject: [ConfigService],
-		}),
-		PassportModule,
-	],
+	imports: [UsersModule, SseRealtimeModule],
 	controllers: [AuthController],
-	providers: [AuthService, JwtStrategy],
-	exports: [AuthService],
+	providers: [AuthService, SessionGuard],
+	exports: [AuthService, SessionGuard],
 })
 export class AuthModule {}

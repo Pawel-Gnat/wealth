@@ -1,68 +1,52 @@
 import { createHash, randomBytes } from "node:crypto";
 import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
 import { ORPCError } from "@orpc/server";
-import type {
-	LogoutResponse,
-	SignInPayload,
-	SignInResponse,
-	SignUpPayload,
-	SignUpResponse,
-	TokenResponse,
-	User,
+import {
+	type SessionSnapshotResponse,
+	type SignInPayload,
+	type SignUpPayload,
+	type SignUpResponse,
+	USER_CREATED_MESSAGE,
+	type User,
 } from "@repo/api/schemas";
 import {
-	REFRESH_TOKEN_COOKIE_NAME,
-	REFRESH_TOKEN_COOKIE_PATH,
-	REFRESH_TOKEN_EXPIRES_IN_DAYS,
+	REFRESH_COOKIE_NAME,
+	REFRESH_GRACE_MS,
+	REFRESH_TTL_DAYS,
+	SESSION_COOKIE_NAME,
+	SESSION_TTL,
 } from "@repo/common/constants";
 import { AUTH_OBSERVABILITY_EVENTS } from "@repo/observability/node";
 import * as bcrypt from "bcrypt";
 import { addDays } from "date-fns";
-import { and, eq, gt, isNull, lt } from "drizzle-orm";
+import { and, eq, gt } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Request, Response } from "express";
-import { ulid } from "ulid";
 import { DBS } from "../database-service/constants.js";
-import { refreshTokensTable } from "../database-service/tables/index.js";
+import { sessionsTable } from "../database-service/tables/index.js";
+import { isProduction } from "../shared/http/is-production.js";
 import { logAuthEvent } from "../shared/observability/log-event.js";
 import { SsePublisher } from "../sse-service/sse-publisher.service.js";
 import { UsersService } from "../users-service/users.service.js";
+import {
+	clearAuthCookies,
+	readAuthCookie,
+	setAuthCookies,
+} from "./auth-cookies.js";
 
 const BCRYPT_ROUNDS = 10;
 
-type RefreshTokensDb = Pick<NodePgDatabase, "delete">;
-
-type AuthSessionResult = {
-	accessToken: string;
-	refreshToken: string;
-	refreshExpiresAt: Date;
-	sessionId: string;
-};
-
-export type SessionRevocationCapture = {
+export type RpcSession = {
 	userId: string;
+	email: string;
 	sessionId: string;
+	sessionExpiresAt: Date;
 };
-
-export class RefreshTokenReuseError extends UnauthorizedException {
-	readonly userId: string;
-	readonly sessionId: string;
-
-	constructor(capture: SessionRevocationCapture) {
-		super("Invalid refresh token");
-		this.userId = capture.userId;
-		this.sessionId = capture.sessionId;
-	}
-}
 
 @Injectable()
 export class AuthService {
 	constructor(
 		private usersService: UsersService,
-		private jwtService: JwtService,
-		private configService: ConfigService,
 		@Inject(DBS.APP) private readonly db: NodePgDatabase,
 		private readonly ssePublisher: SsePublisher,
 	) {}
@@ -84,268 +68,167 @@ export class AuthService {
 
 	async signIn(
 		payload: SignInPayload,
+		request: Request,
 		response: Response,
-	): Promise<SignInResponse> {
-		const session = await this.createSignInSession(payload);
-		this.setRefreshTokenCookie(
-			response,
-			session.refreshToken,
-			session.refreshExpiresAt,
-		);
-
+	): Promise<SessionSnapshotResponse> {
+		const user = await this.validateUser(payload);
+		await this.replaceSessionFromRefreshCookie(request);
+		const tokens = await this.insertSession(user.id);
+		setAuthCookies(response, tokens, isProduction());
 		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.signInSucceeded);
-		return { data: { token: session.accessToken } };
+		return this.toSnapshot(user, tokens.sessionExpiresAt);
 	}
 
-	async refresh(request: Request, response: Response): Promise<TokenResponse> {
-		const refreshToken = this.readRefreshTokenFromRequest(request);
+	async refresh(
+		request: Request,
+		response: Response,
+	): Promise<SessionSnapshotResponse> {
+		const refreshToken = readAuthCookie(request, REFRESH_COOKIE_NAME);
 		if (!refreshToken) {
 			throw new UnauthorizedException("Invalid refresh token");
 		}
 
-		const session = await this.refreshSession(refreshToken);
-		this.setRefreshTokenCookie(
-			response,
-			session.refreshToken,
-			session.refreshExpiresAt,
-		);
-
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.refreshSucceeded);
-		return { data: { token: session.accessToken } };
-	}
-
-	async logout(request: Request, response: Response): Promise<LogoutResponse> {
-		const refreshToken = this.readRefreshTokenFromRequest(request);
-		const capture = await this.logoutSession(refreshToken);
-
-		if (capture) {
-			await this.publishSessionRevokedBestEffort({
-				userId: capture.userId,
-				scope: "session",
-				targetId: capture.sessionId,
-			});
-		}
-
-		this.clearRefreshTokenCookie(response);
-
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.logoutSucceeded);
-		return { data: { message: "logged_out" } };
-	}
-
-	async createSession(user: User): Promise<AuthSessionResult> {
-		const accessToken = await this.createAccessToken(user);
-		const refreshToken = this.generateRefreshToken();
-		const refreshExpiresAt = this.getRefreshTokenExpiresAt();
-		const sessionId = ulid();
+		const presentedHash = this.hashToken(refreshToken);
 		const now = new Date();
+		const nextSessionToken = this.generateToken();
+		const nextRefreshToken = this.generateToken();
+		const sessionExpiresAt = new Date(now.getTime() + SESSION_TTL);
+		const refreshExpiresAt = addDays(now, REFRESH_TTL_DAYS);
 
-		await this.db.transaction(async (tx) => {
-			await tx.insert(refreshTokensTable).values({
-				userId: user.id,
-				sessionId,
-				tokenHash: this.hashRefreshToken(refreshToken),
-				expiresAt: refreshExpiresAt,
-			});
-			await this.cleanupStaleRefreshTokens(tx, user.id, now);
-		});
-
-		return {
-			accessToken,
-			refreshToken,
-			refreshExpiresAt,
-			sessionId,
-		};
-	}
-
-	async refreshSession(refreshToken: string): Promise<AuthSessionResult> {
-		const tokenHash = this.hashRefreshToken(refreshToken);
-		const now = new Date();
-
-		const result = await this.db.transaction(async (tx) => {
-			const [storedToken] = await tx
-				.update(refreshTokensTable)
-				.set({ revokedAt: now })
-				.where(
-					and(
-						eq(refreshTokensTable.tokenHash, tokenHash),
-						isNull(refreshTokensTable.revokedAt),
-						gt(refreshTokensTable.expiresAt, now),
-					),
-				)
-				.returning();
-
-			if (!storedToken) {
-				const [existing] = await tx
-					.select({
-						userId: refreshTokensTable.userId,
-						sessionId: refreshTokensTable.sessionId,
-						revokedAt: refreshTokensTable.revokedAt,
-					})
-					.from(refreshTokensTable)
-					.where(eq(refreshTokensTable.tokenHash, tokenHash))
-					.limit(1);
-
-				if (existing?.revokedAt != null) {
-					await tx
-						.update(refreshTokensTable)
-						.set({ revokedAt: now })
-						.where(
-							and(
-								eq(refreshTokensTable.userId, existing.userId),
-								isNull(refreshTokensTable.revokedAt),
-							),
-						);
-
-					return {
-						ok: false as const,
-						reuseRevocation: {
-							userId: existing.userId,
-							sessionId: existing.sessionId,
-						} satisfies SessionRevocationCapture,
-					};
-				}
-
-				return { ok: false as const };
-			}
-
-			const user = await this.usersService.findUserById(storedToken.userId);
-			if (!user) {
-				return { ok: false as const };
-			}
-
-			const accessToken = await this.createAccessToken({
-				id: String(user.id),
-				email: user.email,
-			});
-			const nextRefreshToken = this.generateRefreshToken();
-			const refreshExpiresAt = this.getRefreshTokenExpiresAt();
-			const userId = String(user.id);
-			const sessionId = storedToken.sessionId;
-
-			await tx.insert(refreshTokensTable).values({
-				userId,
-				sessionId,
-				tokenHash: this.hashRefreshToken(nextRefreshToken),
-				expiresAt: refreshExpiresAt,
-			});
-			await this.cleanupStaleRefreshTokens(tx, userId, now);
-
-			return {
-				ok: true as const,
-				session: {
-					accessToken,
-					refreshToken: nextRefreshToken,
-					refreshExpiresAt,
-					sessionId,
-				},
-			};
-		});
-
-		if (!result.ok) {
-			if (result.reuseRevocation) {
-				await this.publishSessionRevokedBestEffort({
-					userId: result.reuseRevocation.userId,
-					scope: "user",
-					targetId: result.reuseRevocation.userId,
-				});
-				throw new RefreshTokenReuseError(result.reuseRevocation);
-			}
-			throw new UnauthorizedException("Invalid refresh token");
-		}
-
-		return result.session;
-	}
-
-	async logoutSession(
-		refreshToken: string | null,
-	): Promise<SessionRevocationCapture | null> {
-		if (!refreshToken) {
-			return null;
-		}
-
-		const tokenHash = this.hashRefreshToken(refreshToken);
-
-		const [revoked] = await this.db
-			.update(refreshTokensTable)
-			.set({ revokedAt: new Date() })
+		const [rotated] = await this.db
+			.update(sessionsTable)
+			.set({
+				sessionHash: this.hashToken(nextSessionToken),
+				refreshHash: this.hashToken(nextRefreshToken),
+				previousRefreshHash: presentedHash,
+				previousRefreshValidUntil: new Date(now.getTime() + REFRESH_GRACE_MS),
+				sessionExpiresAt,
+				refreshExpiresAt,
+			})
 			.where(
 				and(
-					eq(refreshTokensTable.tokenHash, tokenHash),
-					isNull(refreshTokensTable.revokedAt),
+					eq(sessionsTable.refreshHash, presentedHash),
+					gt(sessionsTable.refreshExpiresAt, now),
 				),
 			)
-			.returning({
-				userId: refreshTokensTable.userId,
-				sessionId: refreshTokensTable.sessionId,
-			});
+			.returning();
 
-		if (!revoked) {
-			return null;
+		if (rotated) {
+			const user = await this.requireUser(rotated.userId);
+			setAuthCookies(
+				response,
+				{
+					sessionToken: nextSessionToken,
+					refreshToken: nextRefreshToken,
+					sessionExpiresAt,
+					refreshExpiresAt,
+				},
+				isProduction(),
+			);
+			logAuthEvent(AUTH_OBSERVABILITY_EVENTS.refreshSucceeded);
+			return this.toSnapshot(user, sessionExpiresAt);
 		}
 
-		return {
-			userId: revoked.userId,
-			sessionId: revoked.sessionId,
-		};
-	}
-
-	async resolveActiveRefreshSession(
-		request: Request,
-	): Promise<SessionRevocationCapture | null> {
-		const refreshToken = this.readRefreshTokenFromRequest(request);
-		if (!refreshToken) {
-			return null;
-		}
-
-		const tokenHash = this.hashRefreshToken(refreshToken);
-		const now = new Date();
-
-		const [row] = await this.db
-			.select({
-				userId: refreshTokensTable.userId,
-				sessionId: refreshTokensTable.sessionId,
-			})
-			.from(refreshTokensTable)
+		const [graceRow] = await this.db
+			.select()
+			.from(sessionsTable)
 			.where(
 				and(
-					eq(refreshTokensTable.tokenHash, tokenHash),
-					isNull(refreshTokensTable.revokedAt),
-					gt(refreshTokensTable.expiresAt, now),
+					eq(sessionsTable.previousRefreshHash, presentedHash),
+					gt(sessionsTable.previousRefreshValidUntil, now),
 				),
 			)
 			.limit(1);
 
-		return row ?? null;
+		if (graceRow) {
+			const user = await this.requireUser(graceRow.userId);
+			logAuthEvent(AUTH_OBSERVABILITY_EVENTS.refreshSucceeded);
+			return this.toSnapshot(user, graceRow.sessionExpiresAt);
+		}
+
+		const [reused] = await this.db
+			.select({
+				id: sessionsTable.id,
+				userId: sessionsTable.userId,
+			})
+			.from(sessionsTable)
+			.where(eq(sessionsTable.previousRefreshHash, presentedHash))
+			.limit(1);
+
+		if (reused) {
+			await this.endSession(reused.userId, reused.id);
+		}
+
+		throw new UnauthorizedException("Invalid refresh token");
 	}
 
-	private async cleanupStaleRefreshTokens(
-		db: RefreshTokensDb,
-		userId: string,
-		now: Date,
-	): Promise<void> {
-		await db
-			.delete(refreshTokensTable)
-			.where(
-				and(
-					eq(refreshTokensTable.userId, userId),
-					lt(refreshTokensTable.expiresAt, now),
-				),
-			);
+	async logout(request: Request, response: Response): Promise<void> {
+		const refreshToken = readAuthCookie(request, REFRESH_COOKIE_NAME);
+		if (refreshToken) {
+			const tokenHash = this.hashToken(refreshToken);
+			const [row] = await this.db
+				.select({
+					id: sessionsTable.id,
+					userId: sessionsTable.userId,
+				})
+				.from(sessionsTable)
+				.where(eq(sessionsTable.refreshHash, tokenHash))
+				.limit(1);
+
+			if (row) {
+				await this.endSession(row.userId, row.id);
+			}
+		}
+
+		clearAuthCookies(response, isProduction());
+		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.logoutSucceeded);
 	}
 
-	private generateRefreshToken() {
-		return randomBytes(32).toString("base64url");
+	async me(request: Request): Promise<SessionSnapshotResponse> {
+		const session = await this.resolveRpcSession(request);
+		if (!session) {
+			throw new UnauthorizedException("Unauthorized");
+		}
+
+		return this.toSnapshot(
+			{ id: session.userId, email: session.email },
+			session.sessionExpiresAt,
+		);
 	}
 
-	private hashRefreshToken(token: string) {
-		return createHash("sha256").update(token).digest("hex");
+	async resolveRpcSession(request: Request): Promise<RpcSession | null> {
+		const sessionToken = readAuthCookie(request, SESSION_COOKIE_NAME);
+		if (!sessionToken) {
+			return null;
+		}
+
+		return this.resolveSessionByHash(
+			this.hashToken(sessionToken),
+			"sessionHash",
+		);
 	}
 
-	async createAccessToken(user: User): Promise<string> {
-		return this.jwtService.signAsync({
-			email: user.email,
-			sub: user.id,
-		});
+	async resolveActiveRefreshSession(request: Request): Promise<{
+		userId: string;
+		sessionId: string;
+	} | null> {
+		const refreshToken = readAuthCookie(request, REFRESH_COOKIE_NAME);
+		if (!refreshToken) {
+			return null;
+		}
+
+		const session = await this.resolveSessionByHash(
+			this.hashToken(refreshToken),
+			"refreshHash",
+		);
+		if (!session) {
+			return null;
+		}
+
+		return {
+			userId: session.userId,
+			sessionId: session.sessionId,
+		};
 	}
 
 	async signUp(input: SignUpPayload): Promise<SignUpResponse> {
@@ -356,71 +239,149 @@ export class AuthService {
 		const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
 		await this.usersService.createUser(input.email, passwordHash);
 		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.signUpSucceeded);
-		return { data: { message: "user_created" } };
+		return { data: { message: USER_CREATED_MESSAGE } };
 	}
 
-	private async createSignInSession(
-		payload: SignInPayload,
-	): Promise<AuthSessionResult> {
-		const user = await this.validateUser(payload);
-		return this.createSession(user);
-	}
-
-	private readRefreshTokenFromRequest(request: Request): string | null {
-		const token = request.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
-		if (typeof token !== "string" || token.length === 0) {
-			return null;
+	private async replaceSessionFromRefreshCookie(
+		request: Request,
+	): Promise<void> {
+		const refreshToken = readAuthCookie(request, REFRESH_COOKIE_NAME);
+		if (!refreshToken) {
+			return;
 		}
 
-		return token;
+		const tokenHash = this.hashToken(refreshToken);
+		const [row] = await this.db
+			.select({
+				id: sessionsTable.id,
+				userId: sessionsTable.userId,
+			})
+			.from(sessionsTable)
+			.where(eq(sessionsTable.refreshHash, tokenHash))
+			.limit(1);
+
+		if (!row) {
+			return;
+		}
+
+		await this.endSession(row.userId, row.id);
 	}
 
-	private setRefreshTokenCookie(
-		response: Response,
-		token: string,
-		expiresAt: Date,
-	): void {
-		response.cookie(REFRESH_TOKEN_COOKIE_NAME, token, {
-			...this.getRefreshTokenCookieOptions(),
-			expires: expiresAt,
-		});
-	}
+	private async insertSession(userId: string): Promise<{
+		sessionToken: string;
+		refreshToken: string;
+		sessionExpiresAt: Date;
+		refreshExpiresAt: Date;
+		sessionId: string;
+	}> {
+		const sessionToken = this.generateToken();
+		const refreshToken = this.generateToken();
+		const now = new Date();
+		const sessionExpiresAt = new Date(now.getTime() + SESSION_TTL);
+		const refreshExpiresAt = addDays(now, REFRESH_TTL_DAYS);
 
-	private clearRefreshTokenCookie(response: Response): void {
-		response.clearCookie(
-			REFRESH_TOKEN_COOKIE_NAME,
-			this.getRefreshTokenCookieOptions(),
-		);
-	}
+		const [row] = await this.db
+			.insert(sessionsTable)
+			.values({
+				userId,
+				sessionHash: this.hashToken(sessionToken),
+				refreshHash: this.hashToken(refreshToken),
+				sessionExpiresAt,
+				refreshExpiresAt,
+			})
+			.returning({ id: sessionsTable.id });
 
-	private getRefreshTokenCookieOptions() {
-		const isProduction =
-			this.configService.get<string>("NODE_ENV") === "production";
+		if (!row) {
+			throw new UnauthorizedException("Invalid credentials");
+		}
 
 		return {
-			httpOnly: true,
-			secure: isProduction,
-			sameSite: isProduction ? ("none" as const) : ("lax" as const),
-			path: REFRESH_TOKEN_COOKIE_PATH,
+			sessionToken,
+			refreshToken,
+			sessionExpiresAt,
+			refreshExpiresAt,
+			sessionId: row.id,
 		};
 	}
 
-	private getRefreshTokenExpiresAt(): Date {
-		return addDays(new Date(), REFRESH_TOKEN_EXPIRES_IN_DAYS);
+	private async resolveSessionByHash(
+		tokenHash: string,
+		column: "sessionHash" | "refreshHash",
+	): Promise<RpcSession | null> {
+		const now = new Date();
+		const expiryColumn =
+			column === "sessionHash"
+				? sessionsTable.sessionExpiresAt
+				: sessionsTable.refreshExpiresAt;
+
+		const [row] = await this.db
+			.select()
+			.from(sessionsTable)
+			.where(and(eq(sessionsTable[column], tokenHash), gt(expiryColumn, now)))
+			.limit(1);
+
+		if (!row) {
+			return null;
+		}
+
+		const user = await this.usersService.findUserById(row.userId);
+		if (!user) {
+			return null;
+		}
+
+		return {
+			userId: String(user.id),
+			email: user.email,
+			sessionId: row.id,
+			sessionExpiresAt: row.sessionExpiresAt,
+		};
 	}
 
-	private async publishSessionRevokedBestEffort(input: {
+	private async requireUser(userId: string): Promise<User> {
+		const user = await this.usersService.findUserById(userId);
+		if (!user) {
+			throw new UnauthorizedException("Invalid refresh token");
+		}
+
+		return {
+			id: String(user.id),
+			email: user.email,
+		};
+	}
+
+	private async endSession(userId: string, sessionId: string): Promise<void> {
+		await this.publishSessionEndedBestEffort({ userId, targetId: sessionId });
+		await this.db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
+	}
+
+	private toSnapshot(
+		user: User,
+		sessionExpiresAt: Date,
+	): SessionSnapshotResponse {
+		return {
+			data: {
+				user,
+				sessionExpiresAt: sessionExpiresAt.toISOString(),
+			},
+		};
+	}
+
+	private generateToken() {
+		return randomBytes(32).toString("base64url");
+	}
+
+	private hashToken(token: string) {
+		return createHash("sha256").update(token).digest("hex");
+	}
+
+	private async publishSessionEndedBestEffort(input: {
 		userId: string;
-		scope: "session" | "user";
 		targetId: string;
 	}) {
 		try {
-			await this.ssePublisher.publishAuthSessionRevoked(input);
+			await this.ssePublisher.publishSessionEnded(input);
 		} catch {
-			logAuthEvent(
-				AUTH_OBSERVABILITY_EVENTS.sessionRevokedPublishFailed,
-				"warn",
-			);
+			logAuthEvent(AUTH_OBSERVABILITY_EVENTS.sessionEndedPublishFailed, "warn");
 		}
 	}
 }

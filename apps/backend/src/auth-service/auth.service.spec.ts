@@ -1,15 +1,15 @@
 import { createHash } from "node:crypto";
 import { UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
 import {
-	REFRESH_TOKEN_COOKIE_NAME,
-	REFRESH_TOKEN_COOKIE_PATH,
+	AUTH_COOKIE_PATH,
+	REFRESH_COOKIE_NAME,
+	SESSION_COOKIE_NAME,
 } from "@repo/common/constants";
 import * as bcrypt from "bcrypt";
-import { subDays } from "date-fns";
-import { and, eq, isNull } from "drizzle-orm";
+import { subSeconds } from "date-fns";
+import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import type { CookieOptions, Request, Response } from "express";
 import {
 	afterAll,
 	beforeAll,
@@ -21,649 +21,330 @@ import {
 } from "vitest";
 
 import { DBS } from "../database-service/constants.js";
-import { refreshTokensTable } from "../database-service/tables/index.js";
+import { sessionsTable } from "../database-service/tables/index.js";
 import { SsePublisher } from "../sse-service/sse-publisher.service.js";
 import { createAuthTestingModule } from "../test/helpers/modules.js";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
 import { UsersService } from "../users-service/users.service.js";
-import { AuthService, RefreshTokenReuseError } from "./auth.service.js";
+import { AuthService } from "./auth.service.js";
+
+const PASSWORD = "secret";
 
 const hashToken = (token: string) =>
 	createHash("sha256").update(token).digest("hex");
+
+const createCookieJar = () => {
+	const cookies: Record<string, string> = {};
+	const cookie = vi.fn(
+		(name: string, value: string, _options?: CookieOptions) => {
+			cookies[name] = value;
+		},
+	);
+	const clearCookie = vi.fn((name: string, _options?: CookieOptions) => {
+		delete cookies[name];
+	});
+
+	return { cookies, cookie, clearCookie };
+};
+
+type CookieJar = ReturnType<typeof createCookieJar>;
+
+const asRequest = (cookies: Record<string, string | undefined>): Request =>
+	({ cookies }) as Request;
+
+const asResponse = (jar: CookieJar): Response =>
+	({ cookie: jar.cookie, clearCookie: jar.clearCookie }) as unknown as Response;
+
+const laxCookieOptions = {
+	httpOnly: true,
+	secure: false,
+	sameSite: "lax" as const,
+	path: AUTH_COOKIE_PATH,
+};
 
 describe("Auth service", () => {
 	let moduleRef: Awaited<ReturnType<typeof createAuthTestingModule>>;
 	let authService: AuthService;
 	let usersService: UsersService;
-	let jwtService: JwtService;
-	let configService: ConfigService;
 	let db: NodePgDatabase;
-	let publishAuthSessionRevoked: ReturnType<typeof vi.fn>;
+	let publishSessionEnded: ReturnType<typeof vi.fn>;
 
 	beforeAll(async () => {
 		moduleRef = await createAuthTestingModule();
 		authService = moduleRef.get(AuthService);
 		usersService = moduleRef.get(UsersService);
-		jwtService = moduleRef.get(JwtService);
-		configService = moduleRef.get(ConfigService);
 		db = moduleRef.get(DBS.APP);
-		publishAuthSessionRevoked = vi.mocked(
-			moduleRef.get(SsePublisher).publishAuthSessionRevoked,
+		publishSessionEnded = vi.mocked(
+			moduleRef.get(SsePublisher).publishSessionEnded,
 		);
+	});
+
+	beforeEach(() => {
+		publishSessionEnded.mockClear();
 	});
 
 	afterAll(async () => {
 		await moduleRef.close();
 	});
 
-	describe("validate user", () => {
-		it("throws when user is not found", async () => {
-			await expect(
-				authService.validateUser({
-					email: "missing-user-alias@example.com",
-					password: "secret",
-				}),
-			).rejects.toThrow(UnauthorizedException);
+	const createUser = async (emailTag: string) =>
+		createTestUser(usersService, {
+			passwordHash: await bcrypt.hash(PASSWORD, 10),
+			emailTag,
 		});
 
-		it("throws when password does not match", async () => {
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("correct-pass", 10),
-				emailTag: "auth-wrong-password",
-			});
+	const signIn = async (
+		user: { email: string },
+		jar: CookieJar,
+		requestCookies = { ...jar.cookies },
+	) =>
+		authService.signIn(
+			{ email: user.email, password: PASSWORD },
+			asRequest(requestCookies),
+			asResponse(jar),
+		);
 
-			await expect(
-				authService.validateUser({
-					email: user.email,
-					password: "wrong",
-				}),
-			).rejects.toThrow(UnauthorizedException);
-		});
+	const refresh = (refreshToken: string, jar: CookieJar) =>
+		authService.refresh(
+			asRequest({ [REFRESH_COOKIE_NAME]: refreshToken }),
+			asResponse(jar),
+		);
 
-		it("returns user when credentials are valid", async () => {
-			const plain = "secret-ok";
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash(plain, 10),
-				emailTag: "auth-valid-credentials",
-			});
+	const sessionsForUser = async (userId: string) =>
+		db.select().from(sessionsTable).where(eq(sessionsTable.userId, userId));
 
-			await expect(
-				authService.validateUser({ email: user.email, password: plain }),
-			).resolves.toEqual({
-				id: expect.any(String),
+	const sessionByRefreshToken = async (refreshToken: string) => {
+		const [row] = await db
+			.select()
+			.from(sessionsTable)
+			.where(eq(sessionsTable.refreshHash, hashToken(refreshToken)))
+			.limit(1);
+		return row ?? null;
+	};
+
+	describe("sign-in", () => {
+		it("sets session and refresh cookies and returns a snapshot", async () => {
+			const user = await createUser("auth-cookie-dev");
+			const jar = createCookieJar();
+
+			const result = await signIn(user, jar);
+
+			expect(result.data.user).toEqual({
+				id: user.id,
 				email: user.email,
 			});
-		});
-	});
-
-	describe("refresh token cookie", () => {
-		it("sets SameSite=Lax and Secure=false outside production", async () => {
-			const plain = "secret-cookie-dev";
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash(plain, 10),
-				emailTag: "auth-cookie-dev",
-			});
-			const cookie = vi.fn();
-
-			await authService.signIn({ email: user.email, password: plain }, {
-				cookie,
-			} as never);
-
-			expect(cookie).toHaveBeenCalledWith(
-				REFRESH_TOKEN_COOKIE_NAME,
-				expect.any(String),
-				expect.objectContaining({
-					httpOnly: true,
-					secure: false,
-					sameSite: "lax",
-					path: REFRESH_TOKEN_COOKIE_PATH,
-					expires: expect.any(Date),
-				}),
+			expect(new Date(result.data.sessionExpiresAt).toISOString()).toBe(
+				result.data.sessionExpiresAt,
 			);
+			expect(jar.cookies[SESSION_COOKIE_NAME]?.length).toBeGreaterThan(0);
+			expect(jar.cookies[REFRESH_COOKIE_NAME]?.length).toBeGreaterThan(0);
+			expect(jar.cookie.mock.calls[0]?.[2]).toMatchObject(laxCookieOptions);
+			expect(jar.cookie.mock.calls[1]?.[2]).toMatchObject(laxCookieOptions);
 		});
 
 		it("sets SameSite=None and Secure=true in production", async () => {
-			const plain = "secret-cookie-prod";
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash(plain, 10),
-				emailTag: "auth-cookie-prod",
-			});
-			const cookie = vi.fn();
-			const getSpy = vi.spyOn(configService, "get").mockImplementation(((
-				key: string,
-			) => {
-				if (key === "NODE_ENV") {
-					return "production";
-				}
-				return undefined;
-			}) as ConfigService["get"]);
+			const user = await createUser("auth-cookie-prod");
+			const jar = createCookieJar();
+			const previousNodeEnv = process.env.NODE_ENV;
+			process.env.NODE_ENV = "production";
 
 			try {
-				await authService.signIn({ email: user.email, password: plain }, {
-					cookie,
-				} as never);
-
-				expect(cookie).toHaveBeenCalledWith(
-					REFRESH_TOKEN_COOKIE_NAME,
-					expect.any(String),
-					expect.objectContaining({
-						httpOnly: true,
-						secure: true,
-						sameSite: "none",
-						path: REFRESH_TOKEN_COOKIE_PATH,
-						expires: expect.any(Date),
-					}),
-				);
+				await signIn(user, jar);
 			} finally {
-				getSpy.mockRestore();
+				process.env.NODE_ENV = previousNodeEnv;
 			}
+
+			expect(jar.cookie.mock.calls[0]?.[2]).toMatchObject({
+				secure: true,
+				sameSite: "none",
+			});
 		});
 
-		it("clears the cookie with SameSite=None in production", async () => {
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-cookie-clear-prod",
-			});
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-			const clearCookie = vi.fn();
-			const getSpy = vi.spyOn(configService, "get").mockImplementation(((
-				key: string,
-			) => {
-				if (key === "NODE_ENV") {
-					return "production";
-				}
-				return undefined;
-			}) as ConfigService["get"]);
+		it("ends the previous session when signing in with an existing refresh cookie", async () => {
+			const user = await createUser("auth-replace-session");
+			const jar = createCookieJar();
+			await signIn(user, jar);
+			const [previous] = await sessionsForUser(user.id);
+			const previousRefresh = jar.cookies[REFRESH_COOKIE_NAME];
 
-			try {
-				await authService.logout(
-					{
-						cookies: {
-							[REFRESH_TOKEN_COOKIE_NAME]: session.refreshToken,
-						},
-					} as never,
-					{ clearCookie } as never,
-				);
+			await signIn(user, createCookieJar(), {
+				[REFRESH_COOKIE_NAME]: previousRefresh,
+			});
 
-				expect(clearCookie).toHaveBeenCalledWith(
-					REFRESH_TOKEN_COOKIE_NAME,
-					expect.objectContaining({
-						httpOnly: true,
-						secure: true,
-						sameSite: "none",
-						path: REFRESH_TOKEN_COOKIE_PATH,
-					}),
-				);
-			} finally {
-				getSpy.mockRestore();
-			}
+			expect(publishSessionEnded).toHaveBeenCalledWith({
+				userId: user.id,
+				targetId: previous?.id,
+			});
+			expect(await sessionByRefreshToken(previousRefresh)).toBeNull();
 		});
 	});
 
-	describe("create session", () => {
-		it("returns a signed access token and refresh token", async () => {
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-create-session",
-			});
+	describe("refresh", () => {
+		it("rotates hashes in place and returns a snapshot", async () => {
+			const user = await createUser("auth-refresh");
+			const jar = createCookieJar();
+			await signIn(user, jar);
+			const previousRefresh = jar.cookies[REFRESH_COOKIE_NAME];
+			const previousHash = hashToken(previousRefresh);
 
-			const result = await authService.createSession({
+			jar.cookie.mockClear();
+			const snapshot = await refresh(previousRefresh, jar);
+			const [row] = await sessionsForUser(user.id);
+
+			expect(snapshot.data.user).toEqual({
 				id: user.id,
 				email: user.email,
 			});
-
-			const payload = await jwtService.verifyAsync<{
-				sub: string;
-				email: string;
-			}>(result.accessToken);
-
-			expect(payload).toMatchObject({
-				sub: user.id,
-				email: user.email,
-			});
-			expect(result.refreshToken).toBeTypeOf("string");
-			expect(result.refreshToken.length).toBeGreaterThan(0);
-			expect(result.refreshExpiresAt).toBeInstanceOf(Date);
-			expect(result.sessionId).toBeTypeOf("string");
-			expect(result.sessionId.length).toBeGreaterThan(0);
-
-			const [row] = await db
-				.select()
-				.from(refreshTokensTable)
-				.where(eq(refreshTokensTable.tokenHash, hashToken(result.refreshToken)))
-				.limit(1);
-
-			expect(row?.sessionId).toBe(result.sessionId);
-		});
-
-		it("deletes expired refresh tokens for the user", async () => {
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-cleanup-create",
-			});
-
-			await db.insert(refreshTokensTable).values({
-				userId: user.id,
-				tokenHash: hashToken("expired-create-token"),
-				expiresAt: subDays(new Date(), 1),
-			});
-
-			await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-
-			const rows = await db
-				.select()
-				.from(refreshTokensTable)
-				.where(eq(refreshTokensTable.userId, user.id));
-
-			expect(rows).toHaveLength(1);
-			expect(rows[0]?.expiresAt.getTime()).toBeGreaterThan(Date.now());
-			expect(rows[0]?.tokenHash).not.toBe(hashToken("expired-create-token"));
-		});
-	});
-
-	describe("refresh session", () => {
-		it("rotates refresh token and returns a new access token", async () => {
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-refresh",
-			});
-
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-
-			const refreshed = await authService.refreshSession(session.refreshToken);
-
-			expect(refreshed.refreshToken).not.toBe(session.refreshToken);
-			expect(refreshed.sessionId).toBe(session.sessionId);
-
-			const [active] = await db
-				.select()
-				.from(refreshTokensTable)
-				.where(
-					eq(refreshTokensTable.tokenHash, hashToken(refreshed.refreshToken)),
-				)
-				.limit(1);
-
-			expect(active?.sessionId).toBe(session.sessionId);
-
-			await expect(
-				authService.refreshSession(session.refreshToken),
-			).rejects.toThrow(RefreshTokenReuseError);
-		});
-
-		it("keeps unexpired revoked tokens so reuse can be detected", async () => {
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-keep-revoked",
-			});
-
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-			const previousHash = hashToken(session.refreshToken);
-
-			await authService.refreshSession(session.refreshToken);
-
-			const [revoked] = await db
-				.select()
-				.from(refreshTokensTable)
-				.where(eq(refreshTokensTable.tokenHash, previousHash))
-				.limit(1);
-
-			expect(revoked).toBeDefined();
-			expect(revoked?.revokedAt).toBeInstanceOf(Date);
-		});
-
-		it("deletes expired refresh tokens for the user on rotate", async () => {
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-cleanup-refresh",
-			});
-
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-
-			await db.insert(refreshTokensTable).values({
-				userId: user.id,
-				tokenHash: hashToken("expired-refresh-token"),
-				expiresAt: subDays(new Date(), 2),
-			});
-
-			await authService.refreshSession(session.refreshToken);
-
-			const expiredRows = await db
-				.select()
-				.from(refreshTokensTable)
-				.where(
-					eq(refreshTokensTable.tokenHash, hashToken("expired-refresh-token")),
-				);
-
-			expect(expiredRows).toHaveLength(0);
-
-			const activeRows = await db
-				.select()
-				.from(refreshTokensTable)
-				.where(
-					and(
-						eq(refreshTokensTable.userId, user.id),
-						isNull(refreshTokensTable.revokedAt),
-					),
-				);
-
-			expect(activeRows).toHaveLength(1);
-		});
-
-		it("revokes all active sessions when a rotated refresh token is reused", async () => {
-			publishAuthSessionRevoked.mockClear();
-			publishAuthSessionRevoked.mockResolvedValue(true);
-
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-refresh-reuse",
-			});
-
-			const firstSession = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-			const secondSession = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-
-			const rotated = await authService.refreshSession(
-				firstSession.refreshToken,
+			expect(row?.refreshHash).toBe(
+				hashToken(jar.cookies[REFRESH_COOKIE_NAME]),
 			);
-
-			await expect(
-				authService.refreshSession(firstSession.refreshToken),
-			).rejects.toSatisfy((error: unknown) => {
-				expect(error).toBeInstanceOf(RefreshTokenReuseError);
-				if (!(error instanceof RefreshTokenReuseError)) {
-					return false;
-				}
-				expect(error.userId).toBe(user.id);
-				expect(error.sessionId).toBe(firstSession.sessionId);
-				return true;
-			});
-
-			expect(publishAuthSessionRevoked).toHaveBeenCalledWith({
-				userId: user.id,
-				scope: "user",
-				targetId: user.id,
-			});
-
-			await expect(
-				authService.refreshSession(rotated.refreshToken),
-			).rejects.toThrow(UnauthorizedException);
-			await expect(
-				authService.refreshSession(secondSession.refreshToken),
-			).rejects.toThrow(UnauthorizedException);
+			expect(row?.previousRefreshHash).toBe(previousHash);
+			expect(jar.cookies[REFRESH_COOKIE_NAME]).not.toBe(previousRefresh);
 		});
 
-		it("still rejects reuse when SSE publish fails", async () => {
-			publishAuthSessionRevoked.mockClear();
-			publishAuthSessionRevoked.mockRejectedValueOnce(new Error("redis down"));
+		it("returns the same session during grace without rotating again", async () => {
+			const user = await createUser("auth-grace");
+			const jar = createCookieJar();
+			await signIn(user, jar);
+			const originalRefresh = jar.cookies[REFRESH_COOKIE_NAME];
 
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-refresh-reuse-publish-fail",
-			});
+			await refresh(originalRefresh, jar);
+			const [afterWin] = await sessionsForUser(user.id);
+			jar.cookie.mockClear();
 
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-			await authService.refreshSession(session.refreshToken);
+			await refresh(originalRefresh, jar);
+			const [afterGrace] = await sessionsForUser(user.id);
 
-			await expect(
-				authService.refreshSession(session.refreshToken),
-			).rejects.toThrow(RefreshTokenReuseError);
+			expect(afterGrace?.id).toBe(afterWin?.id);
+			expect(afterGrace?.refreshHash).toBe(afterWin?.refreshHash);
+			expect(jar.cookie).not.toHaveBeenCalled();
 		});
-	});
 
-	describe("logout session", () => {
-		it("revokes the current refresh token and leaves other sessions active", async () => {
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-logout",
-			});
+		it("deletes only the reused session after grace", async () => {
+			const user = await createUser("auth-reuse");
+			const firstJar = createCookieJar();
+			const secondJar = createCookieJar();
+			await signIn(user, firstJar);
+			await signIn(user, secondJar);
+			const firstRefresh = firstJar.cookies[REFRESH_COOKIE_NAME];
+			const secondRefresh = secondJar.cookies[REFRESH_COOKIE_NAME];
 
-			const firstSession = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-			const secondSession = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-
-			const capture = await authService.logoutSession(
-				firstSession.refreshToken,
-			);
-
-			expect(capture).toEqual({
-				userId: user.id,
-				sessionId: firstSession.sessionId,
-			});
-
-			const [revoked] = await db
+			await refresh(firstRefresh, firstJar);
+			const [rotated] = await db
 				.select()
-				.from(refreshTokensTable)
-				.where(
-					eq(
-						refreshTokensTable.tokenHash,
-						hashToken(firstSession.refreshToken),
-					),
-				)
+				.from(sessionsTable)
+				.where(eq(sessionsTable.previousRefreshHash, hashToken(firstRefresh)))
 				.limit(1);
+			await db
+				.update(sessionsTable)
+				.set({ previousRefreshValidUntil: subSeconds(new Date(), 1) })
+				.where(eq(sessionsTable.id, rotated?.id ?? ""));
 
-			expect(revoked?.revokedAt).toBeInstanceOf(Date);
+			await expect(
+				refresh(firstRefresh, createCookieJar()),
+			).rejects.toBeInstanceOf(UnauthorizedException);
+			expect(publishSessionEnded).toHaveBeenCalledWith({
+				userId: user.id,
+				targetId: rotated?.id,
+			});
 
-			const stillActive = await authService.refreshSession(
-				secondSession.refreshToken,
-			);
-			expect(stillActive.refreshToken).not.toBe(secondSession.refreshToken);
-			expect(stillActive.sessionId).toBe(secondSession.sessionId);
+			const other = await refresh(secondRefresh, createCookieJar());
+			expect(other.data.user.id).toBe(user.id);
 		});
 
-		it("returns null when the refresh token is missing or already revoked", async () => {
-			await expect(authService.logoutSession(null)).resolves.toBeNull();
-
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-logout-idempotent",
-			});
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-
-			await authService.logoutSession(session.refreshToken);
+		it("rejects an unknown refresh token without ending a session", async () => {
 			await expect(
-				authService.logoutSession(session.refreshToken),
-			).resolves.toBeNull();
+				refresh("unknown-refresh-token", createCookieJar()),
+			).rejects.toBeInstanceOf(UnauthorizedException);
+			expect(publishSessionEnded).not.toHaveBeenCalled();
 		});
 	});
 
 	describe("logout", () => {
-		beforeEach(() => {
-			publishAuthSessionRevoked.mockClear();
-			publishAuthSessionRevoked.mockResolvedValue(true);
-		});
-
-		it("publishes session-scoped revoke after logout and clears the cookie", async () => {
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-logout-publish",
-			});
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-			const clearCookie = vi.fn();
+		it("deletes the current session, publishes, and clears both cookies", async () => {
+			const user = await createUser("auth-logout");
+			const jar = createCookieJar();
+			await signIn(user, jar);
+			const [session] = await sessionsForUser(user.id);
+			const refreshToken = jar.cookies[REFRESH_COOKIE_NAME];
 
 			await expect(
 				authService.logout(
-					{
-						cookies: {
-							[REFRESH_TOKEN_COOKIE_NAME]: session.refreshToken,
-						},
-					} as never,
-					{ clearCookie } as never,
+					asRequest({ [REFRESH_COOKIE_NAME]: refreshToken }),
+					asResponse(jar),
 				),
-			).resolves.toEqual({ data: { message: "logged_out" } });
+			).resolves.toBeUndefined();
 
-			expect(publishAuthSessionRevoked).toHaveBeenCalledWith({
+			expect(publishSessionEnded).toHaveBeenCalledWith({
 				userId: user.id,
-				scope: "session",
-				targetId: session.sessionId,
+				targetId: session?.id,
 			});
-			expect(clearCookie).toHaveBeenCalledWith(
-				REFRESH_TOKEN_COOKIE_NAME,
-				expect.objectContaining({
-					httpOnly: true,
-					secure: false,
-					sameSite: "lax",
-					path: REFRESH_TOKEN_COOKIE_PATH,
-				}),
-			);
+			expect(jar.clearCookie.mock.calls).toEqual([
+				[SESSION_COOKIE_NAME, laxCookieOptions],
+				[REFRESH_COOKIE_NAME, laxCookieOptions],
+			]);
+			expect(await sessionByRefreshToken(refreshToken)).toBeNull();
 		});
 
-		it("still returns success when SSE publish fails", async () => {
-			publishAuthSessionRevoked.mockRejectedValueOnce(new Error("redis down"));
-
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-logout-publish-fail",
-			});
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
+		it("is idempotent when there is no session", async () => {
+			const jar = createCookieJar();
 
 			await expect(
-				authService.logout(
-					{
-						cookies: {
-							[REFRESH_TOKEN_COOKIE_NAME]: session.refreshToken,
-						},
-					} as never,
-					{ clearCookie: vi.fn() } as never,
-				),
-			).resolves.toEqual({ data: { message: "logged_out" } });
-		});
-
-		it("still returns success when SSE publish reports unavailable", async () => {
-			publishAuthSessionRevoked.mockResolvedValueOnce(false);
-
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-logout-publish-false",
-			});
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
-
-			await expect(
-				authService.logout(
-					{
-						cookies: {
-							[REFRESH_TOKEN_COOKIE_NAME]: session.refreshToken,
-						},
-					} as never,
-					{ clearCookie: vi.fn() } as never,
-				),
-			).resolves.toEqual({ data: { message: "logged_out" } });
-		});
-
-		it("does not publish when there is no active refresh session", async () => {
-			await expect(
-				authService.logout(
-					{ cookies: {} } as never,
-					{ clearCookie: vi.fn() } as never,
-				),
-			).resolves.toEqual({ data: { message: "logged_out" } });
-
-			expect(publishAuthSessionRevoked).not.toHaveBeenCalled();
+				authService.logout(asRequest({}), asResponse(jar)),
+			).resolves.toBeUndefined();
+			expect(publishSessionEnded).not.toHaveBeenCalled();
+			expect(jar.clearCookie.mock.calls.map(([name]) => name)).toEqual([
+				SESSION_COOKIE_NAME,
+				REFRESH_COOKIE_NAME,
+			]);
 		});
 	});
 
-	describe("resolve active refresh session", () => {
-		it("returns userId and sessionId for a valid refresh cookie", async () => {
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-resolve-session",
-			});
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
+	describe("me", () => {
+		it("returns the same snapshot as sign-in for the session cookie", async () => {
+			const user = await createUser("auth-me");
+			const jar = createCookieJar();
+			const signedIn = await signIn(user, jar);
 
-			const resolved = await authService.resolveActiveRefreshSession({
-				cookies: { "wealth.auth.refresh": session.refreshToken },
-			} as never);
-
-			expect(resolved).toEqual({
-				userId: user.id,
-				sessionId: session.sessionId,
-			});
+			await expect(
+				authService.me(
+					asRequest({
+						[SESSION_COOKIE_NAME]: jar.cookies[SESSION_COOKIE_NAME],
+					}),
+				),
+			).resolves.toEqual(signedIn);
 		});
 
-		it("returns null for missing, revoked, or expired refresh tokens", async () => {
-			await expect(
-				authService.resolveActiveRefreshSession({ cookies: {} } as never),
-			).resolves.toBeNull();
+		it("rejects when the session cookie is missing", async () => {
+			await expect(authService.me(asRequest({}))).rejects.toBeInstanceOf(
+				UnauthorizedException,
+			);
+		});
 
-			const user = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("secret", 10),
-				emailTag: "auth-resolve-invalid",
-			});
-			const session = await authService.createSession({
-				id: user.id,
-				email: user.email,
-			});
+		it("rejects when the session cookie has expired", async () => {
+			const user = await createUser("auth-me-expired");
+			const jar = createCookieJar();
+			await signIn(user, jar);
+			const [row] = await sessionsForUser(user.id);
 
-			await authService.logoutSession(session.refreshToken);
-			await expect(
-				authService.resolveActiveRefreshSession({
-					cookies: { "wealth.auth.refresh": session.refreshToken },
-				} as never),
-			).resolves.toBeNull();
-
-			await db.insert(refreshTokensTable).values({
-				userId: user.id,
-				sessionId: session.sessionId,
-				tokenHash: hashToken("expired-resolve-token"),
-				expiresAt: subDays(new Date(), 1),
-			});
+			await db
+				.update(sessionsTable)
+				.set({ sessionExpiresAt: subSeconds(new Date(), 1) })
+				.where(eq(sessionsTable.id, row?.id ?? ""));
 
 			await expect(
-				authService.resolveActiveRefreshSession({
-					cookies: { "wealth.auth.refresh": "expired-resolve-token" },
-				} as never),
-			).resolves.toBeNull();
+				authService.me(
+					asRequest({
+						[SESSION_COOKIE_NAME]: jar.cookies[SESSION_COOKIE_NAME],
+					}),
+				),
+			).rejects.toBeInstanceOf(UnauthorizedException);
 		});
 	});
 
 	describe("sign up", () => {
 		it("rejects when email is already registered", async () => {
-			const existing = await createTestUser(usersService, {
-				passwordHash: await bcrypt.hash("x", 10),
-				emailTag: "auth-signup-conflict",
-			});
+			const existing = await createUser("auth-signup-conflict");
 
 			await expect(
 				authService.signUp({
@@ -674,7 +355,7 @@ describe("Auth service", () => {
 			).rejects.toThrow("Email already registered");
 		});
 
-		it("creates user and returns success payload", async () => {
+		it("creates user without a session", async () => {
 			const email = uniqueTestUserEmail("signup");
 			const result = await authService.signUp({
 				email,
@@ -683,13 +364,9 @@ describe("Auth service", () => {
 			});
 
 			expect(result).toEqual({ data: { message: "user_created" } });
-
 			const row = await usersService.findUserByEmail(email);
-			expect(row).not.toBeNull();
-			if (row === null) throw new Error("expected user row");
-			expect(row.email).toBe(email);
-			const match = await bcrypt.compare("password123", row.password);
-			expect(match).toBe(true);
+			expect(row?.email).toBe(email);
+			expect(await sessionsForUser(String(row?.id))).toEqual([]);
 		});
 	});
 });

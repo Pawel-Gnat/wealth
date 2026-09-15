@@ -1,21 +1,15 @@
-import { screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { TFunction } from "i18next";
+import { HttpResponse, http } from "msw";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useAuth } from "@/context/auth";
+import { resetRefreshMutex } from "@/shared/lib/auth/auth-api";
 import {
-	afterEach,
-	beforeAll,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	vi,
-} from "vitest";
-import { SigninForm } from "@/pages/auth/ui/signin-form";
-import { logoutSession } from "@/shared/lib/auth/auth-api";
-import { clearAuthSession } from "@/shared/lib/auth/auth-session";
-import { resetRefreshMutex } from "@/shared/lib/auth/refresh-access-token";
-import { init18nWeb } from "@/shared/lib/i18n/i18n";
+	applySessionSnapshot,
+	clearAuthSession,
+} from "@/shared/lib/auth/auth-session";
 import { renderWithProviders } from "@/test/render-with-providers";
+import { server } from "@/test/servers";
 
 const startSseGateway = vi.fn();
 const stopSseGateway = vi.fn();
@@ -25,13 +19,29 @@ vi.mock("@/shared/lib/sse", () => ({
 	stopSseGateway: () => stopSseGateway(),
 }));
 
-describe("AuthProvider SSE wiring", () => {
-	let t: TFunction;
+const unauthorizedMe = () =>
+	http.get("*/auth/me", () =>
+		HttpResponse.json({ error: { message: "Unauthorized" } }, { status: 401 }),
+	);
 
-	beforeAll(async () => {
-		t = (await init18nWeb({ lng: "en" })) as TFunction;
-	});
+const AuthProbe = () => {
+	const { user, isAuthLoading, logout } = useAuth();
 
+	if (isAuthLoading) {
+		return <div data-testid="auth-loading">loading</div>;
+	}
+
+	return (
+		<div>
+			<div data-testid="auth-user">{user?.email ?? "anonymous"}</div>
+			<button type="button" onClick={() => void logout()}>
+				logout
+			</button>
+		</div>
+	);
+};
+
+describe("AuthProvider", () => {
 	beforeEach(() => {
 		clearAuthSession();
 		resetRefreshMutex();
@@ -44,72 +54,71 @@ describe("AuthProvider SSE wiring", () => {
 		resetRefreshMutex();
 	});
 
-	it("keeps sign-in fields visible and does not start SSE without a session", async () => {
-		renderWithProviders(<SigninForm />);
-
-		expect(
-			await screen.findByLabelText(t("email.label", { ns: "form" })),
-		).toBeInTheDocument();
-		expect(
-			screen.getByLabelText(t("password.label", { ns: "form" })),
-		).toBeInTheDocument();
-
-		await waitFor(() => {
-			expect(startSseGateway).not.toHaveBeenCalled();
-		});
+	it("throws when useAuth is used outside AuthProvider", () => {
+		expect(() => render(<AuthProbe />)).toThrow(
+			"useAuth must be used within AuthProvider",
+		);
 	});
 
-	it("starts SSE after a successful sign in", async () => {
-		const user = userEvent.setup();
-		renderWithProviders(<SigninForm />);
+	it("sets user from GET /me and starts SSE", async () => {
+		renderWithProviders(<AuthProbe />);
 
-		await user.type(
-			await screen.findByLabelText(t("email.label", { ns: "form" })),
+		expect(screen.getByTestId("auth-loading")).toBeInTheDocument();
+
+		expect(await screen.findByTestId("auth-user")).toHaveTextContent(
 			"test@example.com",
 		);
-		await user.type(
-			screen.getByLabelText(t("password.label", { ns: "form" })),
-			"secret",
-		);
-		await user.click(
-			screen.getByRole("button", {
-				name: t("action.signin", { ns: "common" }),
-			}),
-		);
-
-		await waitFor(() => {
-			expect(startSseGateway).toHaveBeenCalled();
-		});
+		expect(startSseGateway).toHaveBeenCalled();
 	});
 
-	it("stops SSE after logout", async () => {
-		const user = userEvent.setup();
-		renderWithProviders(<SigninForm />);
+	it("leaves user unset and does not start SSE when GET /me is unauthorized", async () => {
+		server.use(unauthorizedMe());
+		renderWithProviders(<AuthProbe />);
 
-		await user.type(
-			await screen.findByLabelText(t("email.label", { ns: "form" })),
-			"test@example.com",
+		expect(await screen.findByTestId("auth-user")).toHaveTextContent(
+			"anonymous",
 		);
-		await user.type(
-			screen.getByLabelText(t("password.label", { ns: "form" })),
-			"secret",
+		expect(startSseGateway).not.toHaveBeenCalled();
+	});
+
+	it("applies a snapshot from sign-in and starts SSE", async () => {
+		server.use(unauthorizedMe());
+		renderWithProviders(<AuthProbe />);
+
+		expect(await screen.findByTestId("auth-user")).toHaveTextContent(
+			"anonymous",
 		);
-		await user.click(
-			screen.getByRole("button", {
-				name: t("action.signin", { ns: "common" }),
-			}),
-		);
+
+		applySessionSnapshot({
+			user: {
+				id: "01JTZKQX2GT6PHGQER0M8FS6K8",
+				email: "ada@example.com",
+			},
+			sessionExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+		});
 
 		await waitFor(() => {
-			expect(startSseGateway).toHaveBeenCalled();
+			expect(screen.getByTestId("auth-user")).toHaveTextContent(
+				"ada@example.com",
+			);
 		});
+		expect(startSseGateway).toHaveBeenCalled();
+	});
+
+	it("clears user and stops SSE on logout", async () => {
+		const user = userEvent.setup();
+		renderWithProviders(<AuthProbe />);
+
+		expect(await screen.findByTestId("auth-user")).toHaveTextContent(
+			"test@example.com",
+		);
 
 		stopSseGateway.mockClear();
-		await logoutSession();
+		await user.click(screen.getByRole("button", { name: "logout" }));
 
+		await waitFor(() => {
+			expect(screen.getByTestId("auth-user")).toHaveTextContent("anonymous");
+		});
 		expect(stopSseGateway).toHaveBeenCalled();
-		expect(
-			screen.getByLabelText(t("email.label", { ns: "form" })),
-		).toBeInTheDocument();
 	});
 });

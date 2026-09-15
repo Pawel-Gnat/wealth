@@ -4,13 +4,13 @@ import { PageLoader } from "@/shared/widgets/page-loader";
 import { APP_ROUTES } from "../../app/router";
 
 export const AuthenticatedLayout = () => {
-	const { isAuthenticated, isAuthLoading } = useAuth();
+	const { user, isAuthLoading } = useAuth();
 
 	if (isAuthLoading) {
 		return <PageLoader />;
 	}
 
-	if (!isAuthenticated) {
+	if (user === null) {
 		return <Navigate to={APP_ROUTES.auth} replace />;
 	}
 

@@ -1,29 +1,29 @@
+import type { SessionSnapshot } from "@repo/api/schemas";
+
 type AuthSessionHandlers = {
-	onTokenRefreshed?: (token: string) => void;
+	onSessionApplied?: (snapshot: SessionSnapshot) => void;
 	onUnauthorized?: () => void;
 };
 
-let accessToken: string | null = null;
-let onTokenRefreshed: ((token: string) => void) | undefined;
+let sessionActive = false;
+let onSessionApplied: ((snapshot: SessionSnapshot) => void) | undefined;
 let onUnauthorized: (() => void) | undefined;
 
 export const configureAuthSession = (next: AuthSessionHandlers): void => {
-	onTokenRefreshed = next.onTokenRefreshed;
+	onSessionApplied = next.onSessionApplied;
 	onUnauthorized = next.onUnauthorized;
 };
 
-export const getAccessToken = (): string | null => accessToken;
-
-export const persistAccessToken = (token: string): void => {
-	accessToken = token;
-	onTokenRefreshed?.(token);
+export const applySessionSnapshot = (snapshot: SessionSnapshot): void => {
+	sessionActive = true;
+	onSessionApplied?.(snapshot);
 };
 
 export const clearAuthSession = (): void => {
-	if (accessToken === null) {
+	if (!sessionActive) {
 		return;
 	}
 
-	accessToken = null;
+	sessionActive = false;
 	onUnauthorized?.();
 };

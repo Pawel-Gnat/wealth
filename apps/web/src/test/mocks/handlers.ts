@@ -4,9 +4,23 @@ import {
 } from "@repo/api/schemas";
 import { HttpResponse, http } from "msw";
 
+const mockSessionSnapshot = {
+	user: {
+		id: "01JTZKQX2GT6PHGQER0M8FS6K8",
+		email: "test@example.com",
+	},
+	sessionExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+};
+
 const postAuthSignInHandler = () => {
 	return HttpResponse.json({
-		data: { token: "mock-jwt-access-token" },
+		data: mockSessionSnapshot,
+	});
+};
+
+const getAuthMeHandler = () => {
+	return HttpResponse.json({
+		data: mockSessionSnapshot,
 	});
 };
 
@@ -146,9 +160,7 @@ const postAuthRefreshHandler = () => {
 };
 
 const postAuthLogoutHandler = () => {
-	return HttpResponse.json({
-		data: { message: "logged_out" as const },
-	});
+	return new HttpResponse(null, { status: 204 });
 };
 
 export const HANDLERS = [
@@ -165,6 +177,7 @@ export const HANDLERS = [
 	http.get("*/dashboard/summary", getDashboardSummaryHandler),
 	http.get("*/dashboard/cumulative-chart", getDashboardCumulativeChartHandler),
 	http.get("*/dashboard/daily-chart", getDashboardDailyChartHandler),
+	http.get("*/auth/me", getAuthMeHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),
 	http.post("*/auth/refresh", postAuthRefreshHandler),

@@ -1,11 +1,16 @@
 import { Navigate, Outlet } from "react-router";
 import { useAuth } from "@/context/auth";
+import { PageLoader } from "@/shared/widgets/page-loader";
 import { APP_ROUTES } from "../../app/router";
 
 export const UnauthenticatedLayout = () => {
-	const { isAuthenticated } = useAuth();
+	const { user, isAuthLoading } = useAuth();
 
-	if (isAuthenticated) {
+	if (isAuthLoading) {
+		return <PageLoader />;
+	}
+
+	if (user !== null) {
 		return <Navigate to={APP_ROUTES.dashboard} replace />;
 	}
 

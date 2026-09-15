@@ -1,7 +1,7 @@
 import { Controller, UseGuards } from "@nestjs/common";
 import { Implement, implement, ORPCError } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
-import { PassportJwtGuard } from "../guards/passport-jwt.guard.js";
+import { SessionGuard } from "../guards/session.guard.js";
 import { getClientTimeZoneFromHeaders } from "../shared/time-zone/get-client-time-zone-from-headers.js";
 import { DashboardService } from "./dashboard.service.js";
 
@@ -9,7 +9,7 @@ import { DashboardService } from "./dashboard.service.js";
 export class DashboardController {
 	constructor(private readonly dashboardService: DashboardService) {}
 
-	@UseGuards(PassportJwtGuard)
+	@UseGuards(SessionGuard)
 	@Implement(rpcContract.dashboard.getSummary)
 	getSummaryRpc() {
 		return implement(rpcContract.dashboard.getSummary).handler(
@@ -26,7 +26,7 @@ export class DashboardController {
 		);
 	}
 
-	@UseGuards(PassportJwtGuard)
+	@UseGuards(SessionGuard)
 	@Implement(rpcContract.dashboard.getCumulativeChart)
 	getCumulativeChartRpc() {
 		return implement(rpcContract.dashboard.getCumulativeChart).handler(
@@ -47,7 +47,7 @@ export class DashboardController {
 		);
 	}
 
-	@UseGuards(PassportJwtGuard)
+	@UseGuards(SessionGuard)
 	@Implement(rpcContract.dashboard.getDailyChart)
 	getDailyChartRpc() {
 		return implement(rpcContract.dashboard.getDailyChart).handler(

@@ -23,11 +23,9 @@ describe("filterConnectionsForEvent", () => {
 		}),
 	];
 
-	it("filters by sessionId for scope session", () => {
+	it("filters by session id", () => {
 		const matched = filterConnectionsForEvent(connections, {
-			type: "auth.session-revoked",
-			payload: {},
-			scope: "session",
+			type: "session-ended",
 			targetId: "session-b",
 			occurredAt: "2026-07-21T10:00:00.000Z",
 			id: "evt-1",
@@ -37,25 +35,10 @@ describe("filterConnectionsForEvent", () => {
 		expect(matched[0]?.connectionId).toBe("c2");
 	});
 
-	it("filters by userId for scope user", () => {
-		const matched = filterConnectionsForEvent(connections, {
-			type: "auth.session-revoked",
-			payload: {},
-			scope: "user",
-			targetId: "user-1",
-			occurredAt: "2026-07-21T10:00:00.000Z",
-			id: "evt-2",
-		});
-
-		expect(matched).toHaveLength(2);
-	});
-
 	it("returns no connections when target does not match", () => {
 		expect(
 			filterConnectionsForEvent(connections, {
-				type: "auth.session-revoked",
-				payload: {},
-				scope: "session",
+				type: "session-ended",
 				targetId: "missing",
 				occurredAt: "2026-07-21T10:00:00.000Z",
 				id: "evt-3",

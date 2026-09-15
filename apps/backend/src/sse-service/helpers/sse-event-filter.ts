@@ -5,17 +5,7 @@ export const filterConnectionsForEvent = (
 	connections: readonly SseConnection[],
 	event: SseEvent,
 ): SseConnection[] => {
-	if (event.scope === "session") {
-		return connections.filter(
-			(connection) => connection.sessionId === event.targetId,
-		);
-	}
-
-	if (event.scope === "user") {
-		return connections.filter(
-			(connection) => connection.userId === event.targetId,
-		);
-	}
-
-	return [];
+	return connections.filter(
+		(connection) => connection.sessionId === event.targetId,
+	);
 };

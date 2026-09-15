@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import type { AuthSessionRevokedEvent, SseEvent } from "@repo/api/schemas";
+import type { SessionEndedEvent, SseEvent } from "@repo/api/schemas";
 import { ulid } from "ulid";
 import { RedisService } from "../redis-service/redis.service.js";
 import { sseUserChannel } from "./helpers/sse-channels.js";
@@ -15,15 +15,9 @@ export class SsePublisher {
 		);
 	}
 
-	async publishAuthSessionRevoked(input: {
-		userId: string;
-		scope: AuthSessionRevokedEvent["scope"];
-		targetId: string;
-	}) {
-		const event: AuthSessionRevokedEvent = {
-			type: "auth.session-revoked",
-			payload: {},
-			scope: input.scope,
+	async publishSessionEnded(input: { userId: string; targetId: string }) {
+		const event: SessionEndedEvent = {
+			type: "session-ended",
 			targetId: input.targetId,
 			occurredAt: new Date().toISOString(),
 			id: ulid(),

@@ -58,11 +58,9 @@ describe("SseSubscriber", () => {
 		await moduleRef.close();
 	});
 
-	it("writes data frames to matching connections and closes on auth revoke", async () => {
+	it("writes data frames to matching connections and closes on session-ended", async () => {
 		const event = {
-			type: "auth.session-revoked",
-			payload: {},
-			scope: "session",
+			type: "session-ended",
 			targetId: "session-a",
 			occurredAt: "2026-07-21T10:00:00.000Z",
 			id: "evt-1",
@@ -80,12 +78,10 @@ describe("SseSubscriber", () => {
 		expect(completeB).not.toHaveBeenCalled();
 	});
 
-	it("fans out user-scoped revoke to all local connections", async () => {
+	it("does not fan out session-ended to other sessions of the same user", async () => {
 		const event = {
-			type: "auth.session-revoked",
-			payload: {},
-			scope: "user",
-			targetId: "user-1",
+			type: "session-ended",
+			targetId: "session-a",
 			occurredAt: "2026-07-21T10:00:00.000Z",
 			id: "evt-2",
 		};
@@ -96,10 +92,10 @@ describe("SseSubscriber", () => {
 		);
 
 		expect(nextA).toHaveBeenCalledWith(event);
-		expect(nextB).toHaveBeenCalledWith(event);
+		expect(nextB).not.toHaveBeenCalled();
 		expect(completeA).toHaveBeenCalledOnce();
-		expect(completeB).toHaveBeenCalledOnce();
-		expect(unregister).toHaveBeenCalledTimes(2);
+		expect(completeB).not.toHaveBeenCalled();
+		expect(unregister).toHaveBeenCalledTimes(1);
 	});
 
 	it("ignores malformed and invalid envelopes", async () => {

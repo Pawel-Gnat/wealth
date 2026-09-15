@@ -72,11 +72,13 @@ describe("SseService", () => {
 
 	it("rejects when refresh cookie session is missing", async () => {
 		resolveActiveRefreshSession.mockResolvedValue(null);
+		const request = {} as Request;
 		const response = createResponse();
 
-		await expect(sseService.connect({} as Request, response)).rejects.toThrow(
+		await expect(sseService.connect(request, response)).rejects.toThrow(
 			UnauthorizedException,
 		);
+		expect(resolveActiveRefreshSession).toHaveBeenCalledWith(request);
 		expect(register).not.toHaveBeenCalled();
 	});
 
@@ -86,11 +88,13 @@ describe("SseService", () => {
 			sessionId: "session-1",
 		});
 		register.mockRejectedValueOnce(new SseFanOutUnavailableError());
+		const request = {} as Request;
 		const response = createResponse();
 
-		await expect(sseService.connect({} as Request, response)).rejects.toThrow(
+		await expect(sseService.connect(request, response)).rejects.toThrow(
 			ServiceUnavailableException,
 		);
+		expect(resolveActiveRefreshSession).toHaveBeenCalledWith(request);
 		expect(response.flushHeaders).not.toHaveBeenCalled();
 	});
 
@@ -111,6 +115,7 @@ describe("SseService", () => {
 
 		await sseService.connect(request, response);
 
+		expect(resolveActiveRefreshSession).toHaveBeenCalledWith(request);
 		expect(response.status).toHaveBeenCalledWith(200);
 		expect(response.setHeader).toHaveBeenCalledWith(
 			"Content-Type",
@@ -136,11 +141,11 @@ describe("SseService", () => {
 
 		const registeredSink = register.mock.calls[0]?.[0]?.sink;
 		registeredSink.next({
-			type: "auth.session-revoked",
+			type: "session-ended",
 			id: "evt-1",
 		});
 		expect(response.write).toHaveBeenCalledWith(
-			'id: evt-1\ndata: {"type":"auth.session-revoked","id":"evt-1"}\n\n',
+			'id: evt-1\ndata: {"type":"session-ended","id":"evt-1"}\n\n',
 		);
 
 		await vi.advanceTimersByTimeAsync(20_000);

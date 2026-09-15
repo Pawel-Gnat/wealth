@@ -1,3 +1,4 @@
+import type { SessionSnapshot, User } from "@repo/api/schemas";
 import {
 	AUTH_OBSERVABILITY_EVENTS,
 	logger,
@@ -14,13 +15,21 @@ import {
 	useState,
 } from "react";
 import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
-import { bootstrapSession, logoutSession } from "@/shared/lib/auth/auth-api";
-import { configureAuthSession } from "@/shared/lib/auth/auth-session";
-import { initAuthTabSync } from "@/shared/lib/auth/refresh-access-token";
+import {
+	bootstrapSession,
+	getSessionRefreshDelayMs,
+	logoutSession,
+	refreshSession,
+} from "@/shared/lib/auth/auth-api";
+import {
+	applySessionSnapshot,
+	configureAuthSession,
+} from "@/shared/lib/auth/auth-session";
+import { configureOrpcRefresh } from "@/shared/lib/orpc/orpc-transport";
 import { startSseGateway, stopSseGateway } from "@/shared/lib/sse";
 
 type AuthContextValue = {
-	isAuthenticated: boolean;
+	user: User | null;
 	isAuthLoading: boolean;
 	logout: () => Promise<void>;
 };
@@ -29,7 +38,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const queryClient = useQueryClient();
-	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [user, setUser] = useState<User | null>(null);
 	const [isResolvingSession, setIsResolvingSession] = useState(true);
 	const isAuthLoading = useSkeletonLoader({
 		isLoading: isResolvingSession,
@@ -38,26 +47,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	useEffect(() => {
 		let cancelled = false;
+		let refreshTimer: ReturnType<typeof setTimeout> | null = null;
 
+		const clearRefreshTimer = () => {
+			if (refreshTimer === null) {
+				return;
+			}
+
+			clearTimeout(refreshTimer);
+			refreshTimer = null;
+		};
+
+		const applySnapshot = (snapshot: SessionSnapshot) => {
+			setUser(snapshot.user);
+			startSseGateway();
+			clearRefreshTimer();
+			refreshTimer = setTimeout(() => {
+				void refreshSession();
+			}, getSessionRefreshDelayMs(snapshot.sessionExpiresAt));
+		};
+
+		configureOrpcRefresh(refreshSession);
 		configureAuthSession({
-			onTokenRefreshed: () => {
-				setIsAuthenticated(true);
-				startSseGateway();
-			},
+			onSessionApplied: applySnapshot,
 			onUnauthorized: () => {
+				clearRefreshTimer();
 				stopSseGateway();
-				setIsAuthenticated(false);
+				setUser(null);
 				queryClient.clear();
 			},
 		});
 
-		const stopTabSync = initAuthTabSync();
-
 		const initializeAuth = async () => {
 			try {
-				const hasSession = await bootstrapSession();
-				if (!cancelled) {
-					setIsAuthenticated(hasSession);
+				const snapshot = await bootstrapSession();
+				if (!cancelled && snapshot) {
+					applySessionSnapshot(snapshot);
 				}
 			} finally {
 				if (!cancelled) {
@@ -70,8 +95,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 		return () => {
 			cancelled = true;
+			clearRefreshTimer();
+			configureOrpcRefresh(null);
 			configureAuthSession({});
-			stopTabSync();
 			stopSseGateway();
 		};
 	}, [queryClient]);
@@ -85,11 +111,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const value = useMemo<AuthContextValue>(
 		() => ({
-			isAuthenticated,
+			user,
 			isAuthLoading,
 			logout,
 		}),
-		[isAuthenticated, isAuthLoading, logout],
+		[user, isAuthLoading, logout],
 	);
 
 	return <AuthContext value={value}>{children}</AuthContext>;

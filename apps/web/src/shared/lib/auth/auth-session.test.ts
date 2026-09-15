@@ -1,10 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+	applySessionSnapshot,
 	clearAuthSession,
 	configureAuthSession,
-	getAccessToken,
-	persistAccessToken,
 } from "./auth-session";
+
+const snapshot = {
+	user: { id: "user-1", email: "ada@example.com" },
+	sessionExpiresAt: "2026-09-15T08:15:00.000Z",
+};
 
 describe("auth-session", () => {
 	beforeEach(() => {
@@ -12,34 +16,32 @@ describe("auth-session", () => {
 		clearAuthSession();
 	});
 
-	describe("persistAccessToken", () => {
-		it("stores token in memory and notifies handler", () => {
-			const onTokenRefreshed = vi.fn();
-			configureAuthSession({ onTokenRefreshed });
+	describe("applySessionSnapshot", () => {
+		it("notifies handler with the snapshot", () => {
+			const onSessionApplied = vi.fn();
+			configureAuthSession({ onSessionApplied });
 
-			persistAccessToken("new-token");
+			applySessionSnapshot(snapshot);
 
-			expect(getAccessToken()).toBe("new-token");
-			expect(onTokenRefreshed).toHaveBeenCalledWith("new-token");
+			expect(onSessionApplied).toHaveBeenCalledWith(snapshot);
 		});
 	});
 
 	describe("clearAuthSession", () => {
-		it("clears token and notifies handler", () => {
+		it("notifies handler when a session is active", () => {
 			const onUnauthorized = vi.fn();
-			persistAccessToken("token");
 			configureAuthSession({ onUnauthorized });
+			applySessionSnapshot(snapshot);
 
 			clearAuthSession();
 
-			expect(getAccessToken()).toBeNull();
 			expect(onUnauthorized).toHaveBeenCalledOnce();
 		});
 
 		it("does not notify again when session is already cleared", () => {
 			const onUnauthorized = vi.fn();
-			persistAccessToken("token");
 			configureAuthSession({ onUnauthorized });
+			applySessionSnapshot(snapshot);
 
 			clearAuthSession();
 			clearAuthSession();

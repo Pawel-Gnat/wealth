@@ -3,8 +3,7 @@ export const AUTH_OBSERVABILITY_EVENTS = {
 	signUpSucceeded: "auth.sign-up.succeeded",
 	logoutSucceeded: "auth.logout.succeeded",
 	refreshSucceeded: "auth.refresh.succeeded",
-	refreshWebLocksUnavailable: "auth.refresh.web-locks-unavailable",
-	sessionRevokedPublishFailed: "auth.session-revoked.publish-failed",
+	sessionEndedPublishFailed: "auth.session-ended.publish-failed",
 } as const;
 
 export type AuthObservabilityEvent =

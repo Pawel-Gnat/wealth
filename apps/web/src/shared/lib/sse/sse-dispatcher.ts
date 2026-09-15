@@ -21,7 +21,7 @@ export const dispatchSseMessage = (raw: string): SseEvent | null => {
 	const event = result.data;
 
 	switch (event.type) {
-		case "auth.session-revoked":
+		case "session-ended":
 			clearAuthSession();
 			break;
 	}

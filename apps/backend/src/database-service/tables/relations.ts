@@ -3,13 +3,13 @@ import { expenseDocumentsTable } from "./expense-documents.table.js";
 import { expenseLineItemsTable } from "./expense-line-items.table.js";
 import { incomeDocumentsTable } from "./income-documents.table.js";
 import { incomeLineItemsTable } from "./income-line-items.table.js";
-import { refreshTokensTable } from "./refresh-tokens.table.js";
+import { sessionsTable } from "./sessions.table.js";
 import { usersTable } from "./users.table.js";
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
 	expenseDocuments: many(expenseDocumentsTable),
 	incomeDocuments: many(incomeDocumentsTable),
-	refreshTokens: many(refreshTokensTable),
+	sessions: many(sessionsTable),
 }));
 
 export const expenseDocumentsRelations = relations(
@@ -54,12 +54,9 @@ export const incomeLineItemsRelations = relations(
 	}),
 );
 
-export const refreshTokensRelations = relations(
-	refreshTokensTable,
-	({ one }) => ({
-		user: one(usersTable, {
-			fields: [refreshTokensTable.userId],
-			references: [usersTable.id],
-		}),
+export const sessionsRelations = relations(sessionsTable, ({ one }) => ({
+	user: one(usersTable, {
+		fields: [sessionsTable.userId],
+		references: [usersTable.id],
 	}),
-);
+}));
