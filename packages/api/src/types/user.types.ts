@@ -3,6 +3,9 @@ import type {
 	createUserPayloadSchema,
 	createUserResponseDataSchema,
 	createUserResponseSchema,
+	userEditDetailsResponseDataSchema,
+	userEditDetailsResponseSchema,
+	userEditDetailsSchema,
 	userEditPasswordResponseDataSchema,
 	userEditPasswordResponseSchema,
 	userEditPasswordSchema,
@@ -21,4 +24,11 @@ export type UserEditPasswordResponseData = z.infer<
 >;
 export type UserEditPasswordResponse = z.infer<
 	typeof userEditPasswordResponseSchema
+>;
+export type UserEditDetailsPayload = z.infer<typeof userEditDetailsSchema>;
+export type UserEditDetailsResponseData = z.infer<
+	typeof userEditDetailsResponseDataSchema
+>;
+export type UserEditDetailsResponse = z.infer<
+	typeof userEditDetailsResponseSchema
 >;

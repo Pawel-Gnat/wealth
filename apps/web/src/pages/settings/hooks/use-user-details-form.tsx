@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userEditPasswordSchema } from "@repo/api/schemas";
+import { userEditDetailsSchema } from "@repo/api/schemas";
 import type {
-	UserEditPasswordPayload,
-	UserEditPasswordResponse,
+	User,
+	UserEditDetailsPayload,
+	UserEditDetailsResponse,
 } from "@repo/api/types";
 import {
 	AUTH_OBSERVABILITY_EVENTS,
@@ -17,42 +18,41 @@ import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
-export const usePasswordForm = () => {
+export const useUserDetailsForm = (user: User) => {
 	const { t } = useTranslation();
-	const form = useForm<UserEditPasswordPayload>({
-		resolver: zodResolver(userEditPasswordSchema),
+	const form = useForm<UserEditDetailsPayload>({
+		resolver: zodResolver(userEditDetailsSchema),
 		defaultValues: {
-			currentPassword: "",
-			newPassword: "",
-			confirmPassword: "",
+			firstName: user.firstName ?? "",
+			lastName: user.lastName ?? "",
 		},
 	});
 
 	const mutation = useMutation<
-		UserEditPasswordResponse,
+		UserEditDetailsResponse,
 		Error,
-		UserEditPasswordPayload
+		UserEditDetailsPayload
 	>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
 				const data = await controlledAsync(() =>
-					orpcClient.settings.password(payload),
+					orpcClient.settings.details(payload),
 				);
-				logger.info(AUTH_OBSERVABILITY_EVENTS.passwordUpdateSucceeded);
+				logger.info(AUTH_OBSERVABILITY_EVENTS.detailsUpdateSucceeded);
 				return data;
 			}),
-		onSuccess: () => {
-			form.reset();
-			toast.success(t("toast.success.password-updated", { ns: "common" }));
+		onSuccess: (_data, payload) => {
+			form.reset(payload);
+			toast.success(t("toast.success.details-updated", { ns: "common" }));
 		},
 		onError: () => {
-			toast.error(t("toast.error.password-updated", { ns: "common" }));
+			toast.error(t("toast.error.details-updated", { ns: "common" }));
 		},
 	});
 
 	return {
 		control: form.control,
 		isLoading: useLoader({ isLoading: mutation.isPending }),
-		updatePassword: form.handleSubmit((payload) => mutation.mutate(payload)),
+		updateDetails: form.handleSubmit((payload) => mutation.mutate(payload)),
 	};
 };

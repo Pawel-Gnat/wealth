@@ -5,6 +5,6 @@ import {
 } from "../schemas/user.schema";
 
 export const userEditPasswordContract = oc
-	.route({ method: "PUT", path: "/auth/password" })
+	.route({ method: "PUT", path: "/settings/password" })
 	.input(userEditPasswordSchema)
 	.output(userEditPasswordResponseSchema);

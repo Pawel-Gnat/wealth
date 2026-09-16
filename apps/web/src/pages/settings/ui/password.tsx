@@ -4,15 +4,12 @@ import { usePasswordForm } from "../hooks/use-password-form";
 
 export const Password = () => {
 	const { t } = useTranslation();
-	const form = usePasswordForm();
+	const { control, isLoading, updatePassword } = usePasswordForm();
 	const passwordLabel = t("password.label", { ns: "form" });
 
 	return (
 		<Card title={t("password.title", { ns: "settings" })}>
-			<form
-				onSubmit={form.handleSubmit(() => undefined)}
-				className="flex flex-col gap-4"
-			>
+			<form onSubmit={updatePassword} className="flex flex-col gap-4">
 				<FormInput
 					name="currentPassword"
 					label={t("password.current", {
@@ -21,7 +18,7 @@ export const Password = () => {
 					})}
 					type="password"
 					placeholder={t("password.placeholder", { ns: "form" })}
-					control={form.control}
+					control={control}
 					icon="password"
 				/>
 				<FormInput
@@ -29,7 +26,7 @@ export const Password = () => {
 					label={t("password.new", { ns: "settings", label: passwordLabel })}
 					type="password"
 					placeholder={t("password.placeholder", { ns: "form" })}
-					control={form.control}
+					control={control}
 					icon="password"
 				/>
 				<FormInput
@@ -37,10 +34,14 @@ export const Password = () => {
 					label={t("confirm-password.label", { ns: "form" })}
 					type="password"
 					placeholder={t("password.placeholder", { ns: "form" })}
-					control={form.control}
+					control={control}
 					icon="password"
 				/>
-				<ButtonPrimary className="w-fit ml-auto">
+				<ButtonPrimary
+					className="w-fit ml-auto"
+					isLoading={isLoading}
+					disabled={isLoading}
+				>
 					{t("action.update", { ns: "common" })}
 				</ButtonPrimary>
 			</form>

@@ -3,6 +3,7 @@ import { apiPayload } from "./common.schema";
 
 export const USER_CREATED_MESSAGE = "user_created" as const;
 export const USER_PASSWORD_UPDATED_MESSAGE = "user_password_updated" as const;
+export const USER_DETAILS_UPDATED_MESSAGE = "user_details_updated" as const;
 
 export const userSchema = z.object({
 	id: z.string(),
@@ -20,13 +21,16 @@ const passwordComplexitySchema = z
 	.regex(/[0-9]/, "form:password.invalid-number")
 	.regex(/[^A-Za-z0-9]/, "form:password.invalid-special-character");
 
+const firstNameSchema = z.string().trim().max(16, "form:first-name.max");
+const lastNameSchema = z.string().trim().max(16, "form:last-name.max");
+
 export const createUserPayloadSchema = z
 	.object({
 		email: z.email("form:email.invalid").trim().toLowerCase(),
 		password: passwordComplexitySchema,
 		confirmPassword: z.string(),
-		firstName: z.string().trim().max(16, "form:first-name.max").optional(),
-		lastName: z.string().trim().max(16, "form:last-name.max").optional(),
+		firstName: firstNameSchema.optional(),
+		lastName: lastNameSchema.optional(),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: "form:confirm-password.mismatch",
@@ -58,4 +62,17 @@ export const userEditPasswordResponseDataSchema = z.object({
 
 export const userEditPasswordResponseSchema = apiPayload(
 	userEditPasswordResponseDataSchema,
+);
+
+export const userEditDetailsSchema = z.object({
+	firstName: firstNameSchema,
+	lastName: lastNameSchema,
+});
+
+export const userEditDetailsResponseDataSchema = z.object({
+	message: z.literal(USER_DETAILS_UPDATED_MESSAGE),
+});
+
+export const userEditDetailsResponseSchema = apiPayload(
+	userEditDetailsResponseDataSchema,
 );
