@@ -1,15 +1,17 @@
 import { Inject, Injectable } from "@nestjs/common";
 import {
-	type DocumentCreatePayload,
-	type DocumentDetailsResponse,
-	type DocumentListResponse,
 	EXPENSE_CREATED_MESSAGE,
 	EXPENSE_DELETED_MESSAGE,
 	EXPENSE_UPDATED_MESSAGE,
-	type ExpenseDocumentCreateResponse,
-	type ExpenseDocumentDeleteResponse,
-	type ExpenseDocumentUpdateResponse,
 } from "@repo/api/schemas";
+import type {
+	DocumentCreatePayload,
+	DocumentDetailsResponse,
+	DocumentListResponse,
+	ExpenseDocumentCreateResponse,
+	ExpenseDocumentDeleteResponse,
+	ExpenseDocumentUpdateResponse,
+} from "@repo/api/types";
 import {
 	decodeDocumentDateFromStorage,
 	encodeDocumentDateForStorage,

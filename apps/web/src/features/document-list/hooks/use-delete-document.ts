@@ -1,13 +1,13 @@
 import type {
 	ExpenseDocumentDeleteResponse,
 	IncomeDocumentDeleteResponse,
-} from "@repo/api/schemas";
+} from "@repo/api/types";
 import { logger, runWithRequestId } from "@repo/observability/browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getDocumentConfig } from "@/shared/config/document-config";
+import { getDocumentConfig } from "@/features/config/document-config";
+import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
-import type { RecordKind } from "@/shared/types/record-kind";
 
 type DocumentDeleteResponse =
 	| ExpenseDocumentDeleteResponse

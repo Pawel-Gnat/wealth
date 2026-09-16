@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import type { User } from "@repo/api/schemas";
+import type { User } from "@repo/api/types";
 import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants.js";

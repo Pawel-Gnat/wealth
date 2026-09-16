@@ -1,5 +1,5 @@
-import type { SseEvent } from "@repo/api/schemas";
 import { sseEventSchema } from "@repo/api/schemas";
+import type { SseEvent } from "@repo/api/types";
 import { logger, SSE_OBSERVABILITY_EVENTS } from "@repo/observability/browser";
 import { clearAuthSession } from "@/shared/lib/auth/auth-api";
 

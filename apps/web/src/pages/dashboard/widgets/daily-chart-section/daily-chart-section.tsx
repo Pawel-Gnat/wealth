@@ -1,4 +1,4 @@
-import type { Period } from "@repo/api/schemas";
+import type { Period } from "@repo/api/types";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CardState } from "@/shared/widgets/card-state";

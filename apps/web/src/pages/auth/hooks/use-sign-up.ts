@@ -1,4 +1,4 @@
-import type { SignUpPayload, SignUpResponse } from "@repo/api/schemas";
+import type { CreateUserPayload, CreateUserResponse } from "@repo/api/types";
 import {
 	AUTH_OBSERVABILITY_EVENTS,
 	logger,
@@ -11,12 +11,12 @@ import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
 type UseSignUpProps = {
-	onSuccess?: (data: SignUpResponse) => void;
+	onSuccess?: (data: CreateUserResponse) => void;
 	onError?: (error: Error) => void;
 };
 
 export const useSignUp = ({ onSuccess, onError }: UseSignUpProps = {}) => {
-	const mutation = useMutation<SignUpResponse, Error, SignUpPayload>({
+	const mutation = useMutation<CreateUserResponse, Error, CreateUserPayload>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
 				const data = await controlledAsync(() =>

@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getDocumentConfig } from "@/features/config/document-config";
+import type { RecordKind } from "@/features/model/record-kind";
 import { ErrorState, Table } from "@/shared/components";
-import { getDocumentConfig } from "@/shared/config/document-config";
-import type { RecordKind } from "@/shared/types/record-kind";
 import { createDocumentColumns } from "../config/create-document-columns";
 import { useDocumentsList } from "../hooks/use-documents-list";
 import { DocumentDeleteDialog } from "./document-delete-dialog";

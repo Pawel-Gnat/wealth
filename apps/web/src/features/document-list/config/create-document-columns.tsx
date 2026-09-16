@@ -1,4 +1,4 @@
-import type { DocumentListItem } from "@repo/api/schemas";
+import type { DocumentListItem } from "@repo/api/types";
 import {
 	decodeDocumentDateFromStorage,
 	formatDocumentDate,

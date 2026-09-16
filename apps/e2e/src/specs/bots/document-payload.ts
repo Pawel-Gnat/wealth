@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import type { LineItem } from '@repo/api/schemas'
+import type { LineItem } from '@repo/api/types';
 
 const CREATE_PROBABILITY = 0.75
 

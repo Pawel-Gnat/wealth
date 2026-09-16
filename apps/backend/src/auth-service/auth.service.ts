@@ -6,14 +6,14 @@ import {
 	UnauthorizedException,
 } from "@nestjs/common";
 import { ORPCError } from "@orpc/server";
-import {
-	type SessionSnapshotResponse,
-	type SignInPayload,
-	type SignUpPayload,
-	type SignUpResponse,
-	USER_CREATED_MESSAGE,
-	type User,
-} from "@repo/api/schemas";
+import { USER_CREATED_MESSAGE } from "@repo/api/schemas";
+import type {
+	CreateUserPayload,
+	CreateUserResponse,
+	SessionSnapshotResponse,
+	SignInPayload,
+	User,
+} from "@repo/api/types";
 import {
 	REFRESH_COOKIE_NAME,
 	REFRESH_GRACE_MS,
@@ -237,7 +237,7 @@ export class AuthService {
 		};
 	}
 
-	async signUp(input: SignUpPayload): Promise<SignUpResponse> {
+	async signUp(input: CreateUserPayload): Promise<CreateUserResponse> {
 		const existing = await this.usersService.findUserByEmail(input.email);
 		if (existing) {
 			throw new ORPCError("CONFLICT", { message: "Email already registered" });

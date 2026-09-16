@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
+import { getDocumentConfig } from "@/features/config/document-config";
+import type { RecordKind } from "@/features/model/record-kind";
 import { Card } from "@/shared/components";
-import { getDocumentConfig } from "@/shared/config/document-config";
 import { PageLayout } from "@/shared/layouts";
-import type { RecordKind } from "@/shared/types/record-kind";
 import { CardState } from "@/shared/widgets/card-state";
 import { useDocument } from "./hooks/use-document";
 import { DocumentForm as DocumentFormUI } from "./ui/document-form";

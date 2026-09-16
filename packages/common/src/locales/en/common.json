@@ -31,6 +31,7 @@
 	},
 	"action": {
 		"save": "Save",
+		"update": "Update",
 		"signin": "Sign in",
 		"signup": "Sign up",
 		"logout": "Logout",
@@ -43,7 +44,8 @@
 		"leave": "Leave",
 		"accept": "Accept",
 		"reject": "Reject",
-		"download": "Download"
+		"download": "Download",
+		"change-photo": "Change photo"
 	},
 	"toast": {
 		"success": {

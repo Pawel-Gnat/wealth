@@ -1,4 +1,4 @@
-import type { DashboardChartPoint } from "@repo/api/schemas";
+import type { DashboardChartPoint } from "@repo/api/types";
 import { toDate } from "./to-date";
 
 export type DashboardChartDataPoint = {

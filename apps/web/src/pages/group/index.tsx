@@ -1,4 +1,4 @@
-import type { GroupBudget } from "@repo/api/schemas";
+import type { GroupBudget } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { ButtonSecondary, Heading, Icon } from "@/shared/components";

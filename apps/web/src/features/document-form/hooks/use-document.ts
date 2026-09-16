@@ -1,10 +1,10 @@
-import type { DocumentCreatePayload } from "@repo/api/schemas";
+import type { DocumentCreatePayload } from "@repo/api/types";
 import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { useQuery } from "@tanstack/react-query";
-import { getDocumentConfig } from "@/shared/config/document-config";
+import { getDocumentConfig } from "@/features/config/document-config";
+import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useLoader } from "@/shared/hooks/use-loader";
-import type { RecordKind } from "@/shared/types/record-kind";
 
 type UseDocumentProps = {
 	kind: RecordKind;

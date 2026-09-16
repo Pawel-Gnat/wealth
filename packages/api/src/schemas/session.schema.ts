@@ -6,9 +6,5 @@ export const sessionSnapshotSchema = z.object({
 	user: userSchema,
 	sessionExpiresAt: z.iso.datetime(),
 });
-export type SessionSnapshot = z.infer<typeof sessionSnapshotSchema>;
 
 export const sessionSnapshotResponseSchema = apiPayload(sessionSnapshotSchema);
-export type SessionSnapshotResponse = z.infer<
-	typeof sessionSnapshotResponseSchema
->;

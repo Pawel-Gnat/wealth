@@ -1,8 +1,8 @@
-import type { DocumentCreatePayload } from "@repo/api/schemas";
+import type { DocumentCreatePayload } from "@repo/api/types";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { ButtonDestructive, FormInput, Icon, Price } from "@/shared/components";
-import type { LineItemTitleLabelKey } from "../../../shared/model/line-item-title-label-key";
+import type { LineItemTitleLabelKey } from "../../model/line-item-title-label-key";
 
 type DocumentLineItemProps = {
 	index: number;

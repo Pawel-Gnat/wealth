@@ -1,4 +1,4 @@
-import type { BudgetMember, GroupBudget } from "@repo/api/schemas";
+import type { BudgetMember, GroupBudget } from "@repo/api/types";
 
 export type GroupInvitation = {
 	budget: GroupBudget;

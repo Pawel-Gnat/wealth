@@ -1,4 +1,4 @@
-import type { Summary, SummaryKind } from "@repo/api/schemas";
+import type { Summary, SummaryKind } from "@repo/api/types";
 import { cn } from "cn";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";

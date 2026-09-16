@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import type { SessionEndedEvent, SseEvent } from "@repo/api/schemas";
+import type { SessionEndedEvent, SseEvent } from "@repo/api/types";
 import { ulid } from "ulid";
 import { RedisService } from "../redis-service/redis.service.js";
 import { sseUserChannel } from "./helpers/sse-channels.js";

@@ -1,4 +1,4 @@
-import type { SessionSnapshotResponse, SignInPayload } from "@repo/api/schemas";
+import type { SessionSnapshotResponse, SignInPayload } from "@repo/api/types";
 import {
 	AUTH_OBSERVABILITY_EVENTS,
 	logger,

@@ -4,6 +4,7 @@ import {
 	getDashboardDailyChartContract,
 	getDashboardSummaryContract,
 } from "./dashboard.contract";
+import { userEditPasswordContract } from "./edit-password.contract";
 import {
 	createExpenseContract,
 	deleteExpenseContract,
@@ -31,6 +32,7 @@ export const rpcContract = populateContractRouterPaths({
 		refresh: refreshContract,
 		logout: logoutContract,
 		me: meContract,
+		editPassword: userEditPasswordContract,
 	},
 	expenses: {
 		create: createExpenseContract,

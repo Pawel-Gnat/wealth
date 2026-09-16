@@ -1,4 +1,15 @@
 {
 	"title": "Settings",
-	"subtitle": "Profile, personal details and password."
+	"subtitle": "Profile, personal details and password.",
+	"profile": {
+		"title": "Profile"
+	},
+	"personal-details": {
+		"title": "Personal Details"
+	},
+	"password": {
+		"title": "Password",
+		"current": "Current {{label}}",
+		"new": "New {{label}}"
+	}
 }

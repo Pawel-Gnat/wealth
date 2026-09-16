@@ -5,15 +5,15 @@ import type {
 	ExpenseDocumentUpdateResponse,
 	IncomeDocumentCreateResponse,
 	IncomeDocumentUpdateResponse,
-} from "@repo/api/schemas";
+} from "@repo/api/types";
 import { normalizeDocumentDateForApi } from "@repo/common/helpers";
 import { logger, runWithRequestId } from "@repo/observability/browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getDocumentConfig } from "@/shared/config/document-config";
+import { getDocumentConfig } from "@/features/config/document-config";
+import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useLoader } from "@/shared/hooks/use-loader";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
-import type { RecordKind } from "@/shared/types/record-kind";
 
 type DocumentUpsertResponse =
 	| ExpenseDocumentCreateResponse

@@ -1,9 +1,9 @@
-import type { DocumentListResponse } from "@repo/api/schemas";
+import type { DocumentListResponse } from "@repo/api/types";
 import { useQuery } from "@tanstack/react-query";
-import { getDocumentConfig } from "@/shared/config/document-config";
+import { getDocumentConfig } from "@/features/config/document-config";
+import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useLoader } from "@/shared/hooks/use-loader";
-import type { RecordKind } from "@/shared/types/record-kind";
 
 export function useDocumentsList(kind: RecordKind) {
 	const config = getDocumentConfig(kind);

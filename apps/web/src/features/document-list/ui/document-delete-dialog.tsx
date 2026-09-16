@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { getDocumentConfig } from "@/features/config/document-config";
+import type { RecordKind } from "@/features/model/record-kind";
 import { AlertModal } from "@/shared/components";
-import { getDocumentConfig } from "@/shared/config/document-config";
-import type { RecordKind } from "@/shared/types/record-kind";
 import { useDeleteDocument } from "../hooks/use-delete-document";
 
 type DocumentDeleteDialogProps = {

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type SignUpPayload, signUpPayloadSchema } from "@repo/api/schemas";
+import { createUserPayloadSchema } from "@repo/api/schemas";
+import type { CreateUserPayload } from "@repo/api/types";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -23,8 +24,8 @@ export function SignupForm({ onSignedUp }: SignupFormProps) {
 		},
 	});
 
-	const form = useForm<SignUpPayload>({
-		resolver: zodResolver(signUpPayloadSchema),
+	const form = useForm<CreateUserPayload>({
+		resolver: zodResolver(createUserPayloadSchema),
 		defaultValues: {
 			email: "",
 			password: "",
@@ -34,7 +35,7 @@ export function SignupForm({ onSignedUp }: SignupFormProps) {
 		},
 	});
 
-	function onSubmit(data: SignUpPayload) {
+	function onSubmit(data: CreateUserPayload) {
 		signUp(data);
 	}
 

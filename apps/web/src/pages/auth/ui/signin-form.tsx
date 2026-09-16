@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type SignInPayload, signInPayloadSchema } from "@repo/api/schemas";
+import { signInPayloadSchema } from "@repo/api/schemas";
+import type { SignInPayload } from "@repo/api/types";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";

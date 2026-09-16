@@ -1,6 +1,7 @@
 import {
 	AlertCircle,
 	CalendarIcon,
+	Camera,
 	ChartArea,
 	ChartColumn,
 	Check,
@@ -50,6 +51,7 @@ export const icons = {
 	email: Mail,
 	password: Lock,
 	settings: Cog,
+	photo: Camera,
 };
 
 export type IconName = keyof typeof icons;
