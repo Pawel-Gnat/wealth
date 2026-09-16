@@ -33,7 +33,7 @@ export const AuthPage = () => {
 				onValueChange={setActiveTab}
 				className="w-full max-w-sm"
 			>
-				<TabsList className="w-full">
+				<TabsList className="w-full mb-2">
 					<TabsTrigger value={TABS.signin}>
 						{t("action.signin", { ns: "common" })}
 					</TabsTrigger>

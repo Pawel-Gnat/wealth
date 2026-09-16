@@ -1,9 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
+import type { User } from "@repo/api/schemas";
 import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants.js";
 import { usersTable } from "../database-service/tables/index.js";
 import type { UserRow } from "../database-service/types/types.js";
+import { CreateUserInput } from "./types/users.js";
 
 @Injectable()
 export class UsersService {
@@ -18,10 +20,17 @@ export class UsersService {
 		return user ?? null;
 	}
 
-	async createUser(email: string, passwordHash: string): Promise<void> {
+	async createUser({
+		email,
+		passwordHash,
+		firstName,
+		lastName,
+	}: CreateUserInput): Promise<void> {
 		await this.db.insert(usersTable).values({
 			email,
 			password: passwordHash,
+			firstName,
+			lastName,
 		});
 	}
 
@@ -32,5 +41,14 @@ export class UsersService {
 			.where(eq(usersTable.id, id))
 			.limit(1);
 		return user ?? null;
+	}
+
+	mapToUser(user: UserRow): User {
+		return {
+			id: String(user.id),
+			email: user.email,
+			firstName: user.firstName ?? undefined,
+			lastName: user.lastName ?? undefined,
+		};
 	}
 }

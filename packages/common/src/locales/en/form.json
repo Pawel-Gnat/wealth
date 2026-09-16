@@ -18,6 +18,16 @@
 		"label": "Confirm password",
 		"mismatch": "Passwords do not match"
 	},
+	"first-name": {
+		"label": "First name",
+		"placeholder": "Your first name",
+		"max": "First name must be at most 16 characters"
+	},
+	"last-name": {
+		"label": "Last name",
+		"placeholder": "Your last name",
+		"max": "Last name must be at most 16 characters"
+	},
 	"date": {
 		"label": "Date"
 	},

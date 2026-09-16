@@ -29,17 +29,47 @@ describe("Users service", () => {
 	it("creates a user and finds them by email", async () => {
 		const email = uniqueTestUserEmail("users-create");
 		const passwordHash = "hashed-for-integration";
-		await usersService.createUser(email, passwordHash);
+		await usersService.createUser({ email, passwordHash });
 
 		const row = await usersService.findUserByEmail(email);
 		expect(row).not.toBeNull();
-		expect(row).toMatchObject({ email, password: passwordHash });
+		expect(row).toMatchObject({
+			email,
+			password: passwordHash,
+			firstName: null,
+			lastName: null,
+		});
+	});
+
+	it("creates a user with optional names", async () => {
+		const email = uniqueTestUserEmail("users-create-names");
+		await usersService.createUser({
+			email,
+			passwordHash: "hashed-for-integration",
+			firstName: "Ada",
+			lastName: "Lovelace",
+		});
+
+		const row = await usersService.findUserByEmail(email);
+		expect(row).toMatchObject({
+			email,
+			firstName: "Ada",
+			lastName: "Lovelace",
+		});
+		expect(usersService.mapToUser(row!)).toEqual({
+			id: row!.id,
+			email,
+			firstName: "Ada",
+			lastName: "Lovelace",
+		});
 	});
 
 	it("rejects when trying to create user with duplicated email", async () => {
 		const email = uniqueTestUserEmail("users-duplicate");
-		await usersService.createUser(email, "hash-1");
+		await usersService.createUser({ email, passwordHash: "hash-1" });
 
-		await expect(usersService.createUser(email, "hash-2")).rejects.toThrow();
+		await expect(
+			usersService.createUser({ email, passwordHash: "hash-2" }),
+		).rejects.toThrow();
 	});
 });

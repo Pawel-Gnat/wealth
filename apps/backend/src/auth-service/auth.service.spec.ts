@@ -367,11 +367,15 @@ describe("Auth service", () => {
 				email,
 				password: "password123",
 				confirmPassword: "password123",
+				firstName: "Ada",
+				lastName: "Lovelace",
 			});
 
 			expect(result).toEqual({ data: { message: "user_created" } });
 			const row = await usersService.findUserByEmail(email);
 			expect(row?.email).toBe(email);
+			expect(row?.firstName).toBe("Ada");
+			expect(row?.lastName).toBe("Lovelace");
 			expect(await sessionsForUser(String(row?.id))).toEqual([]);
 		});
 	});

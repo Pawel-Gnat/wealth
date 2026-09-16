@@ -64,10 +64,7 @@ export class AuthService {
 		if (!passwordOk) {
 			throw new UnauthorizedException("Invalid credentials");
 		}
-		return {
-			id: String(user.id),
-			email: user.email,
-		};
+		return this.usersService.mapToUser(user);
 	}
 
 	async signIn(
@@ -200,7 +197,7 @@ export class AuthService {
 		}
 
 		return this.toSnapshot(
-			{ id: String(user.id), email: user.email },
+			this.usersService.mapToUser(user),
 			session.sessionExpiresAt,
 		);
 	}
@@ -246,7 +243,12 @@ export class AuthService {
 			throw new ORPCError("CONFLICT", { message: "Email already registered" });
 		}
 		const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
-		await this.usersService.createUser(input.email, passwordHash);
+		await this.usersService.createUser({
+			email: input.email,
+			passwordHash,
+			firstName: input.firstName ?? undefined,
+			lastName: input.lastName ?? undefined,
+		});
 		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.signUpSucceeded);
 		return { data: { message: USER_CREATED_MESSAGE } };
 	}
@@ -350,10 +352,7 @@ export class AuthService {
 			throw new UnauthorizedException("Invalid refresh token");
 		}
 
-		return {
-			id: String(user.id),
-			email: user.email,
-		};
+		return this.usersService.mapToUser(user);
 	}
 
 	private async endSession(userId: string, sessionId: string): Promise<void> {

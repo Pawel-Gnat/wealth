@@ -14,6 +14,8 @@ export const signUpPayloadSchema = z
 			.regex(/[0-9]/, "form:password.invalid-number")
 			.regex(/[^A-Za-z0-9]/, "form:password.invalid-special-character"),
 		confirmPassword: z.string(),
+		firstName: z.string().trim().max(16, "form:first-name.max").optional(),
+		lastName: z.string().trim().max(16, "form:last-name.max").optional(),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: "form:confirm-password.mismatch",

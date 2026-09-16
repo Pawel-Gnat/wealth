@@ -29,6 +29,8 @@ export function SignupForm({ onSignedUp }: SignupFormProps) {
 			email: "",
 			password: "",
 			confirmPassword: "",
+			firstName: "",
+			lastName: "",
 		},
 	});
 
@@ -43,6 +45,22 @@ export function SignupForm({ onSignedUp }: SignupFormProps) {
 			submitDisabled={isLoading}
 			isLoading={isLoading}
 		>
+			<div className="grid sm:grid-cols-2 gap-4">
+				<FormInput
+					name="firstName"
+					label={t("first-name.label", { ns: "form" })}
+					placeholder={t("first-name.placeholder", { ns: "form" })}
+					control={form.control}
+					icon="user"
+				/>
+				<FormInput
+					name="lastName"
+					label={t("last-name.label", { ns: "form" })}
+					placeholder={t("last-name.placeholder", { ns: "form" })}
+					control={form.control}
+					icon="user"
+				/>
+			</div>
 			<FormInput
 				name="email"
 				label={t("email.label", { ns: "form" })}
