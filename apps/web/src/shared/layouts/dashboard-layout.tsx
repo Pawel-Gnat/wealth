@@ -10,10 +10,11 @@ import {
 	Text,
 } from "@/shared/components";
 import { Navigation } from "../widgets/navigation";
+import { UserAvatar } from "../widgets/user-avatar";
 
 export function DashboardLayout() {
 	const { t } = useTranslation();
-	const { logout } = useAuth();
+	const { user, logout } = useAuth();
 
 	return (
 		<Sidebar
@@ -25,10 +26,15 @@ export function DashboardLayout() {
 			navigation={<Navigation />}
 			footer={<ButtonPrimary onClick={() => logout()}>Logout</ButtonPrimary>}
 		>
-			<div className="flex items-center gap-2">
+			<div className="flex items-center gap-2 pr-2">
 				<SidebarTrigger />
 				<Separator orientation="vertical" />
 				<Breadcrumbs />
+				{user && (
+					<div className="flex items-center gap-2 ml-auto">
+						<UserAvatar user={user} />
+					</div>
+				)}
 			</div>
 			<div className="px-2 flex flex-col gap-4 mb-4">
 				<Outlet />

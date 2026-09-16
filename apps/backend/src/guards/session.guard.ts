@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common";
 import { setUserId } from "@repo/observability/node";
 import type { Request } from "express";
-import type { AuthService } from "../auth-service/auth.service.js";
+import { AuthService } from "../auth-service/auth.service.js";
 
 @Injectable()
 export class SessionGuard implements CanActivate {
