@@ -64,6 +64,13 @@
 			"when": 1789450330071,
 			"tag": "0008_yummy_boomerang",
 			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "7",
+			"when": 1789534345638,
+			"tag": "0009_steady_ma_gnuci",
+			"breakpoints": true
 		}
 	]
 }

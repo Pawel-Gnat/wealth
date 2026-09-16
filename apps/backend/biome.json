@@ -18,7 +18,12 @@
 				"src/**/*.controller.ts",
 				"src/**/*.module.ts",
 				"src/**/*.service.ts",
-				"src/**/*.strategy.ts"
+				"src/**/*.strategy.ts",
+				"src/**/*.guard.ts",
+				"src/**/*.filter.ts",
+				"src/**/*.middleware.ts",
+				"src/**/*.pipe.ts",
+				"src/**/*.interceptor.ts"
 			],
 			"linter": {
 				"rules": {
