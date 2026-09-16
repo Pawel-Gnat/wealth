@@ -6,6 +6,7 @@ import {
 	Check,
 	ChevronLeft,
 	ChevronRight,
+	Cog,
 	DoorOpen,
 	LayoutDashboard,
 	LoaderCircle,
@@ -48,6 +49,7 @@ export const icons = {
 	balance: Scale,
 	email: Mail,
 	password: Lock,
+	settings: Cog,
 };
 
 export type IconName = keyof typeof icons;

@@ -6,7 +6,7 @@ import {
 } from "@repo/observability/browser";
 import { useMutation } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
-import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
+import { useLoader } from "@/shared/hooks/use-loader";
 import { applySessionSnapshot } from "@/shared/lib/auth/auth-api";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
@@ -36,7 +36,7 @@ export const useSignIn = ({ onSuccess, onError }: UseSignInProps = {}) => {
 
 	return {
 		signIn: mutation.mutate,
-		isLoading: useSkeletonLoader({ isLoading: mutation.isPending }),
+		isLoading: useLoader({ isLoading: mutation.isPending }),
 		isError: mutation.isError,
 		error: mutation.error,
 		data: mutation.data,

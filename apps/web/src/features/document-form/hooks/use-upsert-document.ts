@@ -11,7 +11,7 @@ import { logger, runWithRequestId } from "@repo/observability/browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/shared/config/document-config";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
-import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
+import { useLoader } from "@/shared/hooks/use-loader";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import type { RecordKind } from "@/shared/types/record-kind";
 
@@ -74,7 +74,7 @@ export function useUpsertDocument({
 
 	return {
 		upsertDocument: mutation.mutate,
-		isLoading: useSkeletonLoader({ isLoading: mutation.isPending }),
+		isLoading: useLoader({ isLoading: mutation.isPending }),
 		isError: mutation.isError,
 		error: mutation.error,
 		data: mutation.data,

@@ -15,6 +15,7 @@ import { ExpensesListPage } from "@/pages/expenses";
 import { GroupDocumentsPage } from "@/pages/group";
 import { IncomeFormPage } from "@/pages/income-form";
 import { IncomesListPage } from "@/pages/incomes";
+import { SettingsPage } from "@/pages/settings";
 import { APP_ROUTES, NEW_DOCUMENT_SEGMENT } from "./routes";
 
 export function AppRouter() {
@@ -41,6 +42,7 @@ export function AppRouter() {
 					<Route path={APP_ROUTES.group.list}>
 						<Route index element={<GroupDocumentsPage />} />
 					</Route>
+					<Route path={APP_ROUTES.settings} element={<SettingsPage />} />
 				</Route>
 			</Route>
 		</Routes>

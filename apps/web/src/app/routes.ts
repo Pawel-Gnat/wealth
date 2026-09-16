@@ -16,6 +16,7 @@ export const APP_ROUTES = {
 	group: {
 		list: "/group",
 	},
+	settings: "/settings",
 } as const;
 
 export type AppRoutes = typeof APP_ROUTES;

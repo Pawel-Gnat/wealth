@@ -6,7 +6,7 @@ type UseLoaderProps = {
 	minDuration?: number;
 };
 
-export const useSkeletonLoader = ({
+export const useLoader = ({
 	isLoading,
 	delay = 300,
 	minDuration = 500,

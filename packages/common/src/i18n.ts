@@ -13,6 +13,7 @@ import enExpenses from "./locales/en/expenses.json" with { type: "json" };
 import enForm from "./locales/en/form.json" with { type: "json" };
 import enGroup from "./locales/en/group.json" with { type: "json" };
 import enIncomes from "./locales/en/incomes.json" with { type: "json" };
+import enSettings from "./locales/en/settings.json" with { type: "json" };
 
 export type ParseNsKeys<Ns extends Namespace> =
 	`${Ns extends string ? Ns : ""}:${ParseKeys<Ns>}`;
@@ -27,6 +28,7 @@ export const I18N_RESOURCES = {
 		expenses: enExpenses,
 		form: enForm,
 		auth: enAuth,
+		settings: enSettings,
 	},
 } as const;
 

@@ -7,7 +7,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 
-import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
+import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
 type UseSignUpProps = {
@@ -35,7 +35,7 @@ export const useSignUp = ({ onSuccess, onError }: UseSignUpProps = {}) => {
 
 	return {
 		signUp: mutation.mutate,
-		isLoading: useSkeletonLoader({ isLoading: mutation.isPending }),
+		isLoading: useLoader({ isLoading: mutation.isPending }),
 		isError: mutation.isError,
 		error: mutation.error,
 		data: mutation.data,

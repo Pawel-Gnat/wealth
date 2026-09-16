@@ -1,5 +1,6 @@
 import type { User } from "@repo/api/schemas";
 import { Link } from "react-router";
+import { APP_ROUTES } from "@/app/routes";
 import { Avatar, Text } from "@/shared/components";
 
 type UserAvatarProps = {
@@ -13,7 +14,7 @@ export const UserAvatar = ({ user }: UserAvatarProps) => {
 			: user.email;
 
 	return (
-		<Link to="/settings" className="flex items-center gap-2">
+		<Link to={APP_ROUTES.settings} className="flex items-center gap-2">
 			<Avatar name={name} src={user.image} />
 			<Text size="sm" weight="medium">
 				{name}
