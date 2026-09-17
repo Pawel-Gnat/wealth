@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { ButtonPrimary, Card, FormInput } from "@/shared/components";
+import { Card, Form, FormInput } from "@/shared/components";
 import { usePasswordForm } from "../hooks/use-password-form";
 
 export const Password = () => {
@@ -9,7 +9,12 @@ export const Password = () => {
 
 	return (
 		<Card title={t("password.title", { ns: "settings" })}>
-			<form onSubmit={updatePassword} className="flex flex-col gap-4">
+			<Form
+				onSubmit={updatePassword}
+				submitText={t("action.update", { ns: "common" })}
+				submitDisabled={isLoading}
+				isLoading={isLoading}
+			>
 				<FormInput
 					name="currentPassword"
 					label={t("password.current", {
@@ -37,14 +42,7 @@ export const Password = () => {
 					control={control}
 					icon="password"
 				/>
-				<ButtonPrimary
-					className="w-fit ml-auto"
-					isLoading={isLoading}
-					disabled={isLoading}
-				>
-					{t("action.update", { ns: "common" })}
-				</ButtonPrimary>
-			</form>
+			</Form>
 		</Card>
 	);
 };

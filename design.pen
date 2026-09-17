@@ -12565,27 +12565,36 @@
                 },
                 {
                   "type": "frame",
-                  "id": "vvMTr",
-                  "name": "Save details",
-                  "height": 40,
-                  "fill": "$primary",
-                  "cornerRadius": "$radius-pill",
-                  "padding": [
-                    0,
-                    20
-                  ],
-                  "justifyContent": "center",
-                  "alignItems": "center",
+                  "id": "Iy6j3",
+                  "name": "Save details row",
+                  "width": "fill_container",
+                  "justifyContent": "end",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "fXP5B",
-                      "name": "Save label",
-                      "fill": "$primary-foreground",
-                      "content": "Save changes",
-                      "fontFamily": "$font-sans",
-                      "fontSize": 14,
-                      "fontWeight": "500"
+                      "type": "frame",
+                      "id": "vvMTr",
+                      "name": "Save details",
+                      "height": 40,
+                      "fill": "$secondary",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        20
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "fXP5B",
+                          "name": "Save label",
+                          "fill": "$secondary-foreground",
+                          "content": "Save changes",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -12814,27 +12823,36 @@
                 },
                 {
                   "type": "frame",
-                  "id": "S6uTY",
-                  "name": "Update password",
-                  "height": 40,
-                  "fill": "$primary",
-                  "cornerRadius": "$radius-pill",
-                  "padding": [
-                    0,
-                    20
-                  ],
-                  "justifyContent": "center",
-                  "alignItems": "center",
+                  "id": "OeC5G",
+                  "name": "Update password row",
+                  "width": "fill_container",
+                  "justifyContent": "end",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "wyjb3",
-                      "name": "Update label",
-                      "fill": "$primary-foreground",
-                      "content": "Update password",
-                      "fontFamily": "$font-sans",
-                      "fontSize": 14,
-                      "fontWeight": "500"
+                      "type": "frame",
+                      "id": "S6uTY",
+                      "name": "Update password",
+                      "height": 40,
+                      "fill": "$secondary",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        20
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "wyjb3",
+                          "name": "Update label",
+                          "fill": "$secondary-foreground",
+                          "content": "Update password",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -13496,27 +13514,36 @@
                 },
                 {
                   "type": "frame",
-                  "id": "gZDwF",
-                  "name": "Save details",
-                  "height": 40,
-                  "fill": "$primary",
-                  "cornerRadius": "$radius-pill",
-                  "padding": [
-                    0,
-                    20
-                  ],
-                  "justifyContent": "center",
-                  "alignItems": "center",
+                  "id": "MV7zR",
+                  "name": "Save details row",
+                  "width": "fill_container",
+                  "justifyContent": "end",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "sOzuU",
-                      "name": "Save label",
-                      "fill": "$primary-foreground",
-                      "content": "Save changes",
-                      "fontFamily": "$font-sans",
-                      "fontSize": 14,
-                      "fontWeight": "500"
+                      "type": "frame",
+                      "id": "gZDwF",
+                      "name": "Save details",
+                      "height": 40,
+                      "fill": "$secondary",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        20
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "sOzuU",
+                          "name": "Save label",
+                          "fill": "$secondary-foreground",
+                          "content": "Save changes",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -13745,27 +13772,36 @@
                 },
                 {
                   "type": "frame",
-                  "id": "u36IJR",
-                  "name": "Update password",
-                  "height": 40,
-                  "fill": "$primary",
-                  "cornerRadius": "$radius-pill",
-                  "padding": [
-                    0,
-                    20
-                  ],
-                  "justifyContent": "center",
-                  "alignItems": "center",
+                  "id": "IeU2A",
+                  "name": "Update password row",
+                  "width": "fill_container",
+                  "justifyContent": "end",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "X9c9wx",
-                      "name": "Update label",
-                      "fill": "$primary-foreground",
-                      "content": "Update password",
-                      "fontFamily": "$font-sans",
-                      "fontSize": 14,
-                      "fontWeight": "500"
+                      "type": "frame",
+                      "id": "u36IJR",
+                      "name": "Update password",
+                      "height": 40,
+                      "fill": "$secondary",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        20
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "X9c9wx",
+                          "name": "Update label",
+                          "fill": "$secondary-foreground",
+                          "content": "Update password",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -19645,27 +19681,36 @@
                 },
                 {
                   "type": "frame",
-                  "id": "Glu2v",
-                  "name": "Save details",
-                  "height": 40,
-                  "fill": "$primary",
-                  "cornerRadius": "$radius-pill",
-                  "padding": [
-                    0,
-                    20
-                  ],
-                  "justifyContent": "center",
-                  "alignItems": "center",
+                  "id": "BYi3D",
+                  "name": "Save details row",
+                  "width": "fill_container",
+                  "justifyContent": "end",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "yUpIg",
-                      "name": "Save label",
-                      "fill": "$primary-foreground",
-                      "content": "Save changes",
-                      "fontFamily": "$font-sans",
-                      "fontSize": 14,
-                      "fontWeight": "500"
+                      "type": "frame",
+                      "id": "Glu2v",
+                      "name": "Save details",
+                      "height": 40,
+                      "fill": "$secondary",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        20
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "yUpIg",
+                          "name": "Save label",
+                          "fill": "$secondary-foreground",
+                          "content": "Save changes",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -19894,27 +19939,36 @@
                 },
                 {
                   "type": "frame",
-                  "id": "k3fHd4",
-                  "name": "Update password",
-                  "height": 40,
-                  "fill": "$primary",
-                  "cornerRadius": "$radius-pill",
-                  "padding": [
-                    0,
-                    20
-                  ],
-                  "justifyContent": "center",
-                  "alignItems": "center",
+                  "id": "iR9Ax",
+                  "name": "Update password row",
+                  "width": "fill_container",
+                  "justifyContent": "end",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "TiQLj",
-                      "name": "Update label",
-                      "fill": "$primary-foreground",
-                      "content": "Update password",
-                      "fontFamily": "$font-sans",
-                      "fontSize": 14,
-                      "fontWeight": "500"
+                      "type": "frame",
+                      "id": "k3fHd4",
+                      "name": "Update password",
+                      "height": 40,
+                      "fill": "$secondary",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        20
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "TiQLj",
+                          "name": "Update label",
+                          "fill": "$secondary-foreground",
+                          "content": "Update password",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -20606,27 +20660,36 @@
                 },
                 {
                   "type": "frame",
-                  "id": "a2NYnF",
-                  "name": "Save details",
-                  "height": 40,
-                  "fill": "$primary",
-                  "cornerRadius": "$radius-pill",
-                  "padding": [
-                    0,
-                    20
-                  ],
-                  "justifyContent": "center",
-                  "alignItems": "center",
+                  "id": "KEbg0",
+                  "name": "Save details row",
+                  "width": "fill_container",
+                  "justifyContent": "end",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "PnngL",
-                      "name": "Save label",
-                      "fill": "$primary-foreground",
-                      "content": "Save changes",
-                      "fontFamily": "$font-sans",
-                      "fontSize": 14,
-                      "fontWeight": "500"
+                      "type": "frame",
+                      "id": "a2NYnF",
+                      "name": "Save details",
+                      "height": 40,
+                      "fill": "$secondary",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        20
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "PnngL",
+                          "name": "Save label",
+                          "fill": "$secondary-foreground",
+                          "content": "Save changes",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -20855,27 +20918,36 @@
                 },
                 {
                   "type": "frame",
-                  "id": "ELuaT",
-                  "name": "Update password",
-                  "height": 40,
-                  "fill": "$primary",
-                  "cornerRadius": "$radius-pill",
-                  "padding": [
-                    0,
-                    20
-                  ],
-                  "justifyContent": "center",
-                  "alignItems": "center",
+                  "id": "FW9kL",
+                  "name": "Update password row",
+                  "width": "fill_container",
+                  "justifyContent": "end",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "xmGyQ",
-                      "name": "Update label",
-                      "fill": "$primary-foreground",
-                      "content": "Update password",
-                      "fontFamily": "$font-sans",
-                      "fontSize": 14,
-                      "fontWeight": "500"
+                      "type": "frame",
+                      "id": "ELuaT",
+                      "name": "Update password",
+                      "height": 40,
+                      "fill": "$secondary",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        20
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "xmGyQ",
+                          "name": "Update label",
+                          "fill": "$secondary-foreground",
+                          "content": "Update password",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -40377,7 +40449,8 @@
                       "fill": "$muted-foreground",
                       "content": "Expenses",
                       "fontFamily": "$font-sans",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -41100,7 +41173,8 @@
                       "fill": "$muted-foreground",
                       "content": "Incomes",
                       "fontFamily": "$font-sans",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -43253,7 +43327,8 @@
                       "fill": "$muted-foreground",
                       "content": "Expenses",
                       "fontFamily": "$font-sans",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -43991,7 +44066,8 @@
                       "fill": "$muted-foreground",
                       "content": "Incomes",
                       "fontFamily": "$font-sans",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -44732,7 +44808,8 @@
                       "fill": "$muted-foreground",
                       "content": "Expenses",
                       "fontFamily": "$font-sans",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -45078,7 +45155,8 @@
                       "fill": "$muted-foreground",
                       "content": "Expenses",
                       "fontFamily": "$font-sans",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
