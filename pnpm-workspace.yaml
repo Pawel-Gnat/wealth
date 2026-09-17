@@ -9,6 +9,7 @@ allowBuilds:
   bcrypt: true
   cpu-features: true
   esbuild: true
+  lefthook: true
   msw: true
   protobufjs: true
   sharp: true
