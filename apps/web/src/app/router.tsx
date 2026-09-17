@@ -1,6 +1,5 @@
 import { Route, Routes } from "react-router";
 import { AuthPage } from "@/pages/auth";
-import { AuthLayout } from "@/pages/auth/layouts";
 import {
 	AuthenticatedLayout,
 	DashboardLayout,
@@ -9,6 +8,7 @@ import {
 
 export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";
 
+import { AuthLayout } from "@/pages/auth/layouts";
 import { DashboardPage } from "@/pages/dashboard";
 import { ExpenseFormPage } from "@/pages/expense-form";
 import { ExpensesListPage } from "@/pages/expenses";

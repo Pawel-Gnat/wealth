@@ -1,3 +1,5 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signInPayloadSchema } from "@repo/api/schemas";
 import type { SessionSnapshotResponse, SignInPayload } from "@repo/api/types";
 import {
 	AUTH_OBSERVABILITY_EVENTS,
@@ -5,17 +7,24 @@ import {
 	runWithRequestId,
 } from "@repo/observability/browser";
 import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useLoader } from "@/shared/hooks/use-loader";
 import { applySessionSnapshot } from "@/shared/lib/auth/auth-api";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
-type UseSignInProps = {
-	onSuccess?: (data: SessionSnapshotResponse) => void;
-	onError?: (error: Error) => void;
-};
+export const useSignInForm = () => {
+	const { t } = useTranslation();
+	const form = useForm<SignInPayload>({
+		resolver: zodResolver(signInPayloadSchema),
+		defaultValues: {
+			email: "",
+			password: "",
+		},
+	});
 
-export const useSignIn = ({ onSuccess, onError }: UseSignInProps = {}) => {
 	const mutation = useMutation<SessionSnapshotResponse, Error, SignInPayload>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
@@ -27,18 +36,15 @@ export const useSignIn = ({ onSuccess, onError }: UseSignInProps = {}) => {
 			}),
 		onSuccess: (data) => {
 			applySessionSnapshot(data.data);
-			onSuccess?.(data);
 		},
-		onError: (error) => {
-			onError?.(error);
+		onError: () => {
+			toast.error(t("toast.error.signed-in", { ns: "common" }));
 		},
 	});
 
 	return {
-		signIn: mutation.mutate,
+		control: form.control,
 		isLoading: useLoader({ isLoading: mutation.isPending }),
-		isError: mutation.isError,
-		error: mutation.error,
-		data: mutation.data,
+		signIn: form.handleSubmit((payload) => mutation.mutate(payload)),
 	};
 };
