@@ -13951,7 +13951,7 @@
                       "id": "ozTmg",
                       "name": "Upload title",
                       "fill": "$foreground",
-                      "content": "Drop a new image here",
+                      "content": "Drop or click to upload a new image",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -13965,32 +13965,6 @@
                       "fontFamily": "$font-sans",
                       "fontSize": 12,
                       "fontWeight": "normal"
-                    },
-                    {
-                      "type": "frame",
-                      "id": "DFrRG",
-                      "name": "Browse",
-                      "height": 32,
-                      "fill": "$secondary",
-                      "cornerRadius": "$radius-pill",
-                      "padding": [
-                        0,
-                        14
-                      ],
-                      "justifyContent": "center",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "Xfgzh",
-                          "name": "Browse label",
-                          "fill": "$secondary-foreground",
-                          "content": "Browse files",
-                          "fontFamily": "$font-sans",
-                          "fontSize": 13,
-                          "fontWeight": "500"
-                        }
-                      ]
                     }
                   ]
                 },

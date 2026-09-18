@@ -6,6 +6,7 @@ import {
 } from "./dashboard.contract";
 import { userEditDetailsContract } from "./edit-details.contract";
 import { userEditPasswordContract } from "./edit-password.contract";
+import { userEditPhotoContract } from "./edit-photo.contract";
 import {
 	createExpenseContract,
 	deleteExpenseContract,
@@ -37,6 +38,7 @@ export const rpcContract = populateContractRouterPaths({
 	settings: {
 		password: userEditPasswordContract,
 		details: userEditDetailsContract,
+		photo: userEditPhotoContract,
 	},
 	expenses: {
 		create: createExpenseContract,

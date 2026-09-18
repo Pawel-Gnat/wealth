@@ -9,6 +9,9 @@ import type {
 	userEditPasswordResponseDataSchema,
 	userEditPasswordResponseSchema,
 	userEditPasswordSchema,
+	userEditPhotoResponseDataSchema,
+	userEditPhotoResponseSchema,
+	userEditPhotoSchema,
 	userSchema,
 } from "../schemas/user.schema";
 
@@ -32,3 +35,8 @@ export type UserEditDetailsResponseData = z.infer<
 export type UserEditDetailsResponse = z.infer<
 	typeof userEditDetailsResponseSchema
 >;
+export type UserEditPhotoPayload = z.infer<typeof userEditPhotoSchema>;
+export type UserEditPhotoResponseData = z.infer<
+	typeof userEditPhotoResponseDataSchema
+>;
+export type UserEditPhotoResponse = z.infer<typeof userEditPhotoResponseSchema>;

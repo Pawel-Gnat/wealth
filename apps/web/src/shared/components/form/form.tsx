@@ -1,5 +1,6 @@
 import { cn } from "cn";
 import type { ReactNode, SubmitEventHandler } from "react";
+import { useTranslation } from "react-i18next";
 import { ButtonPrimary } from "@/shared/components/button";
 
 type FormProps = {
@@ -8,17 +9,19 @@ type FormProps = {
 	className?: string;
 	submitText?: string;
 	submitDisabled?: boolean;
-	isLoading?: boolean;
+	isLoading: boolean;
 };
 
 export const Form = ({
 	onSubmit,
 	children,
 	className,
-	submitText = "Submit",
+	submitText,
 	submitDisabled = false,
-	isLoading = false,
+	isLoading,
 }: FormProps) => {
+	const { t } = useTranslation();
+
 	return (
 		<form onSubmit={onSubmit} className={cn("space-y-6", className)}>
 			<div className="space-y-4">{children}</div>
@@ -28,7 +31,7 @@ export const Form = ({
 					disabled={submitDisabled || isLoading}
 					isLoading={isLoading}
 				>
-					{submitText}
+					{submitText || t("action.save", { ns: "common" })}
 				</ButtonPrimary>
 			</div>
 		</form>

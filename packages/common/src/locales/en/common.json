@@ -57,7 +57,8 @@
 			"income-created": "Income created successfully",
 			"income-updated": "Income updated successfully",
 			"password-updated": "Password updated successfully",
-			"details-updated": "Personal details updated successfully"
+			"details-updated": "Personal details updated successfully",
+			"photo-updated": "Photo updated successfully"
 		},
 		"error": {
 			"signed-in": "Failed to sign in",
@@ -69,7 +70,8 @@
 			"income-created": "Failed to create income",
 			"income-updated": "Failed to update income",
 			"password-updated": "Failed to update password",
-			"details-updated": "Failed to update personal details"
+			"details-updated": "Failed to update personal details",
+			"photo-updated": "Failed to update photo"
 		}
 	}
 }

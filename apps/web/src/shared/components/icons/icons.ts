@@ -20,6 +20,7 @@ import {
 	Trash,
 	TrendingDown,
 	TrendingUp,
+	Upload,
 	User,
 	UserPlus,
 	Users,
@@ -52,6 +53,7 @@ export const icons = {
 	password: Lock,
 	settings: Cog,
 	photo: Camera,
+	upload: Upload,
 };
 
 export type IconName = keyof typeof icons;

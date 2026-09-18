@@ -46,5 +46,12 @@
 		"label": "Price",
 		"invalid": "Enter a valid price",
 		"min": "Price must be at least 0.01"
+	},
+	"file": {
+		"label": "Drop or click to upload a new image",
+		"description": "PNG or JPG, up to {{size}} MB",
+		"required": "Select an image",
+		"invalid-type": "Image must be PNG or JPG",
+		"max": "Size is too large"
 	}
 }

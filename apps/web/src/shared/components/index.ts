@@ -5,6 +5,7 @@ export * from "./breadcrumbs";
 export * from "./button";
 export * from "./card";
 export * from "./chart";
+export * from "./dialog";
 export * from "./empty";
 export * from "./error-state";
 export * from "./form";
