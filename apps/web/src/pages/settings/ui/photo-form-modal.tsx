@@ -4,6 +4,7 @@ import {
 	USER_PHOTO_MIME_TYPES,
 } from "@repo/api/schemas";
 import type { User } from "@repo/api/types";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FormFile, FormModal } from "@/shared/components";
 import { usePhotoForm } from "../hooks/use-photo-form";
@@ -15,17 +16,29 @@ type PhotoFormModalProps = {
 
 export const PhotoFormModal = ({ user }: PhotoFormModalProps) => {
 	const { t } = useTranslation();
-	const { control, isLoading, updatePhoto, previewSrc, reset } = usePhotoForm();
+	const [open, setOpen] = useState(false);
+	const { control, isPending, updatePhoto, previewSrc, reset } = usePhotoForm({
+		onSuccess: () => {
+			setOpen(false);
+		},
+	});
 
 	return (
 		<FormModal
+			open={open}
+			onOpenChange={(nextOpen) => {
+				setOpen(nextOpen);
+
+				if (!nextOpen) {
+					reset();
+				}
+			}}
 			triggerText={t("action.change-photo", { ns: "common" })}
 			triggerIcon="photo"
 			title={t("profile.change-photo.title", { ns: "settings" })}
 			onSubmit={updatePhoto}
-			onClose={reset}
 			submitText={t("action.save", { ns: "common" })}
-			isLoading={isLoading}
+			isPending={isPending}
 		>
 			<PhotoPreview src={previewSrc} user={user} />
 			<FormFile
@@ -40,7 +53,7 @@ export const PhotoFormModal = ({ user }: PhotoFormModalProps) => {
 					ns: "form",
 					size: USER_PHOTO_MAX_SIZE_MB,
 				})}
-				disabled={isLoading}
+				disabled={isPending}
 			/>
 		</FormModal>
 	);

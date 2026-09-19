@@ -43,12 +43,19 @@ export class UsersService {
 		return user ?? null;
 	}
 
+	async updatePassword(id: string, passwordHash: string): Promise<void> {
+		await this.db
+			.update(usersTable)
+			.set({ password: passwordHash })
+			.where(eq(usersTable.id, id));
+	}
+
 	mapToUser(user: UserRow): User {
 		return {
 			id: String(user.id),
 			email: user.email,
-			firstName: user.firstName ?? undefined,
-			lastName: user.lastName ?? undefined,
+			firstName: user.firstName ?? null,
+			lastName: user.lastName ?? null,
 		};
 	}
 }

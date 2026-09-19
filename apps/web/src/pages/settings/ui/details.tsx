@@ -9,15 +9,14 @@ type DetailsProps = {
 
 export const Details = ({ user }: DetailsProps) => {
 	const { t } = useTranslation();
-	const { control, isLoading, updateDetails } = useUserDetailsForm(user);
+	const { control, isPending, updateDetails } = useUserDetailsForm(user);
 
 	return (
 		<Card title={t("personal-details.title", { ns: "settings" })}>
 			<Form
 				onSubmit={updateDetails}
 				submitText={t("action.update", { ns: "common" })}
-				submitDisabled={isLoading}
-				isLoading={isLoading}
+				isPending={isPending}
 			>
 				<div className="grid gap-4 sm:grid-cols-2">
 					<FormInput

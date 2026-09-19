@@ -73,4 +73,21 @@ export class AuthController {
 			return this.authService.signUp(input);
 		});
 	}
+
+	@UseGuards(SessionGuard)
+	@Implement(rpcContract.settings.password)
+	updatePasswordRpc() {
+		return implement(rpcContract.settings.password).handler(
+			async ({ input, context }) => {
+				try {
+					return await this.authService.updatePassword(input, context.request);
+				} catch (err) {
+					if (err instanceof UnauthorizedException) {
+						throw new ORPCError("UNAUTHORIZED", { message: err.message });
+					}
+					throw err;
+				}
+			},
+		);
+	}
 }

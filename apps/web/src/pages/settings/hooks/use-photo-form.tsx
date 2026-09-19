@@ -15,10 +15,13 @@ import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
-import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
-export const usePhotoForm = () => {
+type UsePhotoFormProps = {
+	onSuccess?: () => void;
+};
+
+export const usePhotoForm = ({ onSuccess }: UsePhotoFormProps = {}) => {
 	const { t } = useTranslation();
 	const form = useForm<UserEditPhotoPayload>({
 		resolver: zodResolver(userEditPhotoSchema),
@@ -26,7 +29,7 @@ export const usePhotoForm = () => {
 
 	const photo = useWatch({ control: form.control, name: "photo" });
 	const previewSrc = useMemo(() => {
-		if (!(photo instanceof File)) {
+		if (!(photo instanceof File) || typeof URL.createObjectURL !== "function") {
 			return null;
 		}
 
@@ -57,6 +60,7 @@ export const usePhotoForm = () => {
 		onSuccess: () => {
 			form.reset();
 			toast.success(t("toast.success.photo-updated", { ns: "common" }));
+			onSuccess?.();
 		},
 		onError: () => {
 			toast.error(t("toast.error.photo-updated", { ns: "common" }));
@@ -65,7 +69,7 @@ export const usePhotoForm = () => {
 
 	return {
 		control: form.control,
-		isLoading: useLoader({ isLoading: mutation.isPending }),
+		isPending: mutation.isPending,
 		updatePhoto: form.handleSubmit((payload) => mutation.mutate(payload)),
 		previewSrc,
 		reset: form.reset,

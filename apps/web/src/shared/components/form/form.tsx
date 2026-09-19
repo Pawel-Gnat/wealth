@@ -9,7 +9,7 @@ type FormProps = {
 	className?: string;
 	submitText?: string;
 	submitDisabled?: boolean;
-	isLoading: boolean;
+	isPending?: boolean;
 };
 
 export const Form = ({
@@ -18,7 +18,7 @@ export const Form = ({
 	className,
 	submitText,
 	submitDisabled = false,
-	isLoading,
+	isPending = false,
 }: FormProps) => {
 	const { t } = useTranslation();
 
@@ -28,8 +28,8 @@ export const Form = ({
 			<div className="flex *:w-full">
 				<ButtonPrimary
 					type="submit"
-					disabled={submitDisabled || isLoading}
-					isLoading={isLoading}
+					disabled={submitDisabled || isPending}
+					isLoading={isPending}
 				>
 					{submitText || t("action.save", { ns: "common" })}
 				</ButtonPrimary>

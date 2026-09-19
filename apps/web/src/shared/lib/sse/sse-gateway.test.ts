@@ -11,6 +11,7 @@ import {
 	stopSseGateway,
 } from "@/shared/lib/sse/sse-gateway";
 import { createMockEventSourceFactory } from "@/test/mocks/event-source";
+import { MOCK_USER } from "@/test/mocks/user";
 
 describe("sse-gateway", () => {
 	beforeEach(() => {
@@ -146,7 +147,7 @@ describe("sse-gateway", () => {
 		});
 		configureAuth({ onCleared: onUnauthorized });
 		applySessionSnapshot({
-			user: { id: "user-1", email: "ada@example.com" },
+			user: MOCK_USER,
 			sessionExpiresAt: "2026-09-15T08:15:00.000Z",
 		});
 
@@ -177,7 +178,7 @@ describe("sse-gateway", () => {
 		});
 		configureAuth({ onCleared: onUnauthorized });
 		applySessionSnapshot({
-			user: { id: "user-1", email: "ada@example.com" },
+			user: MOCK_USER,
 			sessionExpiresAt: "2026-09-15T08:15:00.000Z",
 		});
 

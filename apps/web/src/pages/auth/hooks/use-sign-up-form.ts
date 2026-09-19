@@ -11,7 +11,6 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
-import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
 type UseSignUpFormProps = {
@@ -52,7 +51,7 @@ export const useSignUpForm = ({ onSignedUp }: UseSignUpFormProps) => {
 
 	return {
 		control: form.control,
-		isLoading: useLoader({ isLoading: mutation.isPending }),
+		isPending: mutation.isPending,
 		signUp: form.handleSubmit((payload) => mutation.mutate(payload)),
 	};
 };

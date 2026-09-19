@@ -2,14 +2,17 @@ import type { User } from "@repo/api/types";
 import { Link } from "react-router";
 import { APP_ROUTES } from "@/app/routes";
 import { Avatar, Text } from "@/shared/components";
-import { getUserFullName } from "@/shared/helpers/get-user-full-name";
+import {
+	getUserFullName,
+	hasUserName,
+} from "@/shared/helpers/get-user-full-name";
 
 type UserAvatarProps = {
 	user: User;
 };
 
 export const UserAvatar = ({ user }: UserAvatarProps) => {
-	const fullName = getUserFullName(user);
+	const fullName = hasUserName(user) ? getUserFullName(user) : user.email;
 
 	return (
 		<Link to={APP_ROUTES.settings} className="flex items-center gap-2">

@@ -8,14 +8,15 @@ type SignupFormProps = {
 
 export const SignupForm = ({ onSignedUp }: SignupFormProps) => {
 	const { t } = useTranslation();
-	const { control, isLoading, signUp } = useSignUpForm({ onSignedUp });
+	const { control, isPending, signUp } = useSignUpForm({
+		onSignedUp,
+	});
 
 	return (
 		<Form
 			onSubmit={signUp}
 			submitText={t("action.signup", { ns: "common" })}
-			submitDisabled={isLoading}
-			isLoading={isLoading}
+			isPending={isPending}
 		>
 			<div className="grid sm:grid-cols-2 gap-4">
 				<FormInput

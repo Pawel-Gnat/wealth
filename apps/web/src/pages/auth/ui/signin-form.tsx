@@ -4,14 +4,13 @@ import { useSignInForm } from "../hooks/use-sign-in-form";
 
 export const SigninForm = () => {
 	const { t } = useTranslation();
-	const { control, isLoading, signIn } = useSignInForm();
+	const { control, isPending, signIn } = useSignInForm();
 
 	return (
 		<Form
 			onSubmit={signIn}
 			submitText={t("action.signin", { ns: "common" })}
-			submitDisabled={isLoading}
-			isLoading={isLoading}
+			isPending={isPending}
 		>
 			<FormInput
 				name="email"

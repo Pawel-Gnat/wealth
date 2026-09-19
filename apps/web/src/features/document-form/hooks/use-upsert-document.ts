@@ -12,7 +12,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/features/config/document-config";
 import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
-import { useLoader } from "@/shared/hooks/use-loader";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
 type DocumentUpsertResponse =
@@ -74,7 +73,7 @@ export function useUpsertDocument({
 
 	return {
 		upsertDocument: mutation.mutate,
-		isLoading: useLoader({ isLoading: mutation.isPending }),
+		isPending: mutation.isPending,
 		isError: mutation.isError,
 		error: mutation.error,
 		data: mutation.data,

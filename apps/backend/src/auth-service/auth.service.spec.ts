@@ -348,6 +348,81 @@ describe("Auth service", () => {
 		});
 	});
 
+	describe("update password", () => {
+		const NEW_PASSWORD = "Secret1!";
+
+		it("updates the hash, keeps the current session, and ends others", async () => {
+			const user = await createUser("auth-password-update");
+			const currentJar = createCookieJar();
+			const otherJar = createCookieJar();
+
+			await signIn(user, currentJar);
+			await signIn(user, otherJar);
+
+			const currentRefresh = currentJar.cookies[REFRESH_COOKIE_NAME];
+			const otherRefresh = otherJar.cookies[REFRESH_COOKIE_NAME];
+			const currentSession = await authService.resolveRpcSession(
+				asRequest({
+					[SESSION_COOKIE_NAME]: currentJar.cookies[SESSION_COOKIE_NAME],
+				}),
+			);
+			const otherSession = await sessionByRefreshToken(otherRefresh);
+
+			await expect(
+				authService.updatePassword(
+					{
+						currentPassword: PASSWORD,
+						newPassword: NEW_PASSWORD,
+						confirmPassword: NEW_PASSWORD,
+					},
+					asRequest({}, currentSession ?? undefined),
+				),
+			).resolves.toEqual({ data: { message: "user_password_updated" } });
+
+			expect(publishSessionEnded).toHaveBeenCalledWith({
+				userId: user.id,
+				targetId: otherSession?.id,
+			});
+
+			expect(await sessionByRefreshToken(otherRefresh)).toBeNull();
+			expect(await sessionByRefreshToken(currentRefresh)).not.toBeNull();
+
+			await expect(
+				authService.signIn(
+					{ email: user.email, password: NEW_PASSWORD },
+					asRequest({}),
+					asResponse(createCookieJar()),
+				),
+			).resolves.toMatchObject({ data: { user: { id: user.id } } });
+		});
+
+		it("rejects an invalid current password without ending sessions", async () => {
+			const user = await createUser("auth-password-invalid");
+			const jar = createCookieJar();
+
+			await signIn(user, jar);
+			const session = await authService.resolveRpcSession(
+				asRequest({
+					[SESSION_COOKIE_NAME]: jar.cookies[SESSION_COOKIE_NAME],
+				}),
+			);
+
+			await expect(
+				authService.updatePassword(
+					{
+						currentPassword: "wrong-password",
+						newPassword: NEW_PASSWORD,
+						confirmPassword: NEW_PASSWORD,
+					},
+					asRequest({}, session ?? undefined),
+				),
+			).rejects.toBeInstanceOf(UnauthorizedException);
+
+			expect(publishSessionEnded).not.toHaveBeenCalled();
+			expect(await sessionsForUser(user.id)).toHaveLength(1);
+		});
+	});
+
 	describe("sign up", () => {
 		it("rejects when email is already registered", async () => {
 			const existing = await createUser("auth-signup-conflict");

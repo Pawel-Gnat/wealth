@@ -70,7 +70,7 @@ export const DocumentForm = ({
 		}
 	}, [form, initialValues]);
 
-	const { upsertDocument, isLoading } = useUpsertDocument({
+	const { upsertDocument, isPending } = useUpsertDocument({
 		kind,
 		onSuccess: () => {
 			toast.success(
@@ -109,8 +109,7 @@ export const DocumentForm = ({
 			submitText={t(isEditMode ? "action.save" : "action.create", {
 				ns: "common",
 			})}
-			submitDisabled={isLoading}
-			isLoading={isLoading}
+			isPending={isPending}
 		>
 			<FormDatePicker
 				name="date"

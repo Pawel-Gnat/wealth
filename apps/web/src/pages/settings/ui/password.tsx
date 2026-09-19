@@ -4,7 +4,7 @@ import { usePasswordForm } from "../hooks/use-password-form";
 
 export const Password = () => {
 	const { t } = useTranslation();
-	const { control, isLoading, updatePassword } = usePasswordForm();
+	const { control, isPending, updatePassword } = usePasswordForm();
 	const passwordLabel = t("password.label", { ns: "form" });
 
 	return (
@@ -12,8 +12,7 @@ export const Password = () => {
 			<Form
 				onSubmit={updatePassword}
 				submitText={t("action.update", { ns: "common" })}
-				submitDisabled={isLoading}
-				isLoading={isLoading}
+				isPending={isPending}
 			>
 				<FormInput
 					name="currentPassword"

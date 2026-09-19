@@ -23,10 +23,11 @@ type FormModalProps = {
 	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 	className?: string;
 	disabled?: boolean;
-	isLoading: boolean;
+	isPending?: boolean;
 	submitText: string;
 	closeText?: string;
-	onClose?: () => void;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
 };
 
 export const FormModal = ({
@@ -39,18 +40,19 @@ export const FormModal = ({
 	onSubmit,
 	className,
 	disabled = false,
-	isLoading,
+	isPending = false,
 	submitText,
-	onClose,
+	open,
+	onOpenChange,
 }: FormModalProps) => {
 	const { t } = useTranslation();
 
 	return (
 		<Dialog
-			onOpenChange={(open) => {
-				if (!open) {
-					onClose?.();
-				}
+			open={open}
+			onOpenChange={(nextOpen) => {
+				if (isPending && !nextOpen) return;
+				onOpenChange(nextOpen);
 			}}
 		>
 			<DialogTrigger asChild>
@@ -59,7 +61,11 @@ export const FormModal = ({
 					{triggerText}
 				</ButtonSecondary>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-md" showCloseButton={false}>
+			<DialogContent
+				className="sm:max-w-md"
+				showCloseButton={false}
+				aria-describedby={undefined}
+			>
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
 					{description && <DialogDescription>{description}</DialogDescription>}
@@ -68,14 +74,14 @@ export const FormModal = ({
 					<div className="space-y-4">{children}</div>
 					<DialogFooter className="">
 						<DialogClose asChild>
-							<ButtonInput>
+							<ButtonInput disabled={isPending}>
 								{closeText || t("action.cancel", { ns: "common" })}
 							</ButtonInput>
 						</DialogClose>
 						<ButtonPrimary
 							type="submit"
-							disabled={disabled || isLoading}
-							isLoading={isLoading}
+							disabled={disabled || isPending}
+							isLoading={isPending}
 						>
 							{submitText}
 						</ButtonPrimary>
