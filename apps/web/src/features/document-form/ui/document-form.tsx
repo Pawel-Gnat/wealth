@@ -1,8 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	type DocumentCreatePayload,
-	documentCreatePayloadSchema,
-} from "@repo/api/schemas";
+import { documentCreatePayloadSchema } from "@repo/api/schemas";
+import type { DocumentCreatePayload } from "@repo/api/types";
 import { useEffect } from "react";
 import {
 	type Resolver,
@@ -13,6 +11,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
+import { getDocumentConfig } from "@/features/config/document-config";
+import type { RecordKind } from "@/features/model/record-kind";
 import {
 	Form,
 	FormDatePicker,
@@ -21,9 +21,7 @@ import {
 	Separator,
 	Text,
 } from "@/shared/components";
-import { getDocumentConfig } from "@/shared/config/document-config";
 import { Button } from "@/shared/lib/ui/button";
-import type { RecordKind } from "@/shared/types/record-kind";
 import {
 	calculateDocumentTotal,
 	calculateLineTotal,
@@ -72,7 +70,7 @@ export const DocumentForm = ({
 		}
 	}, [form, initialValues]);
 
-	const { upsertDocument, isLoading } = useUpsertDocument({
+	const { upsertDocument, isPending } = useUpsertDocument({
 		kind,
 		onSuccess: () => {
 			toast.success(
@@ -111,8 +109,7 @@ export const DocumentForm = ({
 			submitText={t(isEditMode ? "action.save" : "action.create", {
 				ns: "common",
 			})}
-			submitDisabled={isLoading}
-			isLoading={isLoading}
+			isPending={isPending}
 		>
 			<FormDatePicker
 				name="date"

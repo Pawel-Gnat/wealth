@@ -1,0 +1,19 @@
+{
+	"title": "Settings",
+	"subtitle": "Profile, personal details and password.",
+	"profile": {
+		"title": "Profile",
+		"change-photo": {
+			"title": "Change Photo",
+			"description": "This is how others will see you"
+		}
+	},
+	"personal-details": {
+		"title": "Personal Details"
+	},
+	"password": {
+		"title": "Password",
+		"current": "Current {{label}}",
+		"new": "New {{label}}"
+	}
+}

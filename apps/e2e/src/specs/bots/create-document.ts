@@ -1,4 +1,4 @@
-import type { LineItem } from '@repo/api/schemas'
+import type { LineItem } from '@repo/api/types';
 import type { Page } from '@playwright/test'
 import { ensureI18nInit, getI18nText } from '../helpers/i18n'
 import { expect } from '../helpers/test'

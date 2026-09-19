@@ -5,6 +5,7 @@ import {
 	configureAuth,
 } from "@/shared/lib/auth/auth-api";
 import { dispatchSseMessage } from "@/shared/lib/sse/sse-dispatcher";
+import { MOCK_USER } from "@/test/mocks/user";
 
 const sessionEndedPayload = JSON.stringify({
 	type: "session-ended",
@@ -14,7 +15,7 @@ const sessionEndedPayload = JSON.stringify({
 });
 
 const snapshot = {
-	user: { id: "user-1", email: "ada@example.com" },
+	user: MOCK_USER,
 	sessionExpiresAt: "2026-09-15T08:15:00.000Z",
 };
 

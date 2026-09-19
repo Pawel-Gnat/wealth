@@ -1,4 +1,4 @@
-import type { DocumentListItem } from "@repo/api/schemas";
+import type { DocumentListItem } from "@repo/api/types";
 import {
 	decodeDocumentDateFromStorage,
 	formatDocumentDate,
@@ -15,25 +15,25 @@ import {
 	Tooltip,
 } from "@/shared/components";
 
-type CreateDocumentColumnsProps = {
+type DocumentColumnsProps = {
 	t: TFunction<"common">;
 	language: string;
 	getEditPath: (id: string) => string;
 	onDelete: (documentId: string) => void;
 };
 
-export function createDocumentColumns({
+export const documentColumns = ({
 	t,
 	language,
 	getEditPath,
 	onDelete,
-}: CreateDocumentColumnsProps): ColumnDef<DocumentListItem>[] {
+}: DocumentColumnsProps): ColumnDef<DocumentListItem>[] => {
 	return [
 		{
 			accessorKey: "date",
 			meta: { className: "w-full" },
 			header: () => (
-				<Text size="xs" weight="medium">
+				<Text size="sm" weight="medium">
 					{t("common.date", { ns: "common" })}
 				</Text>
 			),
@@ -52,7 +52,7 @@ export function createDocumentColumns({
 			accessorKey: "totalAmount",
 			meta: { className: "w-[1%] whitespace-nowrap" },
 			header: () => (
-				<Text size="xs" weight="medium">
+				<Text size="sm" weight="medium">
 					{t("common.amount", { ns: "common" })}
 				</Text>
 			),
@@ -72,7 +72,7 @@ export function createDocumentColumns({
 			accessorKey: "actions",
 			meta: { className: "w-[1%] whitespace-nowrap" },
 			header: () => (
-				<Text size="xs" weight="medium" className="text-right">
+				<Text size="sm" weight="medium" className="text-right">
 					-
 					<span className="sr-only">
 						{t("common.actions", { ns: "common" })}
@@ -113,4 +113,4 @@ export function createDocumentColumns({
 			},
 		},
 	];
-}
+};

@@ -1,4 +1,4 @@
-import type { DashboardChartPoint } from "@repo/api/schemas";
+import type { DashboardChartPoint } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Bar, BarChart as BarChartUI } from "recharts";
 import { ChartContainer } from "@/shared/components";

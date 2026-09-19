@@ -1,4 +1,5 @@
-import { DEFAULT_PERIOD, type Period } from "@repo/api/schemas";
+import { DEFAULT_PERIOD } from "@repo/api/schemas";
+import type { Period } from "@repo/api/types";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PageLayout } from "@/shared/layouts";

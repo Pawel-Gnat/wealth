@@ -10,13 +10,11 @@ import {
 	resetRefreshMutex,
 	SESSION_REFRESH_LEAD_MS,
 } from "@/shared/lib/auth/auth-api";
+import { MOCK_USER } from "@/test/mocks/user";
 import { server } from "@/test/servers";
 
 const snapshot = {
-	user: {
-		id: "01JTZKQX2GT6PHGQER0M8FS6K8",
-		email: "test@example.com",
-	},
+	user: MOCK_USER,
 	sessionExpiresAt: "2026-09-15T08:15:00.000Z",
 };
 
@@ -78,10 +76,7 @@ describe("bootstrapSession", () => {
 
 	it("returns the GET /me snapshot", async () => {
 		await expect(bootstrapSession()).resolves.toEqual({
-			user: {
-				id: "01JTZKQX2GT6PHGQER0M8FS6K8",
-				email: "test@example.com",
-			},
+			user: MOCK_USER,
 			sessionExpiresAt: expect.any(String),
 		});
 	});

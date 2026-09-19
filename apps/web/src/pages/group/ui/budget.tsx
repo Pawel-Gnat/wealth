@@ -1,4 +1,4 @@
-import type { BudgetMember } from "@repo/api/schemas";
+import type { BudgetMember } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import {
 	Badge,

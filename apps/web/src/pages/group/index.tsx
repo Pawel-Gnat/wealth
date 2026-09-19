@@ -1,4 +1,4 @@
-import type { GroupBudget } from "@repo/api/schemas";
+import type { BudgetMember, GroupBudget } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { ButtonSecondary, Heading, Icon } from "@/shared/components";
@@ -9,65 +9,64 @@ import { InvitationsList } from "./ui/invitations-list";
 
 const CURRENT_USER_ID = "1";
 
+const member = (
+	id: string,
+	email: string,
+	role: BudgetMember["role"],
+	status: BudgetMember["status"],
+): BudgetMember => ({
+	id,
+	email,
+	firstName: null,
+	lastName: null,
+	role,
+	status,
+});
+
 const BUDGETS: GroupBudget[] = [
 	{
 		id: "budget-1",
 		title: "Household",
 		members: [
-			{ id: "1", email: "me@example.com", role: "owner", status: "active" },
-			{ id: "2", email: "anna@example.com", role: "member", status: "active" },
-			{
-				id: "3",
-				email: "bartek@example.com",
-				role: "member",
-				status: "active",
-			},
+			member("1", "me@example.com", "owner", "active"),
+			member("2", "anna@example.com", "member", "active"),
+			member("3", "bartek@example.com", "member", "active"),
 		],
 	},
 	{
 		id: "budget-2",
 		title: "Trip",
 		members: [
-			{ id: "1", email: "me@example.com", role: "owner", status: "active" },
-			{ id: "4", email: "ola@example.com", role: "member", status: "active" },
-			{ id: "5", email: "kuba@example.com", role: "member", status: "pending" },
+			member("1", "me@example.com", "owner", "active"),
+			member("4", "ola@example.com", "member", "active"),
+			member("5", "kuba@example.com", "member", "pending"),
 		],
 	},
 	{
 		id: "budget-3",
 		title: "Shared rent",
 		members: [
-			{ id: "1", email: "me@example.com", role: "owner", status: "active" },
-			{ id: "6", email: "ewa@example.com", role: "member", status: "pending" },
-			{
-				id: "7",
-				email: "piotr@example.com",
-				role: "member",
-				status: "pending",
-			},
+			member("1", "me@example.com", "owner", "active"),
+			member("6", "ewa@example.com", "member", "pending"),
+			member("7", "piotr@example.com", "member", "pending"),
 		],
 	},
 	{
 		id: "budget-4",
 		title: "Office",
 		members: [
-			{ id: "2", email: "anna@example.com", role: "owner", status: "active" },
-			{ id: "1", email: "me@example.com", role: "member", status: "active" },
-			{
-				id: "3",
-				email: "bartek@example.com",
-				role: "member",
-				status: "active",
-			},
+			member("2", "anna@example.com", "owner", "active"),
+			member("1", "me@example.com", "member", "active"),
+			member("3", "bartek@example.com", "member", "active"),
 		],
 	},
 	{
 		id: "budget-5",
 		title: "Weekend",
 		members: [
-			{ id: "3", email: "bartek@example.com", role: "owner", status: "active" },
-			{ id: "1", email: "me@example.com", role: "member", status: "pending" },
-			{ id: "4", email: "ola@example.com", role: "member", status: "active" },
+			member("3", "bartek@example.com", "owner", "active"),
+			member("1", "me@example.com", "member", "pending"),
+			member("4", "ola@example.com", "member", "active"),
 		],
 	},
 ];

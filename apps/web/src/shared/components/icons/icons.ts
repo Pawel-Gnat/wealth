@@ -1,12 +1,15 @@
 import {
 	AlertCircle,
 	CalendarIcon,
+	Camera,
 	ChartArea,
 	ChartColumn,
 	Check,
 	ChevronLeft,
 	ChevronRight,
+	Cog,
 	DoorOpen,
+	FileImage,
 	LayoutDashboard,
 	LoaderCircle,
 	Lock,
@@ -18,6 +21,7 @@ import {
 	Trash,
 	TrendingDown,
 	TrendingUp,
+	Upload,
 	User,
 	UserPlus,
 	Users,
@@ -48,6 +52,10 @@ export const icons = {
 	balance: Scale,
 	email: Mail,
 	password: Lock,
+	settings: Cog,
+	photo: Camera,
+	upload: Upload,
+	fileImage: FileImage,
 };
 
 export type IconName = keyof typeof icons;

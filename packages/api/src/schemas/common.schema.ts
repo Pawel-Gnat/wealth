@@ -5,9 +5,6 @@ export function apiPayload<T extends z.ZodType>(zodSchema: T) {
 		data: zodSchema,
 	});
 }
-export type ApiResponse<T> = {
-	data: T;
-};
 
 export function apiPaginatedPayload<T extends z.ZodType>(zodSchema: T) {
 	return z.object({
@@ -17,8 +14,3 @@ export function apiPaginatedPayload<T extends z.ZodType>(zodSchema: T) {
 		}),
 	});
 }
-export type ApiPaginatedResponse<T> = ApiResponse<Array<T>> & {
-	pagination: {
-		next?: string;
-	};
-};

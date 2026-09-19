@@ -1,0 +1,27 @@
+import type { User } from "@repo/api/types";
+import { useTranslation } from "react-i18next";
+import { Avatar } from "@/shared/components";
+import { TextMuted } from "@/shared/components/typography/text";
+
+type PhotoPreviewProps = {
+	src?: string | null;
+	user: User;
+};
+
+export const PhotoPreview = ({ src, user }: PhotoPreviewProps) => {
+	const { t } = useTranslation();
+
+	return (
+		<div className="flex items-center gap-2 flex-col">
+			{src ? (
+				<img src={src} alt="" className="size-20 rounded-full object-cover" />
+			) : (
+				<Avatar user={user} size="lg" />
+			)}
+
+			<TextMuted size="sm">
+				{t("profile.change-photo.description", { ns: "settings" })}
+			</TextMuted>
+		</div>
+	);
+};

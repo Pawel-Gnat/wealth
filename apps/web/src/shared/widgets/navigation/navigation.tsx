@@ -23,6 +23,10 @@ export const Navigation = () => {
 				<Icon name="group" />
 				{t("navigation.group", { ns: "common" })}
 			</NavLink>
+			<NavLink to={APP_ROUTES.settings}>
+				<Icon name="settings" />
+				{t("navigation.settings", { ns: "common" })}
+			</NavLink>
 		</nav>
 	);
 };

@@ -1,4 +1,5 @@
-import { type Period, periodSchema, periodValues } from "@repo/api/schemas";
+import { periodSchema, periodValues } from "@repo/api/schemas";
+import type { Period } from "@repo/api/types";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ToggleGroup } from "@/shared/components";

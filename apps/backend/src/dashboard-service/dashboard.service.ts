@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
-import {
-	type DashboardChartResponse,
-	type Period,
-	type SummaryResponse,
-} from "@repo/api/schemas";
+import type {
+	DashboardChartResponse,
+	Period,
+	SummaryResponse,
+} from "@repo/api/types";
 import {
 	decodeDocumentDateFromStorage,
 	encodeDocumentDateForStorage,

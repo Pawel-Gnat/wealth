@@ -1,4 +1,4 @@
-import type { SummaryKind } from "@repo/api/schemas";
+import type { SummaryKind } from "@repo/api/types";
 import type { TFunction } from "i18next";
 
 export const getSummaryTitle = (t: TFunction, kind: SummaryKind): string => {

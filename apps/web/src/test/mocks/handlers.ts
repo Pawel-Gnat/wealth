@@ -1,14 +1,13 @@
 import {
 	EXPENSE_DELETED_MESSAGE,
 	INCOME_DELETED_MESSAGE,
+	USER_PHOTO_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
 import { HttpResponse, http } from "msw";
+import { MOCK_USER } from "./user";
 
 const mockSessionSnapshot = {
-	user: {
-		id: "01JTZKQX2GT6PHGQER0M8FS6K8",
-		email: "test@example.com",
-	},
+	user: MOCK_USER,
 	sessionExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
 };
 
@@ -152,6 +151,12 @@ const getDashboardDailyChartHandler = () => {
 	});
 };
 
+const putSettingsPhotoHandler = () => {
+	return HttpResponse.json({
+		data: { message: USER_PHOTO_UPDATED_MESSAGE },
+	});
+};
+
 const postAuthRefreshHandler = () => {
 	return HttpResponse.json(
 		{ error: { message: "Unauthorized" } },
@@ -177,6 +182,7 @@ export const HANDLERS = [
 	http.get("*/dashboard/summary", getDashboardSummaryHandler),
 	http.get("*/dashboard/cumulative-chart", getDashboardCumulativeChartHandler),
 	http.get("*/dashboard/daily-chart", getDashboardDailyChartHandler),
+	http.put("*/settings/photo", putSettingsPhotoHandler),
 	http.get("*/auth/me", getAuthMeHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),

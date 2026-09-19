@@ -1,4 +1,4 @@
-import type { SummaryKind } from "@repo/api/schemas";
+import type { SummaryKind } from "@repo/api/types";
 import type { TrendBadgeVariant } from "@/shared/components/badge";
 
 export const getTrendBadgeVariant = (

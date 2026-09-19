@@ -1,4 +1,4 @@
-import type { SessionSnapshot } from "@repo/api/schemas";
+import type { SessionSnapshot } from "@repo/api/types";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 

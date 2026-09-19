@@ -8,6 +8,7 @@ import {
 	clearAuthSession,
 	resetRefreshMutex,
 } from "@/shared/lib/auth/auth-api";
+import { MOCK_USER } from "@/test/mocks/user";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 
@@ -102,10 +103,7 @@ describe("AuthProvider", () => {
 		);
 
 		applySessionSnapshot({
-			user: {
-				id: "01JTZKQX2GT6PHGQER0M8FS6K8",
-				email: "ada@example.com",
-			},
+			user: { ...MOCK_USER, email: "ada@example.com" },
 			sessionExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
 		});
 
@@ -149,10 +147,7 @@ describe("AuthProvider", () => {
 
 				return HttpResponse.json({
 					data: {
-						user: {
-							id: "01JTZKQX2GT6PHGQER0M8FS6K8",
-							email: "test@example.com",
-						},
+						user: MOCK_USER,
 						sessionExpiresAt: new Date(
 							Date.now() + 15 * 60 * 1000,
 						).toISOString(),

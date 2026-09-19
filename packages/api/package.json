@@ -13,6 +13,11 @@
 			"types": "./dist/contracts/index.d.ts",
 			"import": "./dist/contracts/index.js",
 			"default": "./dist/contracts/index.js"
+		},
+		"./types": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/types/index.js",
+			"default": "./dist/types/index.js"
 		}
 	},
 	"scripts": {

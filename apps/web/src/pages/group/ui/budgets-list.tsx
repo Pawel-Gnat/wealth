@@ -1,4 +1,4 @@
-import type { GroupBudget } from "@repo/api/schemas";
+import type { GroupBudget } from "@repo/api/types";
 import { Budget } from "./budget";
 
 type BudgetsListProps = {

@@ -8,10 +8,11 @@ import {
 	resetRefreshMutex,
 } from "@/shared/lib/auth/auth-api";
 import { orpcTransportFetch } from "@/shared/lib/orpc/orpc-transport";
+import { MOCK_USER } from "@/test/mocks/user";
 import { server } from "@/test/servers";
 
 const snapshot = {
-	user: { id: "user-1", email: "ada@example.com" },
+	user: MOCK_USER,
 	sessionExpiresAt: "2026-09-15T08:15:00.000Z",
 };
 

@@ -1,10 +1,10 @@
-import type { DocumentCreatePayload } from "@repo/api/schemas";
+import type { DocumentCreatePayload } from "@repo/api/types";
 import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { useQuery } from "@tanstack/react-query";
-import { getDocumentConfig } from "@/shared/config/document-config";
+import { getDocumentConfig } from "@/features/config/document-config";
+import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
-import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
-import type { RecordKind } from "@/shared/types/record-kind";
+import { useLoader } from "@/shared/hooks/use-loader";
 
 type UseDocumentProps = {
 	kind: RecordKind;
@@ -32,7 +32,7 @@ export function useDocument({ kind, documentId }: UseDocumentProps) {
 
 	return {
 		data: query.data,
-		isLoading: useSkeletonLoader({ isLoading: query.isPending }),
+		isLoading: useLoader({ isLoading: query.isPending }),
 		isError: query.isError,
 		error: query.error,
 	};

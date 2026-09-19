@@ -1,4 +1,4 @@
-import type { Period } from "@repo/api/schemas";
+import type { Period } from "@repo/api/types";
 
 export const queryKeys = {
 	expenses: {

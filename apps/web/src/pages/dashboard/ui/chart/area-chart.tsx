@@ -1,4 +1,4 @@
-import type { DashboardChartPoint } from "@repo/api/schemas";
+import type { DashboardChartPoint } from "@repo/api/types";
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { Area, AreaChart as AreaChartUI } from "recharts";

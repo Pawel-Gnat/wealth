@@ -8,8 +8,7 @@
 		"format": "turbo run format",
 		"check-types": "turbo run check-types",
 		"test": "turbo run test",
-		"test:e2e": "turbo run test:e2e",
-		"prepare": "node -e \"if (!process.env.CI) { require('child_process').execSync('lefthook install', { stdio: 'inherit' }) }\""
+		"test:e2e": "turbo run test:e2e"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",

@@ -1,4 +1,4 @@
-import type { SessionSnapshot, User } from "@repo/api/schemas";
+import type { SessionSnapshot, User } from "@repo/api/types";
 import {
 	AUTH_OBSERVABILITY_EVENTS,
 	logger,
@@ -15,7 +15,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { useSkeletonLoader } from "@/shared/hooks/use-skeleton-loader";
+import { useLoader } from "@/shared/hooks/use-loader";
 import {
 	applySessionSnapshot,
 	bootstrapSession,
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<User | null>(null);
 	const [isResolvingSession, setIsResolvingSession] = useState(true);
 	const [isBootstrapError, setIsBootstrapError] = useState(false);
-	const isAuthLoading = useSkeletonLoader({
+	const isAuthLoading = useLoader({
 		isLoading: isResolvingSession,
 	});
 	const initializeAuthRef = useRef<(() => Promise<void>) | null>(null);

@@ -7,13 +7,18 @@ import {
 } from "@nestjs/common";
 import { ORPCError } from "@orpc/server";
 import {
-	type SessionSnapshotResponse,
-	type SignInPayload,
-	type SignUpPayload,
-	type SignUpResponse,
 	USER_CREATED_MESSAGE,
-	type User,
+	USER_PASSWORD_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
+import type {
+	CreateUserPayload,
+	CreateUserResponse,
+	SessionSnapshotResponse,
+	SignInPayload,
+	User,
+	UserEditPasswordPayload,
+	UserEditPasswordResponse,
+} from "@repo/api/types";
 import {
 	REFRESH_COOKIE_NAME,
 	REFRESH_GRACE_MS,
@@ -24,7 +29,7 @@ import {
 import { AUTH_OBSERVABILITY_EVENTS } from "@repo/observability/node";
 import * as bcrypt from "bcrypt";
 import { addDays } from "date-fns";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, ne } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Request, Response } from "express";
 import { DBS } from "../database-service/constants.js";
@@ -237,7 +242,37 @@ export class AuthService {
 		};
 	}
 
-	async signUp(input: SignUpPayload): Promise<SignUpResponse> {
+	async updatePassword(
+		input: UserEditPasswordPayload,
+		request: Request,
+	): Promise<UserEditPasswordResponse> {
+		const session = request.user;
+		if (!session?.userId || !session.sessionId) {
+			throw new UnauthorizedException("Unauthorized");
+		}
+
+		const user = await this.usersService.findUserById(session.userId);
+		if (!user) {
+			throw new UnauthorizedException("Unauthorized");
+		}
+
+		const currentOk = await bcrypt.compare(
+			input.currentPassword,
+			user.password,
+		);
+		if (!currentOk) {
+			throw new UnauthorizedException("Invalid credentials");
+		}
+
+		const passwordHash = await bcrypt.hash(input.newPassword, BCRYPT_ROUNDS);
+		await this.usersService.updatePassword(user.id, passwordHash);
+		await this.endOtherSessions(user.id, session.sessionId);
+		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.passwordUpdateSucceeded);
+
+		return { data: { message: USER_PASSWORD_UPDATED_MESSAGE } };
+	}
+
+	async signUp(input: CreateUserPayload): Promise<CreateUserResponse> {
 		const existing = await this.usersService.findUserByEmail(input.email);
 		if (existing) {
 			throw new ORPCError("CONFLICT", { message: "Email already registered" });
@@ -353,6 +388,23 @@ export class AuthService {
 		}
 
 		return this.usersService.mapToUser(user);
+	}
+
+	private async endOtherSessions(
+		userId: string,
+		currentSessionId: string,
+	): Promise<void> {
+		const rows = await this.db
+			.select({ id: sessionsTable.id })
+			.from(sessionsTable)
+			.where(
+				and(
+					eq(sessionsTable.userId, userId),
+					ne(sessionsTable.id, currentSessionId),
+				),
+			);
+
+		await Promise.all(rows.map((row) => this.endSession(userId, row.id)));
 	}
 
 	private async endSession(userId: string, sessionId: string): Promise<void> {

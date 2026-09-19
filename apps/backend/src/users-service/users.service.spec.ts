@@ -51,13 +51,17 @@ describe("Users service", () => {
 		});
 
 		const row = await usersService.findUserByEmail(email);
+
+		expect(row).not.toBeNull();
+		if (row === null) return;
+
 		expect(row).toMatchObject({
 			email,
 			firstName: "Ada",
 			lastName: "Lovelace",
 		});
-		expect(usersService.mapToUser(row!)).toEqual({
-			id: row!.id,
+		expect(usersService.mapToUser(row)).toEqual({
+			id: row.id,
 			email,
 			firstName: "Ada",
 			lastName: "Lovelace",

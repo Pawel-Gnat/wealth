@@ -1,55 +1,33 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type SignInPayload, signInPayloadSchema } from "@repo/api/schemas";
-import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { Form, FormInput } from "@/shared/components";
-import { useSignIn } from "../hooks/use-sign-in";
+import { useSignInForm } from "../hooks/use-sign-in-form";
 
-export function SigninForm() {
+export const SigninForm = () => {
 	const { t } = useTranslation();
-	const { signIn, isLoading } = useSignIn({
-		onError: () => {
-			toast.error(t("toast.error.signed-in", { ns: "common" }));
-		},
-	});
-
-	const form = useForm<SignInPayload>({
-		resolver: zodResolver(signInPayloadSchema),
-		defaultValues: {
-			email: "",
-			password: "",
-		},
-	});
-
-	function onSubmit(data: SignInPayload) {
-		signIn(data);
-	}
+	const { control, isPending, signIn } = useSignInForm();
 
 	return (
 		<Form
-			onSubmit={form.handleSubmit(onSubmit)}
+			onSubmit={signIn}
 			submitText={t("action.signin", { ns: "common" })}
-			submitDisabled={isLoading}
-			isLoading={isLoading}
+			isPending={isPending}
 		>
 			<FormInput
 				name="email"
 				label={t("email.label", { ns: "form" })}
 				type="email"
 				placeholder={t("email.placeholder", { ns: "form" })}
-				control={form.control}
+				control={control}
 				icon="email"
 			/>
-
 			<FormInput
 				name="password"
 				label={t("password.label", { ns: "form" })}
 				type="password"
 				placeholder={t("password.placeholder", { ns: "form" })}
-				control={form.control}
+				control={control}
 				icon="password"
 			/>
 		</Form>
 	);
-}
+};

@@ -1,4 +1,4 @@
-import type { DashboardChartPoint } from "@repo/api/schemas";
+import type { DashboardChartPoint } from "@repo/api/types";
 import { AreaChart } from "./area-chart";
 import { BarChart } from "./bar-chart";
 import type { ChartType } from "./chart-toggle";

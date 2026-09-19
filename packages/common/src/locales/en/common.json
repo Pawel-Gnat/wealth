@@ -19,7 +19,8 @@
 		"dashboard": "Dashboard",
 		"incomes": "Incomes",
 		"expenses": "Expenses",
-		"group": "Group budgets"
+		"group": "Group budgets",
+		"settings": "Settings"
 	},
 	"pagination": {
 		"rows-per-page": "Rows per page",
@@ -30,6 +31,7 @@
 	},
 	"action": {
 		"save": "Save",
+		"update": "Update",
 		"signin": "Sign in",
 		"signup": "Sign up",
 		"logout": "Logout",
@@ -42,7 +44,9 @@
 		"leave": "Leave",
 		"accept": "Accept",
 		"reject": "Reject",
-		"download": "Download"
+		"download": "Download",
+		"change-photo": "Change photo",
+		"remove": "Remove {{fileName}}"
 	},
 	"toast": {
 		"success": {
@@ -52,7 +56,10 @@
 			"expense-deleted": "Expense deleted successfully",
 			"income-deleted": "Income deleted successfully",
 			"income-created": "Income created successfully",
-			"income-updated": "Income updated successfully"
+			"income-updated": "Income updated successfully",
+			"password-updated": "Password updated successfully",
+			"details-updated": "Personal details updated successfully",
+			"photo-updated": "Photo updated successfully"
 		},
 		"error": {
 			"signed-in": "Failed to sign in",
@@ -62,7 +69,10 @@
 			"expense-deleted": "Failed to delete expense",
 			"income-deleted": "Failed to delete income",
 			"income-created": "Failed to create income",
-			"income-updated": "Failed to update income"
+			"income-updated": "Failed to update income",
+			"password-updated": "Failed to update password",
+			"details-updated": "Failed to update personal details",
+			"photo-updated": "Failed to update photo"
 		}
 	}
 }

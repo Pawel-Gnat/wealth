@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
+import { getDocumentConfig } from "@/features/config/document-config";
+import type { RecordKind } from "@/features/model/record-kind";
 import { ButtonSecondary, Card, Icon } from "@/shared/components";
-import { getDocumentConfig } from "@/shared/config/document-config";
 import { PageLayout } from "@/shared/layouts";
-import type { RecordKind } from "@/shared/types/record-kind";
 import { DocumentTable } from "./ui/document-table";
 
 type DocumentListProps = {

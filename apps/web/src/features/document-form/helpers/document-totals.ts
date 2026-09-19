@@ -1,4 +1,4 @@
-import type { DocumentCreatePayload } from "@repo/api/schemas";
+import type { DocumentCreatePayload } from "@repo/api/types";
 
 export function calculateLineTotal(
 	singleAmount: number | undefined,

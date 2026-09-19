@@ -1,63 +1,36 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type SignUpPayload, signUpPayloadSchema } from "@repo/api/schemas";
-import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { Form, FormInput } from "@/shared/components";
-import { useSignUp } from "../hooks/use-sign-up";
+import { useSignUpForm } from "../hooks/use-sign-up-form";
 
 type SignupFormProps = {
 	onSignedUp: () => void;
 };
 
-export function SignupForm({ onSignedUp }: SignupFormProps) {
+export const SignupForm = ({ onSignedUp }: SignupFormProps) => {
 	const { t } = useTranslation();
-	const { signUp, isLoading } = useSignUp({
-		onSuccess: () => {
-			toast.success(t("toast.success.account-created", { ns: "common" }));
-			form.reset();
-			onSignedUp();
-		},
-		onError: () => {
-			toast.error(t("toast.error.account-created", { ns: "common" }));
-		},
+	const { control, isPending, signUp } = useSignUpForm({
+		onSignedUp,
 	});
-
-	const form = useForm<SignUpPayload>({
-		resolver: zodResolver(signUpPayloadSchema),
-		defaultValues: {
-			email: "",
-			password: "",
-			confirmPassword: "",
-			firstName: "",
-			lastName: "",
-		},
-	});
-
-	function onSubmit(data: SignUpPayload) {
-		signUp(data);
-	}
 
 	return (
 		<Form
-			onSubmit={form.handleSubmit(onSubmit)}
+			onSubmit={signUp}
 			submitText={t("action.signup", { ns: "common" })}
-			submitDisabled={isLoading}
-			isLoading={isLoading}
+			isPending={isPending}
 		>
 			<div className="grid sm:grid-cols-2 gap-4">
 				<FormInput
 					name="firstName"
 					label={t("first-name.label", { ns: "form" })}
 					placeholder={t("first-name.placeholder", { ns: "form" })}
-					control={form.control}
+					control={control}
 					icon="user"
 				/>
 				<FormInput
 					name="lastName"
 					label={t("last-name.label", { ns: "form" })}
 					placeholder={t("last-name.placeholder", { ns: "form" })}
-					control={form.control}
+					control={control}
 					icon="user"
 				/>
 			</div>
@@ -66,7 +39,7 @@ export function SignupForm({ onSignedUp }: SignupFormProps) {
 				label={t("email.label", { ns: "form" })}
 				type="email"
 				placeholder={t("email.placeholder", { ns: "form" })}
-				control={form.control}
+				control={control}
 				icon="email"
 			/>
 			<FormInput
@@ -74,7 +47,7 @@ export function SignupForm({ onSignedUp }: SignupFormProps) {
 				label={t("password.label", { ns: "form" })}
 				type="password"
 				placeholder={t("password.placeholder", { ns: "form" })}
-				control={form.control}
+				control={control}
 				icon="password"
 			/>
 			<FormInput
@@ -82,9 +55,9 @@ export function SignupForm({ onSignedUp }: SignupFormProps) {
 				label={t("confirm-password.label", { ns: "form" })}
 				type="password"
 				placeholder={t("password.placeholder", { ns: "form" })}
-				control={form.control}
+				control={control}
 				icon="password"
 			/>
 		</Form>
 	);
-}
+};

@@ -1,6 +1,9 @@
 export const AUTH_OBSERVABILITY_EVENTS = {
 	signInSucceeded: "auth.sign-in.succeeded",
 	signUpSucceeded: "auth.sign-up.succeeded",
+	passwordUpdateSucceeded: "auth.password.update.succeeded",
+	detailsUpdateSucceeded: "auth.details.update.succeeded",
+	photoUpdateSucceeded: "auth.photo.update.succeeded",
 	logoutSucceeded: "auth.logout.succeeded",
 	refreshSucceeded: "auth.refresh.succeeded",
 	sessionEndedPublishFailed: "auth.session-ended.publish-failed",

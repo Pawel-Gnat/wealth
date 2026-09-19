@@ -1,10 +1,10 @@
 import { oc } from "@orpc/contract";
 import {
-	signUpPayloadSchema,
-	signUpResponseSchema,
-} from "../schemas/signup.schema";
+	createUserPayloadSchema,
+	createUserResponseSchema,
+} from "../schemas/user.schema";
 
 export const signUpContract = oc
 	.route({ method: "POST", path: "/auth/signup" })
-	.input(signUpPayloadSchema)
-	.output(signUpResponseSchema);
+	.input(createUserPayloadSchema)
+	.output(createUserResponseSchema);
