@@ -134,6 +134,8 @@ describe("Auth service", () => {
 			expect(result.data.user).toEqual({
 				id: user.id,
 				email: user.email,
+				firstName: null,
+				lastName: null,
 			});
 			expect(new Date(result.data.sessionExpiresAt).toISOString()).toBe(
 				result.data.sessionExpiresAt,
@@ -196,6 +198,8 @@ describe("Auth service", () => {
 			expect(snapshot.data.user).toEqual({
 				id: user.id,
 				email: user.email,
+				firstName: null,
+				lastName: null,
 			});
 			expect(row?.refreshHash).toBe(
 				hashToken(jar.cookies[REFRESH_COOKIE_NAME]),
