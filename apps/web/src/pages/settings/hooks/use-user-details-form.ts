@@ -42,9 +42,17 @@ export const useUserDetailsForm = (user: User) => {
 				logger.info(AUTH_OBSERVABILITY_EVENTS.detailsUpdateSucceeded);
 				return data;
 			}),
-		onSuccess: async (_data, payload) => {
+		onSuccess: (_data, payload) => {
 			form.reset(payload);
-			await queryClient.invalidateQueries({ queryKey: queryKeys.me() });
+			queryClient.setQueryData(queryKeys.me(), (current: User | null) =>
+				current
+					? {
+							...current,
+							firstName: payload.firstName || null,
+							lastName: payload.lastName || null,
+						}
+					: current,
+			);
 			toast.success(t("toast.success.details-updated", { ns: "common" }));
 		},
 		onError: () => {
