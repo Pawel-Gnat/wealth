@@ -5,10 +5,8 @@ import {
 	bootstrapSession,
 	clearAuthSession,
 	configureAuth,
-	getSessionRefreshDelayMs,
 	refreshSession,
 	resetRefreshMutex,
-	SESSION_REFRESH_LEAD_MS,
 } from "@/shared/lib/auth/auth-api";
 import { MOCK_USER } from "@/test/mocks/user";
 import { server } from "@/test/servers";
@@ -17,17 +15,6 @@ const snapshot = {
 	user: MOCK_USER,
 	sessionExpiresAt: "2026-09-15T08:15:00.000Z",
 };
-
-describe("getSessionRefreshDelayMs", () => {
-	it("schedules refresh one minute before session expiry", () => {
-		const now = Date.parse("2026-09-15T08:00:00.000Z");
-
-		expect(getSessionRefreshDelayMs("2026-09-15T08:15:00.000Z", now)).toBe(
-			SESSION_REFRESH_LEAD_MS * 14,
-		);
-		expect(getSessionRefreshDelayMs("2026-09-15T08:00:30.000Z", now)).toBe(0);
-	});
-});
 
 describe("configureAuth", () => {
 	beforeEach(() => {

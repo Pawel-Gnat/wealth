@@ -1,7 +1,36 @@
-import { dispatchSseMessage } from "@/shared/lib/sse/sse-dispatcher";
+import { sseEventSchema } from "@repo/api/schemas";
+import type { SseEvent } from "@repo/api/types";
+import { logger, SSE_OBSERVABILITY_EVENTS } from "@repo/observability/browser";
+import { clearAuthSession } from "@/shared/lib/auth/auth-api";
 
 const RECONNECT_INITIAL_MS = 1_000;
 const RECONNECT_MAX_MS = 30_000;
+
+export const dispatchSseMessage = (raw: string): SseEvent | null => {
+	let parsed: unknown;
+	try {
+		parsed = JSON.parse(raw);
+	} catch {
+		logger.warn(SSE_OBSERVABILITY_EVENTS.frameMalformed);
+		return null;
+	}
+
+	const result = sseEventSchema.safeParse(parsed);
+	if (!result.success) {
+		logger.warn(SSE_OBSERVABILITY_EVENTS.envelopeInvalid);
+		return null;
+	}
+
+	const event = result.data;
+
+	switch (event.type) {
+		case "session-ended":
+			clearAuthSession();
+			break;
+	}
+
+	return event;
+};
 
 export type EventSourceLike = {
 	close: () => void;

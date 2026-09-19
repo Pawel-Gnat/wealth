@@ -2,9 +2,6 @@ import type { SessionSnapshot } from "@repo/api/types";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
-export const SESSION_REFRESH_LEAD_MS = 60_000;
-const MAX_TIMEOUT_MS = 2 ** 31 - 1;
-
 type AuthHandlers = {
 	onApplied?: (snapshot: SessionSnapshot) => void;
 	onCleared?: () => void;
@@ -48,21 +45,6 @@ export const withRefreshMutex = async <T>(
 	}
 
 	return refreshPromise as Promise<T>;
-};
-
-export const getSessionRefreshDelayMs = (
-	sessionExpiresAt: string,
-	now = Date.now(),
-): number => {
-	const expiresAt = Date.parse(sessionExpiresAt);
-	if (Number.isNaN(expiresAt)) {
-		return 0;
-	}
-
-	return Math.min(
-		MAX_TIMEOUT_MS,
-		Math.max(0, expiresAt - now - SESSION_REFRESH_LEAD_MS),
-	);
 };
 
 export const bootstrapSession = async (): Promise<SessionSnapshot | null> => {
