@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getDocumentConfig } from "@/features/config/document-config";
 import type { RecordKind } from "@/features/model/record-kind";
 import { ErrorState, Table } from "@/shared/components";
-import { createDocumentColumns } from "../config/create-document-columns";
+import { documentColumns } from "../config/document-columns";
 import { useDocumentsList } from "../hooks/use-documents-list";
 import { DocumentDeleteDialog } from "./document-delete-dialog";
 
@@ -19,7 +19,7 @@ export const DocumentTable = ({ kind }: DocumentTableProps) => {
 
 	const columns = useMemo(
 		() =>
-			createDocumentColumns({
+			documentColumns({
 				t,
 				language: i18n.language,
 				getEditPath: config.editRoute,

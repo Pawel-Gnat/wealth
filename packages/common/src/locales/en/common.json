@@ -45,7 +45,8 @@
 		"accept": "Accept",
 		"reject": "Reject",
 		"download": "Download",
-		"change-photo": "Change photo"
+		"change-photo": "Change photo",
+		"remove": "Remove {{fileName}}"
 	},
 	"toast": {
 		"success": {

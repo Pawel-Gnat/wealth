@@ -9,6 +9,7 @@ import {
 	ChevronRight,
 	Cog,
 	DoorOpen,
+	FileImage,
 	LayoutDashboard,
 	LoaderCircle,
 	Lock,
@@ -54,6 +55,7 @@ export const icons = {
 	settings: Cog,
 	photo: Camera,
 	upload: Upload,
+	fileImage: FileImage,
 };
 
 export type IconName = keyof typeof icons;

@@ -24,22 +24,29 @@ export type FormControlFunction<
 	props: FormInputProps<TFieldValues, TName, TTransformedValues> & ExtraProps,
 ) => ReactNode;
 
-type FormInputProps<
+type FormFieldControlProps<
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 	TTransformedValues = TFieldValues,
 > = {
 	name: TName;
 	label: ReactNode;
-	description?: ReactNode;
 	control: Control<TFieldValues, TName, TTransformedValues>;
 };
 
-type FormBaseProps<
+type FormInputProps<
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 	TTransformedValues = TFieldValues,
-> = FormInputProps<TFieldValues, TName, TTransformedValues> & {
+> = FormFieldControlProps<TFieldValues, TName, TTransformedValues> & {
+	description?: ReactNode;
+};
+
+type FormBaseLayoutProps<
+	TFieldValues extends FieldValues = FieldValues,
+	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+	TTransformedValues = TFieldValues,
+> = FormFieldControlProps<TFieldValues, TName, TTransformedValues> & {
 	horizontal?: boolean;
 	controlFirst?: boolean;
 	children: (
@@ -52,32 +59,46 @@ type FormBaseProps<
 	) => ReactNode;
 };
 
+type FormBaseProps<
+	TFieldValues extends FieldValues = FieldValues,
+	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+	TTransformedValues = TFieldValues,
+> = FormBaseLayoutProps<TFieldValues, TName, TTransformedValues> &
+	(
+		| {
+				srOnly: true;
+				description?: never;
+		  }
+		| {
+				srOnly?: false;
+				description?: ReactNode;
+		  }
+	);
+
 export const FormBase = <
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 	TTransformedValues = TFieldValues,
->({
-	name,
-	label,
-	description,
-	control,
-	children,
-	horizontal = false,
-	controlFirst = false,
-}: FormBaseProps<TFieldValues, TName, TTransformedValues>) => {
+>(
+	props: FormBaseProps<TFieldValues, TName, TTransformedValues>,
+) => {
+	const {
+		name,
+		label,
+		control,
+		children,
+		horizontal = false,
+		controlFirst = false,
+		srOnly = false,
+	} = props;
+	const description = srOnly ? undefined : props.description;
+
 	return (
 		<Controller
 			name={name}
 			control={control}
 			render={({ field, fieldState }) => {
-				const labelElement = (
-					<>
-						<FieldLabel htmlFor={field.name}>{label}</FieldLabel>
-						{description && <FieldDescription>{description}</FieldDescription>}
-					</>
-				);
-
-				const control = children({
+				const fieldControl = children({
 					...field,
 					id: field.name,
 					"aria-invalid": fieldState.invalid,
@@ -87,6 +108,17 @@ export const FormBase = <
 					<FieldError errors={[fieldState.error]} />
 				);
 
+				const labelElement = srOnly ? (
+					<FieldLabel htmlFor={field.name} className="sr-only">
+						{label}
+					</FieldLabel>
+				) : (
+					<>
+						<FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+						{description && <FieldDescription>{description}</FieldDescription>}
+					</>
+				);
+
 				return (
 					<Field
 						data-invalid={fieldState.invalid}
@@ -94,16 +126,21 @@ export const FormBase = <
 					>
 						{controlFirst ? (
 							<>
-								{control}
+								{fieldControl}
 								<FieldContent>
-									{labelElement}
+									{!srOnly && labelElement}
 									{errorElement}
 								</FieldContent>
+								{srOnly && labelElement}
 							</>
 						) : (
 							<>
-								<FieldContent>{labelElement}</FieldContent>
-								{control}
+								{srOnly ? (
+									labelElement
+								) : (
+									<FieldContent>{labelElement}</FieldContent>
+								)}
+								{fieldControl}
 								{errorElement}
 							</>
 						)}

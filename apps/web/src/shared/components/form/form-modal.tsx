@@ -26,6 +26,7 @@ type FormModalProps = {
 	isLoading: boolean;
 	submitText: string;
 	closeText?: string;
+	onClose?: () => void;
 };
 
 export const FormModal = ({
@@ -40,11 +41,18 @@ export const FormModal = ({
 	disabled = false,
 	isLoading,
 	submitText,
+	onClose,
 }: FormModalProps) => {
 	const { t } = useTranslation();
 
 	return (
-		<Dialog>
+		<Dialog
+			onOpenChange={(open) => {
+				if (!open) {
+					onClose?.();
+				}
+			}}
+		>
 			<DialogTrigger asChild>
 				<ButtonSecondary>
 					{triggerIcon && <Icon name={triggerIcon} />}

@@ -1,4 +1,5 @@
 export * from "./alert-modal";
+export * from "./attachment";
 export * from "./avatar";
 export * from "./badge";
 export * from "./breadcrumbs";

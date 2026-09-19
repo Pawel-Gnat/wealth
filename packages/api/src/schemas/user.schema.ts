@@ -13,7 +13,7 @@ export const USER_PHOTO_MIME_TYPES = ["image/png", "image/jpeg"] as const;
 export const userSchema = z.object({
 	id: z.string(),
 	email: z.email(),
-	image: z.string().optional(),
+	image: z.string().min(1).nullable().optional(),
 	firstName: z.string().optional(),
 	lastName: z.string().optional(),
 });

@@ -1,11 +1,9 @@
-import {
-	USER_PHOTO_MAX_SIZE_BYTES,
-	USER_PHOTO_MIME_TYPES,
-} from "@repo/api/schemas";
 import { cn } from "cn";
 import type { ReactNode } from "react";
 import { type DropzoneOptions, useDropzone } from "react-dropzone";
+import { Attachment } from "../attachment";
 import { Icon } from "../icons";
+import { Text, TextMuted } from "../typography/text";
 import { FormBase, type FormControlFunction } from "./form-base";
 
 type FormFileDropzoneProps = {
@@ -51,53 +49,59 @@ const FormFileDropzone = ({
 
 	const selectedFile = value instanceof File ? value : null;
 
+	const clearFile = () => {
+		onChange(null);
+		if (inputRef.current) {
+			inputRef.current.value = "";
+		}
+	};
+
 	return (
-		<div
-			{...getRootProps({
-				className: cn(
-					"flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[20px] border border-border bg-muted p-5",
-					isDragActive && "border-foreground",
-					isInvalid && "border-destructive",
-					disabled && "pointer-events-none opacity-50",
-				),
-			})}
-		>
-			<input
-				{...getInputProps({
-					id,
-					name,
-					onBlur,
+		<div className="space-y-2">
+			<div
+				{...getRootProps({
+					className: cn(
+						"flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-border bg-muted p-5",
+						isDragActive && "border-foreground",
+						isInvalid && "border-destructive",
+						disabled && "pointer-events-none opacity-50",
+					),
 				})}
-				aria-invalid={isInvalid}
-				ref={(element) => {
-					setInputRef(element);
-					if (element) {
-						inputRef.current = element;
-					}
-				}}
-			/>
-			<Icon name="upload" size={24} className="text-muted-foreground" />
-			<span className="text-sm font-medium">{label}</span>
-			{(description || selectedFile) && (
-				<span className="text-xs text-muted-foreground">
-					{selectedFile ? selectedFile.name : description}
-				</span>
+			>
+				<input
+					{...getInputProps({
+						id,
+						name,
+						onBlur,
+					})}
+					aria-invalid={isInvalid}
+					ref={(element) => {
+						setInputRef(element);
+						if (element) {
+							inputRef.current = element;
+						}
+					}}
+				/>
+				<Icon name="upload" size={24} className="text-muted-foreground" />
+				<Text size="sm" weight="medium">
+					{label}
+				</Text>
+				<TextMuted size="xs"> {description}</TextMuted>
+			</div>
+			{selectedFile && (
+				<Attachment title={selectedFile.name} onRemove={clearFile} />
 			)}
 		</div>
 	);
 };
 
 export const FormFile: FormControlFunction<{
-	accept?: DropzoneOptions["accept"];
-	maxSize?: number;
-	disabled?: boolean;
+	accept: NonNullable<DropzoneOptions["accept"]>;
+	maxSize: number;
+	disabled: boolean;
 }> = ({ name, label, description, control, accept, maxSize, disabled }) => {
 	return (
-		<FormBase
-			name={name}
-			label={<span className="sr-only">{label}</span>}
-			control={control}
-		>
+		<FormBase srOnly name={name} label={label} control={control}>
 			{(field) => (
 				<FormFileDropzone
 					name={field.name}
@@ -108,13 +112,10 @@ export const FormFile: FormControlFunction<{
 					setInputRef={field.ref}
 					aria-invalid={field["aria-invalid"]}
 					label={label}
-					description={description ?? null}
-					accept={
-						accept ??
-						Object.fromEntries(USER_PHOTO_MIME_TYPES.map((mime) => [mime, []]))
-					}
-					maxSize={maxSize ?? USER_PHOTO_MAX_SIZE_BYTES}
-					disabled={disabled ?? false}
+					description={description}
+					accept={accept}
+					maxSize={maxSize}
+					disabled={disabled}
 				/>
 			)}
 		</FormBase>

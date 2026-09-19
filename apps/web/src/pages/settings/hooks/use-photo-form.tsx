@@ -1,9 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	USER_PHOTO_MAX_SIZE_BYTES,
-	USER_PHOTO_MAX_SIZE_MB,
-	userEditPhotoSchema,
-} from "@repo/api/schemas";
+import { userEditPhotoSchema } from "@repo/api/schemas";
 import type {
 	UserEditPhotoPayload,
 	UserEditPhotoResponse,
@@ -72,7 +68,6 @@ export const usePhotoForm = () => {
 		isLoading: useLoader({ isLoading: mutation.isPending }),
 		updatePhoto: form.handleSubmit((payload) => mutation.mutate(payload)),
 		previewSrc,
-		maxSizeMb: USER_PHOTO_MAX_SIZE_MB,
-		maxSize: USER_PHOTO_MAX_SIZE_BYTES,
+		reset: form.reset,
 	};
 };
