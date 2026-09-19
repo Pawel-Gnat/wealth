@@ -4,14 +4,9 @@ import { PageLoader } from "@/shared/widgets/page-loader";
 import { SessionResolveError } from "@/shared/widgets/session-resolve-error";
 
 export const AuthSessionStatus = ({ children }: { children: ReactNode }) => {
-	const {
-		isAuthLoading,
-		isResolvingSession,
-		isBootstrapError,
-		retryBootstrap,
-	} = useAuth();
+	const { isAuthLoading, isBootstrapError, retryBootstrap } = useAuth();
 
-	if (isResolvingSession || isAuthLoading) {
+	if (isAuthLoading) {
 		return <PageLoader />;
 	}
 

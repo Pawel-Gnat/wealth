@@ -4,11 +4,11 @@ import { APP_ROUTES } from "../../app/router";
 import { AuthSessionStatus } from "./auth-session-status";
 
 export const AuthenticatedLayout = () => {
-	const { user } = useAuth();
+	const { isAuthenticated } = useAuth();
 
 	return (
 		<AuthSessionStatus>
-			{user === null ? <Navigate to={APP_ROUTES.auth} replace /> : <Outlet />}
+			{isAuthenticated ? <Outlet /> : <Navigate to={APP_ROUTES.auth} replace />}
 		</AuthSessionStatus>
 	);
 };

@@ -90,4 +90,21 @@ export class AuthController {
 			},
 		);
 	}
+
+	@UseGuards(SessionGuard)
+	@Implement(rpcContract.settings.details)
+	updateDetailsRpc() {
+		return implement(rpcContract.settings.details).handler(
+			async ({ input, context }) => {
+				try {
+					return await this.authService.updateDetails(input, context.request);
+				} catch (err) {
+					if (err instanceof UnauthorizedException) {
+						throw new ORPCError("UNAUTHORIZED", { message: err.message });
+					}
+					throw err;
+				}
+			},
+		);
+	}
 }

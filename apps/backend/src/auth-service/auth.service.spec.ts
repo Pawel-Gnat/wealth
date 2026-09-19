@@ -427,6 +427,64 @@ describe("Auth service", () => {
 		});
 	});
 
+	describe("update details", () => {
+		it("updates names and keeps other sessions", async () => {
+			const user = await createUser("auth-details-update");
+			const currentJar = createCookieJar();
+			const otherJar = createCookieJar();
+
+			await signIn(user, currentJar);
+			await signIn(user, otherJar);
+
+			const currentSession = await authService.resolveRpcSession(
+				asRequest({
+					[SESSION_COOKIE_NAME]: currentJar.cookies[SESSION_COOKIE_NAME],
+				}),
+			);
+
+			await expect(
+				authService.updateDetails(
+					{ firstName: "Ada", lastName: "Lovelace" },
+					asRequest({}, currentSession ?? undefined),
+				),
+			).resolves.toEqual({ data: { message: "user_details_updated" } });
+
+			expect(publishSessionEnded).not.toHaveBeenCalled();
+			expect(await sessionsForUser(user.id)).toHaveLength(2);
+
+			const updated = await usersService.findUserById(user.id);
+			expect(updated).toMatchObject({
+				firstName: "Ada",
+				lastName: "Lovelace",
+			});
+		});
+
+		it("rejects when the session is missing", async () => {
+			await expect(
+				authService.updateDetails(
+					{ firstName: "Ada", lastName: "Lovelace" },
+					asRequest({}),
+				),
+			).rejects.toBeInstanceOf(UnauthorizedException);
+		});
+
+		it("rejects when the user row is missing", async () => {
+			await expect(
+				authService.updateDetails(
+					{ firstName: "Ada", lastName: "Lovelace" },
+					asRequest(
+						{},
+						{
+							userId: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+							sessionId: "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+							sessionExpiresAt: new Date(),
+						},
+					),
+				),
+			).rejects.toBeInstanceOf(UnauthorizedException);
+		});
+	});
+
 	describe("sign up", () => {
 		it("rejects when email is already registered", async () => {
 			const existing = await createUser("auth-signup-conflict");

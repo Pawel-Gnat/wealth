@@ -4,3 +4,8 @@ export type CreateUserInput = {
 	firstName?: string | undefined;
 	lastName?: string | undefined;
 };
+
+export type UpdateUserDetailsInput = {
+	firstName: string;
+	lastName: string;
+};

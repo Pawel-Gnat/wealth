@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router";
-import { useAuth } from "@/context/auth";
+import { useAuth, useUser } from "@/context/auth";
 import {
 	Breadcrumbs,
 	ButtonPrimary,
@@ -14,7 +14,10 @@ import { UserAvatar } from "../widgets/user-avatar";
 
 export function DashboardLayout() {
 	const { t } = useTranslation();
-	const { user, logout } = useAuth();
+	const { logout } = useAuth();
+	const { data: user } = useUser();
+
+	if (!user) return;
 
 	return (
 		<Sidebar
@@ -30,11 +33,10 @@ export function DashboardLayout() {
 				<SidebarTrigger />
 				<Separator orientation="vertical" />
 				<Breadcrumbs />
-				{user && (
-					<div className="flex items-center gap-2 ml-auto">
-						<UserAvatar user={user} />
-					</div>
-				)}
+
+				<div className="flex items-center gap-2 ml-auto">
+					<UserAvatar user={user} />
+				</div>
 			</div>
 			<div className="px-2 flex flex-col gap-4 mb-4">
 				<Outlet />

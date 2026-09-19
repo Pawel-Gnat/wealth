@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useAuth } from "@/context/auth";
+import { useAuth, useUser } from "@/context/auth";
 import {
 	applySessionSnapshot,
 	clearAuthSession,
@@ -26,8 +26,8 @@ const unauthorizedMe = () =>
 	);
 
 const AuthProbe = () => {
-	const { user, isAuthLoading, isBootstrapError, retryBootstrap, logout } =
-		useAuth();
+	const { isAuthLoading, isBootstrapError, retryBootstrap, logout } = useAuth();
+	const { data: user } = useUser();
 
 	if (isAuthLoading) {
 		return <div data-testid="auth-loading">loading</div>;
@@ -73,7 +73,7 @@ describe("AuthProvider", () => {
 		);
 	});
 
-	it("sets user from GET /me and starts SSE", async () => {
+	it("seeds the user query from GET /me and starts SSE", async () => {
 		renderWithProviders(<AuthProbe />);
 
 		expect(screen.getByTestId("auth-loading")).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe("AuthProvider", () => {
 		expect(startSseGateway).toHaveBeenCalled();
 	});
 
-	it("leaves user unset and does not start SSE when GET /me is unauthorized", async () => {
+	it("leaves the user query unset and does not start SSE when GET /me is unauthorized", async () => {
 		server.use(unauthorizedMe());
 		renderWithProviders(<AuthProbe />);
 
@@ -94,7 +94,7 @@ describe("AuthProvider", () => {
 		expect(startSseGateway).not.toHaveBeenCalled();
 	});
 
-	it("applies a snapshot from sign-in and starts SSE", async () => {
+	it("applies a snapshot from sign-in into the user query and starts SSE", async () => {
 		server.use(unauthorizedMe());
 		renderWithProviders(<AuthProbe />);
 
@@ -115,7 +115,7 @@ describe("AuthProvider", () => {
 		expect(startSseGateway).toHaveBeenCalled();
 	});
 
-	it("clears user and stops SSE on logout", async () => {
+	it("clears the user query and stops SSE on logout", async () => {
 		const user = userEvent.setup();
 		renderWithProviders(<AuthProbe />);
 

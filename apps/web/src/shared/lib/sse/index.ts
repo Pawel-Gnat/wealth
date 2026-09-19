@@ -1,10 +1,10 @@
-export { dispatchSseMessage } from "@/shared/lib/sse/sse-dispatcher";
 export type {
 	EventSourceFactory,
 	EventSourceLike,
 } from "@/shared/lib/sse/sse-gateway";
 export {
 	configureSseGateway,
+	dispatchSseMessage,
 	resetSseGatewayForTests,
 	startSseGateway,
 	stopSseGateway,

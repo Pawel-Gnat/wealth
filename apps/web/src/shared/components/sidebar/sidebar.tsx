@@ -30,14 +30,14 @@ export const Sidebar = ({
 		<SidebarProvider>
 			<aside>
 				<SidebarUI>
-					<SidebarHeader>{header}</SidebarHeader>
+					<SidebarHeader className="px-4 sm:p-4">{header}</SidebarHeader>
 					<SidebarContent>
 						<SidebarGroup>{navigation}</SidebarGroup>
 					</SidebarContent>
 					<SidebarFooter>{footer}</SidebarFooter>
 				</SidebarUI>
 			</aside>
-			<SidebarInset className="p-2 flex flex-col gap-6">
+			<SidebarInset className="p-2 sm:p-4 flex flex-col gap-6">
 				{children}
 			</SidebarInset>
 		</SidebarProvider>
