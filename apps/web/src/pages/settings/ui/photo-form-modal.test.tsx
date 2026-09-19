@@ -117,7 +117,7 @@ describe("PhotoFormModal", () => {
 		await waitFor(() => {
 			expect(
 				within(dialog).getByRole("button", {
-					name: t("action.save", { ns: "common" }),
+					name: t("action.cancel", { ns: "common" }),
 				}),
 			).toBeDisabled();
 		});
