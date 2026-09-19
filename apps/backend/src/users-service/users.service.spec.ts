@@ -1,7 +1,7 @@
 import { Test, type TestingModule } from "@nestjs/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { uniqueTestUserEmail } from "../test/mocks/users.js";
+import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
 import { TestModule } from "../test/test.module.js";
 import { UsersService } from "./users.service.js";
 
@@ -42,29 +42,60 @@ describe("Users service", () => {
 	});
 
 	it("creates a user with optional names", async () => {
-		const email = uniqueTestUserEmail("users-create-names");
-		await usersService.createUser({
-			email,
+		const row = await createTestUser(usersService, {
+			emailTag: "users-create-names",
 			passwordHash: "hashed-for-integration",
 			firstName: "Ada",
 			lastName: "Lovelace",
 		});
 
-		const row = await usersService.findUserByEmail(email);
-
-		expect(row).not.toBeNull();
-		if (row === null) return;
-
 		expect(row).toMatchObject({
-			email,
 			firstName: "Ada",
 			lastName: "Lovelace",
 		});
 		expect(usersService.mapToUser(row)).toEqual({
 			id: row.id,
-			email,
+			email: row.email,
 			firstName: "Ada",
 			lastName: "Lovelace",
+		});
+	});
+
+	it("updates first and last name", async () => {
+		const created = await createTestUser(usersService, {
+			emailTag: "users-update-details",
+			passwordHash: "hashed-for-integration",
+		});
+
+		await usersService.updateDetails(created.id, {
+			firstName: "Ada",
+			lastName: "Lovelace",
+		});
+
+		const updated = await usersService.findUserById(created.id);
+		expect(updated).toMatchObject({
+			firstName: "Ada",
+			lastName: "Lovelace",
+		});
+	});
+
+	it("stores empty names as null", async () => {
+		const created = await createTestUser(usersService, {
+			emailTag: "users-update-details-empty",
+			passwordHash: "hashed-for-integration",
+			firstName: "Ada",
+			lastName: "Lovelace",
+		});
+
+		await usersService.updateDetails(created.id, {
+			firstName: "",
+			lastName: "",
+		});
+
+		const updated = await usersService.findUserById(created.id);
+		expect(updated).toMatchObject({
+			firstName: null,
+			lastName: null,
 		});
 	});
 

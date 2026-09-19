@@ -1,6 +1,7 @@
 import type { Period } from "@repo/api/types";
 
 export const queryKeys = {
+	me: () => ["me"] as const,
 	expenses: {
 		all: () => ["expenses"] as const,
 		single: (id: string) => ["expenses", id] as const,

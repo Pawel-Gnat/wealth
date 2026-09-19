@@ -10,15 +10,17 @@ import {
 	logger,
 	runWithRequestId,
 } from "@repo/observability/browser";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
 export const useUserDetailsForm = (user: User) => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const form = useForm<UserEditDetailsPayload>({
 		resolver: zodResolver(userEditDetailsSchema),
 		defaultValues: {
@@ -40,8 +42,9 @@ export const useUserDetailsForm = (user: User) => {
 				logger.info(AUTH_OBSERVABILITY_EVENTS.detailsUpdateSucceeded);
 				return data;
 			}),
-		onSuccess: (_data, payload) => {
+		onSuccess: async (_data, payload) => {
 			form.reset(payload);
+			await queryClient.invalidateQueries({ queryKey: queryKeys.me() });
 			toast.success(t("toast.success.details-updated", { ns: "common" }));
 		},
 		onError: () => {

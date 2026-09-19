@@ -5,7 +5,7 @@ import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants.js";
 import { usersTable } from "../database-service/tables/index.js";
 import type { UserRow } from "../database-service/types/types.js";
-import { CreateUserInput } from "./types/users.js";
+import { CreateUserInput, UpdateUserDetailsInput } from "./types/users.js";
 
 @Injectable()
 export class UsersService {
@@ -47,6 +47,19 @@ export class UsersService {
 		await this.db
 			.update(usersTable)
 			.set({ password: passwordHash })
+			.where(eq(usersTable.id, id));
+	}
+
+	async updateDetails(
+		id: string,
+		{ firstName, lastName }: UpdateUserDetailsInput,
+	): Promise<void> {
+		await this.db
+			.update(usersTable)
+			.set({
+				firstName: firstName || null,
+				lastName: lastName || null,
+			})
 			.where(eq(usersTable.id, id));
 	}
 

@@ -8,6 +8,7 @@ import {
 import { ORPCError } from "@orpc/server";
 import {
 	USER_CREATED_MESSAGE,
+	USER_DETAILS_UPDATED_MESSAGE,
 	USER_PASSWORD_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
 import type {
@@ -16,6 +17,8 @@ import type {
 	SessionSnapshotResponse,
 	SignInPayload,
 	User,
+	UserEditDetailsPayload,
+	UserEditDetailsResponse,
 	UserEditPasswordPayload,
 	UserEditPasswordResponse,
 } from "@repo/api/types";
@@ -270,6 +273,29 @@ export class AuthService {
 		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.passwordUpdateSucceeded);
 
 		return { data: { message: USER_PASSWORD_UPDATED_MESSAGE } };
+	}
+
+	async updateDetails(
+		input: UserEditDetailsPayload,
+		request: Request,
+	): Promise<UserEditDetailsResponse> {
+		const session = request.user;
+		if (!session?.userId) {
+			throw new UnauthorizedException("Unauthorized");
+		}
+
+		const user = await this.usersService.findUserById(session.userId);
+		if (!user) {
+			throw new UnauthorizedException("Unauthorized");
+		}
+
+		await this.usersService.updateDetails(user.id, {
+			firstName: input.firstName,
+			lastName: input.lastName,
+		});
+		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.detailsUpdateSucceeded);
+
+		return { data: { message: USER_DETAILS_UPDATED_MESSAGE } };
 	}
 
 	async signUp(input: CreateUserPayload): Promise<CreateUserResponse> {

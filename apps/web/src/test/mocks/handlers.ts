@@ -1,6 +1,7 @@
 import {
 	EXPENSE_DELETED_MESSAGE,
 	INCOME_DELETED_MESSAGE,
+	USER_DETAILS_UPDATED_MESSAGE,
 	USER_PHOTO_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
 import { HttpResponse, http } from "msw";
@@ -151,6 +152,12 @@ const getDashboardDailyChartHandler = () => {
 	});
 };
 
+const putSettingsDetailsHandler = () => {
+	return HttpResponse.json({
+		data: { message: USER_DETAILS_UPDATED_MESSAGE },
+	});
+};
+
 const putSettingsPhotoHandler = () => {
 	return HttpResponse.json({
 		data: { message: USER_PHOTO_UPDATED_MESSAGE },
@@ -182,6 +189,7 @@ export const HANDLERS = [
 	http.get("*/dashboard/summary", getDashboardSummaryHandler),
 	http.get("*/dashboard/cumulative-chart", getDashboardCumulativeChartHandler),
 	http.get("*/dashboard/daily-chart", getDashboardDailyChartHandler),
+	http.put("*/settings/details", putSettingsDetailsHandler),
 	http.put("*/settings/photo", putSettingsPhotoHandler),
 	http.get("*/auth/me", getAuthMeHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),

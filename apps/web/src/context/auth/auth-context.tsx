@@ -1,4 +1,4 @@
-import type { SessionSnapshot, User } from "@repo/api/types";
+import type { SessionSnapshot } from "@repo/api/types";
 import {
 	AUTH_OBSERVABILITY_EVENTS,
 	logger,
@@ -25,9 +25,10 @@ import {
 	refreshSession,
 } from "@/shared/lib/auth/auth-api";
 import { startSseGateway, stopSseGateway } from "@/shared/lib/sse";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
 type AuthContextValue = {
-	user: User | null;
+	isAuthenticated: boolean;
 	isAuthLoading: boolean;
 	isResolvingSession: boolean;
 	isBootstrapError: boolean;
@@ -39,7 +40,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const queryClient = useQueryClient();
-	const [user, setUser] = useState<User | null>(null);
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [isResolvingSession, setIsResolvingSession] = useState(true);
 	const [isBootstrapError, setIsBootstrapError] = useState(false);
 	const isAuthLoading = useLoader({
@@ -61,7 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		};
 
 		const applySnapshot = (snapshot: SessionSnapshot) => {
-			setUser(snapshot.user);
+			setIsAuthenticated(true);
+			queryClient.setQueryData(queryKeys.me(), snapshot.user);
 			startSseGateway();
 			clearRefreshTimer();
 			refreshTimer = setTimeout(() => {
@@ -74,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			onCleared: () => {
 				clearRefreshTimer();
 				stopSseGateway();
-				setUser(null);
+				setIsAuthenticated(false);
 				queryClient.clear();
 			},
 		});
@@ -125,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const value = useMemo<AuthContextValue>(
 		() => ({
-			user,
+			isAuthenticated,
 			isAuthLoading,
 			isResolvingSession,
 			isBootstrapError,
@@ -133,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			logout,
 		}),
 		[
-			user,
+			isAuthenticated,
 			isAuthLoading,
 			isResolvingSession,
 			isBootstrapError,
