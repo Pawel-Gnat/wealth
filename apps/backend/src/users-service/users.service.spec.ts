@@ -1,6 +1,9 @@
 import { Test, type TestingModule } from "@nestjs/testing";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { DBS } from "../database-service/constants.js";
+import { storageTable } from "../database-service/tables/index.js";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
 import { TestModule } from "../test/test.module.js";
 import { UsersService } from "./users.service.js";
@@ -8,12 +11,14 @@ import { UsersService } from "./users.service.js";
 describe("Users service", () => {
 	let moduleRef: TestingModule;
 	let usersService: UsersService;
+	let db: NodePgDatabase;
 
 	beforeAll(async () => {
 		moduleRef = await Test.createTestingModule({
 			imports: [TestModule],
 		}).compile();
 		usersService = moduleRef.get(UsersService);
+		db = moduleRef.get(DBS.APP);
 	});
 
 	afterAll(async () => {
@@ -56,6 +61,7 @@ describe("Users service", () => {
 		expect(usersService.mapToUser(row)).toEqual({
 			id: row.id,
 			email: row.email,
+			image: null,
 			firstName: "Ada",
 			lastName: "Lovelace",
 		});
@@ -77,6 +83,32 @@ describe("Users service", () => {
 			firstName: "Ada",
 			lastName: "Lovelace",
 		});
+	});
+
+	it("updates image to a storage id", async () => {
+		const created = await createTestUser(usersService, {
+			emailTag: "users-update-image",
+			passwordHash: "hashed-for-integration",
+		});
+
+		const [stored] = await db
+			.insert(storageTable)
+			.values({ objectKey: `avatars/${created.id}/avatar_name.jpg` })
+			.returning({ id: storageTable.id });
+
+		expect(stored).toBeDefined();
+		if (!stored) {
+			throw new Error("storage insert failed");
+		}
+		await usersService.updateImage(created.id, stored.id);
+
+		const updated = await usersService.findUserById(created.id);
+		expect(updated).toBeDefined();
+		if (!updated) {
+			throw new Error("user not found");
+		}
+		expect(updated.image).toBe(stored.id);
+		expect(usersService.mapToUser(updated).image).toBe(stored.id);
 	});
 
 	it("stores empty names as null", async () => {

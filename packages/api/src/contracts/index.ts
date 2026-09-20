@@ -4,9 +4,9 @@ import {
 	getDashboardDailyChartContract,
 	getDashboardSummaryContract,
 } from "./dashboard.contract";
+import { userEditAvatarContract } from "./edit-avatar.contract";
 import { userEditDetailsContract } from "./edit-details.contract";
 import { userEditPasswordContract } from "./edit-password.contract";
-import { userEditPhotoContract } from "./edit-photo.contract";
 import {
 	createExpenseContract,
 	deleteExpenseContract,
@@ -26,6 +26,7 @@ import { meContract } from "./me.contract";
 import { refreshContract } from "./refresh.contract";
 import { signInContract } from "./signin.contract";
 import { signUpContract } from "./signup.contract";
+import { storageGetContract } from "./storage.contract";
 
 export const rpcContract = populateContractRouterPaths({
 	user: {
@@ -38,7 +39,10 @@ export const rpcContract = populateContractRouterPaths({
 	settings: {
 		password: userEditPasswordContract,
 		details: userEditDetailsContract,
-		photo: userEditPhotoContract,
+		avatar: userEditAvatarContract,
+	},
+	storage: {
+		get: storageGetContract,
 	},
 	expenses: {
 		create: createExpenseContract,

@@ -1,8 +1,8 @@
 import {
 	EXPENSE_DELETED_MESSAGE,
 	INCOME_DELETED_MESSAGE,
+	USER_AVATAR_UPDATED_MESSAGE,
 	USER_DETAILS_UPDATED_MESSAGE,
-	USER_PHOTO_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
 import { HttpResponse, http } from "msw";
 import { MOCK_USER } from "./user";
@@ -158,9 +158,17 @@ const putSettingsDetailsHandler = () => {
 	});
 };
 
-const putSettingsPhotoHandler = () => {
+const putSettingsAvatarHandler = () => {
 	return HttpResponse.json({
-		data: { message: USER_PHOTO_UPDATED_MESSAGE },
+		data: { message: USER_AVATAR_UPDATED_MESSAGE },
+	});
+};
+
+const getStorageHandler = () => {
+	return HttpResponse.json({
+		data: {
+			url: "http://localhost:9000/wealth-storage/avatars/user/avatar.jpg",
+		},
 	});
 };
 
@@ -190,7 +198,8 @@ export const HANDLERS = [
 	http.get("*/dashboard/cumulative-chart", getDashboardCumulativeChartHandler),
 	http.get("*/dashboard/daily-chart", getDashboardDailyChartHandler),
 	http.put("*/settings/details", putSettingsDetailsHandler),
-	http.put("*/settings/photo", putSettingsPhotoHandler),
+	http.put("*/settings/avatar", putSettingsAvatarHandler),
+	http.get("*/storage/:id", getStorageHandler),
 	http.get("*/auth/me", getAuthMeHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),

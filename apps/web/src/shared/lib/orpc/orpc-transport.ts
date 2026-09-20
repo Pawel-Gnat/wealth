@@ -45,22 +45,35 @@ const isPublicAuthRoute = (requestUrl: string): boolean => {
 	return PUBLIC_AUTH_PATHS.has(getRequestPathname(requestUrl));
 };
 
-const createRequestInit = (
-	requestId: string,
-	init?: RequestInit,
-): RequestInit => {
-	const headers = new Headers(init?.headers);
+const withCommonHeaders = (headers: Headers, requestId: string) => {
 	headers.set(REQUEST_ID_HEADER_NAME, requestId);
 
 	if (typeof window !== "undefined") {
 		headers.set("X-Timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
 	}
 
-	return {
-		...init,
-		credentials: "include",
-		headers,
-	};
+	return headers;
+};
+
+const toFetchArgs = (
+	input: RequestInfo | URL,
+	init: RequestInit | undefined,
+	requestId: string,
+): [RequestInfo | URL, RequestInit] => {
+	if (typeof Request !== "undefined" && input instanceof Request) {
+		const headers = withCommonHeaders(new Headers(input.headers), requestId);
+		return [
+			new Request(input, { headers, credentials: "include" }),
+			{ ...init, credentials: "include" },
+		];
+	}
+
+	const headers = withCommonHeaders(new Headers(init?.headers), requestId);
+	if (typeof FormData !== "undefined" && init?.body instanceof FormData) {
+		headers.delete("Content-Type");
+	}
+
+	return [input, { ...init, credentials: "include", headers }];
 };
 
 export const orpcTransportFetch = async (
@@ -77,7 +90,11 @@ export const orpcTransportFetch = async (
 	}
 
 	try {
-		let response = await fetch(input, createRequestInit(requestId, init));
+		const retryInput =
+			typeof Request !== "undefined" && input instanceof Request
+				? input.clone()
+				: input;
+		let response = await fetch(...toFetchArgs(input, init, requestId));
 
 		if (
 			response.status === 401 &&
@@ -88,7 +105,7 @@ export const orpcTransportFetch = async (
 			const snapshot = await refreshSession();
 
 			if (snapshot) {
-				response = await fetch(input, createRequestInit(requestId, init));
+				response = await fetch(...toFetchArgs(retryInput, init, requestId));
 			}
 		}
 

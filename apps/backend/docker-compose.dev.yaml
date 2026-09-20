@@ -22,6 +22,22 @@ services:
     volumes:
       - redis-data:/data
 
+  minio:
+    image: quay.io/minio/aistor/minio:latest
+    container_name: wealth-minio
+    restart: unless-stopped
+    command: server --console-address ":9001" /data --license /minio.license
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+      - ./minio.license:/minio.license:ro
+
 volumes:
   postgres-data:
   redis-data:
+  minio-data:

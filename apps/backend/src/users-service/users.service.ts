@@ -63,10 +63,18 @@ export class UsersService {
 			.where(eq(usersTable.id, id));
 	}
 
+	async updateImage(id: string, image: string | null): Promise<void> {
+		await this.db
+			.update(usersTable)
+			.set({ image })
+			.where(eq(usersTable.id, id));
+	}
+
 	mapToUser(user: UserRow): User {
 		return {
 			id: String(user.id),
 			email: user.email,
+			image: user.image ?? null,
 			firstName: user.firstName ?? null,
 			lastName: user.lastName ?? null,
 		};

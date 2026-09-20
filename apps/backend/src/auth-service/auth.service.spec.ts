@@ -134,6 +134,7 @@ describe("Auth service", () => {
 			expect(result.data.user).toEqual({
 				id: user.id,
 				email: user.email,
+				image: null,
 				firstName: null,
 				lastName: null,
 			});
@@ -198,6 +199,7 @@ describe("Auth service", () => {
 			expect(snapshot.data.user).toEqual({
 				id: user.id,
 				email: user.email,
+				image: null,
 				firstName: null,
 				lastName: null,
 			});

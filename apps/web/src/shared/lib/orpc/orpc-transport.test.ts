@@ -42,6 +42,31 @@ describe("orpcTransportFetch", () => {
 		expect(requestId).toEqual(expect.any(String));
 	});
 
+	it("keeps multipart content-type for a FormData Request", async () => {
+		let contentType: string | null = null;
+
+		server.use(
+			http.put("http://backend.test/settings/avatar", ({ request }) => {
+				contentType = request.headers.get("content-type");
+				return HttpResponse.json({ ok: true });
+			}),
+		);
+
+		const form = new FormData();
+		form.set("avatar", new File(["x"], "a.jpg", { type: "image/jpeg" }));
+
+		const response = await orpcTransportFetch(
+			new Request("http://backend.test/settings/avatar", {
+				method: "PUT",
+				body: form,
+			}),
+			{ redirect: "manual" },
+		);
+
+		expect(response.ok).toBe(true);
+		expect(contentType).toMatch(/^multipart\/form-data/i);
+	});
+
 	it("retries a Request after a successful refresh", async () => {
 		let calls = 0;
 		const refresh = vi.fn(() => HttpResponse.json({ data: snapshot }));

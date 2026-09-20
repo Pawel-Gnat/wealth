@@ -2,6 +2,7 @@ import type { Period } from "@repo/api/types";
 
 export const queryKeys = {
 	me: () => ["me"] as const,
+	userAvatar: (id: string | null | undefined) => ["user-avatar", id] as const,
 	expenses: {
 		all: () => ["expenses"] as const,
 		single: (id: string) => ["expenses", id] as const,

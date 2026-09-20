@@ -5,4 +5,5 @@ export * from "./group.types";
 export * from "./session.types";
 export * from "./signin.types";
 export * from "./sse.types";
+export * from "./storage.types";
 export * from "./user.types";

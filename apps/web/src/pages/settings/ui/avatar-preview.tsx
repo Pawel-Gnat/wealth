@@ -3,12 +3,12 @@ import { useTranslation } from "react-i18next";
 import { Avatar } from "@/shared/components";
 import { TextMuted } from "@/shared/components/typography/text";
 
-type PhotoPreviewProps = {
+type AvatarPreviewProps = {
 	src?: string | null;
 	user: User;
 };
 
-export const PhotoPreview = ({ src, user }: PhotoPreviewProps) => {
+export const AvatarPreview = ({ src, user }: AvatarPreviewProps) => {
 	const { t } = useTranslation();
 
 	return (
@@ -20,7 +20,7 @@ export const PhotoPreview = ({ src, user }: PhotoPreviewProps) => {
 			)}
 
 			<TextMuted size="sm">
-				{t("profile.change-photo.description", { ns: "settings" })}
+				{t("profile.change-avatar.description", { ns: "settings" })}
 			</TextMuted>
 		</div>
 	);

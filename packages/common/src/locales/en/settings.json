@@ -3,8 +3,8 @@
 	"subtitle": "Profile, personal details and password.",
 	"profile": {
 		"title": "Profile",
-		"change-photo": {
-			"title": "Change Photo",
+		"change-avatar": {
+			"title": "Change Avatar",
 			"description": "This is how others will see you"
 		}
 	},

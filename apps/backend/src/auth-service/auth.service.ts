@@ -7,6 +7,7 @@ import {
 } from "@nestjs/common";
 import { ORPCError } from "@orpc/server";
 import {
+	USER_AVATAR_UPDATED_MESSAGE,
 	USER_CREATED_MESSAGE,
 	USER_DETAILS_UPDATED_MESSAGE,
 	USER_PASSWORD_UPDATED_MESSAGE,
@@ -17,6 +18,8 @@ import type {
 	SessionSnapshotResponse,
 	SignInPayload,
 	User,
+	UserEditAvatarPayload,
+	UserEditAvatarResponse,
 	UserEditDetailsPayload,
 	UserEditDetailsResponse,
 	UserEditPasswordPayload,
@@ -40,12 +43,13 @@ import { sessionsTable } from "../database-service/tables/index.js";
 import { isProduction } from "../shared/http/is-production.js";
 import { logAuthEvent } from "../shared/observability/log-event.js";
 import { SsePublisher } from "../sse-service/sse-publisher.service.js";
+import { StorageService } from "../storage-service/storage.service.js";
 import { UsersService } from "../users-service/users.service.js";
 import {
 	clearAuthCookies,
 	readAuthCookie,
 	setAuthCookies,
-} from "./auth-cookies.js";
+} from "./helpers/auth-cookies.js";
 
 const BCRYPT_ROUNDS = 10;
 
@@ -61,6 +65,7 @@ export class AuthService {
 		private usersService: UsersService,
 		@Inject(DBS.APP) private readonly db: NodePgDatabase,
 		private readonly ssePublisher: SsePublisher,
+		private readonly storageService: StorageService,
 	) {}
 
 	async validateUser(payload: SignInPayload): Promise<User> {
@@ -296,6 +301,43 @@ export class AuthService {
 		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.detailsUpdateSucceeded);
 
 		return { data: { message: USER_DETAILS_UPDATED_MESSAGE } };
+	}
+
+	async updateAvatar(
+		input: UserEditAvatarPayload,
+		request: Request,
+	): Promise<UserEditAvatarResponse> {
+		const session = request.user;
+		if (!session?.userId) {
+			throw new UnauthorizedException("Unauthorized");
+		}
+
+		const user = await this.usersService.findUserById(session.userId);
+		if (!user) {
+			throw new UnauthorizedException("Unauthorized");
+		}
+
+		const previousImageId = user.image;
+		const { id } = await this.storageService.uploadAvatar({
+			userId: user.id,
+			file: input.avatar,
+		});
+		await this.usersService.updateImage(user.id, id);
+
+		if (previousImageId) {
+			try {
+				await this.storageService.delete(previousImageId);
+			} catch {
+				logAuthEvent(
+					AUTH_OBSERVABILITY_EVENTS.avatarPreviousDeleteFailed,
+					"warn",
+				);
+			}
+		}
+
+		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.avatarUpdateSucceeded);
+
+		return { data: { message: USER_AVATAR_UPDATED_MESSAGE } };
 	}
 
 	async signUp(input: CreateUserPayload): Promise<CreateUserResponse> {

@@ -3,15 +3,15 @@ import type {
 	createUserPayloadSchema,
 	createUserResponseDataSchema,
 	createUserResponseSchema,
+	userEditAvatarResponseDataSchema,
+	userEditAvatarResponseSchema,
+	userEditAvatarSchema,
 	userEditDetailsResponseDataSchema,
 	userEditDetailsResponseSchema,
 	userEditDetailsSchema,
 	userEditPasswordResponseDataSchema,
 	userEditPasswordResponseSchema,
 	userEditPasswordSchema,
-	userEditPhotoResponseDataSchema,
-	userEditPhotoResponseSchema,
-	userEditPhotoSchema,
 	userSchema,
 } from "../schemas/user.schema";
 
@@ -35,8 +35,10 @@ export type UserEditDetailsResponseData = z.infer<
 export type UserEditDetailsResponse = z.infer<
 	typeof userEditDetailsResponseSchema
 >;
-export type UserEditPhotoPayload = z.infer<typeof userEditPhotoSchema>;
-export type UserEditPhotoResponseData = z.infer<
-	typeof userEditPhotoResponseDataSchema
+export type UserEditAvatarPayload = z.infer<typeof userEditAvatarSchema>;
+export type UserEditAvatarResponseData = z.infer<
+	typeof userEditAvatarResponseDataSchema
 >;
-export type UserEditPhotoResponse = z.infer<typeof userEditPhotoResponseSchema>;
+export type UserEditAvatarResponse = z.infer<
+	typeof userEditAvatarResponseSchema
+>;
