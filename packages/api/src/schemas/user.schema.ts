@@ -4,11 +4,11 @@ import { apiPayload } from "./common.schema";
 export const USER_CREATED_MESSAGE = "user_created" as const;
 export const USER_PASSWORD_UPDATED_MESSAGE = "user_password_updated" as const;
 export const USER_DETAILS_UPDATED_MESSAGE = "user_details_updated" as const;
-export const USER_PHOTO_UPDATED_MESSAGE = "user_photo_updated" as const;
+export const USER_AVATAR_UPDATED_MESSAGE = "user_avatar_updated" as const;
 
-export const USER_PHOTO_MAX_SIZE_MB = 5;
-export const USER_PHOTO_MAX_SIZE_BYTES = USER_PHOTO_MAX_SIZE_MB * 1024 * 1024;
-export const USER_PHOTO_MIME_TYPES = ["image/png", "image/jpeg"] as const;
+export const USER_AVATAR_MAX_SIZE_MB = 5;
+export const USER_AVATAR_MAX_SIZE_BYTES = USER_AVATAR_MAX_SIZE_MB * 1024 * 1024;
+export const USER_AVATAR_MIME_TYPES = ["image/png", "image/jpeg"] as const;
 
 export const userSchema = z.object({
 	id: z.string(),
@@ -82,17 +82,17 @@ export const userEditDetailsResponseSchema = apiPayload(
 	userEditDetailsResponseDataSchema,
 );
 
-export const userEditPhotoSchema = z.object({
-	photo: z
+export const userEditAvatarSchema = z.object({
+	avatar: z
 		.file({ error: "form:file.required" })
-		.mime([...USER_PHOTO_MIME_TYPES], { error: "form:file.invalid-type" })
-		.max(USER_PHOTO_MAX_SIZE_BYTES, { error: "form:file.max" }),
+		.mime([...USER_AVATAR_MIME_TYPES], { error: "form:file.invalid-type" })
+		.max(USER_AVATAR_MAX_SIZE_BYTES, { error: "form:file.max" }),
 });
 
-export const userEditPhotoResponseDataSchema = z.object({
-	message: z.literal(USER_PHOTO_UPDATED_MESSAGE),
+export const userEditAvatarResponseDataSchema = z.object({
+	message: z.literal(USER_AVATAR_UPDATED_MESSAGE),
 });
 
-export const userEditPhotoResponseSchema = apiPayload(
-	userEditPhotoResponseDataSchema,
+export const userEditAvatarResponseSchema = apiPayload(
+	userEditAvatarResponseDataSchema,
 );

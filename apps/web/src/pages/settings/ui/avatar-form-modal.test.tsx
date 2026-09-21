@@ -9,7 +9,7 @@ import { MOCK_JPEG_FILE } from "@/test/mocks/jpeg-file";
 import { MOCK_USER } from "@/test/mocks/user";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
-import { PhotoFormModal } from "./photo-form-modal";
+import { AvatarFormModal } from "./avatar-form-modal";
 
 vi.mock("sonner", () => ({
 	toast: {
@@ -18,7 +18,7 @@ vi.mock("sonner", () => ({
 	},
 }));
 
-describe("PhotoFormModal", () => {
+describe("AvatarFormModal", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -26,7 +26,7 @@ describe("PhotoFormModal", () => {
 		vi.stubGlobal(
 			"URL",
 			Object.assign(URL, {
-				createObjectURL: vi.fn(() => "blob:mock-photo"),
+				createObjectURL: vi.fn(() => "blob:mock-avatar"),
 				revokeObjectURL: vi.fn(),
 			}),
 		);
@@ -39,11 +39,11 @@ describe("PhotoFormModal", () => {
 
 	const openModal = async () => {
 		const userActions = userEvent.setup();
-		renderWithProviders(<PhotoFormModal user={MOCK_USER} />);
+		renderWithProviders(<AvatarFormModal user={MOCK_USER} />);
 
 		await userActions.click(
 			screen.getByRole("button", {
-				name: t("action.change-photo", { ns: "common" }),
+				name: t("action.change-avatar", { ns: "common" }),
 			}),
 		);
 
@@ -67,7 +67,7 @@ describe("PhotoFormModal", () => {
 
 		await waitFor(() => {
 			expect(toast.success).toHaveBeenCalledWith(
-				t("toast.success.photo-updated", { ns: "common" }),
+				t("toast.success.avatar-updated", { ns: "common" }),
 			);
 		});
 		await waitFor(() => {
@@ -77,7 +77,7 @@ describe("PhotoFormModal", () => {
 
 	it("keeps the modal open and shows an error toast when upload fails", async () => {
 		server.use(
-			http.put("*/settings/photo", () =>
+			http.put("*/settings/avatar", () =>
 				HttpResponse.json({ message: "Upload failed" }, { status: 500 }),
 			),
 		);
@@ -92,7 +92,7 @@ describe("PhotoFormModal", () => {
 
 		await waitFor(() => {
 			expect(toast.error).toHaveBeenCalledWith(
-				t("toast.error.photo-updated", { ns: "common" }),
+				t("toast.error.avatar-updated", { ns: "common" }),
 			);
 		});
 		expect(screen.getByRole("dialog")).toBeInTheDocument();
@@ -100,9 +100,9 @@ describe("PhotoFormModal", () => {
 
 	it("does not close the modal while upload is pending", async () => {
 		server.use(
-			http.put("*/settings/photo", async () => {
+			http.put("*/settings/avatar", async () => {
 				await new Promise(() => undefined);
-				return HttpResponse.json({ data: { message: "user_photo_updated" } });
+				return HttpResponse.json({ data: { message: "user_avatar_updated" } });
 			}),
 		);
 

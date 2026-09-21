@@ -1,27 +1,29 @@
 import {
-	USER_PHOTO_MAX_SIZE_BYTES,
-	USER_PHOTO_MAX_SIZE_MB,
-	USER_PHOTO_MIME_TYPES,
+	USER_AVATAR_MAX_SIZE_BYTES,
+	USER_AVATAR_MAX_SIZE_MB,
+	USER_AVATAR_MIME_TYPES,
 } from "@repo/api/schemas";
 import type { User } from "@repo/api/types";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FormFile, FormModal } from "@/shared/components";
-import { usePhotoForm } from "../hooks/use-photo-form";
-import { PhotoPreview } from "./photo-preview";
+import { useAvatarForm } from "../hooks/use-avatar-form";
+import { AvatarPreview } from "./avatar-preview";
 
-type PhotoFormModalProps = {
+type AvatarFormModalProps = {
 	user: User;
 };
 
-export const PhotoFormModal = ({ user }: PhotoFormModalProps) => {
+export const AvatarFormModal = ({ user }: AvatarFormModalProps) => {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
-	const { control, isPending, updatePhoto, previewSrc, reset } = usePhotoForm({
-		onSuccess: () => {
-			setOpen(false);
+	const { control, isPending, updateAvatar, previewSrc, reset } = useAvatarForm(
+		{
+			onSuccess: () => {
+				setOpen(false);
+			},
 		},
-	});
+	);
 
 	return (
 		<FormModal
@@ -33,25 +35,25 @@ export const PhotoFormModal = ({ user }: PhotoFormModalProps) => {
 					reset();
 				}
 			}}
-			triggerText={t("action.change-photo", { ns: "common" })}
+			triggerText={t("action.change-avatar", { ns: "common" })}
 			triggerIcon="photo"
-			title={t("profile.change-photo.title", { ns: "settings" })}
-			onSubmit={updatePhoto}
+			title={t("profile.change-avatar.title", { ns: "settings" })}
+			onSubmit={updateAvatar}
 			submitText={t("action.save", { ns: "common" })}
 			isPending={isPending}
 		>
-			<PhotoPreview src={previewSrc} user={user} />
+			<AvatarPreview src={previewSrc} user={user} />
 			<FormFile
-				name="photo"
+				name="avatar"
 				accept={Object.fromEntries(
-					USER_PHOTO_MIME_TYPES.map((mime) => [mime, []]),
+					USER_AVATAR_MIME_TYPES.map((mime) => [mime, []]),
 				)}
-				maxSize={USER_PHOTO_MAX_SIZE_BYTES}
+				maxSize={USER_AVATAR_MAX_SIZE_BYTES}
 				control={control}
 				label={t("file.label", { ns: "form" })}
 				description={t("file.description", {
 					ns: "form",
-					size: USER_PHOTO_MAX_SIZE_MB,
+					size: USER_AVATAR_MAX_SIZE_MB,
 				})}
 				disabled={isPending}
 			/>

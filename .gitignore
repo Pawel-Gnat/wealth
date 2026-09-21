@@ -73,3 +73,6 @@ playwright/.cache/
 playwright/.auth/
 
 .ai
+
+# Local MinIO license
+apps/backend/minio/minio.license

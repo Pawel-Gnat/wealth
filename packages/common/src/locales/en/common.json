@@ -45,7 +45,7 @@
 		"accept": "Accept",
 		"reject": "Reject",
 		"download": "Download",
-		"change-photo": "Change photo",
+		"change-avatar": "Change avatar",
 		"remove": "Remove {{fileName}}"
 	},
 	"toast": {
@@ -59,7 +59,7 @@
 			"income-updated": "Income updated successfully",
 			"password-updated": "Password updated successfully",
 			"details-updated": "Personal details updated successfully",
-			"photo-updated": "Photo updated successfully"
+			"avatar-updated": "Avatar updated successfully"
 		},
 		"error": {
 			"signed-in": "Failed to sign in",
@@ -72,7 +72,7 @@
 			"income-updated": "Failed to update income",
 			"password-updated": "Failed to update password",
 			"details-updated": "Failed to update personal details",
-			"photo-updated": "Failed to update photo"
+			"avatar-updated": "Failed to update avatar"
 		}
 	}
 }

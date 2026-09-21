@@ -1,40 +1,45 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userEditPhotoSchema } from "@repo/api/schemas";
+import { userEditAvatarSchema } from "@repo/api/schemas";
 import type {
-	UserEditPhotoPayload,
-	UserEditPhotoResponse,
+	UserEditAvatarPayload,
+	UserEditAvatarResponse,
 } from "@repo/api/types";
 import {
 	AUTH_OBSERVABILITY_EVENTS,
 	logger,
 	runWithRequestId,
 } from "@repo/observability/browser";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
-type UsePhotoFormProps = {
+type UseAvatarFormProps = {
 	onSuccess?: () => void;
 };
 
-export const usePhotoForm = ({ onSuccess }: UsePhotoFormProps = {}) => {
+export const useAvatarForm = ({ onSuccess }: UseAvatarFormProps = {}) => {
 	const { t } = useTranslation();
-	const form = useForm<UserEditPhotoPayload>({
-		resolver: zodResolver(userEditPhotoSchema),
+	const queryClient = useQueryClient();
+	const form = useForm<UserEditAvatarPayload>({
+		resolver: zodResolver(userEditAvatarSchema),
 	});
 
-	const photo = useWatch({ control: form.control, name: "photo" });
+	const avatar = useWatch({ control: form.control, name: "avatar" });
 	const previewSrc = useMemo(() => {
-		if (!(photo instanceof File) || typeof URL.createObjectURL !== "function") {
+		if (
+			!(avatar instanceof File) ||
+			typeof URL.createObjectURL !== "function"
+		) {
 			return null;
 		}
 
-		return URL.createObjectURL(photo);
-	}, [photo]);
+		return URL.createObjectURL(avatar);
+	}, [avatar]);
 
 	useEffect(() => {
 		return () => {
@@ -45,32 +50,33 @@ export const usePhotoForm = ({ onSuccess }: UsePhotoFormProps = {}) => {
 	}, [previewSrc]);
 
 	const mutation = useMutation<
-		UserEditPhotoResponse,
+		UserEditAvatarResponse,
 		Error,
-		UserEditPhotoPayload
+		UserEditAvatarPayload
 	>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
 				const data = await controlledAsync(() =>
-					orpcClient.settings.photo(payload),
+					orpcClient.settings.avatar(payload),
 				);
-				logger.info(AUTH_OBSERVABILITY_EVENTS.photoUpdateSucceeded);
+				logger.info(AUTH_OBSERVABILITY_EVENTS.avatarUpdateSucceeded);
 				return data;
 			}),
 		onSuccess: () => {
 			form.reset();
-			toast.success(t("toast.success.photo-updated", { ns: "common" }));
+			void queryClient.invalidateQueries({ queryKey: queryKeys.me() });
+			toast.success(t("toast.success.avatar-updated", { ns: "common" }));
 			onSuccess?.();
 		},
 		onError: () => {
-			toast.error(t("toast.error.photo-updated", { ns: "common" }));
+			toast.error(t("toast.error.avatar-updated", { ns: "common" }));
 		},
 	});
 
 	return {
 		control: form.control,
 		isPending: mutation.isPending,
-		updatePhoto: form.handleSubmit((payload) => mutation.mutate(payload)),
+		updateAvatar: form.handleSubmit((payload) => mutation.mutate(payload)),
 		previewSrc,
 		reset: form.reset,
 	};

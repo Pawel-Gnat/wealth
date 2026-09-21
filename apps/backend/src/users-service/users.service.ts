@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { User } from "@repo/api/types";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants.js";
 import { usersTable } from "../database-service/tables/index.js";
@@ -63,10 +63,37 @@ export class UsersService {
 			.where(eq(usersTable.id, id));
 	}
 
-	mapToUser(user: UserRow): User {
+	async updateImage(id: string, image: string | null): Promise<void> {
+		await this.db
+			.update(usersTable)
+			.set({ image })
+			.where(eq(usersTable.id, id));
+	}
+
+	async updateImageIfCurrent(
+		id: string,
+		nextImage: string,
+		expectedCurrent: string | null,
+	): Promise<boolean> {
+		const currentImageCondition =
+			expectedCurrent === null
+				? isNull(usersTable.image)
+				: eq(usersTable.image, expectedCurrent);
+
+		const updated = await this.db
+			.update(usersTable)
+			.set({ image: nextImage })
+			.where(and(eq(usersTable.id, id), currentImageCondition))
+			.returning({ id: usersTable.id });
+
+		return updated.length > 0;
+	}
+
+	mapToUser(user: UserRow, imageUrl: string | null = null): User {
 		return {
 			id: String(user.id),
 			email: user.email,
+			image: imageUrl,
 			firstName: user.firstName ?? null,
 			lastName: user.lastName ?? null,
 		};

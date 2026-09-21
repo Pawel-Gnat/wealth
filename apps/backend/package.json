@@ -28,6 +28,7 @@
 		"start:e2e": "tsx src/test/start-e2e.ts"
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.1136.0",
 		"@nestjs/common": "^11.0.1",
 		"@nestjs/config": "^4.0.4",
 		"@nestjs/core": "^11.0.1",

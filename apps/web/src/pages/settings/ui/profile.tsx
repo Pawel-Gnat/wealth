@@ -1,7 +1,7 @@
 import type { User } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/shared/components";
-import { PhotoFormModal } from "./photo-form-modal";
+import { AvatarFormModal } from "./avatar-form-modal";
 import { UserAvatar } from "./user-avatar";
 
 type ProfileProps = {
@@ -16,7 +16,7 @@ export const Profile = ({ user }: ProfileProps) => {
 			contentClassName="flex items-center justify-between"
 		>
 			<UserAvatar user={user} />
-			<PhotoFormModal user={user} />
+			<AvatarFormModal user={user} />
 		</Card>
 	);
 };
