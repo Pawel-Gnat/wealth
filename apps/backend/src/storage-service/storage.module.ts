@@ -1,15 +1,11 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import { Global, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { AuthModule } from "../auth-service/auth.module.js";
 import { S3_CLIENT } from "./constants.js";
-import { StorageController } from "./storage.controller.js";
 import { StorageService } from "./storage.service.js";
 
 @Global()
 @Module({
-	imports: [AuthModule],
-	controllers: [StorageController],
 	providers: [
 		{
 			provide: S3_CLIENT,

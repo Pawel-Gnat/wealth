@@ -5,7 +5,6 @@ import {
 	getUserInitials,
 	hasUserName,
 } from "@/shared/helpers/get-user-full-name";
-import { useGetUserAvatar } from "@/shared/hooks/use-get-user-avatar";
 import {
 	AvatarFallback,
 	AvatarImage,
@@ -19,12 +18,10 @@ type AvatarProps = {
 
 export const Avatar = ({ user, size }: AvatarProps) => {
 	const fullName = hasUserName(user) ? getUserFullName(user) : user.email;
-	const { url, isError } = useGetUserAvatar(user.image);
-	console.log(url, isError);
 
 	return (
 		<AvatarUI className={avatarVariants({ size })}>
-			{url && !isError && <AvatarImage src={url} alt={fullName} />}
+			{user.image && <AvatarImage src={user.image} alt={fullName} />}
 			<AvatarFallback>{getUserInitials(user)}</AvatarFallback>
 		</AvatarUI>
 	);

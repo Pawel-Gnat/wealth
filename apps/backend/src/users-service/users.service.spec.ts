@@ -108,7 +108,54 @@ describe("Users service", () => {
 			throw new Error("user not found");
 		}
 		expect(updated.image).toBe(stored.id);
-		expect(usersService.mapToUser(updated).image).toBe(stored.id);
+		expect(usersService.mapToUser(updated).image).toBeNull();
+		expect(
+			usersService.mapToUser(
+				updated,
+				`http://localhost:9000/wealth-storage/${stored.id}`,
+			).image,
+		).toBe(`http://localhost:9000/wealth-storage/${stored.id}`);
+	});
+
+	it("updateImageIfCurrent swaps only when the expected image matches", async () => {
+		const created = await createTestUser(usersService, {
+			emailTag: "users-update-image-cas",
+			passwordHash: "hashed-for-integration",
+		});
+
+		const [first] = await db
+			.insert(storageTable)
+			.values({ objectKey: `avatars/${created.id}/first.jpg` })
+			.returning({ id: storageTable.id });
+		const [second] = await db
+			.insert(storageTable)
+			.values({ objectKey: `avatars/${created.id}/second.jpg` })
+			.returning({ id: storageTable.id });
+		const [third] = await db
+			.insert(storageTable)
+			.values({ objectKey: `avatars/${created.id}/third.jpg` })
+			.returning({ id: storageTable.id });
+
+		expect(first && second && third).toBeTruthy();
+		if (!first || !second || !third) {
+			throw new Error("storage insert failed");
+		}
+
+		await expect(
+			usersService.updateImageIfCurrent(created.id, first.id, null),
+		).resolves.toBe(true);
+		await expect(
+			usersService.updateImageIfCurrent(created.id, second.id, null),
+		).resolves.toBe(false);
+		await expect(
+			usersService.updateImageIfCurrent(created.id, second.id, first.id),
+		).resolves.toBe(true);
+		await expect(
+			usersService.updateImageIfCurrent(created.id, third.id, first.id),
+		).resolves.toBe(false);
+
+		const updated = await usersService.findUserById(created.id);
+		expect(updated?.image).toBe(second.id);
 	});
 
 	it("stores empty names as null", async () => {

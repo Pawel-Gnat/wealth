@@ -164,14 +164,6 @@ const putSettingsAvatarHandler = () => {
 	});
 };
 
-const getStorageHandler = () => {
-	return HttpResponse.json({
-		data: {
-			url: "http://localhost:9000/wealth-storage/avatars/user/avatar.jpg",
-		},
-	});
-};
-
 const postAuthRefreshHandler = () => {
 	return HttpResponse.json(
 		{ error: { message: "Unauthorized" } },
@@ -199,7 +191,6 @@ export const HANDLERS = [
 	http.get("*/dashboard/daily-chart", getDashboardDailyChartHandler),
 	http.put("*/settings/details", putSettingsDetailsHandler),
 	http.put("*/settings/avatar", putSettingsAvatarHandler),
-	http.get("*/storage/:id", getStorageHandler),
 	http.get("*/auth/me", getAuthMeHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),

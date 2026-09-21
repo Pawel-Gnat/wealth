@@ -40,6 +40,7 @@ import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Request, Response } from "express";
 import { DBS } from "../database-service/constants.js";
 import { sessionsTable } from "../database-service/tables/index.js";
+import type { UserRow } from "../database-service/types/types.js";
 import { isProduction } from "../shared/http/is-production.js";
 import { logAuthEvent } from "../shared/observability/log-event.js";
 import { SsePublisher } from "../sse-service/sse-publisher.service.js";
@@ -77,7 +78,7 @@ export class AuthService {
 		if (!passwordOk) {
 			throw new UnauthorizedException("Invalid credentials");
 		}
-		return this.usersService.mapToUser(user);
+		return this.withResolvedAvatarUrl(user);
 	}
 
 	async signIn(
@@ -210,7 +211,7 @@ export class AuthService {
 		}
 
 		return this.toSnapshot(
-			this.usersService.mapToUser(user),
+			await this.withResolvedAvatarUrl(user),
 			session.sessionExpiresAt,
 		);
 	}
@@ -322,7 +323,39 @@ export class AuthService {
 			userId: user.id,
 			file: input.avatar,
 		});
-		await this.usersService.updateImage(user.id, id);
+
+		let swapped: boolean;
+		try {
+			swapped = await this.usersService.updateImageIfCurrent(
+				user.id,
+				id,
+				previousImageId,
+			);
+		} catch (error) {
+			try {
+				await this.storageService.delete(id);
+			} catch {
+				logAuthEvent(
+					AUTH_OBSERVABILITY_EVENTS.avatarPreviousDeleteFailed,
+					"warn",
+				);
+			}
+			throw error;
+		}
+
+		if (!swapped) {
+			try {
+				await this.storageService.delete(id);
+			} catch {
+				logAuthEvent(
+					AUTH_OBSERVABILITY_EVENTS.avatarPreviousDeleteFailed,
+					"warn",
+				);
+			}
+			throw new ORPCError("CONFLICT", {
+				message: "Avatar was updated concurrently",
+			});
+		}
 
 		if (previousImageId) {
 			try {
@@ -455,7 +488,12 @@ export class AuthService {
 			throw new UnauthorizedException("Invalid refresh token");
 		}
 
-		return this.usersService.mapToUser(user);
+		return this.withResolvedAvatarUrl(user);
+	}
+
+	private async withResolvedAvatarUrl(user: UserRow): Promise<User> {
+		const imageUrl = await this.storageService.resolvePublicUrl(user.image);
+		return this.usersService.mapToUser(user, imageUrl);
 	}
 
 	private async endOtherSessions(

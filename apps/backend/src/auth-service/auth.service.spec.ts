@@ -21,8 +21,12 @@ import {
 } from "vitest";
 
 import { DBS } from "../database-service/constants.js";
-import { sessionsTable } from "../database-service/tables/index.js";
+import {
+	sessionsTable,
+	storageTable,
+} from "../database-service/tables/index.js";
 import { SsePublisher } from "../sse-service/sse-publisher.service.js";
+import { StorageService } from "../storage-service/storage.service.js";
 import { createAuthTestingModule } from "../test/helpers/modules.js";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
 import { UsersService } from "../users-service/users.service.js";
@@ -68,6 +72,7 @@ describe("Auth service", () => {
 	let moduleRef: Awaited<ReturnType<typeof createAuthTestingModule>>;
 	let authService: AuthService;
 	let usersService: UsersService;
+	let storageService: StorageService;
 	let db: NodePgDatabase;
 	let publishSessionEnded: ReturnType<typeof vi.fn>;
 
@@ -75,6 +80,7 @@ describe("Auth service", () => {
 		moduleRef = await createAuthTestingModule();
 		authService = moduleRef.get(AuthService);
 		usersService = moduleRef.get(UsersService);
+		storageService = moduleRef.get(StorageService);
 		db = moduleRef.get(DBS.APP);
 		publishSessionEnded = vi.mocked(
 			moduleRef.get(SsePublisher).publishSessionEnded,
@@ -83,6 +89,14 @@ describe("Auth service", () => {
 
 	beforeEach(() => {
 		publishSessionEnded.mockClear();
+		vi.mocked(storageService.uploadAvatar).mockReset();
+		vi.mocked(storageService.delete).mockReset();
+		vi.mocked(storageService.resolvePublicUrl).mockReset();
+		vi.mocked(storageService.uploadAvatar).mockResolvedValue({
+			id: "storage-id",
+		});
+		vi.mocked(storageService.delete).mockResolvedValue(undefined);
+		vi.mocked(storageService.resolvePublicUrl).mockResolvedValue(null);
 	});
 
 	afterAll(async () => {
@@ -484,6 +498,82 @@ describe("Auth service", () => {
 					),
 				),
 			).rejects.toBeInstanceOf(UnauthorizedException);
+		});
+	});
+
+	describe("update avatar", () => {
+		const jpegFile = () =>
+			new File(["x"], "avatar.jpg", { type: "image/jpeg" });
+
+		it("keeps the winning upload when two updates race", async () => {
+			const user = await createUser("auth-avatar-race");
+			const jar = createCookieJar();
+			await signIn(user, jar);
+
+			const [first] = await db
+				.insert(storageTable)
+				.values({ objectKey: `avatars/${user.id}/first.jpg` })
+				.returning({ id: storageTable.id });
+			const [second] = await db
+				.insert(storageTable)
+				.values({ objectKey: `avatars/${user.id}/second.jpg` })
+				.returning({ id: storageTable.id });
+
+			expect(first && second).toBeTruthy();
+
+			if (!first || !second) {
+				throw new Error("storage insert failed");
+			}
+
+			const snapshot = await usersService.findUserById(user.id);
+			expect(snapshot).toBeTruthy();
+
+			if (!snapshot) {
+				throw new Error("user not found");
+			}
+
+			const findUserById = vi
+				.spyOn(usersService, "findUserById")
+				.mockResolvedValue(snapshot);
+
+			vi.mocked(storageService.uploadAvatar)
+				.mockResolvedValueOnce({ id: first.id })
+				.mockResolvedValueOnce({ id: second.id });
+
+			const request = asRequest(jar.cookies, {
+				userId: user.id,
+				sessionId: "session-id",
+				sessionExpiresAt: new Date(Date.now() + 60_000),
+			});
+
+			const results = await Promise.allSettled([
+				authService.updateAvatar({ avatar: jpegFile() }, request),
+				authService.updateAvatar({ avatar: jpegFile() }, request),
+			]);
+
+			findUserById.mockRestore();
+
+			const fulfilled = results.filter(
+				(result) => result.status === "fulfilled",
+			);
+			const rejected = results.filter((result) => result.status === "rejected");
+
+			expect(fulfilled).toHaveLength(1);
+			expect(rejected).toHaveLength(1);
+
+			if (rejected[0]?.status === "rejected") {
+				expect(rejected[0].reason).toMatchObject({
+					code: "CONFLICT",
+				});
+			}
+
+			const updated = await usersService.findUserById(user.id);
+			expect(updated?.image === first.id || updated?.image === second.id).toBe(
+				true,
+			);
+
+			const loserId = updated?.image === first.id ? second.id : first.id;
+			expect(storageService.delete).toHaveBeenCalledWith(loserId);
 		});
 	});
 

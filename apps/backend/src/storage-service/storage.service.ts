@@ -5,7 +5,6 @@ import {
 } from "@aws-sdk/client-s3";
 import { Inject, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import type { StorageGetResponse } from "@repo/api/types";
 import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { ulid } from "ulid";
@@ -66,7 +65,13 @@ export class StorageService {
 		}
 	}
 
-	async getPublicUrl(id: string): Promise<StorageGetResponse> {
+	async resolvePublicUrl(
+		id: string | null | undefined,
+	): Promise<string | null> {
+		if (!id) {
+			return null;
+		}
+
 		const [row] = await this.db
 			.select({ objectKey: storageTable.objectKey })
 			.from(storageTable)
@@ -74,10 +79,10 @@ export class StorageService {
 			.limit(1);
 
 		if (!row) {
-			throw new Error("Storage object not found");
+			return null;
 		}
 
-		return { data: { url: `${this.publicUrlBase}/${row.objectKey}` } };
+		return `${this.publicUrlBase}/${row.objectKey}`;
 	}
 
 	async delete(id: string): Promise<void> {

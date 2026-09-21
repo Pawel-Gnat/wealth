@@ -92,9 +92,9 @@ describe("Storage service", () => {
 			.where(eq(storageTable.id, id))
 			.limit(1);
 
-		await expect(storageService.getPublicUrl(id)).resolves.toEqual({
-			data: { url: `${PUBLIC_URL_BASE}/${row?.objectKey}` },
-		});
+		await expect(storageService.resolvePublicUrl(id)).resolves.toBe(
+			`${PUBLIC_URL_BASE}/${row?.objectKey}`,
+		);
 	});
 
 	it("deletes the object and row", async () => {
@@ -114,9 +114,9 @@ describe("Storage service", () => {
 		expect(row).toBeUndefined();
 	});
 
-	it("throws when the storage row is missing", async () => {
+	it("returns null when the storage row is missing", async () => {
 		await expect(
-			storageService.getPublicUrl("01ARZ3NDEKTSV4RRFFQ69G5FAZ"),
-		).rejects.toThrow("Storage object not found");
+			storageService.resolvePublicUrl("01ARZ3NDEKTSV4RRFFQ69G5FAZ"),
+		).resolves.toBeNull();
 	});
 });

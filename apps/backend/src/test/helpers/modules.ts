@@ -34,6 +34,9 @@ export async function createAuthTestingModule(overrides?: {
 					delete:
 						overrides?.storageService?.delete ??
 						vi.fn().mockResolvedValue(undefined),
+					resolvePublicUrl:
+						overrides?.storageService?.resolvePublicUrl ??
+						vi.fn().mockResolvedValue(null),
 				},
 			},
 		],

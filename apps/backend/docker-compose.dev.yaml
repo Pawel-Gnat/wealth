@@ -45,7 +45,6 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      STORAGE_BUCKET: ${STORAGE_BUCKET}
     volumes:
       - ./minio/public-avatars-policy.json:/config/public-avatars-policy.json:ro
     entrypoint: /bin/sh
@@ -55,8 +54,8 @@ services:
         until mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do
           sleep 1
         done
-        mc mb --ignore-existing "local/$$STORAGE_BUCKET"
-        mc anonymous set-json /config/public-avatars-policy.json "local/$$STORAGE_BUCKET"
+        mc mb --ignore-existing local/wealth-storage
+        mc anonymous set-json /config/public-avatars-policy.json local/wealth-storage
 
 volumes:
   postgres-data:

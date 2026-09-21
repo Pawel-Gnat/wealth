@@ -26,7 +26,6 @@ import { meContract } from "./me.contract";
 import { refreshContract } from "./refresh.contract";
 import { signInContract } from "./signin.contract";
 import { signUpContract } from "./signup.contract";
-import { storageGetContract } from "./storage.contract";
 
 export const rpcContract = populateContractRouterPaths({
 	user: {
@@ -40,9 +39,6 @@ export const rpcContract = populateContractRouterPaths({
 		password: userEditPasswordContract,
 		details: userEditDetailsContract,
 		avatar: userEditAvatarContract,
-	},
-	storage: {
-		get: storageGetContract,
 	},
 	expenses: {
 		create: createExpenseContract,
