@@ -15,14 +15,14 @@ import { StorageService } from "./storage.service.js";
 			provide: S3_CLIENT,
 			useFactory: (configService: ConfigService) =>
 				new S3Client({
-					region: configService.getOrThrow<string>("STORAGE_REGION"),
-					endpoint: configService.getOrThrow<string>("STORAGE_ENDPOINT"),
-					forcePathStyle:
-						configService.get<string>("STORAGE_FORCE_PATH_STYLE") === "true",
+					region: configService.getOrThrow<string>("AWS_REGION"),
+					endpoint: configService.getOrThrow<string>("AWS_ENDPOINT_URL_S3"),
+					forcePathStyle: true,
 					credentials: {
-						accessKeyId: configService.getOrThrow<string>("STORAGE_ACCESS_KEY"),
-						secretAccessKey:
-							configService.getOrThrow<string>("STORAGE_SECRET_KEY"),
+						accessKeyId: configService.getOrThrow<string>("AWS_ACCESS_KEY_ID"),
+						secretAccessKey: configService.getOrThrow<string>(
+							"AWS_SECRET_ACCESS_KEY",
+						),
 					},
 				}),
 			inject: [ConfigService],
