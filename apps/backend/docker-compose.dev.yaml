@@ -35,7 +35,28 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio-data:/data
-      - ./minio.license:/minio.license:ro
+      - ./minio/minio.license:/minio.license:ro
+
+  minio-init:
+    image: quay.io/minio/aistor/mc:latest
+    container_name: wealth-minio-init
+    depends_on:
+      - minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      STORAGE_BUCKET: ${STORAGE_BUCKET}
+    volumes:
+      - ./minio/public-avatars-policy.json:/config/public-avatars-policy.json:ro
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        until mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do
+          sleep 1
+        done
+        mc mb --ignore-existing "local/$$STORAGE_BUCKET"
+        mc anonymous set-json /config/public-avatars-policy.json "local/$$STORAGE_BUCKET"
 
 volumes:
   postgres-data:

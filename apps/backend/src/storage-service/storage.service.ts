@@ -1,6 +1,5 @@
 import {
 	DeleteObjectCommand,
-	PutBucketPolicyCommand,
 	PutObjectCommand,
 	type S3Client,
 } from "@aws-sdk/client-s3";
@@ -20,7 +19,6 @@ import type { UploadAvatarInput } from "./types/storage.js";
 export class StorageService {
 	private readonly bucket: string;
 	private readonly publicUrlBase: string;
-	private publicAvatarReadReady = false;
 
 	constructor(
 		@Inject(S3_CLIENT) private readonly s3: S3Client,
@@ -36,8 +34,6 @@ export class StorageService {
 	}> {
 		const objectKey = `avatars/${userId}/${ulid()}_${sanitizeFileName(file.name)}`;
 		const body = Buffer.from(await file.arrayBuffer());
-
-		await this.ensurePublicAvatarRead();
 
 		await this.s3.send(
 			new PutObjectCommand({
@@ -103,30 +99,5 @@ export class StorageService {
 		);
 
 		await this.db.delete(storageTable).where(eq(storageTable.id, id));
-	}
-
-	private async ensurePublicAvatarRead() {
-		if (this.publicAvatarReadReady) {
-			return;
-		}
-
-		await this.s3.send(
-			new PutBucketPolicyCommand({
-				Bucket: this.bucket,
-				Policy: JSON.stringify({
-					Version: "2012-10-17",
-					Statement: [
-						{
-							Sid: "PublicReadAvatars",
-							Effect: "Allow",
-							Principal: { AWS: ["*"] },
-							Action: ["s3:GetObject"],
-							Resource: [`arn:aws:s3:::${this.bucket}/avatars/*`],
-						},
-					],
-				}),
-			}),
-		);
-		this.publicAvatarReadReady = true;
 	}
 }

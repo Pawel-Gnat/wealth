@@ -1,8 +1,4 @@
-import {
-	DeleteObjectCommand,
-	PutBucketPolicyCommand,
-	PutObjectCommand,
-} from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
@@ -70,10 +66,9 @@ describe("Storage service", () => {
 		const { id } = await upload("avatar_name.jpg");
 
 		expect(id).toBeTruthy();
-		expect(send.mock.calls[0]?.[0]).toBeInstanceOf(PutBucketPolicyCommand);
-		expect(send.mock.calls[1]?.[0]).toBeInstanceOf(PutObjectCommand);
+		expect(send.mock.calls[0]?.[0]).toBeInstanceOf(PutObjectCommand);
 
-		const command = send.mock.calls[1]?.[0] as PutObjectCommand;
+		const command = send.mock.calls[0]?.[0];
 
 		expect(command).toBeInstanceOf(PutObjectCommand);
 		expect(command.input.Bucket).toBe(BUCKET);

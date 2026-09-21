@@ -1,4 +1,4 @@
-Local MinIO (object storage in `docker-compose.dev.yaml`) requires a personal MinIO license file at `apps/backend/minio.license` (same folder as the compose file, gitignored). Without a valid license the container can start, but all S3 operations are denied.
+Local MinIO (object storage in `docker-compose.dev.yaml`) requires a personal MinIO license file at `apps/backend/minio/minio.license` (gitignored). Without a valid license the container can start, but all S3 operations are denied.
 
 `docker-compose -f docker-compose.dev.yaml up -d` to instantiate postgres db container
 -f means to read specific file

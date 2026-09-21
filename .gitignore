@@ -75,4 +75,4 @@ playwright/.auth/
 .ai
 
 # Local MinIO license
-apps/backend/minio.license
+apps/backend/minio/minio.license
