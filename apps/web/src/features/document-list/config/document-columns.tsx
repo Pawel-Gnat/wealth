@@ -6,14 +6,7 @@ import {
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TFunction } from "i18next";
 import { Link } from "react-router";
-import {
-	ButtonDestructive,
-	ButtonSecondary,
-	Icon,
-	Price,
-	Text,
-	Tooltip,
-} from "@/shared/components";
+import { Button, Icon, Price, Text, Tooltip } from "@/shared/components";
 
 type DocumentColumnsProps = {
 	t: TFunction<"common">;
@@ -87,24 +80,25 @@ export const documentColumns = ({
 					<div className="flex items-center gap-2 justify-end">
 						<Tooltip
 							trigger={
-								<ButtonSecondary asChild size="icon">
+								<Button variant="secondary" asChild size="icon">
 									<Link to={getEditPath(row.original.id)}>
 										<Icon name="edit" />
 										<span className="sr-only">{editText}</span>
 									</Link>
-								</ButtonSecondary>
+								</Button>
 							}
 							text={editText}
 						/>
 						<Tooltip
 							trigger={
-								<ButtonDestructive
+								<Button
+									variant="destructive"
 									size="icon"
 									onClick={() => onDelete(row.original.id)}
 								>
 									<Icon name="delete" />
 									<span className="sr-only">{deleteText}</span>
-								</ButtonDestructive>
+								</Button>
 							}
 							text={deleteText}
 						/>

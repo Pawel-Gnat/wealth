@@ -6,7 +6,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/shared/lib/ui/popover";
-import { ButtonInput } from "../button/button";
+import { Button } from "../button";
 import { Icon } from "../icons";
 import { FormBase, type FormControlFunction } from "./form-base";
 
@@ -16,10 +16,10 @@ export const FormDatePicker: FormControlFunction = (props) => {
 			{({ onChange, value, ...field }) => (
 				<Popover>
 					<PopoverTrigger asChild>
-						<ButtonInput className="w-full" {...field}>
+						<Button variant="input" className="w-full" {...field}>
 							<Icon name="calendar" />
 							{format(value, "PPP")}
-						</ButtonInput>
+						</Button>
 					</PopoverTrigger>
 					<PopoverContent className="w-auto p-0" align="start">
 						<Calendar

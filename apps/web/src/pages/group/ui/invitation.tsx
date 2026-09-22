@@ -1,13 +1,6 @@
 import type { BudgetMember } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
-import {
-	Badge,
-	ButtonDestructive,
-	ButtonPrimary,
-	Icon,
-	Text,
-	Tooltip,
-} from "@/shared/components";
+import { Badge, Button, Icon, Text, Tooltip } from "@/shared/components";
 import { TextMuted } from "@/shared/components/typography/text";
 import { AvatarGroup } from "@/shared/widgets/avatar-group";
 
@@ -62,23 +55,23 @@ export const Invitation = ({
 					<>
 						<Tooltip
 							trigger={
-								<ButtonDestructive size="icon" onClick={() => {}}>
+								<Button variant="destructive" size="icon" onClick={() => {}}>
 									<Icon name="reject" />
 									<span className="sr-only">
 										{t("action.reject", { ns: "common" })}
 									</span>
-								</ButtonDestructive>
+								</Button>
 							}
 							text={t("action.reject", { ns: "common" })}
 						/>
 						<Tooltip
 							trigger={
-								<ButtonPrimary size="icon">
+								<Button size="icon">
 									<Icon name="accept" />
 									<span className="sr-only">
 										{t("action.accept", { ns: "common" })}
 									</span>
-								</ButtonPrimary>
+								</Button>
 							}
 							text={t("action.accept", { ns: "common" })}
 						/>
@@ -86,12 +79,12 @@ export const Invitation = ({
 				) : (
 					<Tooltip
 						trigger={
-							<ButtonDestructive size="icon" onClick={() => {}}>
+							<Button variant="destructive" size="icon" onClick={() => {}}>
 								<Icon name="reject" />
 								<span className="sr-only">
 									{t("action.cancel", { ns: "common" })}
 								</span>
-							</ButtonDestructive>
+							</Button>
 						}
 						text={t("action.cancel", { ns: "common" })}
 					/>

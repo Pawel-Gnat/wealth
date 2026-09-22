@@ -9,7 +9,7 @@ import {
 	DialogTrigger,
 	Dialog as DialogUI,
 } from "@/shared/lib/ui/dialog";
-import { ButtonPrimary } from "../button";
+import { Button } from "../button";
 
 type DialogProps = {
 	triggerText: string;
@@ -31,7 +31,7 @@ export const Dialog = ({
 	return (
 		<DialogUI>
 			<DialogTrigger asChild>
-				<ButtonPrimary>{triggerText}</ButtonPrimary>
+				<Button>{triggerText}</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
@@ -41,9 +41,7 @@ export const Dialog = ({
 				{children}
 				<DialogFooter className="sm:justify-start">
 					<DialogClose asChild>
-						<ButtonPrimary>
-							{closeText || t("action.cancel", { ns: "common" })}
-						</ButtonPrimary>
+						<Button>{closeText || t("action.cancel", { ns: "common" })}</Button>
 					</DialogClose>
 				</DialogFooter>
 			</DialogContent>

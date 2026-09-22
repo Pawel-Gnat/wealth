@@ -1,7 +1,7 @@
 import { cn } from "cn";
 import type { ReactNode, SubmitEventHandler } from "react";
 import { useTranslation } from "react-i18next";
-import { ButtonPrimary } from "@/shared/components/button";
+import { Button } from "@/shared/components/button";
 
 type FormProps = {
 	onSubmit: SubmitEventHandler<HTMLFormElement>;
@@ -26,13 +26,13 @@ export const Form = ({
 		<form onSubmit={onSubmit} className={cn("space-y-6", className)}>
 			<div className="space-y-4">{children}</div>
 			<div className="flex *:w-full">
-				<ButtonPrimary
+				<Button
 					type="submit"
 					disabled={submitDisabled || isPending}
 					isLoading={isPending}
 				>
 					{submitText || t("action.save", { ns: "common" })}
-				</ButtonPrimary>
+				</Button>
 			</div>
 		</form>
 	);

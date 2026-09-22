@@ -3,7 +3,7 @@ import { Outlet } from "react-router";
 import { useAuth, useUser } from "@/context/auth";
 import {
 	Breadcrumbs,
-	ButtonPrimary,
+	Button,
 	Separator,
 	Sidebar,
 	SidebarTrigger,
@@ -27,7 +27,7 @@ export function DashboardLayout() {
 				</Text>
 			}
 			navigation={<Navigation />}
-			footer={<ButtonPrimary onClick={() => logout()}>Logout</ButtonPrimary>}
+			footer={<Button onClick={() => logout()}>Logout</Button>}
 		>
 			<div className="flex items-center gap-2 pr-2">
 				<SidebarTrigger />

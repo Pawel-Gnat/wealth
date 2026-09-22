@@ -8,7 +8,7 @@ import {
 	AttachmentTitle,
 	Attachment as AttachmentUI,
 } from "@/shared/lib/ui/attachment";
-import { ButtonInput } from "../button/button";
+import { Button } from "../button";
 import { Icon } from "../icons";
 
 type AttachmentProps = {
@@ -44,13 +44,14 @@ export const Attachment = ({
 				)}
 			</AttachmentContent>
 			<AttachmentActions>
-				<ButtonInput
+				<Button
+					variant="input"
 					size="icon"
 					aria-label={t("action.remove", { ns: "common", fileName: title })}
 					onClick={onRemove}
 				>
 					<Icon name="delete" />
-				</ButtonInput>
+				</Button>
 			</AttachmentActions>
 		</AttachmentUI>
 	);

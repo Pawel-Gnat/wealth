@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { ButtonPrimary, ErrorState } from "@/shared/components";
+import { Button, ErrorState } from "@/shared/components";
 
 type SessionResolveErrorProps = {
 	onRetry: () => void;
@@ -14,9 +14,7 @@ export const SessionResolveError = ({ onRetry }: SessionResolveErrorProps) => {
 				title={t("session.resolve-error.title", { ns: "auth" })}
 				description={t("session.resolve-error.description", { ns: "auth" })}
 			/>
-			<ButtonPrimary type="button" onClick={onRetry}>
-				{t("action.retry")}
-			</ButtonPrimary>
+			<Button onClick={onRetry}>{t("action.retry")}</Button>
 		</div>
 	);
 };

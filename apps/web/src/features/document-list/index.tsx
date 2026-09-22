@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { getDocumentConfig } from "@/features/config/document-config";
 import type { RecordKind } from "@/features/model/record-kind";
-import { ButtonSecondary, Card, Icon } from "@/shared/components";
+import { Button, Card, Icon } from "@/shared/components";
 import { PageLayout } from "@/shared/layouts";
 import { DocumentTable } from "./ui/document-table";
 
@@ -21,12 +21,12 @@ export const DocumentList = ({ kind }: DocumentListProps) => {
 		>
 			<Card
 				actions={
-					<ButtonSecondary className="w-fit ml-auto" asChild>
+					<Button variant="secondary" className="w-fit ml-auto" asChild>
 						<Link to={config.addRoute}>
 							<Icon name="add" />
 							{t("action.add", { ns: "common" })}
 						</Link>
-					</ButtonSecondary>
+					</Button>
 				}
 			>
 				<DocumentTable kind={kind} />

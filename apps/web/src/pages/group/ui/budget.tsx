@@ -1,13 +1,6 @@
 import type { BudgetMember } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
-import {
-	Badge,
-	ButtonDestructive,
-	ButtonSecondary,
-	Icon,
-	Text,
-	Tooltip,
-} from "@/shared/components";
+import { Badge, Button, Icon, Text, Tooltip } from "@/shared/components";
 import { AvatarGroup } from "@/shared/widgets/avatar-group";
 
 type BudgetProps = {
@@ -40,34 +33,34 @@ export const Budget = ({ title, members, userId }: BudgetProps) => {
 					<>
 						<Tooltip
 							trigger={
-								<ButtonSecondary size="icon">
+								<Button variant="secondary" size="icon">
 									<Icon name="addUser" />
 									<span className="sr-only">
 										{t("action.add", { ns: "common" })}
 									</span>
-								</ButtonSecondary>
+								</Button>
 							}
 							text={t("action.add", { ns: "common" })}
 						/>
 						<Tooltip
 							trigger={
-								<ButtonSecondary size="icon">
+								<Button variant="secondary" size="icon">
 									<Icon name="edit" />
 									<span className="sr-only">
 										{t("action.edit", { ns: "common" })}
 									</span>
-								</ButtonSecondary>
+								</Button>
 							}
 							text={t("action.edit", { ns: "common" })}
 						/>
 						<Tooltip
 							trigger={
-								<ButtonDestructive size="icon" onClick={() => {}}>
+								<Button variant="destructive" size="icon" onClick={() => {}}>
 									<Icon name="delete" />
 									<span className="sr-only">
 										{t("action.delete", { ns: "common" })}
 									</span>
-								</ButtonDestructive>
+								</Button>
 							}
 							text={t("action.delete", { ns: "common" })}
 						/>
@@ -75,12 +68,12 @@ export const Budget = ({ title, members, userId }: BudgetProps) => {
 				) : (
 					<Tooltip
 						trigger={
-							<ButtonDestructive size="icon" onClick={() => {}}>
+							<Button variant="destructive" size="icon" onClick={() => {}}>
 								<Icon name="leave" />
 								<span className="sr-only">
 									{t("action.leave", { ns: "common" })}
 								</span>
-							</ButtonDestructive>
+							</Button>
 						}
 						text={t("action.leave", { ns: "common" })}
 					/>
