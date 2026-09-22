@@ -7,7 +7,7 @@ export const periodValues = [7, DEFAULT_PERIOD] as const;
 export const periodEnumSchema = z.coerce.number().pipe(z.literal(periodValues));
 export const periodSchema = periodEnumSchema.default(DEFAULT_PERIOD);
 
-export const dashboardPeriodInputSchema = z.object({
+export const dashboardPeriodParamsSchema = z.object({
 	days: periodSchema,
 });
 

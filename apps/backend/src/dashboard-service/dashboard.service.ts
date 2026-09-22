@@ -22,21 +22,25 @@ import type { AmountRow } from "./types/amount-row.js";
 export class DashboardService {
 	constructor(@Inject(DBS.APP) private readonly db: NodePgDatabase) {}
 
-	async getSummary(userId: string, timeZone: string): Promise<SummaryResponse> {
+	async getSummary(
+		userId: string,
+		days: Period,
+		timeZone: string,
+	): Promise<SummaryResponse> {
 		const today = getTodayInTimeZone(timeZone);
-		const currentMonthStart = this.getCurrentMonthStart(today);
-		const previousPeriod = this.getPreviousPeriodBounds(today);
+		const currentStart = this.getRollingRangeStart(today, days);
+		const previousPeriod = this.getPreviousRollingPeriodBounds(today, days);
 
 		const [currentExpenses, previousExpenses, currentIncomes, previousIncomes] =
 			await Promise.all([
-				this.fetchSumInRange(userId, currentMonthStart, today, "expense"),
+				this.fetchSumInRange(userId, currentStart, today, "expense"),
 				this.fetchSumInRange(
 					userId,
 					previousPeriod.start,
 					previousPeriod.end,
 					"expense",
 				),
-				this.fetchSumInRange(userId, currentMonthStart, today, "income"),
+				this.fetchSumInRange(userId, currentStart, today, "income"),
 				this.fetchSumInRange(
 					userId,
 					previousPeriod.start,
@@ -45,7 +49,7 @@ export class DashboardService {
 				),
 			]);
 
-		const currentDays = this.countDaysInRange(currentMonthStart, today);
+		const currentDays = this.countDaysInRange(currentStart, today);
 		const previousDays = this.countDaysInRange(
 			previousPeriod.start,
 			previousPeriod.end,
@@ -224,38 +228,23 @@ export class DashboardService {
 		return totals;
 	}
 
-	private getCurrentMonthStart(today: string): string {
-		return `${today.slice(0, 7)}-01`;
-	}
-
 	private getRollingRangeStart(today: string, days: Period): string {
 		return this.addDaysToStoredDate(today, -(days - 1));
 	}
 
-	private getPreviousPeriodBounds(today: string): {
+	private getPreviousRollingPeriodBounds(
+		today: string,
+		days: Period,
+	): {
 		start: string;
 		end: string;
 	} {
-		const date = decodeDocumentDateFromStorage(today);
-		const year = date.getUTCFullYear();
-		const month = date.getUTCMonth();
-		const day = date.getUTCDate();
-		const previousMonth = month === 0 ? 11 : month - 1;
-		const previousYear = month === 0 ? year - 1 : year;
-		const lastDayOfPreviousMonth = new Date(
-			Date.UTC(year, month, 0, 12, 0, 0, 0),
-		).getUTCDate();
-		const clampedDay = Math.min(day, lastDayOfPreviousMonth);
+		const currentStart = this.getRollingRangeStart(today, days);
+		const previousEnd = this.addDaysToStoredDate(currentStart, -1);
 
 		return {
-			start: encodeDocumentDateForStorage(
-				new Date(Date.UTC(previousYear, previousMonth, 1, 12, 0, 0, 0)),
-			),
-			end: encodeDocumentDateForStorage(
-				new Date(
-					Date.UTC(previousYear, previousMonth, clampedDay, 12, 0, 0, 0),
-				),
-			),
+			start: this.addDaysToStoredDate(previousEnd, -(days - 1)),
+			end: previousEnd,
 		};
 	}
 

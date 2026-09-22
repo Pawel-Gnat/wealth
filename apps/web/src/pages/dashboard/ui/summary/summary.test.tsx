@@ -1,3 +1,4 @@
+import { DEFAULT_PERIOD } from "@repo/api/schemas";
 import { screen, waitFor } from "@testing-library/react";
 import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
@@ -22,15 +23,39 @@ describe("Summary", () => {
 			),
 		);
 
-		renderWithProviders(<Summary />);
+		renderWithProviders(<Summary days={DEFAULT_PERIOD} />);
 
 		expect(
 			await screen.findByText(t("summary.error.title", { ns: "dashboard" })),
 		).toBeInTheDocument();
 	});
 
+	it("requests summary data for the provided period", async () => {
+		let days: string | null = null;
+
+		server.use(
+			http.get("*/dashboard/summary", ({ request }) => {
+				days = new URL(request.url).searchParams.get("days");
+
+				return HttpResponse.json({
+					data: {
+						expenses: { amount: 100, percentChange: 12.5 },
+						incomes: { amount: 250, percentChange: null },
+						netBalance: { amount: 150, percentChange: -3.2 },
+					},
+				});
+			}),
+		);
+
+		renderWithProviders(<Summary days={7} />);
+
+		await waitFor(() => {
+			expect(days).toBe("7");
+		});
+	});
+
 	it("renders summary amounts and percent badges", async () => {
-		renderWithProviders(<Summary />);
+		renderWithProviders(<Summary days={DEFAULT_PERIOD} />);
 
 		await waitFor(() => {
 			expect(screen.getByText(formatPrice(100, "en"))).toBeInTheDocument();
@@ -68,7 +93,7 @@ describe("Summary", () => {
 			),
 		);
 
-		renderWithProviders(<Summary />);
+		renderWithProviders(<Summary days={DEFAULT_PERIOD} />);
 
 		expect(
 			await screen.findAllByText(t("summary.empty", { ns: "dashboard" })),
@@ -88,7 +113,9 @@ describe("Summary", () => {
 			}),
 		);
 
-		const { container } = renderWithProviders(<Summary />);
+		const { container } = renderWithProviders(
+			<Summary days={DEFAULT_PERIOD} />,
+		);
 
 		await waitFor(() => {
 			expect(

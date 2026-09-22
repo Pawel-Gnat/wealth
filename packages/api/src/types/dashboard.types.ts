@@ -3,7 +3,7 @@ import type {
 	dashboardChartDataSchema,
 	dashboardChartPointSchema,
 	dashboardChartResponseSchema,
-	dashboardPeriodInputSchema,
+	dashboardPeriodParamsSchema,
 	periodValues,
 	summaryDataSchema,
 	summaryKindSchema,
@@ -12,7 +12,7 @@ import type {
 } from "../schemas/dashboard.schema";
 
 export type Period = (typeof periodValues)[number];
-export type DashboardPeriodInput = z.infer<typeof dashboardPeriodInputSchema>;
+export type DashboardPeriodParams = z.infer<typeof dashboardPeriodParamsSchema>;
 export type Summary = z.infer<typeof summarySchema>;
 export type SummaryData = z.infer<typeof summaryDataSchema>;
 export type SummaryKind = z.infer<typeof summaryKindSchema>;

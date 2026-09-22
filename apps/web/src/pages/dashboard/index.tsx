@@ -19,7 +19,7 @@ export const DashboardPage = () => {
 			subtitle={t("subtitle", { ns: "dashboard" })}
 		>
 			<PeriodToggle value={period} onValueChange={setPeriod} />
-			<Summary />
+			<Summary days={period} />
 			<ChartLegend />
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 				<DailyChartSection days={period} />

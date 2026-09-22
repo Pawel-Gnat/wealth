@@ -2,9 +2,9 @@ import type { z } from "zod";
 import type {
 	documentCreatePayloadSchema,
 	documentDetailsResponseSchema,
-	documentGetPayloadSchema,
 	documentListItemSchema,
 	documentListResponseSchema,
+	documentParamsSchema,
 	documentSchema,
 	documentUpdatePayloadSchema,
 	expenseDocumentCreateResponseDataSchema,
@@ -55,7 +55,7 @@ export type IncomeDocumentUpdateResponseData = z.infer<
 export type IncomeDocumentUpdateResponse = z.infer<
 	typeof incomeDocumentUpdateResponseSchema
 >;
-export type DocumentGetPayload = z.infer<typeof documentGetPayloadSchema>;
+export type DocumentParams = z.infer<typeof documentParamsSchema>;
 export type ExpenseDocumentDeleteResponseData = z.infer<
 	typeof expenseDocumentDeleteResponseDataSchema
 >;

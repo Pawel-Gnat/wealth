@@ -1,4 +1,5 @@
 import { summaryKinds } from "@repo/api/schemas";
+import type { Period } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 
 import { useDashboardSummary } from "@/pages/dashboard/hooks/use-dashboard-summary";
@@ -6,11 +7,15 @@ import { Card, ErrorState } from "@/shared/components";
 import { getSummaryTitle } from "./helpers/summary-label.helpers";
 import { SummaryMetric } from "./summary-metric";
 
-export const Summary = () => {
-	const { t } = useTranslation();
-	const { data, isLoading, isError } = useDashboardSummary();
+type SummaryProps = {
+	days: Period;
+};
 
-	if (isError || (!isLoading && !data)) {
+export const Summary = ({ days }: SummaryProps) => {
+	const { t } = useTranslation();
+	const { data, isLoading, isError } = useDashboardSummary({ days });
+
+	if (isError) {
 		return (
 			<Card>
 				<ErrorState
@@ -32,7 +37,7 @@ export const Summary = () => {
 					kind={kind}
 					title={getSummaryTitle(t, kind)}
 					summary={data?.[kind]}
-					isLoading={isLoading}
+					isLoading={isLoading || data == null}
 				/>
 			))}
 		</Card>

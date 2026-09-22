@@ -78,6 +78,7 @@ Conventions:
 ## API schemas (`@repo/api`)
 
 - All Zod schemas live in `packages/api/src/schemas/` only — do not define validation schemas in `apps/web` or `apps/backend`.
+- Request schemas: write (body) → `*PayloadSchema`; read (query/path) → `*ParamsSchema`.
 
 ## Web tests (MSW)
 

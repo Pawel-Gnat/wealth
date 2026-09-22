@@ -48,7 +48,15 @@ export const CardState = <T,>(props: CardStateProps<T>) => {
 		errorDescription,
 	} = props;
 
-	if (isLoading) {
+	if (isError) {
+		return (
+			<Card title={title} subtitle={subtitle} className={className}>
+				<ErrorState title={errorTitle} description={errorDescription} />
+			</Card>
+		);
+	}
+
+	if (isLoading || data == null) {
 		return (
 			<Card
 				title={title}
@@ -57,14 +65,6 @@ export const CardState = <T,>(props: CardStateProps<T>) => {
 				className={className}
 			>
 				<Skeleton className={skeletonClassName} />
-			</Card>
-		);
-	}
-
-	if (isError || data == null) {
-		return (
-			<Card title={title} subtitle={subtitle} className={className}>
-				<ErrorState title={errorTitle} description={errorDescription} />
 			</Card>
 		);
 	}
