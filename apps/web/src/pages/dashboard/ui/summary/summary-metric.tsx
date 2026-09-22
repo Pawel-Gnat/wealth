@@ -2,8 +2,7 @@ import type { Summary, SummaryKind } from "@repo/api/types";
 import { cn } from "cn";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Badge, Icon, Price, Skeleton } from "@/shared/components";
-import { TextMuted } from "@/shared/components/typography/text";
+import { Badge, Icon, Price, Skeleton, Text } from "@/shared/components";
 import { formatPercentChange } from "../../helpers/format-percent-change";
 import { getTrendBadgeVariant } from "../../helpers/get-trend-badge-variant";
 
@@ -57,7 +56,9 @@ export const SummaryMetric = ({
 				name={icon}
 				className={cn("size-8 p-2 rounded-full", iconClassName)}
 			/>
-			<TextMuted size="sm">{title}</TextMuted>
+			<Text size="sm" color="muted">
+				{title}
+			</Text>
 
 			{isLoading || summary == null ? (
 				<Skeleton className="h-7 w-14" />
@@ -73,18 +74,18 @@ export const SummaryMetric = ({
 			{isLoading || summary == null ? (
 				<Skeleton className="h-4 w-40" />
 			) : summary.amount === 0 ? (
-				<TextMuted size="xs">
+				<Text size="xs" color="muted">
 					{t("summary.empty", { ns: "dashboard" })}
-				</TextMuted>
+				</Text>
 			) : (
 				summary.percentChange !== null && (
 					<div className="flex flex-wrap items-center gap-2">
 						<Badge variant={getTrendBadgeVariant(kind, summary.percentChange)}>
 							{formatPercentChange(summary.percentChange)}
 						</Badge>
-						<TextMuted size="xs">
+						<Text size="xs" color="muted">
 							{t("summary.vs-previous-period", { ns: "dashboard" })}
-						</TextMuted>
+						</Text>
 					</div>
 				)
 			)}

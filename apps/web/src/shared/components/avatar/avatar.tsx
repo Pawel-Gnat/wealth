@@ -10,7 +10,7 @@ import {
 	AvatarImage,
 	Avatar as AvatarUI,
 } from "@/shared/lib/ui/avatar";
-import { avatarVariants } from "./config/avatar.config";
+import { avatarVariants } from "./avatar.variants";
 
 type AvatarProps = {
 	user: User;

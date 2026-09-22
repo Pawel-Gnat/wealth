@@ -1,7 +1,7 @@
 import { type ComponentProps, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { TextError } from "../typography";
+import { Text } from "../typography";
 
 type FieldErrorProps = ComponentProps<"div"> & {
 	errors?: Array<{ message?: string } | undefined>;
@@ -31,7 +31,9 @@ export function FieldError({
 		if (uniqueErrors.length === 1) {
 			const msg = uniqueErrors[0]?.message;
 			return msg ? (
-				<TextError size="xs">{String(t(msg as never))}</TextError>
+				<Text size="xs" color="destructive" weight="bold">
+					{String(t(msg as never))}
+				</Text>
 			) : null;
 		}
 
@@ -41,7 +43,9 @@ export function FieldError({
 					const msg = error?.message;
 					return msg ? (
 						<li key={msg}>
-							<TextError size="xs">{String(t(msg as never))}</TextError>
+							<Text size="xs" color="destructive" weight="bold">
+								{String(t(msg as never))}
+							</Text>
 						</li>
 					) : null;
 				})}

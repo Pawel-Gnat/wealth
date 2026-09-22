@@ -6,7 +6,7 @@ import {
 	type buttonVariants as shadcnButtonVariants,
 } from "@/shared/lib/ui/button";
 import { Icon } from "../icons";
-import { buttonVariants } from "./config/button.config";
+import { buttonVariants } from "./button.variants";
 
 type ButtonProps = {
 	children: ReactNode;

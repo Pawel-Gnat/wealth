@@ -25,7 +25,7 @@ export const ChartTooltip = ({ chartConfig, language }: ChartTooltipProps) => {
 								}}
 							/>
 							<div className="flex flex-1 items-center justify-between gap-2 leading-none">
-								<Text as="span" size="xs" className="text-muted-foreground">
+								<Text as="span" size="xs" color="muted">
 									{chartConfig[name as keyof typeof chartConfig]?.label ?? name}
 								</Text>
 								<Price

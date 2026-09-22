@@ -1,61 +1,36 @@
 import { cn } from "cn";
-import type { HTMLAttributes, ReactNode } from "react";
+import {
+	type TextColor,
+	type TextSize,
+	type TextWeight,
+	textVariants,
+} from "./text.variants";
 
 export type TextProps = {
-	children: ReactNode;
 	as?: "p" | "span";
-	size?: "xxs" | "xs" | "sm" | "base" | "lg";
-	weight?: "normal" | "medium" | "bold";
-	className?: string;
-} & HTMLAttributes<HTMLParagraphElement>;
+	size?: TextSize | undefined;
+	color?: TextColor | undefined;
+	weight?: TextWeight;
+} & React.HTMLAttributes<HTMLParagraphElement>;
 
-const sizeClasses: Record<NonNullable<TextProps["size"]>, string> = {
-	xxs: "text-xxs leading-xxs",
-	xs: "text-xs leading-xs",
-	sm: "text-sm leading-sm",
-	base: "text-base leading-base",
-	lg: "text-lg leading-lg",
-};
-
-type BaseTextProps = TextProps & {
-	toneClassName: string;
-};
-
-export const BaseText = ({
-	children,
+export const Text = ({
 	className,
 	as = "p",
 	size = "base",
 	weight = "normal",
-	toneClassName,
-	...rest
-}: BaseTextProps) => {
-	const Component = as;
-	const sizeClass = sizeClasses[size];
-	const weightClass = `font-${weight}`;
+	color = "default",
+	...props
+}: TextProps) => {
+	const Tag = as;
 
 	return (
-		<Component
-			className={cn(toneClassName, sizeClass, weightClass, className)}
-			{...rest}
+		<Tag
+			data-slot="text"
+			data-tone={color}
+			className={cn(textVariants({ size, weight, color }), className)}
+			{...props}
 		>
-			{children}
-		</Component>
+			{props.children}
+		</Tag>
 	);
 };
-
-export const Text = (props: TextProps) => (
-	<BaseText {...props} toneClassName="" />
-);
-
-export const TextSecondary = (props: TextProps) => (
-	<BaseText {...props} toneClassName="text-primary" />
-);
-
-export const TextMuted = (props: TextProps) => (
-	<BaseText {...props} toneClassName="text-muted-foreground" />
-);
-
-export const TextError = ({ weight = "bold", ...props }: TextProps) => (
-	<BaseText {...props} weight={weight} toneClassName="text-destructive" />
-);

@@ -1,7 +1,6 @@
 import type { BudgetMember } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Badge, Button, Icon, Text, Tooltip } from "@/shared/components";
-import { TextMuted } from "@/shared/components/typography/text";
 import { AvatarGroup } from "@/shared/widgets/avatar-group";
 
 type InvitationProps = {
@@ -47,7 +46,9 @@ export const Invitation = ({
 				</div>
 				<div className="flex items-center gap-2">
 					<AvatarGroup users={members} />
-					<TextMuted size="xs">{subtitle}</TextMuted>
+					<Text size="xs" color="muted">
+						{subtitle}
+					</Text>
 				</div>
 			</div>
 			<div className="flex flex-row gap-2">

@@ -1,6 +1,5 @@
 import type { User } from "@repo/api/types";
 import { Avatar, Text } from "@/shared/components";
-import { TextMuted } from "@/shared/components/typography/text";
 import {
 	getUserFullName,
 	hasUserName,
@@ -20,7 +19,9 @@ export const UserAvatar = ({ user }: UserAvatarProps) => {
 						{getUserFullName(user)}
 					</Text>
 				)}
-				<TextMuted size="sm">{user.email}</TextMuted>
+				<Text size="sm" color="muted">
+					{user.email}
+				</Text>
 			</div>
 		</div>
 	);
