@@ -15,7 +15,7 @@ export const Summary = ({ days }: SummaryProps) => {
 	const { t } = useTranslation();
 	const { data, isLoading, isError } = useDashboardSummary({ days });
 
-	if (isError || (!isLoading && !data)) {
+	if (isError) {
 		return (
 			<Card>
 				<ErrorState
@@ -37,7 +37,7 @@ export const Summary = ({ days }: SummaryProps) => {
 					kind={kind}
 					title={getSummaryTitle(t, kind)}
 					summary={data?.[kind]}
-					isLoading={isLoading}
+					isLoading={isLoading || data == null}
 				/>
 			))}
 		</Card>

@@ -30,6 +30,30 @@ describe("Summary", () => {
 		).toBeInTheDocument();
 	});
 
+	it("requests summary data for the provided period", async () => {
+		let days: string | null = null;
+
+		server.use(
+			http.get("*/dashboard/summary", ({ request }) => {
+				days = new URL(request.url).searchParams.get("days");
+
+				return HttpResponse.json({
+					data: {
+						expenses: { amount: 100, percentChange: 12.5 },
+						incomes: { amount: 250, percentChange: null },
+						netBalance: { amount: 150, percentChange: -3.2 },
+					},
+				});
+			}),
+		);
+
+		renderWithProviders(<Summary days={7} />);
+
+		await waitFor(() => {
+			expect(days).toBe("7");
+		});
+	});
+
 	it("renders summary amounts and percent badges", async () => {
 		renderWithProviders(<Summary days={DEFAULT_PERIOD} />);
 
