@@ -1,16 +1,12 @@
+import type { VariantProps } from "class-variance-authority";
 import { cn } from "cn";
-import {
-	type TextColor,
-	type TextSize,
-	type TextWeight,
-	textVariants,
-} from "./text.variants";
+import { textVariants } from "./text.variants";
 
 export type TextProps = {
 	as?: "p" | "span";
-	size?: TextSize | undefined;
-	color?: TextColor | undefined;
-	weight?: TextWeight;
+	size?: VariantProps<typeof textVariants>["size"];
+	color?: NonNullable<VariantProps<typeof textVariants>["color"]>;
+	weight?: VariantProps<typeof textVariants>["weight"];
 } & React.HTMLAttributes<HTMLParagraphElement>;
 
 export const Text = ({

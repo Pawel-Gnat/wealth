@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
 export const textVariants = cva("", {
 	variants: {
@@ -27,9 +27,3 @@ export const textVariants = cva("", {
 		color: "default",
 	},
 });
-
-export type TextSize = NonNullable<VariantProps<typeof textVariants>["size"]>;
-export type TextWeight = NonNullable<
-	VariantProps<typeof textVariants>["weight"]
->;
-export type TextColor = NonNullable<VariantProps<typeof textVariants>["color"]>;

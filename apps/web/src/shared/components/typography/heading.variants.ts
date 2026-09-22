@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
 export const headingVariants = cva("font-bold", {
 	variants: {
@@ -12,7 +12,3 @@ export const headingVariants = cva("font-bold", {
 		as: "h1",
 	},
 });
-
-export type HeadingTag = NonNullable<
-	VariantProps<typeof headingVariants>["as"]
->;

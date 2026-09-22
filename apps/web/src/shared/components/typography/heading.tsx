@@ -1,8 +1,9 @@
+import type { VariantProps } from "class-variance-authority";
 import { cn } from "cn";
-import { type HeadingTag, headingVariants } from "./heading.variants";
+import { headingVariants } from "./heading.variants";
 
 export type HeadingProps = {
-	as?: HeadingTag;
+	as?: NonNullable<VariantProps<typeof headingVariants>["as"]>;
 } & React.HTMLAttributes<HTMLHeadingElement>;
 
 export const Heading = ({ as = "h1", className, ...props }: HeadingProps) => {
