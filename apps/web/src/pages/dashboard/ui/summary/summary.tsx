@@ -1,4 +1,5 @@
 import { summaryKinds } from "@repo/api/schemas";
+import type { Period } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 
 import { useDashboardSummary } from "@/pages/dashboard/hooks/use-dashboard-summary";
@@ -6,9 +7,13 @@ import { Card, ErrorState } from "@/shared/components";
 import { getSummaryTitle } from "./helpers/summary-label.helpers";
 import { SummaryMetric } from "./summary-metric";
 
-export const Summary = () => {
+type SummaryProps = {
+	days: Period;
+};
+
+export const Summary = ({ days }: SummaryProps) => {
 	const { t } = useTranslation();
-	const { data, isLoading, isError } = useDashboardSummary();
+	const { data, isLoading, isError } = useDashboardSummary({ days });
 
 	if (isError || (!isLoading && !data)) {
 		return (

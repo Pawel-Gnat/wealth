@@ -78,7 +78,7 @@ export const incomeDocumentUpdateResponseSchema = apiPayload(
 	incomeDocumentUpdateResponseDataSchema,
 );
 
-export const documentGetPayloadSchema = z.object({
+export const documentParamsSchema = z.object({
 	id: z.string(),
 });
 

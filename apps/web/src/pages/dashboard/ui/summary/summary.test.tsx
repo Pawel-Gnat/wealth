@@ -1,3 +1,4 @@
+import { DEFAULT_PERIOD } from "@repo/api/schemas";
 import { screen, waitFor } from "@testing-library/react";
 import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
@@ -22,7 +23,7 @@ describe("Summary", () => {
 			),
 		);
 
-		renderWithProviders(<Summary />);
+		renderWithProviders(<Summary days={DEFAULT_PERIOD} />);
 
 		expect(
 			await screen.findByText(t("summary.error.title", { ns: "dashboard" })),
@@ -30,7 +31,7 @@ describe("Summary", () => {
 	});
 
 	it("renders summary amounts and percent badges", async () => {
-		renderWithProviders(<Summary />);
+		renderWithProviders(<Summary days={DEFAULT_PERIOD} />);
 
 		await waitFor(() => {
 			expect(screen.getByText(formatPrice(100, "en"))).toBeInTheDocument();
@@ -68,7 +69,7 @@ describe("Summary", () => {
 			),
 		);
 
-		renderWithProviders(<Summary />);
+		renderWithProviders(<Summary days={DEFAULT_PERIOD} />);
 
 		expect(
 			await screen.findAllByText(t("summary.empty", { ns: "dashboard" })),
@@ -88,7 +89,9 @@ describe("Summary", () => {
 			}),
 		);
 
-		const { container } = renderWithProviders(<Summary />);
+		const { container } = renderWithProviders(
+			<Summary days={DEFAULT_PERIOD} />,
+		);
 
 		await waitFor(() => {
 			expect(

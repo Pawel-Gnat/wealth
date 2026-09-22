@@ -12,7 +12,7 @@ export const queryKeys = {
 	},
 	dashboard: {
 		all: () => ["dashboard"] as const,
-		summary: () => ["dashboard", "summary"] as const,
+		summary: (days: Period) => ["dashboard", "summary", days] as const,
 		cumulativeChart: (days: Period) =>
 			["dashboard", "cumulative-chart", days] as const,
 		dailyChart: (days: Period) => ["dashboard", "daily-chart", days] as const,

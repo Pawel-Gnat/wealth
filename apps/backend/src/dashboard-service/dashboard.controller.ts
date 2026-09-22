@@ -14,11 +14,12 @@ export class DashboardController {
 	@Implement(rpcContract.dashboard.getSummary)
 	getSummaryRpc() {
 		return implement(rpcContract.dashboard.getSummary).handler(
-			({ context }) => {
+			({ context, input }) => {
 				const timeZone = getClientTimeZoneFromHeaders(context.request.headers);
 
 				return this.dashboardService.getSummary(
 					userIdFromRequest(context.request),
+					input.days,
 					timeZone,
 				);
 			},

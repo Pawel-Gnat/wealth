@@ -57,7 +57,7 @@ describe("Dashboard service", () => {
 			});
 
 			await expect(
-				dashboardService.getSummary(user.id, "UTC"),
+				dashboardService.getSummary(user.id, 30, "UTC"),
 			).resolves.toEqual({
 				data: {
 					expenses: { amount: 0, percentChange: null },
@@ -67,7 +67,7 @@ describe("Dashboard service", () => {
 			});
 		});
 
-		it("aggregates current-month totals and net balance", async () => {
+		it("aggregates rolling-period totals and net balance", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
 				passwordHash: "hash",
@@ -85,6 +85,11 @@ describe("Dashboard service", () => {
 					totalAmount: "50",
 					expenseDate: "2026-07-10",
 				},
+				{
+					userId: user.id,
+					totalAmount: "999",
+					expenseDate: "2026-06-15",
+				},
 			]);
 
 			await db.insert(incomeDocumentsTable).values({
@@ -93,11 +98,36 @@ describe("Dashboard service", () => {
 				incomeDate: "2026-07-05",
 			});
 
-			const result = await dashboardService.getSummary(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, 30, "UTC");
 
 			expect(result.data.expenses.amount).toBe(150);
 			expect(result.data.incomes.amount).toBe(300);
 			expect(result.data.netBalance.amount).toBe(150);
+		});
+
+		it("uses a rolling last-7-days window for amounts", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const user = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "dash-summary-7",
+			});
+
+			await db.insert(expenseDocumentsTable).values([
+				{
+					userId: user.id,
+					totalAmount: "40",
+					expenseDate: "2026-07-10",
+				},
+				{
+					userId: user.id,
+					totalAmount: "999",
+					expenseDate: "2026-07-08",
+				},
+			]);
+
+			const result = await dashboardService.getSummary(user.id, 7, "UTC");
+
+			expect(result.data.expenses.amount).toBe(40);
 		});
 
 		it("returns percentChange null when the previous period average is zero", async () => {
@@ -113,12 +143,12 @@ describe("Dashboard service", () => {
 				expenseDate: "2026-07-10",
 			});
 
-			const result = await dashboardService.getSummary(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, 30, "UTC");
 
 			expect(result.data.expenses.percentChange).toBeNull();
 		});
 
-		it("calculates percentChange from daily averages", async () => {
+		it("calculates percentChange from daily averages across equal rolling windows", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
 				passwordHash: "hash",
@@ -138,10 +168,10 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getSummary(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, 30, "UTC");
 
-			const previousDays = 15;
-			const currentDays = 15;
+			const previousDays = 30;
+			const currentDays = 30;
 			const avgPrevious = 150 / previousDays;
 			const avgCurrent = 300 / currentDays;
 			const expected =
@@ -170,10 +200,10 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getSummary(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, 30, "UTC");
 
-			const previousDays = 15;
-			const currentDays = 15;
+			const previousDays = 30;
+			const currentDays = 30;
 			const avgPrevious = -300 / previousDays;
 			const avgCurrent = -100 / currentDays;
 			const expected =
@@ -184,37 +214,36 @@ describe("Dashboard service", () => {
 			expect(result.data.netBalance.percentChange).toBeGreaterThan(0);
 		});
 
-		it("clamps the previous period end when the current day exceeds the previous month length", async () => {
-			vi.setSystemTime(new Date("2026-03-31T12:00:00.000Z"));
-
+		it("compares against the previous equal-length rolling window", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
 				passwordHash: "hash",
-				emailTag: "dash-clamp",
+				emailTag: "dash-prev-window",
 			});
 
 			await db.insert(expenseDocumentsTable).values([
 				{
 					userId: user.id,
-					totalAmount: "280",
-					expenseDate: "2026-02-28",
+					totalAmount: "70",
+					expenseDate: "2026-07-05",
 				},
 				{
 					userId: user.id,
-					totalAmount: "100",
-					expenseDate: "2026-03-15",
+					totalAmount: "140",
+					expenseDate: "2026-07-12",
 				},
 			]);
 
-			const result = await dashboardService.getSummary(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, 7, "UTC");
 
-			const previousDays = 28;
-			const currentDays = 31;
-			const avgPrevious = 280 / previousDays;
-			const avgCurrent = 100 / currentDays;
+			const previousDays = 7;
+			const currentDays = 7;
+			const avgPrevious = 70 / previousDays;
+			const avgCurrent = 140 / currentDays;
 			const expected =
 				((avgCurrent - avgPrevious) / Math.abs(avgPrevious)) * 100;
 
+			expect(result.data.expenses.amount).toBe(140);
 			expect(result.data.expenses.percentChange).toBe(expected);
 		});
 
@@ -238,7 +267,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const result = await dashboardService.getSummary(user.id, "UTC");
+			const result = await dashboardService.getSummary(user.id, 30, "UTC");
 
 			expect(result.data.expenses.amount).toBe(100);
 		});
@@ -265,9 +294,10 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			const utcResult = await dashboardService.getSummary(user.id, "UTC");
+			const utcResult = await dashboardService.getSummary(user.id, 30, "UTC");
 			const warsawResult = await dashboardService.getSummary(
 				user.id,
+				30,
 				"Europe/Warsaw",
 			);
 
@@ -534,7 +564,7 @@ describe("Dashboard service", () => {
 				incomeDate: "2026-07-14",
 			});
 
-			const summary = await dashboardService.getSummary(user.id, "UTC");
+			const summary = await dashboardService.getSummary(user.id, 30, "UTC");
 			const cumulativeChart = await dashboardService.getCumulativeChart(
 				user.id,
 				30,
