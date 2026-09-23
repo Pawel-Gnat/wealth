@@ -1,5 +1,4 @@
-import { Heading } from "@/shared/components";
-import { TextMuted } from "../components/typography/text";
+import { Heading, Text } from "@/shared/components";
 
 type PageLayoutProps = {
 	title: string;
@@ -12,7 +11,9 @@ export const PageLayout = ({ title, subtitle, children }: PageLayoutProps) => {
 		<div className="flex flex-col gap-6">
 			<div className="flex flex-col gap-1">
 				<Heading>{title}</Heading>
-				<TextMuted size="sm">{subtitle}</TextMuted>
+				<Text size="sm" color="muted">
+					{subtitle}
+				</Text>
 			</div>
 			{children}
 		</div>

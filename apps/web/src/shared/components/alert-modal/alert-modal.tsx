@@ -1,19 +1,17 @@
 import { cn } from "cn";
 import {
 	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
 	AlertDialogContent,
 	AlertDialogDescription,
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/shared/lib/ui/alert-dialog";
-import { Icon } from "../icons";
+import { Button } from "../button";
 
 type AlertModalProps = {
 	open?: boolean;
-	onOpenChange?: (open: boolean) => void;
+	onOpenChange: (open: boolean) => void;
 	title: React.ReactNode;
 	description?: React.ReactNode;
 	cancelText: React.ReactNode;
@@ -38,13 +36,13 @@ export const AlertModal = ({
 		if (isConfirming && !nextOpen) {
 			return;
 		}
-		onOpenChange?.(nextOpen);
+		onOpenChange(nextOpen);
 	};
 
 	return (
 		<AlertDialog
 			{...(open !== undefined && { open })}
-			{...(onOpenChange && { onOpenChange: handleOpenChange })}
+			onOpenChange={handleOpenChange}
 		>
 			<AlertDialogContent className={cn("rounded-lg", className)}>
 				<AlertDialogHeader>
@@ -54,23 +52,21 @@ export const AlertModal = ({
 					)}
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel disabled={isConfirming} className="rounded-lg">
-						{cancelText}
-					</AlertDialogCancel>
-					<AlertDialogAction
-						onClick={(event) => {
-							event.preventDefault();
-							onConfirm();
-						}}
+					<Button
+						variant="outline"
 						disabled={isConfirming}
-						className="rounded-lg"
+						onClick={() => handleOpenChange(false)}
 					>
-						{isConfirming ? (
-							<Icon name="loader" className="animate-spin" />
-						) : (
-							confirmText
-						)}
-					</AlertDialogAction>
+						{cancelText}
+					</Button>
+					<Button
+						variant="destructive"
+						disabled={isConfirming}
+						isLoading={isConfirming}
+						onClick={onConfirm}
+					>
+						{confirmText}
+					</Button>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>

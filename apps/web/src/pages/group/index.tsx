@@ -1,7 +1,7 @@
 import type { BudgetMember, GroupBudget } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { ButtonSecondary, Heading, Icon } from "@/shared/components";
+import { Button, Heading, Icon } from "@/shared/components";
 import { CardState } from "@/shared/widgets/card-state";
 import { getActiveBudgets, getInvitations } from "./helpers/get-group-lists";
 import { BudgetsList } from "./ui/budgets-list";
@@ -83,12 +83,12 @@ export const GroupDocumentsPage = () => {
 			<CardState
 				title={t("budgets.title", { ns: "group" })}
 				actions={
-					<ButtonSecondary className="w-fit ml-auto" asChild>
+					<Button variant="secondary" className="w-fit ml-auto" asChild>
 						<Link to={"/"}>
 							<Icon name="add" />
 							{t("action.create", { ns: "common" })}
 						</Link>
-					</ButtonSecondary>
+					</Button>
 				}
 				data={budgets}
 				isError={false}

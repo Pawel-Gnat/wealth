@@ -10,8 +10,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/shared/lib/ui/dialog";
-import { ButtonPrimary, ButtonSecondary } from "../button";
-import { ButtonInput } from "../button/button";
+import { Button } from "../button";
 import { Icon, type IconName } from "../icons";
 
 type FormModalProps = {
@@ -56,10 +55,10 @@ export const FormModal = ({
 			}}
 		>
 			<DialogTrigger asChild>
-				<ButtonSecondary>
+				<Button variant="secondary">
 					{triggerIcon && <Icon name={triggerIcon} />}
 					{triggerText}
-				</ButtonSecondary>
+				</Button>
 			</DialogTrigger>
 			<DialogContent
 				className="sm:max-w-md"
@@ -74,17 +73,17 @@ export const FormModal = ({
 					<div className="space-y-4">{children}</div>
 					<DialogFooter className="">
 						<DialogClose asChild>
-							<ButtonInput disabled={isPending}>
+							<Button variant="input" disabled={isPending}>
 								{closeText || t("action.cancel", { ns: "common" })}
-							</ButtonInput>
+							</Button>
 						</DialogClose>
-						<ButtonPrimary
+						<Button
 							type="submit"
 							disabled={disabled || isPending}
 							isLoading={isPending}
 						>
 							{submitText}
-						</ButtonPrimary>
+						</Button>
 					</DialogFooter>
 				</form>
 			</DialogContent>

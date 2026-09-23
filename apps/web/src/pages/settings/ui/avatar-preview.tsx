@@ -1,7 +1,6 @@
 import type { User } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
-import { Avatar } from "@/shared/components";
-import { TextMuted } from "@/shared/components/typography/text";
+import { Avatar, Text } from "@/shared/components";
 
 type AvatarPreviewProps = {
 	src?: string | null;
@@ -19,9 +18,9 @@ export const AvatarPreview = ({ src, user }: AvatarPreviewProps) => {
 				<Avatar user={user} size="lg" />
 			)}
 
-			<TextMuted size="sm">
+			<Text size="sm" color="muted">
 				{t("profile.change-avatar.description", { ns: "settings" })}
-			</TextMuted>
+			</Text>
 		</div>
 	);
 };

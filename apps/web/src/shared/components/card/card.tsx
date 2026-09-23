@@ -2,7 +2,6 @@ import { cn } from "cn";
 import type { ReactNode } from "react";
 import { CardContent, CardHeader, Card as CardUI } from "@/shared/lib/ui/card";
 import { Text } from "../typography";
-import { TextMuted } from "../typography/text";
 
 export type CardProps = {
 	title?: string | undefined;
@@ -32,7 +31,11 @@ export const Card = ({
 									{title}
 								</Text>
 							)}
-							{subtitle && <TextMuted size="sm">{subtitle}</TextMuted>}
+							{subtitle && (
+								<Text size="sm" color="muted">
+									{subtitle}
+								</Text>
+							)}
 						</div>
 					)}
 					{actions && <div className="ml-auto">{actions}</div>}

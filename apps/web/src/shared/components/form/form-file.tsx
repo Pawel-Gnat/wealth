@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { type DropzoneOptions, useDropzone } from "react-dropzone";
 import { Attachment } from "../attachment";
 import { Icon } from "../icons";
-import { Text, TextMuted } from "../typography/text";
+import { Text } from "../typography/text";
 import { FormBase, type FormControlFunction } from "./form-base";
 
 type FormFileDropzoneProps = {
@@ -86,7 +86,9 @@ const FormFileDropzone = ({
 				<Text size="sm" weight="medium">
 					{label}
 				</Text>
-				<TextMuted size="xs"> {description}</TextMuted>
+				<Text size="xs" color="muted">
+					{description}
+				</Text>
 			</div>
 			{selectedFile && (
 				<Attachment title={selectedFile.name} onRemove={clearFile} />

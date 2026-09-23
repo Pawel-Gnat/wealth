@@ -1,1 +1,1 @@
-export { ButtonDestructive, ButtonPrimary, ButtonSecondary } from "./button";
+export { Button } from "./button";

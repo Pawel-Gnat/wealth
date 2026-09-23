@@ -1,9 +1,12 @@
 import type { VariantProps } from "class-variance-authority";
-import { cn } from "cn";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-import { Button as ButtonUI, buttonVariants } from "@/shared/lib/ui/button";
+import {
+	Button as ButtonUI,
+	type buttonVariants as shadcnButtonVariants,
+} from "@/shared/lib/ui/button";
 import { Icon } from "../icons";
+import { buttonVariants } from "./button.variants";
 
 type ButtonProps = {
 	children: ReactNode;
@@ -11,91 +14,29 @@ type ButtonProps = {
 	asChild?: boolean;
 	isLoading?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement> &
-	VariantProps<typeof buttonVariants>;
+	VariantProps<typeof buttonVariants> &
+	Pick<VariantProps<typeof shadcnButtonVariants>, "size">;
 
-const Button = ({
+export const Button = ({
 	children,
 	className,
 	variant,
 	size,
 	asChild = false,
 	isLoading = false,
+	disabled,
 	...props
 }: ButtonProps) => {
 	return (
 		<ButtonUI
-			className={cn(buttonVariants({ variant, size, className }))}
-			asChild={asChild}
-			{...props}
-		>
-			{children}
-		</ButtonUI>
-	);
-};
-
-export const ButtonPrimary = ({
-	children,
-	isLoading = false,
-	className,
-	size = "default",
-	...props
-}: ButtonProps) => {
-	return (
-		<Button size={size} className={cn(className)} {...props}>
-			{isLoading ? <Icon name="loader" className="animate-spin" /> : children}
-		</Button>
-	);
-};
-
-export const ButtonSecondary = ({
-	children,
-	isLoading = false,
-	className,
-	size = "default",
-	variant = "secondary",
-	...props
-}: ButtonProps) => {
-	return (
-		<Button size={size} className={cn(className)} variant={variant} {...props}>
-			{isLoading ? <Icon name="loader" className="animate-spin" /> : children}
-		</Button>
-	);
-};
-
-export const ButtonInput = ({
-	children,
-	isLoading = false,
-	className,
-	size = "default",
-	variant = "outline",
-	...props
-}: ButtonProps) => {
-	return (
-		<Button
+			variant={variant === "input" ? "outline" : variant}
 			size={size}
-			className={cn(
-				"bg-input/50 text-input-foreground hover:bg-input/30",
-				className,
-			)}
-			variant={variant}
+			className={buttonVariants({ variant, className })}
+			asChild={asChild}
+			disabled={disabled || isLoading}
 			{...props}
 		>
 			{isLoading ? <Icon name="loader" className="animate-spin" /> : children}
-		</Button>
-	);
-};
-
-export const ButtonDestructive = ({
-	children,
-	isLoading = false,
-	className,
-	size = "default",
-	variant = "destructive",
-	...props
-}: ButtonProps) => {
-	return (
-		<Button size={size} className={cn(className)} variant={variant} {...props}>
-			{isLoading ? <Icon name="loader" className="animate-spin" /> : children}
-		</Button>
+		</ButtonUI>
 	);
 };

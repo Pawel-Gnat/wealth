@@ -7,7 +7,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/lib/ui/select";
-import { ButtonSecondary } from "../button";
+import { Button } from "../button";
 import { Icon } from "../icons";
 import { Text } from "../typography";
 
@@ -48,22 +48,24 @@ export const Pagination = <TData,>({ table }: PaginationProps<TData>) => {
 				</Text>
 
 				<div className="flex items-center gap-2">
-					<ButtonSecondary
+					<Button
+						variant="secondary"
 						size="sm"
 						onClick={() => table.previousPage()}
 						disabled={!table.getCanPreviousPage()}
 					>
 						{t("pagination.previous", { ns: "common" })}
 						<Icon name="arrowLeft" />
-					</ButtonSecondary>
-					<ButtonSecondary
+					</Button>
+					<Button
+						variant="secondary"
 						size="sm"
 						onClick={() => table.nextPage()}
 						disabled={!table.getCanNextPage()}
 					>
 						{t("pagination.next", { ns: "common" })}
 						<Icon name="arrowRight" />
-					</ButtonSecondary>
+					</Button>
 				</div>
 			</div>
 		</div>
