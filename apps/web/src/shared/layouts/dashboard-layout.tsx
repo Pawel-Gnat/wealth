@@ -35,7 +35,7 @@ export function DashboardLayout() {
 				<Breadcrumbs />
 
 				<div className="flex items-center gap-2 ml-auto">
-					<UserAvatar user={user} />
+					<UserAvatar user={user} asLink />
 				</div>
 			</div>
 			<div className="px-2 flex flex-col gap-4 mb-4">
