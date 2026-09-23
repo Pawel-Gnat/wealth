@@ -11,7 +11,7 @@ import { Button } from "../button";
 
 type AlertModalProps = {
 	open?: boolean;
-	onOpenChange?: (open: boolean) => void;
+	onOpenChange: (open: boolean) => void;
 	title: React.ReactNode;
 	description?: React.ReactNode;
 	cancelText: React.ReactNode;
@@ -36,13 +36,13 @@ export const AlertModal = ({
 		if (isConfirming && !nextOpen) {
 			return;
 		}
-		onOpenChange?.(nextOpen);
+		onOpenChange(nextOpen);
 	};
 
 	return (
 		<AlertDialog
 			{...(open !== undefined && { open })}
-			{...(onOpenChange && { onOpenChange: handleOpenChange })}
+			onOpenChange={handleOpenChange}
 		>
 			<AlertDialogContent className={cn("rounded-lg", className)}>
 				<AlertDialogHeader>

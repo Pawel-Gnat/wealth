@@ -24,6 +24,7 @@ export const Button = ({
 	size,
 	asChild = false,
 	isLoading = false,
+	disabled,
 	...props
 }: ButtonProps) => {
 	return (
@@ -32,6 +33,7 @@ export const Button = ({
 			size={size}
 			className={buttonVariants({ variant, className })}
 			asChild={asChild}
+			disabled={disabled || isLoading}
 			{...props}
 		>
 			{isLoading ? <Icon name="loader" className="animate-spin" /> : children}

@@ -16,7 +16,7 @@ export const textVariants = cva("", {
 		},
 		color: {
 			default: "",
-			secondary: "text-primary",
+			secondary: "text-secondary",
 			muted: "text-muted-foreground",
 			destructive: "text-destructive",
 		},

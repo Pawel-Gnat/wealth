@@ -22,21 +22,36 @@ export const UserAvatar = ({
 	size = "sm",
 	showUserName = false,
 }: UserAvatarProps) => {
-	const Component = asLink ? Link : "div";
+	const fullName = hasUserName(user) ? getUserFullName(user) : null;
+	const primaryLabel = fullName ?? user.email;
 
-	return (
-		<Component to={APP_ROUTES.settings} className="flex items-center gap-2">
+	const content = (
+		<>
 			<Avatar user={user} size={size} />
 			<div className="flex flex-col">
-				{showUserName && hasUserName(user) && (
-					<Text size="lg" weight="medium">
-						{getUserFullName(user)}
+				<Text
+					size={showUserName && fullName ? "lg" : "sm"}
+					weight={showUserName && fullName ? "medium" : "normal"}
+					color={showUserName && fullName ? "default" : "muted"}
+				>
+					{primaryLabel}
+				</Text>
+				{showUserName && fullName && (
+					<Text size="sm" color="muted">
+						{user.email}
 					</Text>
 				)}
-				<Text size="sm" color="muted">
-					{user.email}
-				</Text>
 			</div>
-		</Component>
+		</>
 	);
+
+	if (asLink) {
+		return (
+			<Link to={APP_ROUTES.settings} className="flex items-center gap-2">
+				{content}
+			</Link>
+		);
+	}
+
+	return <div className="flex items-center gap-2">{content}</div>;
 };
