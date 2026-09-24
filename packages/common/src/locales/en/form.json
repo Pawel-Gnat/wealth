@@ -28,6 +28,11 @@
 		"placeholder": "Your last name",
 		"max": "Last name must be at most 16 characters"
 	},
+	"title": {
+		"label": "Title",
+		"placeholder": "Budget title",
+		"required": "Title is required"
+	},
 	"date": {
 		"label": "Date"
 	},

@@ -1,9 +1,9 @@
 import type { BudgetMember, GroupBudget } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
-import { Button, Heading, Icon } from "@/shared/components";
+import { Heading } from "@/shared/components";
 import { CardState } from "@/shared/widgets/card-state";
 import { getActiveBudgets, getInvitations } from "./helpers/get-group-lists";
+import { BudgetModalForm } from "./ui/budget-modal-form";
 import { BudgetsList } from "./ui/budgets-list";
 import { InvitationsList } from "./ui/invitations-list";
 
@@ -27,6 +27,9 @@ const BUDGETS: GroupBudget[] = [
 	{
 		id: "budget-1",
 		title: "Household",
+		ownerId: "1",
+		expenses: [],
+		incomes: [],
 		members: [
 			member("1", "me@example.com", "owner", "active"),
 			member("2", "anna@example.com", "member", "active"),
@@ -36,6 +39,9 @@ const BUDGETS: GroupBudget[] = [
 	{
 		id: "budget-2",
 		title: "Trip",
+		ownerId: "1",
+		expenses: [],
+		incomes: [],
 		members: [
 			member("1", "me@example.com", "owner", "active"),
 			member("4", "ola@example.com", "member", "active"),
@@ -45,6 +51,9 @@ const BUDGETS: GroupBudget[] = [
 	{
 		id: "budget-3",
 		title: "Shared rent",
+		ownerId: "1",
+		expenses: [],
+		incomes: [],
 		members: [
 			member("1", "me@example.com", "owner", "active"),
 			member("6", "ewa@example.com", "member", "pending"),
@@ -54,6 +63,9 @@ const BUDGETS: GroupBudget[] = [
 	{
 		id: "budget-4",
 		title: "Office",
+		ownerId: "2",
+		expenses: [],
+		incomes: [],
 		members: [
 			member("2", "anna@example.com", "owner", "active"),
 			member("1", "me@example.com", "member", "active"),
@@ -63,6 +75,9 @@ const BUDGETS: GroupBudget[] = [
 	{
 		id: "budget-5",
 		title: "Weekend",
+		ownerId: "3",
+		expenses: [],
+		incomes: [],
 		members: [
 			member("3", "bartek@example.com", "owner", "active"),
 			member("1", "me@example.com", "member", "pending"),
@@ -80,16 +95,10 @@ export const GroupDocumentsPage = () => {
 	return (
 		<div className="flex flex-col gap-6">
 			<Heading>{t("title", { ns: "group" })}</Heading>
+
 			<CardState
 				title={t("budgets.title", { ns: "group" })}
-				actions={
-					<Button variant="secondary" className="w-fit ml-auto" asChild>
-						<Link to={"/"}>
-							<Icon name="add" />
-							{t("action.create", { ns: "common" })}
-						</Link>
-					</Button>
-				}
+				actions={<BudgetModalForm />}
 				data={budgets}
 				isError={false}
 				errorTitle={t("budgets.error.title", { ns: "group" })}
@@ -100,6 +109,7 @@ export const GroupDocumentsPage = () => {
 			>
 				{(items) => <BudgetsList budgets={items} userId={CURRENT_USER_ID} />}
 			</CardState>
+
 			<CardState
 				title={t("invitations.title", { ns: "group" })}
 				data={invitations}

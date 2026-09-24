@@ -14,6 +14,7 @@ import {
 	listExpensesContract,
 	updateExpenseContract,
 } from "./expenses.contract";
+import { createGroupBudgetContract } from "./group.contract";
 import {
 	createIncomeContract,
 	deleteIncomeContract,
@@ -46,6 +47,9 @@ export const rpcContract = populateContractRouterPaths({
 		get: getExpenseContract,
 		update: updateExpenseContract,
 		delete: deleteExpenseContract,
+	},
+	group: {
+		create: createGroupBudgetContract,
 	},
 	incomes: {
 		create: createIncomeContract,

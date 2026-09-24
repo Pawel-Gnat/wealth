@@ -36,6 +36,7 @@ export const DocumentLineItem = ({
 				label={t(titleLabelKey, { ns: "form" })}
 				placeholder={t("line-item.placeholder", { ns: "form" })}
 				control={form.control}
+				icon="text"
 			/>
 
 			<div className="flex flex-col sm:flex-row items-start gap-2">
@@ -47,6 +48,7 @@ export const DocumentLineItem = ({
 					step="0.01"
 					valueAsNumber
 					control={form.control}
+					icon="money"
 				/>
 
 				<FormInput
@@ -57,6 +59,7 @@ export const DocumentLineItem = ({
 					step="1"
 					valueAsNumber
 					control={form.control}
+					icon="number"
 				/>
 
 				<div className="flex shrink-0 flex-col gap-3 ml-auto">
