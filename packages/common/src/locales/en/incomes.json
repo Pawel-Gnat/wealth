@@ -1,5 +1,7 @@
 {
 	"single": {
+		"title": "Income details",
+		"description": "Read-only view of the income.",
 		"title-create": "Create a new income",
 		"description-create": "Add a date and line items, then save the record.",
 		"title-edit": "Edit income",

@@ -1,12 +1,10 @@
-import { screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { screen, waitFor } from "@testing-library/react";
 import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { DOCUMENT_CONFIG } from "@/features/config/document-config";
 import type { RecordKind } from "@/features/model/record-kind";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
-import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 import { DocumentTable } from "./document-table";
@@ -78,7 +76,7 @@ describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
 			style: "currency",
 			currency: "USD",
 		}).format(123.45);
-		const editActionLabel = t("action.edit", { ns: "common" });
+		const previewActionLabel = t("action.preview", { ns: "common" });
 
 		renderWithProviders(<DocumentTable kind={kind} />);
 
@@ -86,86 +84,11 @@ describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
 			expect(screen.getByText(formattedDate)).toBeInTheDocument();
 		});
 
-		const editLink = screen.getByRole("link", {
-			name: editActionLabel,
+		const previewLink = screen.getByRole("link", {
+			name: previewActionLabel,
 		});
 
 		expect(screen.getByText(formattedAmount)).toBeInTheDocument();
-		expect(editLink).toHaveAttribute("href", config.editRoute(documentId));
-	});
-
-	it("opens delete dialog without deleting yet", async () => {
-		const user = userEvent.setup();
-		let deleteCallCount = 0;
-
-		server.use(
-			http.delete(`*/${apiSegment}/:id`, () => {
-				deleteCallCount += 1;
-				return HttpResponse.json({ data: { message: "deleted" } });
-			}),
-		);
-
-		renderWithProviders(<DocumentTable kind={kind} />);
-		const deleteButtonLabel = t("action.delete", { ns: "common" });
-		const deleteButton = await screen.findByRole("button", {
-			name: deleteButtonLabel,
-		});
-
-		await user.click(deleteButton);
-
-		expect(screen.getByRole("alertdialog")).toBeInTheDocument();
-		expect(deleteCallCount).toBe(0);
-	});
-
-	it("refreshes the list after confirmed delete", async () => {
-		const user = userEvent.setup();
-		let listCallCount = 0;
-
-		server.use(
-			http.get(`*/${apiSegment}`, () => {
-				listCallCount += 1;
-				if (listCallCount === 1) {
-					return HttpResponse.json({
-						data: [
-							{
-								id: documentId,
-								date: "2024-03-01T12:00:00.000Z",
-								totalAmount: 123.45,
-							},
-						],
-						pagination: {},
-					});
-				}
-
-				return HttpResponse.json({ data: [], pagination: {} });
-			}),
-		);
-
-		const { queryClient } = renderWithProviders(<DocumentTable kind={kind} />);
-		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
-
-		const deleteButtonLabel = t("action.delete", { ns: "common" });
-		const noResultsMessage = t("list.empty.title", {
-			ns: config.i18nNamespace,
-		});
-		const deleteButton = await screen.findByRole("button", {
-			name: deleteButtonLabel,
-		});
-
-		await user.click(deleteButton);
-
-		const dialog = screen.getByRole("alertdialog");
-		await user.click(
-			within(dialog).getByRole("button", { name: deleteButtonLabel }),
-		);
-
-		await waitFor(() => {
-			expect(screen.getByText(noResultsMessage)).toBeInTheDocument();
-		});
-
-		expect(listCallCount).toBeGreaterThanOrEqual(2);
-		expect(invalidateSpy).toHaveBeenCalledWith({
-			queryKey: queryKeys.dashboard.all(),
-		});
+		expect(previewLink).toHaveAttribute("href", config.viewRoute(documentId));
 	});
 });

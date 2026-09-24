@@ -2,7 +2,11 @@ import { I18N_RESOURCES } from "@repo/common/i18n";
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
-import { APP_ROUTES, NEW_DOCUMENT_SEGMENT } from "@/app/routes";
+import {
+	APP_ROUTES,
+	EDIT_DOCUMENT_SEGMENT,
+	NEW_DOCUMENT_SEGMENT,
+} from "@/app/routes";
 import {
 	BreadcrumbItem,
 	BreadcrumbLink,
@@ -17,6 +21,25 @@ type NavigationSegment =
 
 const isNavigationSegment = (segment: string): segment is NavigationSegment =>
 	Object.hasOwn(I18N_RESOURCES.en.common.navigation, segment);
+
+const getSegmentLabel = (
+	segment: string,
+	t: ReturnType<typeof useTranslation>["t"],
+) => {
+	if (isNavigationSegment(segment)) {
+		return t(`navigation.${segment}`, { ns: "common" });
+	}
+
+	if (segment === NEW_DOCUMENT_SEGMENT) {
+		return t("action.add", { ns: "common" });
+	}
+
+	if (segment === EDIT_DOCUMENT_SEGMENT) {
+		return t("action.edit", { ns: "common" });
+	}
+
+	return t("common.document", { ns: "common" });
+};
 
 export const Breadcrumbs = () => {
 	const { pathname } = useLocation();
@@ -34,11 +57,7 @@ export const Breadcrumbs = () => {
 
 			return {
 				to,
-				label: isNavigationSegment(segment)
-					? t(`navigation.${segment}`, { ns: "common" })
-					: t(segment === NEW_DOCUMENT_SEGMENT ? "action.add" : "action.edit", {
-							ns: "common",
-						}),
+				label: getSegmentLabel(segment, t),
 			};
 		}),
 	];

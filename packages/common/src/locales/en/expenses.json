@@ -1,5 +1,7 @@
 {
 	"single": {
+		"title": "Expense details",
+		"description": "Read-only view of the expense.",
 		"title-create": "Create a new expense",
 		"description-create": "Add a date and line items, then save the record.",
 		"title-edit": "Edit expense",

@@ -11,15 +11,13 @@ import { Button, Icon, Price, Text, Tooltip } from "@/shared/components";
 type DocumentColumnsProps = {
 	t: TFunction<"common">;
 	language: string;
-	getEditPath: (id: string) => string;
-	onDelete: (documentId: string) => void;
+	getViewPath: (id: string) => string;
 };
 
 export const documentColumns = ({
 	t,
 	language,
-	getEditPath,
-	onDelete,
+	getViewPath,
 }: DocumentColumnsProps): ColumnDef<DocumentListItem>[] => {
 	return [
 		{
@@ -65,7 +63,7 @@ export const documentColumns = ({
 			accessorKey: "actions",
 			meta: { className: "w-[1%] whitespace-nowrap" },
 			header: () => (
-				<Text size="sm" weight="medium" className="text-right">
+				<Text size="sm" weight="medium" className="text-center">
 					-
 					<span className="sr-only">
 						{t("common.actions", { ns: "common" })}
@@ -73,34 +71,20 @@ export const documentColumns = ({
 				</Text>
 			),
 			cell: ({ row }) => {
-				const editText = t("action.edit", { ns: "common" });
-				const deleteText = t("action.delete", { ns: "common" });
+				const previewText = t("action.preview", { ns: "common" });
 
 				return (
 					<div className="flex items-center gap-2 justify-end">
 						<Tooltip
 							trigger={
 								<Button variant="secondary" asChild size="icon">
-									<Link to={getEditPath(row.original.id)}>
-										<Icon name="edit" />
-										<span className="sr-only">{editText}</span>
+									<Link to={getViewPath(row.original.id)}>
+										<Icon name="preview" />
+										<span className="sr-only">{previewText}</span>
 									</Link>
 								</Button>
 							}
-							text={editText}
-						/>
-						<Tooltip
-							trigger={
-								<Button
-									variant="destructive"
-									size="icon"
-									onClick={() => onDelete(row.original.id)}
-								>
-									<Icon name="delete" />
-									<span className="sr-only">{deleteText}</span>
-								</Button>
-							}
-							text={deleteText}
+							text={previewText}
 						/>
 					</div>
 				);

@@ -1,7 +1,14 @@
 import type { DocumentCreatePayload } from "@repo/api/types";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Button, FormInput, Icon, Price } from "@/shared/components";
+import {
+	Badge,
+	Button,
+	FormInput,
+	Icon,
+	Price,
+	Tooltip,
+} from "@/shared/components";
 import type { LineItemTitleLabelKey } from "../../model/line-item-title-label-key";
 
 type DocumentLineItemProps = {
@@ -20,6 +27,7 @@ export const DocumentLineItem = ({
 	titleLabelKey,
 }: DocumentLineItemProps) => {
 	const { t, i18n } = useTranslation();
+	const deleteText = t("action.delete", { ns: "common" });
 
 	return (
 		<div className="flex flex-col gap-4 border-b pb-4 last:border-b-0 last:pb-0">
@@ -30,7 +38,7 @@ export const DocumentLineItem = ({
 				control={form.control}
 			/>
 
-			<div className="flex flex-row gap-2 items-end">
+			<div className="flex flex-col sm:flex-row items-start gap-2">
 				<FormInput
 					name={`lineItems.${index}.singleAmount`}
 					label={t("single-amount.label", { ns: "form" })}
@@ -51,18 +59,40 @@ export const DocumentLineItem = ({
 					control={form.control}
 				/>
 
-				<div className="py-2 px-4 bg-input/50 rounded-3xl">
-					<Price
-						size="sm"
-						weight="medium"
-						amount={lineTotal}
-						language={i18n.language}
-					/>
-				</div>
+				<div className="flex shrink-0 flex-col gap-3 ml-auto">
+					<div
+						className="flex-col gap-1 leading-snug hidden sm:flex"
+						aria-hidden
+					>
+						<span className="leading-snug">&nbsp;</span>
+					</div>
+					<div className="flex h-9 items-center gap-2">
+						<Badge variant="neutral" className="h-auto">
+							<Price
+								size="sm"
+								color="secondary"
+								weight="medium"
+								className="px-3 py-1.5"
+								amount={lineTotal}
+								language={i18n.language}
+							/>
+						</Badge>
 
-				<Button variant="destructive" size="icon" onClick={() => remove(index)}>
-					<Icon name="delete" />
-				</Button>
+						<Tooltip
+							trigger={
+								<Button
+									variant="destructive"
+									size="icon"
+									onClick={() => remove(index)}
+								>
+									<Icon name="delete" />
+									<span className="sr-only">{deleteText}</span>
+								</Button>
+							}
+							text={deleteText}
+						/>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

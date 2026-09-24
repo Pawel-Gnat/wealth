@@ -9,7 +9,8 @@ export const buttonVariants = cva("", {
 			ghost: "",
 			destructive: "",
 			link: "",
-			input: "bg-input/50 text-input-foreground hover:bg-input/30",
+			input:
+				"bg-input/50 text-input-foreground hover:bg-input/30 font-normal justify-start",
 		},
 	},
 	defaultVariants: {

@@ -19,6 +19,7 @@ export const documentListResponseSchema = apiPaginatedPayload(
 );
 
 export const lineItemSchema = z.object({
+	id: z.string(),
 	title: z.string().trim().min(1, "form:line-item.required"),
 	quantity: z
 		.number({ error: "form:quantity.invalid" })
@@ -39,7 +40,7 @@ export const documentDetailsResponseSchema = apiPayload(documentSchema);
 
 export const documentCreatePayloadSchema = z.object({
 	date: z.coerce.date(),
-	lineItems: z.array(lineItemSchema),
+	lineItems: z.array(lineItemSchema.omit({ id: true })),
 });
 
 export const documentUpdatePayloadSchema = documentCreatePayloadSchema.extend({

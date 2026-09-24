@@ -77,6 +77,7 @@ export class IncomesService {
 
 		const lineItems = await this.db
 			.select({
+				id: incomeLineItemsTable.id,
 				title: incomeLineItemsTable.title,
 				quantity: incomeLineItemsTable.quantity,
 				singleAmount: incomeLineItemsTable.singleAmount,
@@ -90,6 +91,7 @@ export class IncomesService {
 				date: decodeDocumentDateFromStorage(document.date),
 				totalAmount: Number(document.totalAmount),
 				lineItems: lineItems.map((lineItem) => ({
+					id: lineItem.id,
 					title: lineItem.title,
 					quantity: lineItem.quantity,
 					singleAmount: Number(lineItem.singleAmount),
