@@ -48,7 +48,16 @@ export function DocumentForm({ kind }: DocumentFormProps) {
 						<DocumentFormUI
 							kind={kind}
 							{...(id ? { documentId: id } : {})}
-							initialValues={document}
+							initialValues={{
+								date: document.date,
+								lineItems: document.lineItems.map(
+									({ title, quantity, singleAmount }) => ({
+										title,
+										quantity,
+										singleAmount,
+									}),
+								),
+							}}
 						/>
 					)}
 				</CardState>

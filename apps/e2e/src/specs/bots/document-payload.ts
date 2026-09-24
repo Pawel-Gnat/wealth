@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker'
-import type { LineItem } from '@repo/api/types';
+import type { DocumentCreatePayload } from '@repo/api/types'
+
+type CreateLineItem = DocumentCreatePayload['lineItems'][number]
 
 const CREATE_PROBABILITY = 0.75
 
@@ -9,10 +11,10 @@ const EXPENSE_MAX_QUANTITY = 7
 const INCOME_MAX_QUANTITY = 3
 
 export const shouldCreateDocument = (): boolean => Math.random() < CREATE_PROBABILITY
-export const createExpensePayload = (): LineItem => createDocumentPayload(EXPENSE_AMOUNT, EXPENSE_MAX_QUANTITY)
-export const createIncomePayload = (): LineItem => createDocumentPayload(INCOME_AMOUNT, INCOME_MAX_QUANTITY)
+export const createExpensePayload = (): CreateLineItem => createDocumentPayload(EXPENSE_AMOUNT, EXPENSE_MAX_QUANTITY)
+export const createIncomePayload = (): CreateLineItem => createDocumentPayload(INCOME_AMOUNT, INCOME_MAX_QUANTITY)
 
-const createDocumentPayload = (amountRange: { min: number; max: number }, maxQuantity: number): LineItem => {
+const createDocumentPayload = (amountRange: { min: number; max: number }, maxQuantity: number): CreateLineItem => {
 	const singleAmount = roundToTwoDecimals(
 		faker.number.float({
 			min: amountRange.min,

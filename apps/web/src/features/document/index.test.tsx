@@ -73,7 +73,7 @@ describe.each(documentKinds)("$kind Document", ({
 			screen.getByText(t("single.description", { ns: config.i18nNamespace })),
 		).toBeInTheDocument();
 
-		const editLink = screen.getByRole("link", {
+		const editLink = await screen.findByRole("link", {
 			name: t("action.edit", { ns: "common" }),
 		});
 

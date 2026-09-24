@@ -1,4 +1,4 @@
-import type { DocumentCreatePayload } from "@repo/api/types";
+import type { DocumentDetails } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import {
 	calculateDocumentTotal,
@@ -7,7 +7,7 @@ import {
 import { Price, Text } from "@/shared/components";
 
 type DocumentViewProps = {
-	document: DocumentCreatePayload;
+	document: DocumentDetails;
 };
 
 export const DocumentView = ({ document }: DocumentViewProps) => {
@@ -30,7 +30,7 @@ export const DocumentView = ({ document }: DocumentViewProps) => {
 
 				return (
 					<div
-						key={`${item.title}-${item.singleAmount}-${item.quantity}`}
+						key={item.id}
 						className="flex items-center gap-4 border-b border-border py-3.5 last:border-b-0"
 					>
 						<div className="flex flex-1 flex-col gap-1">

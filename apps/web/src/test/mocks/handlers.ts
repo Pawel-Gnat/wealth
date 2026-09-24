@@ -55,7 +55,14 @@ const getExpenseByIdHandler = () => {
 			id: "01JTZKQX2GT6PHGQER0M8FS6K8",
 			date: "2024-03-01T12:00:00.000Z",
 			totalAmount: 123.45,
-			lineItems: [{ title: "Taxi", quantity: 1, singleAmount: 123.45 }],
+			lineItems: [
+				{
+					id: "01JTZKQX2GT6PHGQER0M8FS6K9",
+					title: "Taxi",
+					quantity: 1,
+					singleAmount: 123.45,
+				},
+			],
 		},
 	});
 };
@@ -97,7 +104,14 @@ const getIncomeByIdHandler = () => {
 			id: "01JTZKQX2GT6PHGQER0M8FS6K8",
 			date: "2024-03-01T12:00:00.000Z",
 			totalAmount: 123.45,
-			lineItems: [{ title: "Salary", quantity: 1, singleAmount: 123.45 }],
+			lineItems: [
+				{
+					id: "01JTZKQX2GT6PHGQER0M8FS6KA",
+					title: "Salary",
+					quantity: 1,
+					singleAmount: 123.45,
+				},
+			],
 		},
 	});
 };

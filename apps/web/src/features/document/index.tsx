@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import { getDocumentConfig } from "@/features/config/document-config";
 import { useDocument } from "@/features/document-form/hooks/use-document";
 import type { RecordKind } from "@/features/model/record-kind";
-import { Button, Icon } from "@/shared/components";
 import { PageLayout } from "@/shared/layouts";
 import { CardState } from "@/shared/widgets/card-state";
+import { DocumentActions } from "./ui/document-actions";
 import { DocumentDeleteDialog } from "./ui/document-delete-dialog";
 import { DocumentView } from "./ui/document-view";
 
@@ -46,18 +46,12 @@ export const Document = ({ kind }: DocumentProps) => {
 				errorDescription={errorDescription}
 				skeletonClassName="h-100"
 				actions={
-					<div className="flex items-center gap-2">
-						<Button variant="secondary" asChild>
-							<Link to={config.editRoute(id)}>
-								<Icon name="edit" />
-								{t("action.edit", { ns: "common" })}
-							</Link>
-						</Button>
-						<Button variant="destructive" onClick={() => setIsDeleteOpen(true)}>
-							<Icon name="delete" />
-							{t("action.delete", { ns: "common" })}
-						</Button>
-					</div>
+					<DocumentActions
+						editPath={config.editRoute(id)}
+						isLoading={isLoading}
+						isReady={Boolean(data)}
+						onDelete={() => setIsDeleteOpen(true)}
+					/>
 				}
 			>
 				{(document) => <DocumentView document={document} />}

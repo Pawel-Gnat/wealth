@@ -1,4 +1,4 @@
-import type { DocumentCreatePayload } from "@repo/api/types";
+import type { DocumentDetails } from "@repo/api/types";
 import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { useQuery } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/features/config/document-config";
@@ -24,8 +24,10 @@ export function useDocument({ kind, documentId }: UseDocumentProps) {
 				}),
 			);
 		},
-		select: (response): DocumentCreatePayload => ({
+		select: (response): DocumentDetails => ({
+			id: response.data.id,
 			date: decodeDocumentDateFromStorage(response.data.date),
+			totalAmount: response.data.totalAmount,
 			lineItems: response.data.lineItems,
 		}),
 	});

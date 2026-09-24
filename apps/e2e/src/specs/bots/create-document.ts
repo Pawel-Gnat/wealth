@@ -1,9 +1,11 @@
-import type { LineItem } from '@repo/api/types';
 import type { Page } from '@playwright/test'
+import type { DocumentCreatePayload } from '@repo/api/types'
 import { ensureI18nInit, getI18nText } from '../helpers/i18n'
 import { expect } from '../helpers/test'
 
-export const createExpenseDocument = async (page: Page, payload: LineItem) => {
+type CreateLineItem = DocumentCreatePayload['lineItems'][number]
+
+export const createExpenseDocument = async (page: Page, payload: CreateLineItem) => {
 	await createDocument(page, {
 		path: '/expenses/new',
 		listPath: '/expenses',
@@ -13,7 +15,7 @@ export const createExpenseDocument = async (page: Page, payload: LineItem) => {
 	})
 }
 
-export const createIncomeDocument = async (page: Page, payload: LineItem) => {
+export const createIncomeDocument = async (page: Page, payload: CreateLineItem) => {
 	await createDocument(page, {
 		path: '/incomes/new',
 		listPath: '/incomes',
@@ -30,7 +32,7 @@ const createDocument = async (
 		listPath: string
 		heading: string
 		lineItemLabel: string
-		payload: LineItem
+		payload: CreateLineItem
 	},
 ) => {
 	await ensureI18nInit()

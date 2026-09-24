@@ -77,6 +77,7 @@ export class ExpensesService {
 
 		const lineItems = await this.db
 			.select({
+				id: expenseLineItemsTable.id,
 				title: expenseLineItemsTable.title,
 				quantity: expenseLineItemsTable.quantity,
 				singleAmount: expenseLineItemsTable.singleAmount,
@@ -90,6 +91,7 @@ export class ExpensesService {
 				date: decodeDocumentDateFromStorage(document.date),
 				totalAmount: Number(document.totalAmount),
 				lineItems: lineItems.map((lineItem) => ({
+					id: lineItem.id,
 					title: lineItem.title,
 					quantity: lineItem.quantity,
 					singleAmount: Number(lineItem.singleAmount),

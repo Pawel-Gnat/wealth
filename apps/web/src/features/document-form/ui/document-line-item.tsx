@@ -17,7 +17,6 @@ type DocumentLineItemProps = {
 	remove: (index: number) => void;
 	lineTotal: number;
 	titleLabelKey: LineItemTitleLabelKey;
-	readOnly?: boolean;
 };
 
 export const DocumentLineItem = ({
@@ -26,7 +25,6 @@ export const DocumentLineItem = ({
 	remove,
 	lineTotal,
 	titleLabelKey,
-	readOnly = false,
 }: DocumentLineItemProps) => {
 	const { t, i18n } = useTranslation();
 	const deleteText = t("action.delete", { ns: "common" });
@@ -38,7 +36,6 @@ export const DocumentLineItem = ({
 				label={t(titleLabelKey, { ns: "form" })}
 				placeholder={t("line-item.placeholder", { ns: "form" })}
 				control={form.control}
-				readOnly={readOnly}
 			/>
 
 			<div className="flex flex-col sm:flex-row items-start gap-2">
@@ -50,7 +47,6 @@ export const DocumentLineItem = ({
 					step="0.01"
 					valueAsNumber
 					control={form.control}
-					readOnly={readOnly}
 				/>
 
 				<FormInput
@@ -61,7 +57,6 @@ export const DocumentLineItem = ({
 					step="1"
 					valueAsNumber
 					control={form.control}
-					readOnly={readOnly}
 				/>
 
 				<div className="flex shrink-0 flex-col gap-3 ml-auto">
@@ -83,21 +78,19 @@ export const DocumentLineItem = ({
 							/>
 						</Badge>
 
-						{!readOnly ? (
-							<Tooltip
-								trigger={
-									<Button
-										variant="destructive"
-										size="icon"
-										onClick={() => remove(index)}
-									>
-										<Icon name="delete" />
-										<span className="sr-only">{deleteText}</span>
-									</Button>
-								}
-								text={deleteText}
-							/>
-						) : null}
+						<Tooltip
+							trigger={
+								<Button
+									variant="destructive"
+									size="icon"
+									onClick={() => remove(index)}
+								>
+									<Icon name="delete" />
+									<span className="sr-only">{deleteText}</span>
+								</Button>
+							}
+							text={deleteText}
+						/>
 					</div>
 				</div>
 			</div>

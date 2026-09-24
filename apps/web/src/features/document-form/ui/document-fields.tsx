@@ -26,14 +26,9 @@ const EMPTY_LINE_ITEM: DocumentCreatePayload["lineItems"][number] = {
 type DocumentFieldsProps = {
 	form: UseFormReturn<DocumentCreatePayload>;
 	kind: RecordKind;
-	readOnly?: boolean;
 };
 
-export const DocumentFields = ({
-	form,
-	kind,
-	readOnly = false,
-}: DocumentFieldsProps) => {
+export const DocumentFields = ({ form, kind }: DocumentFieldsProps) => {
 	const config = getDocumentConfig(kind);
 	const { t, i18n } = useTranslation();
 	const { fields, append, remove } = useFieldArray({
@@ -52,24 +47,21 @@ export const DocumentFields = ({
 				name="date"
 				label={t("date.label", { ns: "form" })}
 				control={form.control}
-				readOnly={readOnly}
 			/>
 
 			<div className="flex items-center justify-between">
 				<Text weight="medium">
 					{t(config.sectionTitleKey, { ns: config.i18nNamespace })}
 				</Text>
-				{!readOnly ? (
-					<Button
-						type="button"
-						variant="secondary"
-						size="sm"
-						onClick={() => append(EMPTY_LINE_ITEM)}
-					>
-						<Icon name="add" className="mr-1" />
-						{t("action.add", { ns: "common" })}
-					</Button>
-				) : null}
+				<Button
+					type="button"
+					variant="secondary"
+					size="sm"
+					onClick={() => append(EMPTY_LINE_ITEM)}
+				>
+					<Icon name="add" className="mr-1" />
+					{t("action.add", { ns: "common" })}
+				</Button>
 			</div>
 			<Separator orientation="horizontal" />
 
@@ -89,7 +81,6 @@ export const DocumentFields = ({
 							remove={remove}
 							lineTotal={lineTotal}
 							titleLabelKey={config.lineItemLabelKey}
-							readOnly={readOnly}
 						/>
 					);
 				})}

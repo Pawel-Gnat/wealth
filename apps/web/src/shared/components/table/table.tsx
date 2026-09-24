@@ -1,34 +1,22 @@
 import {
 	type ColumnDef,
-	flexRender,
 	getCoreRowModel,
 	getPaginationRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { Skeleton } from "@/shared/lib/ui/skeleton";
-import {
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-	Table as TableUI,
-} from "@/shared/lib/ui/table";
-import { Empty } from "../empty";
+import { TableBody, Table as TableUI } from "@/shared/lib/ui/table";
 import type { IconName } from "../icons";
 import { Pagination } from "./pagination";
+import { DataTableEmpty } from "./table-empty";
+import { DataTableHeader } from "./table-header";
+import { DataTableRows } from "./table-rows";
+import { DataTableSkeletonBody } from "./table-skeleton-body";
 
 declare module "@tanstack/react-table" {
 	interface ColumnMeta<TData, TValue> {
 		className?: string;
 	}
 }
-
-const SKELETON_ROW_COUNT = 10;
-const SKELETON_ROW_KEYS = Array.from(
-	{ length: SKELETON_ROW_COUNT },
-	(_, i) => `skeleton-row-${i}`,
-);
 
 type DataTableProps<TData, TValue> = {
 	columns: ColumnDef<TData, TValue>[];
@@ -58,73 +46,19 @@ export const Table = <TData, TValue>({
 		<div className="flex flex-col gap-4">
 			<div className="overflow-hidden rounded-md border">
 				<TableUI>
-					<TableHeader className="bg-muted">
-						{table.getHeaderGroups().map((headerGroup) => (
-							<TableRow key={headerGroup.id}>
-								{headerGroup.headers.map((header) => {
-									return (
-										<TableHead
-											key={header.id}
-											className={header.column.columnDef.meta?.className}
-										>
-											{header.isPlaceholder
-												? null
-												: flexRender(
-														header.column.columnDef.header,
-														header.getContext(),
-													)}
-										</TableHead>
-									);
-								})}
-							</TableRow>
-						))}
-					</TableHeader>
+					<DataTableHeader table={table} />
 					<TableBody>
 						{isLoading ? (
-							SKELETON_ROW_KEYS.map((rowKey) => (
-								<TableRow key={rowKey}>
-									{table.getVisibleFlatColumns().map((column) => (
-										<TableCell
-											key={`${rowKey}-${column.id}`}
-											className={column.columnDef.meta?.className}
-										>
-											<Skeleton className="h-4 w-full max-w-48" />
-										</TableCell>
-									))}
-								</TableRow>
-							))
-						) : table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
-								<TableRow
-									key={row.id}
-									data-state={row.getIsSelected() && "selected"}
-								>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell
-											key={cell.id}
-											className={cell.column.columnDef.meta?.className}
-										>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
-										</TableCell>
-									))}
-								</TableRow>
-							))
+							<DataTableSkeletonBody table={table} />
+						) : table.getRowModel().rows.length ? (
+							<DataTableRows table={table} />
 						) : (
-							<TableRow>
-								<TableCell
-									colSpan={columns.length}
-									className="h-24 text-center"
-								>
-									<Empty
-										title={noResultsTitle}
-										description={noResultsDescription}
-										icon={noResultsIcon}
-									/>
-								</TableCell>
-							</TableRow>
+							<DataTableEmpty
+								colSpan={columns.length}
+								title={noResultsTitle}
+								description={noResultsDescription}
+								icon={noResultsIcon}
+							/>
 						)}
 					</TableBody>
 				</TableUI>

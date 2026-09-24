@@ -63,7 +63,7 @@ export const documentColumns = ({
 			accessorKey: "actions",
 			meta: { className: "w-[1%] whitespace-nowrap" },
 			header: () => (
-				<Text size="sm" weight="medium" className="text-right">
+				<Text size="sm" weight="medium" className="text-center">
 					-
 					<span className="sr-only">
 						{t("common.actions", { ns: "common" })}
