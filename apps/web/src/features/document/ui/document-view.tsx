@@ -5,7 +5,6 @@ import {
 	calculateLineTotal,
 } from "@/features/document-form/helpers/document-totals";
 import { Price, Text } from "@/shared/components";
-import { formatPrice } from "@/shared/components/price/helpers/price.helpers";
 
 type DocumentViewProps = {
 	document: DocumentCreatePayload;
@@ -39,8 +38,13 @@ export const DocumentView = ({ document }: DocumentViewProps) => {
 								{item.title}
 							</Text>
 							<Text size="sm" color="muted">
-								{formatPrice(item.singleAmount, i18n.language)} ×{" "}
-								{item.quantity}
+								<Price
+									as="span"
+									size="sm"
+									amount={item.singleAmount}
+									language={i18n.language}
+								/>{" "}
+								x {item.quantity}
 							</Text>
 						</div>
 						<Price
