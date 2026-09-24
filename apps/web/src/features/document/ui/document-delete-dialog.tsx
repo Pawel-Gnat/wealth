@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { getDocumentConfig } from "@/features/config/document-config";
 import type { RecordKind } from "@/features/model/record-kind";
@@ -16,13 +17,16 @@ export const DocumentDeleteDialog = ({
 	kind,
 	onClose,
 }: DocumentDeleteDialogProps) => {
-	const config = getDocumentConfig(kind);
 	const { t } = useTranslation();
+	const config = getDocumentConfig(kind);
+	const navigate = useNavigate();
+
 	const { deleteDocument, isLoading } = useDeleteDocument({
 		kind,
 		onSuccess: () => {
 			toast.success(t(config.toast.deleted, { ns: "common" }));
 			onClose();
+			navigate(config.listRoute);
 		},
 		onError: () => {
 			toast.error(t(config.toast.deleteError, { ns: "common" }));

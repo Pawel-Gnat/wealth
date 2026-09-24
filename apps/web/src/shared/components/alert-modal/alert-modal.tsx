@@ -51,9 +51,9 @@ export const AlertModal = ({
 						<AlertDialogDescription>{description}</AlertDialogDescription>
 					)}
 				</AlertDialogHeader>
-				<AlertDialogFooter>
+				<AlertDialogFooter className="flex-row justify-end">
 					<Button
-						variant="outline"
+						variant="ghost"
 						disabled={isConfirming}
 						onClick={() => handleOpenChange(false)}
 					>

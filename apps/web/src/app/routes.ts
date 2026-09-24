@@ -1,4 +1,5 @@
 export const NEW_DOCUMENT_SEGMENT = "new" as const;
+export const EDIT_DOCUMENT_SEGMENT = "edit" as const;
 
 export const APP_ROUTES = {
 	auth: "/auth",
@@ -6,12 +7,16 @@ export const APP_ROUTES = {
 	incomes: {
 		list: "/incomes",
 		add: `/incomes/${NEW_DOCUMENT_SEGMENT}`,
-		edit: (id: string): `/incomes/${string}` => `/incomes/${id}`,
+		view: (id: string): `/incomes/${string}` => `/incomes/${id}`,
+		edit: (id: string): `/incomes/${string}/${typeof EDIT_DOCUMENT_SEGMENT}` =>
+			`/incomes/${id}/${EDIT_DOCUMENT_SEGMENT}`,
 	},
 	expenses: {
 		list: "/expenses",
 		add: `/expenses/${NEW_DOCUMENT_SEGMENT}`,
-		edit: (id: string): `/expenses/${string}` => `/expenses/${id}`,
+		view: (id: string): `/expenses/${string}` => `/expenses/${id}`,
+		edit: (id: string): `/expenses/${string}/${typeof EDIT_DOCUMENT_SEGMENT}` =>
+			`/expenses/${id}/${EDIT_DOCUMENT_SEGMENT}`,
 	},
 	group: {
 		list: "/group",
