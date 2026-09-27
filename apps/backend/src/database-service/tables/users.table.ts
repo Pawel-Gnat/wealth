@@ -1,6 +1,6 @@
 import { pgTable, text } from "drizzle-orm/pg-core";
-import { timestamp, ulidPrimaryKey } from "./helpers.js";
-import { storageTable } from "./storage.table.js";
+import { timestamp, ulidPrimaryKey } from "./helpers";
+import { storageTable } from "./storage.table";
 
 export const usersTable = pgTable("users", {
 	id: ulidPrimaryKey(),

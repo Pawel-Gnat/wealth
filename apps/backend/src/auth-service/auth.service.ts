@@ -38,19 +38,19 @@ import { addDays } from "date-fns";
 import { and, eq, gt, ne } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Request, Response } from "express";
-import { DBS } from "../database-service/constants.js";
-import { sessionsTable } from "../database-service/tables/index.js";
-import type { UserRow } from "../database-service/types/types.js";
-import { isProduction } from "../shared/http/is-production.js";
-import { logAuthEvent } from "../shared/observability/log-event.js";
-import { SsePublisher } from "../sse-service/sse-publisher.service.js";
-import { StorageService } from "../storage-service/storage.service.js";
-import { UsersService } from "../users-service/users.service.js";
+import { DBS } from "../database-service/constants";
+import { sessionsTable } from "../database-service/tables/index";
+import type { UserRow } from "../database-service/types/types";
+import { isProduction } from "../shared/http/is-production";
+import { logAuthEvent } from "../shared/observability/log-event";
+import { SsePublisher } from "../sse-service/sse-publisher.service";
+import { StorageService } from "../storage-service/storage.service";
+import { UsersService } from "../users-service/users.service";
 import {
 	clearAuthCookies,
 	readAuthCookie,
 	setAuthCookies,
-} from "./helpers/auth-cookies.js";
+} from "./helpers/auth-cookies";
 
 const BCRYPT_ROUNDS = 10;
 

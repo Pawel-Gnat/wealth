@@ -2,11 +2,11 @@ import { Test, type TestingModule } from "@nestjs/testing";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DBS } from "../database-service/constants.js";
-import { storageTable } from "../database-service/tables/index.js";
-import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
-import { TestModule } from "../test/test.module.js";
-import { UsersService } from "./users.service.js";
+import { DBS } from "../database-service/constants";
+import { storageTable } from "../database-service/tables/index";
+import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users";
+import { TestModule } from "../test/test.module";
+import { UsersService } from "./users.service";
 
 describe("Users service", () => {
 	let moduleRef: TestingModule;

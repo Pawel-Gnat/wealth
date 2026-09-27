@@ -1,6 +1,6 @@
 import { Controller, Get, Req, Res } from "@nestjs/common";
 import type { Request, Response } from "express";
-import { SseService } from "./sse.service.js";
+import { SseService } from "./sse.service";
 
 @Controller()
 export class SseController {

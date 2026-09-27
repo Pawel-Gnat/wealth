@@ -10,12 +10,12 @@ import type {
 } from "@repo/api/types";
 import { and, asc, desc, eq, inArray, or } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { DBS } from "../database-service/constants.js";
+import { DBS } from "../database-service/constants";
 import {
 	budgetMemberTable,
 	budgetTable,
 	usersTable,
-} from "../database-service/tables/index.js";
+} from "../database-service/tables/index";
 
 @Injectable()
 export class BudgetService {

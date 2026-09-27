@@ -3,15 +3,15 @@ import { ORPCError } from "@orpc/nest";
 import { BUDGET_CREATED_MESSAGE } from "@repo/api/schemas";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { DBS } from "../database-service/constants.js";
+import { DBS } from "../database-service/constants";
 import {
 	budgetMemberTable,
 	budgetTable,
-} from "../database-service/tables/index.js";
-import { createTestUser } from "../test/mocks/users.js";
-import { TestModule } from "../test/test.module.js";
-import { UsersService } from "../users-service/users.service.js";
-import { BudgetService } from "./budget.service.js";
+} from "../database-service/tables/index";
+import { createTestUser } from "../test/mocks/users";
+import { TestModule } from "../test/test.module";
+import { UsersService } from "../users-service/users.service";
+import { BudgetService } from "./budget.service";
 
 describe("Budget service", () => {
 	let moduleRef: TestingModule;

@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
-import { AuthModule } from "../auth-service/auth.module.js";
-import { BudgetController } from "./budget.controller.js";
-import { BudgetService } from "./budget.service.js";
+import { AuthModule } from "../auth-service/auth.module";
+import { BudgetController } from "./budget.controller";
+import { BudgetService } from "./budget.service";
 
 @Module({
 	imports: [AuthModule],

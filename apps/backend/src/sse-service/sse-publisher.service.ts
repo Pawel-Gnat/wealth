@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import type { SessionEndedEvent, SseEvent } from "@repo/api/types";
 import { ulid } from "ulid";
-import { RedisService } from "../redis-service/redis.service.js";
-import { sseUserChannel } from "./helpers/sse-channels.js";
+import { RedisService } from "../redis-service/redis.service";
+import { sseUserChannel } from "./helpers/sse-channels";
 
 @Injectable()
 export class SsePublisher {

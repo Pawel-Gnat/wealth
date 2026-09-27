@@ -1,5 +1,5 @@
-import { toIngestEndpoint } from "./better-stack.js";
-import type { BetterStackConfig, LogSink } from "./types.js";
+import { toIngestEndpoint } from "./better-stack";
+import type { BetterStackConfig, LogSink } from "./types";
 
 type LogtailClient = {
 	info: (message: string, context: Record<string, unknown>) => unknown;

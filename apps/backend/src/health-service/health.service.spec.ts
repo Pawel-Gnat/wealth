@@ -1,9 +1,9 @@
 import { ServiceUnavailableException } from "@nestjs/common";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { PG_POOL_APP } from "../database-service/constants.js";
-import { RedisService } from "../redis-service/redis.service.js";
-import { HealthService } from "./health.service.js";
+import { PG_POOL_APP } from "../database-service/constants";
+import { RedisService } from "../redis-service/redis.service";
+import { HealthService } from "./health.service";
 
 describe("HealthService", () => {
 	let moduleRef: TestingModule;

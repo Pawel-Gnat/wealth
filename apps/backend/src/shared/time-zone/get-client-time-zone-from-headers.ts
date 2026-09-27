@@ -1,6 +1,6 @@
 import type { IncomingHttpHeaders } from "node:http";
-import { CLIENT_TIMEZONE_HEADER } from "./constants.js";
-import { resolveClientTimeZone } from "./resolve-client-time-zone.js";
+import { CLIENT_TIMEZONE_HEADER } from "./constants";
+import { resolveClientTimeZone } from "./resolve-client-time-zone";
 
 export const getClientTimeZoneFromHeaders = (
 	headers: IncomingHttpHeaders,

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { waitForDatabase } from "./wait-for-database.js";
+import { waitForDatabase } from "./wait-for-database";
 
 describe("waitForDatabase", () => {
 	it("resolves on the first successful ping", async () => {

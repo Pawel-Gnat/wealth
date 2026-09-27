@@ -8,11 +8,11 @@ import { ConfigService } from "@nestjs/config";
 import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { ulid } from "ulid";
-import { DBS } from "../database-service/constants.js";
-import { storageTable } from "../database-service/tables/index.js";
-import { S3_CLIENT } from "./constants.js";
-import { sanitizeFileName } from "./helpers/sanitize-file-name.js";
-import type { UploadAvatarInput } from "./types/storage.js";
+import { DBS } from "../database-service/constants";
+import { storageTable } from "../database-service/tables/index";
+import { S3_CLIENT } from "./constants";
+import { sanitizeFileName } from "./helpers/sanitize-file-name";
+import type { UploadAvatarInput } from "./types/storage";
 
 @Injectable()
 export class StorageService {

@@ -2,10 +2,10 @@ import { Inject, Injectable } from "@nestjs/common";
 import type { User } from "@repo/api/types";
 import { and, eq, isNull } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { DBS } from "../database-service/constants.js";
-import { usersTable } from "../database-service/tables/index.js";
-import type { UserRow } from "../database-service/types/types.js";
-import { CreateUserInput, UpdateUserDetailsInput } from "./types/users.js";
+import { DBS } from "../database-service/constants";
+import { usersTable } from "../database-service/tables/index";
+import type { UserRow } from "../database-service/types/types";
+import { CreateUserInput, UpdateUserDetailsInput } from "./types/users";
 
 @Injectable()
 export class UsersService {

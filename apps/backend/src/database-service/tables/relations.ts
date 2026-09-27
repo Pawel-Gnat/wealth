@@ -1,12 +1,12 @@
 import { relations } from "drizzle-orm";
-import { budgetMemberTable } from "./budget-members.table.js";
-import { budgetTable } from "./budgets.table.js";
-import { expenseDocumentsTable } from "./expense-documents.table.js";
-import { expenseLineItemsTable } from "./expense-line-items.table.js";
-import { incomeDocumentsTable } from "./income-documents.table.js";
-import { incomeLineItemsTable } from "./income-line-items.table.js";
-import { sessionsTable } from "./sessions.table.js";
-import { usersTable } from "./users.table.js";
+import { budgetMemberTable } from "./budget-members.table";
+import { budgetTable } from "./budgets.table";
+import { expenseDocumentsTable } from "./expense-documents.table";
+import { expenseLineItemsTable } from "./expense-line-items.table";
+import { incomeDocumentsTable } from "./income-documents.table";
+import { incomeLineItemsTable } from "./income-line-items.table";
+import { sessionsTable } from "./sessions.table";
+import { usersTable } from "./users.table";
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
 	expenseDocuments: many(expenseDocumentsTable),

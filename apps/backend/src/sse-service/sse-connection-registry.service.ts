@@ -1,8 +1,8 @@
 import { Injectable, Logger, type OnModuleDestroy } from "@nestjs/common";
 import { SSE_MAX_CONNECTIONS_PER_USER } from "@repo/common/constants";
 import { ulid } from "ulid";
-import { RedisService } from "../redis-service/redis.service.js";
-import { sseUserChannel } from "./helpers/sse-channels.js";
+import { RedisService } from "../redis-service/redis.service";
+import { sseUserChannel } from "./helpers/sse-channels";
 
 export type SseConnectionSink = {
 	next: (data: unknown) => void;

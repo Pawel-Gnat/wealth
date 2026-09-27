@@ -5,10 +5,10 @@ import {
 } from "@nestjs/common";
 import { sseEventSchema } from "@repo/api/schemas";
 import { SSE_OBSERVABILITY_EVENTS } from "@repo/observability/node";
-import { RedisService } from "../redis-service/redis.service.js";
-import { logSseEvent } from "../shared/observability/log-event.js";
-import { userIdFromSseChannel } from "./helpers/sse-channels.js";
-import { SseConnectionRegistry } from "./sse-connection-registry.service.js";
+import { RedisService } from "../redis-service/redis.service";
+import { logSseEvent } from "../shared/observability/log-event";
+import { userIdFromSseChannel } from "./helpers/sse-channels";
+import { SseConnectionRegistry } from "./sse-connection-registry.service";
 
 @Injectable()
 export class SseSubscriber implements OnModuleInit, OnModuleDestroy {

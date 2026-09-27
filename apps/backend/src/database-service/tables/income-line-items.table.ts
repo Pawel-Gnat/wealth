@@ -1,6 +1,6 @@
 import { index, integer, numeric, pgTable, text } from "drizzle-orm/pg-core";
-import { timestamp, ulidPrimaryKey } from "./helpers.js";
-import { incomeDocumentsTable } from "./income-documents.table.js";
+import { timestamp, ulidPrimaryKey } from "./helpers";
+import { incomeDocumentsTable } from "./income-documents.table";
 
 export const incomeLineItemsTable = pgTable(
 	"income_line_items",

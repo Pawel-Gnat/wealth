@@ -6,11 +6,11 @@ import {
 } from "@nestjs/common";
 import { SSE_HEARTBEAT_INTERVAL_MS } from "@repo/common/constants";
 import type { Request, Response } from "express";
-import { AuthService } from "../auth-service/auth.service.js";
+import { AuthService } from "../auth-service/auth.service";
 import {
 	SseConnectionRegistry,
 	SseFanOutUnavailableError,
-} from "./sse-connection-registry.service.js";
+} from "./sse-connection-registry.service";
 
 @Injectable()
 export class SseService {

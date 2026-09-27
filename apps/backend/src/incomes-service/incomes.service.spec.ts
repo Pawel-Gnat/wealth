@@ -7,15 +7,15 @@ import {
 import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { DBS } from "../database-service/constants.js";
+import { DBS } from "../database-service/constants";
 import {
 	incomeDocumentsTable,
 	incomeLineItemsTable,
-} from "../database-service/tables/index.js";
-import { createTestUser } from "../test/mocks/users.js";
-import { TestModule } from "../test/test.module.js";
-import { UsersService } from "../users-service/users.service.js";
-import { IncomesService } from "./incomes.service.js";
+} from "../database-service/tables/index";
+import { createTestUser } from "../test/mocks/users";
+import { TestModule } from "../test/test.module";
+import { UsersService } from "../users-service/users.service";
+import { IncomesService } from "./incomes.service";
 
 describe("Incomes service", () => {
 	let moduleRef: TestingModule;

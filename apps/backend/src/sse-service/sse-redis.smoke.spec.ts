@@ -1,13 +1,13 @@
 import { ConfigService } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { RedisService } from "../redis-service/redis.service.js";
+import { RedisService } from "../redis-service/redis.service";
 import {
 	setupTestRedis,
 	type TestRedisContext,
-} from "../test/helpers/redis-setup.js";
-import { sseUserChannel } from "./helpers/sse-channels.js";
-import { SsePublisher } from "./sse-publisher.service.js";
+} from "../test/helpers/redis-setup";
+import { sseUserChannel } from "./helpers/sse-channels";
+import { SsePublisher } from "./sse-publisher.service";
 
 describe("SSE Redis pub/sub smoke", () => {
 	let redis: TestRedisContext;

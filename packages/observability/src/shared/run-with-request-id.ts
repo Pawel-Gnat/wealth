@@ -1,4 +1,4 @@
-import type { Observability } from "./types.js";
+import type { Observability } from "./types";
 
 export const createRunWithRequestId = (
 	observability: Pick<Observability, "setRequestId" | "clearRequestId">,
