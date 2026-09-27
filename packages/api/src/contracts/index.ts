@@ -1,5 +1,10 @@
 import { populateContractRouterPaths } from "@orpc/contract";
 import {
+	createBudgetContract,
+	listBudgetDocumentsContract,
+	listBudgetsContract,
+} from "./budget.contract";
+import {
 	getDashboardCumulativeChartContract,
 	getDashboardDailyChartContract,
 	getDashboardSummaryContract,
@@ -14,7 +19,6 @@ import {
 	listExpensesContract,
 	updateExpenseContract,
 } from "./expenses.contract";
-import { createGroupBudgetContract } from "./group.contract";
 import {
 	createIncomeContract,
 	deleteIncomeContract,
@@ -48,8 +52,10 @@ export const rpcContract = populateContractRouterPaths({
 		update: updateExpenseContract,
 		delete: deleteExpenseContract,
 	},
-	group: {
-		create: createGroupBudgetContract,
+	budget: {
+		list: listBudgetsContract,
+		create: createBudgetContract,
+		documents: listBudgetDocumentsContract,
 	},
 	incomes: {
 		create: createIncomeContract,

@@ -33,6 +33,9 @@
 		"placeholder": "Budget title",
 		"required": "Title is required"
 	},
+	"member-ids": {
+		"unique": "Members must be unique"
+	},
 	"date": {
 		"label": "Date"
 	},

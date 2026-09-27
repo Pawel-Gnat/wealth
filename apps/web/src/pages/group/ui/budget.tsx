@@ -1,6 +1,7 @@
 import type { BudgetMember } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
+import { APP_ROUTES } from "@/app/routes";
 import { Badge, Button, Icon, Text, Tooltip } from "@/shared/components";
 import { AvatarGroup } from "@/shared/widgets/avatar-group";
 
@@ -8,18 +9,23 @@ type BudgetProps = {
 	id: string;
 	title: string;
 	members: BudgetMember[];
+	ownerId: string;
 	userId: string;
 };
 
-export const Budget = ({ id, title, members, userId }: BudgetProps) => {
+export const Budget = ({
+	id,
+	title,
+	members,
+	ownerId,
+	userId,
+}: BudgetProps) => {
 	const { t } = useTranslation();
-	const isOwner = members.some(
-		(member) => member.id === userId && member.role === "owner",
-	);
+	const isOwner = ownerId === userId;
 
 	return (
 		<Link
-			to={`/group/${id}`}
+			to={APP_ROUTES.group.view(id)}
 			className="flex items-center justify-between pb-4 hover:bg-muted transition-colors rounded-md p-4"
 		>
 			<div className="space-y-2">

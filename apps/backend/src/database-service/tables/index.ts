@@ -1,3 +1,5 @@
+export * from "./budget-members.table.js";
+export * from "./budgets.table.js";
 export * from "./expense-documents.table.js";
 export * from "./expense-line-items.table.js";
 export * from "./income-documents.table.js";

@@ -1,18 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { groupBudgetCreatePayloadSchema } from "@repo/api/schemas";
+import { budgetCreatePayloadSchema } from "@repo/api/schemas";
 import type {
-	GroupBudgetCreatePayload,
-	GroupBudgetCreateResponse,
+	BudgetCreatePayload,
+	BudgetCreateResponse,
 } from "@repo/api/types";
 import { runWithRequestId } from "@repo/observability/browser";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
-export const DEFAULT_CREATE_GROUP_BUDGET_VALUES: GroupBudgetCreatePayload = {
+export const DEFAULT_CREATE_GROUP_BUDGET_VALUES: BudgetCreatePayload = {
 	title: "",
 	memberIds: [],
 };
@@ -25,22 +26,27 @@ export const useCreateGroupBudgetForm = ({
 	onCreated,
 }: UseCreateGroupBudgetFormProps) => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 
-	const form = useForm<GroupBudgetCreatePayload>({
-		resolver: zodResolver(groupBudgetCreatePayloadSchema),
+	const form = useForm<BudgetCreatePayload>({
+		resolver: zodResolver(budgetCreatePayloadSchema),
 		defaultValues: DEFAULT_CREATE_GROUP_BUDGET_VALUES,
 	});
 
 	const mutation = useMutation<
-		GroupBudgetCreateResponse,
+		BudgetCreateResponse,
 		Error,
-		GroupBudgetCreatePayload
+		BudgetCreatePayload
 	>({
 		mutationFn: (payload) =>
 			runWithRequestId(() =>
-				controlledAsync(() => orpcClient.group.create(payload)),
+				controlledAsync(() => orpcClient.budget.create(payload)),
 			),
 		onSuccess: () => {
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.budgets.all(),
+				exact: true,
+			});
 			form.reset(DEFAULT_CREATE_GROUP_BUDGET_VALUES);
 			toast.success(t("toast.success.group-budget-created", { ns: "common" }));
 			onCreated();

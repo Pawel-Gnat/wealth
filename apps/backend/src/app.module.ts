@@ -9,6 +9,7 @@ import { ORPCModule, onError } from "@orpc/nest";
 import { captureException } from "@repo/observability/node";
 import type { Request, Response } from "express";
 import { AuthModule } from "./auth-service/auth.module.js";
+import { BudgetModule } from "./budget-service/budget.module.js";
 import { DashboardModule } from "./dashboard-service/dashboard.module.js";
 import { DatabaseModule } from "./database-service/database.module.js";
 import { ExpensesModule } from "./expenses-service/expenses.module.js";
@@ -60,6 +61,7 @@ declare module "@orpc/nest" {
 		UsersModule,
 		StorageModule,
 		ExpensesModule,
+		BudgetModule,
 		IncomesModule,
 		DashboardModule,
 		AuthModule,

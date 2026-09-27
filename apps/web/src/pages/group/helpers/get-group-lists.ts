@@ -1,19 +1,12 @@
-import type { BudgetMember, GroupBudget } from "@repo/api/types";
+import type { BudgetListItem, BudgetMember } from "@repo/api/types";
 
 export type GroupInvitation = {
-	budget: GroupBudget;
+	budget: BudgetListItem;
 	invitee: BudgetMember;
 };
 
-export const getActiveBudgets = (budgets: GroupBudget[], userId: string) =>
-	budgets.filter((budget) =>
-		budget.members.some(
-			(member) => member.id === userId && member.status === "active",
-		),
-	);
-
 export const getInvitations = (
-	budgets: GroupBudget[],
+	budgets: BudgetListItem[],
 	userId: string,
 ): GroupInvitation[] =>
 	budgets.flatMap((budget) => {
@@ -23,11 +16,7 @@ export const getInvitations = (
 			return [{ budget, invitee: me }];
 		}
 
-		if (
-			!budget.members.some(
-				(member) => member.id === userId && member.role === "owner",
-			)
-		) {
+		if (budget.ownerId !== userId) {
 			return [];
 		}
 

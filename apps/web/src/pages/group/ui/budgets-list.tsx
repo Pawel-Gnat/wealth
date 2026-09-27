@@ -1,10 +1,10 @@
-import type { GroupBudget } from "@repo/api/types";
+import type { BudgetListItem } from "@repo/api/types";
 import { Fragment } from "react";
 import { Separator } from "@/shared/components";
 import { Budget } from "./budget";
 
 type BudgetsListProps = {
-	budgets: GroupBudget[];
+	budgets: BudgetListItem[];
 	userId: string;
 };
 
@@ -17,6 +17,7 @@ export const BudgetsList = ({ budgets, userId }: BudgetsListProps) => {
 						id={budget.id}
 						title={budget.title}
 						userId={userId}
+						ownerId={budget.ownerId}
 						members={budget.members}
 					/>
 					{index !== budgets.length - 1 && (
