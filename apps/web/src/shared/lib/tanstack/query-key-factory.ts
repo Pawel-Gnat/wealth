@@ -12,6 +12,7 @@ export const queryKeys = {
 	},
 	budgets: {
 		all: () => ["budgets"] as const,
+		invites: () => ["budgets", "invites"] as const,
 		documents: (id: string, kind?: BudgetDocumentKind) =>
 			["budgets", id, "documents", kind ?? "all"] as const,
 	},

@@ -7,6 +7,8 @@ import type {
 	budgetDocumentSchema,
 	budgetDocumentsParamsSchema,
 	budgetDocumentsResponseSchema,
+	budgetInviteSchema,
+	budgetInvitesResponseSchema,
 	budgetListItemSchema,
 	budgetListResponseSchema,
 	budgetMemberSchema,
@@ -19,6 +21,8 @@ export type BudgetMember = z.infer<typeof budgetMemberSchema>;
 export type Budget = z.infer<typeof budgetSchema>;
 export type BudgetListItem = z.infer<typeof budgetListItemSchema>;
 export type BudgetListResponse = z.infer<typeof budgetListResponseSchema>;
+export type BudgetInvite = z.infer<typeof budgetInviteSchema>;
+export type BudgetInvitesResponse = z.infer<typeof budgetInvitesResponseSchema>;
 export type BudgetCreatePayload = z.infer<typeof budgetCreatePayloadSchema>;
 export type BudgetCreateResponseData = z.infer<
 	typeof budgetCreateResponseDataSchema

@@ -19,6 +19,15 @@ export class BudgetController {
 		});
 	}
 
+	@Implement(rpcContract.budget.invites)
+	listBudgetInvitesRpc() {
+		return implement(rpcContract.budget.invites).handler(({ context }) => {
+			return this.budgetService.listInvitesByUserId(
+				userIdFromRequest(context.request),
+			);
+		});
+	}
+
 	@Implement(rpcContract.budget.create)
 	createBudgetRpc() {
 		return implement(rpcContract.budget.create).handler(

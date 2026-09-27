@@ -33,6 +33,15 @@ export const budgetListResponseSchema = apiPayload(
 	z.array(budgetListItemSchema),
 );
 
+export const budgetInviteSchema = z.object({
+	budget: budgetListItemSchema,
+	invitee: budgetMemberSchema,
+});
+
+export const budgetInvitesResponseSchema = apiPayload(
+	z.array(budgetInviteSchema),
+);
+
 export const budgetCreatePayloadSchema = z.object({
 	title: z.string().trim().min(1, "form:title.required"),
 	memberIds: z

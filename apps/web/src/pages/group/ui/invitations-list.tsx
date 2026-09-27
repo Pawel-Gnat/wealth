@@ -1,8 +1,8 @@
-import type { GroupInvitation } from "../helpers/get-group-lists";
+import type { BudgetInvite } from "@repo/api/types";
 import { Invitation } from "./invitation";
 
 type InvitationsListProps = {
-	invitations: GroupInvitation[];
+	invitations: BudgetInvite[];
 	userId: string;
 };
 

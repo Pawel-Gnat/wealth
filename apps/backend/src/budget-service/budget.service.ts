@@ -3,10 +3,11 @@ import { BUDGET_CREATED_MESSAGE } from "@repo/api/schemas";
 import type {
 	BudgetCreatePayload,
 	BudgetCreateResponse,
+	BudgetInvitesResponse,
 	BudgetListResponse,
 	BudgetMember,
 } from "@repo/api/types";
-import { and, desc, eq, inArray, or } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, or } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants.js";
 import {
@@ -53,6 +54,73 @@ export class BudgetService {
 			return { data: [] };
 		}
 
+		const membersByBudgetId = await this.membersByBudgetId(
+			budgets.map((budget) => budget.id),
+		);
+
+		return {
+			data: budgets.map((budget) => ({
+				...budget,
+				members: membersByBudgetId.get(budget.id) ?? [],
+			})),
+		};
+	}
+
+	async listInvitesByUserId(userId: string): Promise<BudgetInvitesResponse> {
+		const inviteRows = await this.db
+			.select({
+				budgetId: budgetTable.id,
+				title: budgetTable.title,
+				ownerId: budgetTable.ownerId,
+				inviteeId: usersTable.id,
+			})
+			.from(budgetMemberTable)
+			.innerJoin(budgetTable, eq(budgetMemberTable.budgetId, budgetTable.id))
+			.innerJoin(usersTable, eq(budgetMemberTable.userId, usersTable.id))
+			.where(
+				and(
+					eq(budgetMemberTable.status, "pending"),
+					or(
+						eq(budgetMemberTable.userId, userId),
+						eq(budgetTable.ownerId, userId),
+					),
+				),
+			)
+			.orderBy(desc(budgetTable.createdAt), asc(usersTable.id));
+
+		if (inviteRows.length === 0) {
+			return { data: [] };
+		}
+
+		const membersByBudgetId = await this.membersByBudgetId([
+			...new Set(inviteRows.map((row) => row.budgetId)),
+		]);
+
+		return {
+			data: inviteRows.flatMap((row) => {
+				const members = membersByBudgetId.get(row.budgetId) ?? [];
+				const invitee = members.find((member) => member.id === row.inviteeId);
+
+				if (!invitee) {
+					return [];
+				}
+
+				return [
+					{
+						budget: {
+							id: row.budgetId,
+							title: row.title,
+							ownerId: row.ownerId,
+							members,
+						},
+						invitee,
+					},
+				];
+			}),
+		};
+	}
+
+	private async membersByBudgetId(budgetIds: string[]) {
 		const memberRows = await this.db
 			.select({
 				budgetId: budgetMemberTable.budgetId,
@@ -64,12 +132,7 @@ export class BudgetService {
 			})
 			.from(budgetMemberTable)
 			.innerJoin(usersTable, eq(budgetMemberTable.userId, usersTable.id))
-			.where(
-				inArray(
-					budgetMemberTable.budgetId,
-					budgets.map((budget) => budget.id),
-				),
-			);
+			.where(inArray(budgetMemberTable.budgetId, budgetIds));
 
 		const membersByBudgetId = new Map<string, BudgetMember[]>();
 
@@ -86,12 +149,7 @@ export class BudgetService {
 			membersByBudgetId.set(row.budgetId, members);
 		}
 
-		return {
-			data: budgets.map((budget) => ({
-				...budget,
-				members: membersByBudgetId.get(budget.id) ?? [],
-			})),
-		};
+		return membersByBudgetId;
 	}
 
 	async createBudgetByUserId(

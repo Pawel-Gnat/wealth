@@ -186,6 +186,113 @@ describe("Budget service", () => {
 		});
 	});
 
+	describe("list invites by user id", () => {
+		it("returns an empty list when the user has no pending invites", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: "hashed-password",
+				emailTag: "budget-invites-empty",
+			});
+
+			await expect(budgetService.listInvitesByUserId(user.id)).resolves.toEqual(
+				{
+					data: [],
+				},
+			);
+		});
+
+		it("returns incoming pending memberships and outgoing pending invitees", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+			const owner = await createTestUser(usersService, {
+				email: `budget-invites-owner-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+			const activeMember = await createTestUser(usersService, {
+				email: `budget-invites-active-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+			const pendingMember = await createTestUser(usersService, {
+				email: `budget-invites-pending-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+			const otherOwner = await createTestUser(usersService, {
+				email: `budget-invites-other-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+
+			const [ownedBudget] = await db
+				.insert(budgetTable)
+				.values({
+					title: "Household",
+					ownerId: owner.id,
+					createdAt: new Date("2024-06-01T00:00:00.000Z"),
+				})
+				.returning({ id: budgetTable.id });
+
+			const [incomingBudget] = await db
+				.insert(budgetTable)
+				.values({
+					title: "Weekend",
+					ownerId: otherOwner.id,
+					createdAt: new Date("2024-01-01T00:00:00.000Z"),
+				})
+				.returning({ id: budgetTable.id });
+
+			if (!ownedBudget || !incomingBudget) {
+				throw new Error("Expected seeded budgets");
+			}
+
+			await db.insert(budgetMemberTable).values([
+				{
+					budgetId: ownedBudget.id,
+					userId: activeMember.id,
+					status: "active",
+				},
+				{
+					budgetId: ownedBudget.id,
+					userId: pendingMember.id,
+				},
+				{
+					budgetId: incomingBudget.id,
+					userId: owner.id,
+				},
+			]);
+
+			const forOwner = await budgetService.listInvitesByUserId(owner.id);
+
+			expect(forOwner.data.map((invite) => invite.budget.title)).toEqual([
+				"Household",
+				"Weekend",
+			]);
+			expect(forOwner.data[0]).toMatchObject({
+				budget: { id: ownedBudget.id, ownerId: owner.id },
+				invitee: { id: pendingMember.id, status: "pending" },
+			});
+			expect(
+				forOwner.data[0]?.budget.members.map((member) => member.id),
+			).toEqual(expect.arrayContaining([activeMember.id, pendingMember.id]));
+			expect(forOwner.data[1]).toMatchObject({
+				budget: { id: incomingBudget.id, ownerId: otherOwner.id },
+				invitee: { id: owner.id, status: "pending" },
+			});
+
+			const forPendingMember = await budgetService.listInvitesByUserId(
+				pendingMember.id,
+			);
+			expect(forPendingMember.data).toHaveLength(1);
+			expect(forPendingMember.data[0]).toMatchObject({
+				budget: { id: ownedBudget.id },
+				invitee: { id: pendingMember.id, status: "pending" },
+			});
+
+			const forActiveMember = await budgetService.listInvitesByUserId(
+				activeMember.id,
+			);
+			expect(forActiveMember.data).toEqual([]);
+		});
+	});
+
 	describe("create budget by user id", () => {
 		it("creates a budget without members", async () => {
 			const db = moduleRef.get(DBS.APP);

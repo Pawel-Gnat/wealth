@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useUser } from "@/context/auth";
 import { Heading } from "@/shared/components";
 import { CardState } from "@/shared/widgets/card-state";
-import { getInvitations } from "./helpers/get-group-lists";
+import { useBudgetInvites } from "./hooks/use-budget-invites";
 import { useBudgets } from "./hooks/use-budgets";
 import { BudgetModalForm } from "./ui/budget-modal-form";
 import { BudgetsList } from "./ui/budgets-list";
@@ -12,12 +12,15 @@ export const GroupDocumentsPage = () => {
 	const { t } = useTranslation();
 	const { data: user } = useUser();
 	const { data: budgets, isLoading, isError } = useBudgets();
+	const {
+		data: invitations,
+		isLoading: isInvitesLoading,
+		isError: isInvitesError,
+	} = useBudgetInvites();
 
 	if (!user) {
 		return null;
 	}
-
-	const invitations = budgets ? getInvitations(budgets, user.id) : undefined;
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -42,8 +45,8 @@ export const GroupDocumentsPage = () => {
 			<CardState
 				title={t("invitations.title", { ns: "group" })}
 				data={invitations}
-				isLoading={isLoading}
-				isError={isError}
+				isLoading={isInvitesLoading}
+				isError={isInvitesError}
 				errorTitle={t("invitations.error.title", { ns: "group" })}
 				errorDescription={t("invitations.error.description", {
 					ns: "group",
