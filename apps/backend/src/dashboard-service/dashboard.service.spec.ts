@@ -10,15 +10,15 @@ import {
 	it,
 	vi,
 } from "vitest";
-import { DBS } from "../database-service/constants.js";
+import { DBS } from "../database-service/constants";
 import {
 	expenseDocumentsTable,
 	incomeDocumentsTable,
-} from "../database-service/tables/index.js";
-import { createTestUser } from "../test/mocks/users.js";
-import { TestModule } from "../test/test.module.js";
-import { UsersService } from "../users-service/users.service.js";
-import { DashboardService } from "./dashboard.service.js";
+} from "../database-service/tables/index";
+import { createTestUser } from "../test/mocks/users";
+import { TestModule } from "../test/test.module";
+import { UsersService } from "../users-service/users.service";
+import { DashboardService } from "./dashboard.service";
 
 const FIXED_TODAY = "2026-07-15T12:00:00.000Z";
 

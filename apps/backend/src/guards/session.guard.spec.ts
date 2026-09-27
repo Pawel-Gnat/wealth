@@ -1,7 +1,7 @@
 import { UnauthorizedException } from "@nestjs/common";
 import { describe, expect, it, vi } from "vitest";
-import type { AuthService } from "../auth-service/auth.service.js";
-import { SessionGuard } from "./session.guard.js";
+import type { AuthService } from "../auth-service/auth.service";
+import { SessionGuard } from "./session.guard";
 
 const createContext = (request: object) =>
 	({

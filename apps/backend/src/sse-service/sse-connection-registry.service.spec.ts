@@ -1,12 +1,12 @@
 import { Test, type TestingModule } from "@nestjs/testing";
 import { SSE_MAX_CONNECTIONS_PER_USER } from "@repo/common/constants";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { RedisService } from "../redis-service/redis.service.js";
-import { sseUserChannel } from "./helpers/sse-channels.js";
+import { RedisService } from "../redis-service/redis.service";
+import { sseUserChannel } from "./helpers/sse-channels";
 import {
 	SseConnectionRegistry,
 	SseFanOutUnavailableError,
-} from "./sse-connection-registry.service.js";
+} from "./sse-connection-registry.service";
 
 describe("SseConnectionRegistry", () => {
 	let moduleRef: TestingModule;

@@ -8,23 +8,23 @@ import { APP_FILTER, REQUEST } from "@nestjs/core";
 import { ORPCModule, onError } from "@orpc/nest";
 import { captureException } from "@repo/observability/node";
 import type { Request, Response } from "express";
-import { AuthModule } from "./auth-service/auth.module.js";
-import { BudgetModule } from "./budget-service/budget.module.js";
-import { DashboardModule } from "./dashboard-service/dashboard.module.js";
-import { DatabaseModule } from "./database-service/database.module.js";
-import { ExpensesModule } from "./expenses-service/expenses.module.js";
+import { AuthModule } from "./auth-service/auth.module";
+import { BudgetModule } from "./budget-service/budget.module";
+import { DashboardModule } from "./dashboard-service/dashboard.module";
+import { DatabaseModule } from "./database-service/database.module";
+import { ExpensesModule } from "./expenses-service/expenses.module";
 import {
 	ObservabilityExceptionFilter,
 	shouldCaptureException,
-} from "./filters/observability-exception.filter.js";
-import { HealthModule } from "./health-service/health.module.js";
-import { IncomesModule } from "./incomes-service/incomes.module.js";
-import { RequestIdMiddleware } from "./middleware/request-id.middleware.js";
-import { RedisModule } from "./redis-service/redis.module.js";
-import { SseHttpModule } from "./sse-service/sse-http.module.js";
-import { SseRealtimeModule } from "./sse-service/sse-realtime.module.js";
-import { StorageModule } from "./storage-service/storage.module.js";
-import { UsersModule } from "./users-service/users.module.js";
+} from "./filters/observability-exception.filter";
+import { HealthModule } from "./health-service/health.module";
+import { IncomesModule } from "./incomes-service/incomes.module";
+import { RequestIdMiddleware } from "./middleware/request-id.middleware";
+import { RedisModule } from "./redis-service/redis.module";
+import { SseHttpModule } from "./sse-service/sse-http.module";
+import { SseRealtimeModule } from "./sse-service/sse-realtime.module";
+import { StorageModule } from "./storage-service/storage.module";
+import { UsersModule } from "./users-service/users.module";
 
 declare module "@orpc/nest" {
 	interface ORPCGlobalContext {

@@ -1,6 +1,6 @@
 import { index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { timestamp as defaultTimestamp, ulidPrimaryKey } from "./helpers.js";
-import { usersTable } from "./users.table.js";
+import { timestamp as defaultTimestamp, ulidPrimaryKey } from "./helpers";
+import { usersTable } from "./users.table";
 
 export const sessionsTable = pgTable(
 	"sessions",

@@ -1,4 +1,4 @@
-import type { ContextStore, ObservabilityContext } from "./types.js";
+import type { ContextStore, ObservabilityContext } from "./types";
 
 export const createModuleContextStore = (): ContextStore => {
 	let context: ObservabilityContext = {};

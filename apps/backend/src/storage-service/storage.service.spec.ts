@@ -11,11 +11,11 @@ import {
 	it,
 	vi,
 } from "vitest";
-import { DBS } from "../database-service/constants.js";
-import { storageTable } from "../database-service/tables/index.js";
-import { TestModule } from "../test/test.module.js";
-import { S3_CLIENT } from "./constants.js";
-import { StorageService } from "./storage.service.js";
+import { DBS } from "../database-service/constants";
+import { storageTable } from "../database-service/tables/index";
+import { TestModule } from "../test/test.module";
+import { S3_CLIENT } from "./constants";
+import { StorageService } from "./storage.service";
 
 const USER_ID = "01ARZ3NDEKTSV4RRFFQ69G5FAV";
 const BUCKET = "wealth-storage";

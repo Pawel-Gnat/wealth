@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getTodayInTimeZone } from "./get-today-in-time-zone.js";
+import { getTodayInTimeZone } from "./get-today-in-time-zone";
 
 describe("getTodayInTimeZone", () => {
 	beforeEach(() => {

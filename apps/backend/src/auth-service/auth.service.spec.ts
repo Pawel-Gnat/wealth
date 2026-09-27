@@ -20,17 +20,14 @@ import {
 	vi,
 } from "vitest";
 
-import { DBS } from "../database-service/constants.js";
-import {
-	sessionsTable,
-	storageTable,
-} from "../database-service/tables/index.js";
-import { SsePublisher } from "../sse-service/sse-publisher.service.js";
-import { StorageService } from "../storage-service/storage.service.js";
-import { createAuthTestingModule } from "../test/helpers/modules.js";
-import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users.js";
-import { UsersService } from "../users-service/users.service.js";
-import { AuthService, type RpcSession } from "./auth.service.js";
+import { DBS } from "../database-service/constants";
+import { sessionsTable, storageTable } from "../database-service/tables/index";
+import { SsePublisher } from "../sse-service/sse-publisher.service";
+import { StorageService } from "../storage-service/storage.service";
+import { createAuthTestingModule } from "../test/helpers/modules";
+import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users";
+import { UsersService } from "../users-service/users.service";
+import { AuthService, type RpcSession } from "./auth.service";
 
 const PASSWORD = "secret";
 

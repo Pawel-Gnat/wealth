@@ -1,7 +1,4 @@
-import {
-	createConsoleErrorSink,
-	createConsoleLogSink,
-} from "./console-sink.js";
+import { createConsoleErrorSink, createConsoleLogSink } from "./console-sink";
 import type {
 	ContextStore,
 	ErrorSink,
@@ -10,7 +7,7 @@ import type {
 	Observability,
 	ObservabilityInitConfig,
 	ObservabilityService,
-} from "./types.js";
+} from "./types";
 
 type RuntimeState = {
 	service: ObservabilityService;

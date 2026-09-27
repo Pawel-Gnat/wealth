@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
 	MIGRATION_ADVISORY_LOCK_KEY,
 	withMigrationLock,
-} from "./with-migration-lock.js";
+} from "./with-migration-lock";
 
 describe("withMigrationLock", () => {
 	it("acquires the advisory lock, runs the callback, then unlocks", async () => {

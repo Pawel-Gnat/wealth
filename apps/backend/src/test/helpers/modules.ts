@@ -2,10 +2,10 @@ import type { TestingModule } from "@nestjs/testing";
 import { Test } from "@nestjs/testing";
 import { vi } from "vitest";
 
-import { AuthService } from "../../auth-service/auth.service.js";
-import { SsePublisher } from "../../sse-service/sse-publisher.service.js";
-import { StorageService } from "../../storage-service/storage.service.js";
-import { TestModule } from "../test.module.js";
+import { AuthService } from "../../auth-service/auth.service";
+import { SsePublisher } from "../../sse-service/sse-publisher.service";
+import { StorageService } from "../../storage-service/storage.service";
+import { TestModule } from "../test.module";
 
 export async function createAuthTestingModule(overrides?: {
 	ssePublisher?: Partial<SsePublisher>;

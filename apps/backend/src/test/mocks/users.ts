@@ -1,6 +1,6 @@
-import type { UserRow } from "../../database-service/types/types.js";
-import type { CreateUserInput } from "../../users-service/types/users.js";
-import type { UsersService } from "../../users-service/users.service.js";
+import type { UserRow } from "../../database-service/types/types";
+import type { CreateUserInput } from "../../users-service/types/users";
+import type { UsersService } from "../../users-service/users.service";
 
 export function uniqueTestUserEmail(emailTag: string): string {
 	return `${emailTag}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}@example.com`;

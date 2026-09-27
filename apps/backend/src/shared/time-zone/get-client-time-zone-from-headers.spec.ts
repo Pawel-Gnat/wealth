@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { FALLBACK_TIME_ZONE } from "./constants.js";
-import { getClientTimeZoneFromHeaders } from "./get-client-time-zone-from-headers.js";
+import { FALLBACK_TIME_ZONE } from "./constants";
+import { getClientTimeZoneFromHeaders } from "./get-client-time-zone-from-headers";
 
 describe("getClientTimeZoneFromHeaders", () => {
 	it("reads a string header value", () => {

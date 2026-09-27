@@ -1,7 +1,7 @@
 import { ConfigService } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { RedisService } from "./redis.service.js";
+import { RedisService } from "./redis.service";
 
 const {
 	mockPublisher,

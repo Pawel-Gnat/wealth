@@ -1,5 +1,5 @@
 import { type ChildProcess, spawn } from "node:child_process";
-import { setupTestDatabase } from "./helpers/db-setup.js";
+import { setupTestDatabase } from "./helpers/db-setup";
 
 const SHUTDOWN_GRACE_MS = 2_000;
 

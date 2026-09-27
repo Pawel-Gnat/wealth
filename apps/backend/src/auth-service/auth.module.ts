@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
-import { SessionGuard } from "../guards/session.guard.js";
-import { SseRealtimeModule } from "../sse-service/sse-realtime.module.js";
-import { UsersModule } from "../users-service/users.module.js";
-import { AuthController } from "./auth.controller.js";
-import { AuthService } from "./auth.service.js";
+import { SessionGuard } from "../guards/session.guard";
+import { SseRealtimeModule } from "../sse-service/sse-realtime.module";
+import { UsersModule } from "../users-service/users.module";
+import { AuthController } from "./auth.controller";
+import { AuthService } from "./auth.service";
 
 @Module({
 	imports: [UsersModule, SseRealtimeModule],

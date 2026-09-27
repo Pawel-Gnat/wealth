@@ -5,8 +5,8 @@ import {
 	ServiceUnavailableException,
 } from "@nestjs/common";
 import type { Pool } from "pg";
-import { PG_POOL_APP } from "../database-service/constants.js";
-import { RedisService } from "../redis-service/redis.service.js";
+import { PG_POOL_APP } from "../database-service/constants";
+import { RedisService } from "../redis-service/redis.service";
 
 @Injectable()
 export class HealthService {

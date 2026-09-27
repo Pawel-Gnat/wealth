@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { FALLBACK_TIME_ZONE } from "./constants.js";
-import { resolveClientTimeZone } from "./resolve-client-time-zone.js";
+import { FALLBACK_TIME_ZONE } from "./constants";
+import { resolveClientTimeZone } from "./resolve-client-time-zone";
 
 describe("resolveClientTimeZone", () => {
 	it("returns UTC when value is missing or blank", () => {

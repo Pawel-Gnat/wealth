@@ -1,4 +1,4 @@
-import type { ErrorSink, ObservabilityInitConfig } from "./types.js";
+import type { ErrorSink, ObservabilityInitConfig } from "./types";
 
 type SentryScope = {
 	setTag: (key: string, value: string) => void;

@@ -1,4 +1,4 @@
-import type { BetterStackConfig } from "./types.js";
+import type { BetterStackConfig } from "./types";
 
 export const hasBetterStackCredentials = (
 	betterStack: BetterStackConfig | undefined,

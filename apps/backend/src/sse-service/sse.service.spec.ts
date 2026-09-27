@@ -5,12 +5,12 @@ import {
 import { Test, type TestingModule } from "@nestjs/testing";
 import type { Request, Response } from "express";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AuthService } from "../auth-service/auth.service.js";
-import { SseService } from "./sse.service.js";
+import { AuthService } from "../auth-service/auth.service";
+import { SseService } from "./sse.service";
 import {
 	SseConnectionRegistry,
 	SseFanOutUnavailableError,
-} from "./sse-connection-registry.service.js";
+} from "./sse-connection-registry.service";
 
 describe("SseService", () => {
 	let moduleRef: TestingModule;

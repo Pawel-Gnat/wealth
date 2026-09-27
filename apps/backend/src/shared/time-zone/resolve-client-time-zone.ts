@@ -1,4 +1,4 @@
-import { FALLBACK_TIME_ZONE } from "./constants.js";
+import { FALLBACK_TIME_ZONE } from "./constants";
 
 export const resolveClientTimeZone = (value: string | undefined) => {
 	const trimmed = value?.trim();

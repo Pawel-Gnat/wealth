@@ -1,10 +1,10 @@
-import { shouldUseBetterStack } from "./better-stack.js";
+import { shouldUseBetterStack } from "./better-stack";
 import type {
 	BetterStackConfig,
 	ErrorSink,
 	LogSink,
 	ObservabilityInitConfig,
-} from "./types.js";
+} from "./types";
 
 type RemoteSinks = {
 	logSink: LogSink;

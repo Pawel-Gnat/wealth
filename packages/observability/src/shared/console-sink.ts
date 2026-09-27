@@ -1,4 +1,4 @@
-import type { ErrorSink, LogSink } from "./types.js";
+import type { ErrorSink, LogSink } from "./types";
 
 export const createConsoleLogSink = (): LogSink => ({
 	write: (record) => {

@@ -1,5 +1,5 @@
 import { formatInTimeZone } from "date-fns-tz";
-import { FALLBACK_TIME_ZONE } from "./constants.js";
+import { FALLBACK_TIME_ZONE } from "./constants";
 
 export const getTodayInTimeZone = (
 	timeZone: string,

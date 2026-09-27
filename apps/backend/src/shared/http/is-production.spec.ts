@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isProduction } from "./is-production.js";
+import { isProduction } from "./is-production";
 
 describe("isProduction", () => {
 	it("returns true in production", () => {

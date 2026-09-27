@@ -1,8 +1,8 @@
 import { budgetMemberStatuses } from "@repo/api/schemas";
 import { index, pgEnum, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
-import { budgetTable } from "./budgets.table.js";
-import { timestamp } from "./helpers.js";
-import { usersTable } from "./users.table.js";
+import { budgetTable } from "./budgets.table";
+import { timestamp } from "./helpers";
+import { usersTable } from "./users.table";
 
 export const budgetMemberStatusEnum = pgEnum(
 	"budget_member_status",

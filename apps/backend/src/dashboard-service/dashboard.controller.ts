@@ -1,10 +1,10 @@
 import { Controller, UseGuards } from "@nestjs/common";
 import { Implement, implement } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
-import { SessionGuard } from "../guards/session.guard.js";
-import { userIdFromRequest } from "../guards/user-id-from-request.js";
-import { getClientTimeZoneFromHeaders } from "../shared/time-zone/get-client-time-zone-from-headers.js";
-import { DashboardService } from "./dashboard.service.js";
+import { SessionGuard } from "../guards/session.guard";
+import { userIdFromRequest } from "../guards/user-id-from-request";
+import { getClientTimeZoneFromHeaders } from "../shared/time-zone/get-client-time-zone-from-headers";
+import { DashboardService } from "./dashboard.service";
 
 @Controller()
 @UseGuards(SessionGuard)

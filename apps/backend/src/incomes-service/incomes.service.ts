@@ -19,16 +19,16 @@ import {
 } from "@repo/common/helpers";
 import { and, desc, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { DBS } from "../database-service/constants.js";
+import { DBS } from "../database-service/constants";
 import {
 	incomeDocumentsTable,
 	incomeLineItemsTable,
-} from "../database-service/tables/index.js";
+} from "../database-service/tables/index";
 import {
 	calculateDocumentTotalAmount,
 	mapPayloadLineItemsToInsertRows,
-} from "../shared/document/document-line-items.helpers.js";
-import { logDocumentSucceeded } from "../shared/observability/log-event.js";
+} from "../shared/document/document-line-items.helpers";
+import { logDocumentSucceeded } from "../shared/observability/log-event";
 
 @Injectable()
 export class IncomesService {

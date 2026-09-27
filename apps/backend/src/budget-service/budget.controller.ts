@@ -1,9 +1,9 @@
 import { Controller, UseGuards } from "@nestjs/common";
 import { Implement, implement } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
-import { SessionGuard } from "../guards/session.guard.js";
-import { userIdFromRequest } from "../guards/user-id-from-request.js";
-import { BudgetService } from "./budget.service.js";
+import { SessionGuard } from "../guards/session.guard";
+import { userIdFromRequest } from "../guards/user-id-from-request";
+import { BudgetService } from "./budget.service";
 
 @Controller()
 @UseGuards(SessionGuard)

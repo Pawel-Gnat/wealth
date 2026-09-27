@@ -1,1 +1,1 @@
-export * from "./document-date.js";
+export * from "./document-date";

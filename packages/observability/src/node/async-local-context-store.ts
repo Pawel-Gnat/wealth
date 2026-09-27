@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import type { ContextStore, ObservabilityContext } from "../shared/types.js";
+import type { ContextStore, ObservabilityContext } from "../shared/types";
 
 type StoreState = ObservabilityContext;
 

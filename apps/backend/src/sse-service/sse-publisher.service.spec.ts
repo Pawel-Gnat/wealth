@@ -1,8 +1,8 @@
 import { Test, type TestingModule } from "@nestjs/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { RedisService } from "../redis-service/redis.service.js";
-import { sseUserChannel } from "./helpers/sse-channels.js";
-import { SsePublisher } from "./sse-publisher.service.js";
+import { RedisService } from "../redis-service/redis.service";
+import { sseUserChannel } from "./helpers/sse-channels";
+import { SsePublisher } from "./sse-publisher.service";
 
 describe("SsePublisher", () => {
 	let moduleRef: TestingModule;

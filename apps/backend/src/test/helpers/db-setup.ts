@@ -1,15 +1,11 @@
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 
-const migrationsFolder = resolve(
-	dirname(fileURLToPath(import.meta.url)),
-	"../../../drizzle",
-);
+const migrationsFolder = resolve(process.cwd(), "drizzle");
 
 export interface TestDatabaseContext {
 	connectionUri: string;

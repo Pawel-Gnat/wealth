@@ -10,13 +10,13 @@ import {
 } from "@repo/common/helpers";
 import { and, eq, gte, lte, sum } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { DBS } from "../database-service/constants.js";
+import { DBS } from "../database-service/constants";
 import {
 	expenseDocumentsTable,
 	incomeDocumentsTable,
-} from "../database-service/tables/index.js";
-import { getTodayInTimeZone } from "../shared/time-zone/get-today-in-time-zone.js";
-import type { AmountRow } from "./types/amount-row.js";
+} from "../database-service/tables/index";
+import { getTodayInTimeZone } from "../shared/time-zone/get-today-in-time-zone";
+import type { AmountRow } from "./types/amount-row";
 
 @Injectable()
 export class DashboardService {

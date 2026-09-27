@@ -1,4 +1,4 @@
-import { setupTestDatabase } from "./helpers/db-setup.js";
+import { setupTestDatabase } from "./helpers/db-setup";
 
 export default async function globalSetup(): Promise<() => Promise<void>> {
 	const { connectionUri, stop } = await setupTestDatabase();
