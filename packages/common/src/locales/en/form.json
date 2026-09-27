@@ -31,7 +31,8 @@
 	"title": {
 		"label": "Title",
 		"placeholder": "Budget title",
-		"required": "Title is required"
+		"required": "Title is required",
+		"max": "Title must be at most 80 characters"
 	},
 	"member-ids": {
 		"unique": "Members must be unique"

@@ -4,6 +4,7 @@ import { documentListItemSchema, documentSchema } from "./document.schema";
 import { userSchema } from "./user.schema";
 
 export const BUDGET_CREATED_MESSAGE = "budget_created" as const;
+export const BUDGET_TITLE_MAX_LENGTH = 80;
 
 export const budgetMemberStatuses = ["active", "pending"] as const;
 
@@ -43,7 +44,11 @@ export const budgetInvitesResponseSchema = apiPayload(
 );
 
 export const budgetCreatePayloadSchema = z.object({
-	title: z.string().trim().min(1, "form:title.required"),
+	title: z
+		.string()
+		.trim()
+		.min(1, "form:title.required")
+		.max(BUDGET_TITLE_MAX_LENGTH, "form:title.max"),
 	memberIds: z
 		.array(z.string().min(1))
 		.refine((memberIds) => new Set(memberIds).size === memberIds.length, {

@@ -1,4 +1,5 @@
 import { Test, type TestingModule } from "@nestjs/testing";
+import { ORPCError } from "@orpc/nest";
 import { BUDGET_CREATED_MESSAGE } from "@repo/api/schemas";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -442,7 +443,7 @@ describe("Budget service", () => {
 					title: "Broken invite",
 					memberIds: [missingInviteeId],
 				}),
-			).rejects.toThrow();
+			).rejects.toBeInstanceOf(ORPCError);
 
 			const createdBudgets = await db
 				.select()

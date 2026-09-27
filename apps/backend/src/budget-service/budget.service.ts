@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { ORPCError } from "@orpc/nest";
 import { BUDGET_CREATED_MESSAGE } from "@repo/api/schemas";
 import type {
 	BudgetCreatePayload,
@@ -159,6 +160,19 @@ export class BudgetService {
 		const inviteeIds = payload.memberIds.filter(
 			(memberId) => memberId !== ownerId,
 		);
+
+		if (inviteeIds.length > 0) {
+			const existingUsers = await this.db
+				.select({ id: usersTable.id })
+				.from(usersTable)
+				.where(inArray(usersTable.id, inviteeIds));
+
+			if (existingUsers.length !== inviteeIds.length) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: "One or more members do not exist",
+				});
+			}
+		}
 
 		await this.db.transaction(async (tx) => {
 			const [createdBudget] = await tx
