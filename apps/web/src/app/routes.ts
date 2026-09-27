@@ -20,6 +20,7 @@ export const APP_ROUTES = {
 	},
 	group: {
 		list: "/group",
+		view: (id: string): `/group/${string}` => `/group/${id}`,
 	},
 	settings: "/settings",
 } as const;

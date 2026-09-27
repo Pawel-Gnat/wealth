@@ -1,5 +1,11 @@
 import { populateContractRouterPaths } from "@orpc/contract";
 import {
+	createBudgetContract,
+	listBudgetDocumentsContract,
+	listBudgetInvitesContract,
+	listBudgetsContract,
+} from "./budget.contract";
+import {
 	getDashboardCumulativeChartContract,
 	getDashboardDailyChartContract,
 	getDashboardSummaryContract,
@@ -46,6 +52,12 @@ export const rpcContract = populateContractRouterPaths({
 		get: getExpenseContract,
 		update: updateExpenseContract,
 		delete: deleteExpenseContract,
+	},
+	budget: {
+		list: listBudgetsContract,
+		invites: listBudgetInvitesContract,
+		create: createBudgetContract,
+		documents: listBudgetDocumentsContract,
 	},
 	incomes: {
 		create: createIncomeContract,

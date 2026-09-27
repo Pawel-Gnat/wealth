@@ -18,41 +18,38 @@ export const Invitation = ({
 }: InvitationProps) => {
 	const { t } = useTranslation();
 
-	const ownerEmail = members.find((member) => member.role === "owner")?.email;
 	const inviteeEmail = members.find((member) => member.id === inviteeId)?.email;
-	const isIncoming = inviteeId === userId;
+	const isInvitee = inviteeId === userId;
 
-	const subtitle = isIncoming
-		? ownerEmail
-			? t("invitations.invited-by", { ns: "group", email: ownerEmail })
-			: null
-		: inviteeEmail
-			? t("invitations.waiting-for-acceptance", {
-					ns: "group",
-					email: inviteeEmail,
-				})
-			: null;
+	const subtitle = inviteeEmail
+		? t("invitations.waiting-for-acceptance", {
+				ns: "group",
+				email: inviteeEmail,
+			})
+		: null;
 
 	return (
 		<div className="flex items-center justify-between pb-4">
 			<div className="space-y-2">
 				<div className="flex items-center gap-2">
 					<Text weight="medium">{title}</Text>
-					<Badge variant={isIncoming ? "secondary" : "default"}>
-						{isIncoming
+					<Badge variant={isInvitee ? "secondary" : "default"}>
+						{isInvitee
 							? t("common.invited", { ns: "common" })
 							: t("common.waiting", { ns: "common" })}
 					</Badge>
 				</div>
 				<div className="flex items-center gap-2">
 					<AvatarGroup users={members} />
-					<Text size="xs" color="muted">
-						{subtitle}
-					</Text>
+					{!isInvitee && subtitle && (
+						<Text size="xs" color="muted">
+							{subtitle}
+						</Text>
+					)}
 				</div>
 			</div>
 			<div className="flex flex-row gap-2">
-				{isIncoming ? (
+				{isInvitee ? (
 					<>
 						<Tooltip
 							trigger={

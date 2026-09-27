@@ -55,6 +55,7 @@
 	"toast": {
 		"success": {
 			"account-created": "Account created successfully",
+			"group-budget-created": "Group budget created successfully",
 			"expense-created": "Expense created successfully",
 			"expense-updated": "Expense updated successfully",
 			"expense-deleted": "Expense deleted successfully",
@@ -68,6 +69,7 @@
 		"error": {
 			"signed-in": "Failed to sign in",
 			"account-created": "Failed to create account",
+			"group-budget-created": "Failed to create group budget",
 			"expense-created": "Failed to create expense",
 			"expense-updated": "Failed to update expense",
 			"expense-deleted": "Failed to delete expense",

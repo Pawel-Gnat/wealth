@@ -23,7 +23,7 @@ type FormModalProps = {
 	className?: string;
 	disabled?: boolean;
 	isPending?: boolean;
-	submitText: string;
+	submitText?: string;
 	closeText?: string;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -82,7 +82,7 @@ export const FormModal = ({
 							disabled={disabled || isPending}
 							isLoading={isPending}
 						>
-							{submitText}
+							{submitText || t("action.create", { ns: "common" })}
 						</Button>
 					</DialogFooter>
 				</form>

@@ -1,4 +1,6 @@
 import { relations } from "drizzle-orm";
+import { budgetMemberTable } from "./budget-members.table.js";
+import { budgetTable } from "./budgets.table.js";
 import { expenseDocumentsTable } from "./expense-documents.table.js";
 import { expenseLineItemsTable } from "./expense-line-items.table.js";
 import { incomeDocumentsTable } from "./income-documents.table.js";
@@ -10,6 +12,8 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
 	expenseDocuments: many(expenseDocumentsTable),
 	incomeDocuments: many(incomeDocumentsTable),
 	sessions: many(sessionsTable),
+	budgets: many(budgetTable),
+	budgetMembers: many(budgetMemberTable),
 }));
 
 export const expenseDocumentsRelations = relations(
@@ -50,6 +54,28 @@ export const incomeLineItemsRelations = relations(
 		incomeDocument: one(incomeDocumentsTable, {
 			fields: [incomeLineItemsTable.incomeDocumentId],
 			references: [incomeDocumentsTable.id],
+		}),
+	}),
+);
+
+export const budgetRelations = relations(budgetTable, ({ one, many }) => ({
+	owner: one(usersTable, {
+		fields: [budgetTable.ownerId],
+		references: [usersTable.id],
+	}),
+	members: many(budgetMemberTable),
+}));
+
+export const budgetMemberRelations = relations(
+	budgetMemberTable,
+	({ one }) => ({
+		budget: one(budgetTable, {
+			fields: [budgetMemberTable.budgetId],
+			references: [budgetTable.id],
+		}),
+		user: one(usersTable, {
+			fields: [budgetMemberTable.userId],
+			references: [usersTable.id],
 		}),
 	}),
 );

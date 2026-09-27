@@ -8913,6 +8913,34 @@
                       "fontWeight": "normal"
                     }
                   ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ki53V",
+                  "name": "Difference Legend",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "t3y38",
+                      "name": "Difference Swatch",
+                      "fill": "$secondary",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "text",
+                      "id": "TsUd6",
+                      "name": "Difference Legend Label",
+                      "fill": "$foreground",
+                      "content": "Difference",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
                 }
               ]
             },
@@ -9654,6 +9682,41 @@
                             },
                             {
                               "type": "path",
+                              "id": "zUQN2",
+                              "x": 0,
+                              "y": 0,
+                              "name": "Difference Area",
+                              "geometry": "M0 150l0-8c11 1 45 8 67 7 22-1 44-11 66-13 22-2 45 0 67 1 22 1 45 4 67 4 22 0 44 2 66-3 22-5 56-21 67-25l0 37z",
+                              "viewBox": [
+                                0,
+                                0,
+                                400,
+                                150
+                              ],
+                              "fill": {
+                                "type": "gradient",
+                                "gradientType": "linear",
+                                "enabled": true,
+                                "rotation": 180,
+                                "size": {
+                                  "height": 1
+                                },
+                                "colors": [
+                                  {
+                                    "color": "#334155CC",
+                                    "position": 0
+                                  },
+                                  {
+                                    "color": "#3341551A",
+                                    "position": 1
+                                  }
+                                ]
+                              },
+                              "width": 520,
+                              "height": 160
+                            },
+                            {
+                              "type": "path",
                               "id": "xLenf",
                               "x": 0,
                               "y": 0,
@@ -9696,6 +9759,29 @@
                               "width": 520,
                               "height": 160,
                               "stroke": "#009843",
+                              "strokeWidth": 2
+                            },
+                            {
+                              "type": "path",
+                              "id": "Zp7Le",
+                              "x": 0,
+                              "y": 0,
+                              "name": "Difference Line",
+                              "geometry": "M0 142c11 1 45 8 67 7 22-1 44-11 66-13 22-2 45 0 67 1 22 1 45 4 67 4 22 0 44 2 66-3 22-5 56-21 67-25",
+                              "viewBox": [
+                                0,
+                                0,
+                                400,
+                                150
+                              ],
+                              "fill": {
+                                "type": "color",
+                                "color": "#000000",
+                                "enabled": false
+                              },
+                              "width": 520,
+                              "height": 160,
+                              "stroke": "$secondary",
                               "strokeWidth": 2
                             }
                           ]
@@ -16729,6 +16815,34 @@
                       "fontWeight": "normal"
                     }
                   ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NFi13",
+                  "name": "Difference Legend",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "zFNkb",
+                      "name": "Difference Swatch",
+                      "fill": "$secondary",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "text",
+                      "id": "vpeGG",
+                      "name": "Difference Legend Label",
+                      "fill": "$foreground",
+                      "content": "Difference",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
                 }
               ]
             },
@@ -16888,7 +17002,6 @@
                           "type": "frame",
                           "id": "KuH7n",
                           "name": "Canvas",
-                          "clip": true,
                           "width": "fill_container",
                           "height": 160,
                           "gap": 8,
@@ -17479,6 +17592,41 @@
                             },
                             {
                               "type": "path",
+                              "id": "AMK9R",
+                              "x": 0,
+                              "y": 0,
+                              "name": "Difference Area",
+                              "geometry": "M0 150l0-8c11 1 45 8 67 7 22-1 44-11 66-13 22-2 45 0 67 1 22 1 45 4 67 4 22 0 44 2 66-3 22-5 56-21 67-25l0 37z",
+                              "viewBox": [
+                                0,
+                                0,
+                                400,
+                                150
+                              ],
+                              "fill": {
+                                "type": "gradient",
+                                "gradientType": "linear",
+                                "enabled": true,
+                                "rotation": 180,
+                                "size": {
+                                  "height": 1
+                                },
+                                "colors": [
+                                  {
+                                    "color": "#334155CC",
+                                    "position": 0
+                                  },
+                                  {
+                                    "color": "#3341551A",
+                                    "position": 1
+                                  }
+                                ]
+                              },
+                              "width": 295,
+                              "height": 160
+                            },
+                            {
+                              "type": "path",
                               "id": "Q5CvJ",
                               "x": 0,
                               "y": 0,
@@ -17521,6 +17669,29 @@
                               "width": 295,
                               "height": 160,
                               "stroke": "#009843",
+                              "strokeWidth": 2
+                            },
+                            {
+                              "type": "path",
+                              "id": "BYrZ5",
+                              "x": 0,
+                              "y": 0,
+                              "name": "Difference Line",
+                              "geometry": "M0 142c11 1 45 8 67 7 22-1 44-11 66-13 22-2 45 0 67 1 22 1 45 4 67 4 22 0 44 2 66-3 22-5 56-21 67-25",
+                              "viewBox": [
+                                0,
+                                0,
+                                400,
+                                150
+                              ],
+                              "fill": {
+                                "type": "color",
+                                "color": "#000000",
+                                "enabled": false
+                              },
+                              "width": 295,
+                              "height": 160,
+                              "stroke": "$secondary",
                               "strokeWidth": 2
                             }
                           ]
@@ -27511,6 +27682,34 @@
                       "fontWeight": "normal"
                     }
                   ]
+                },
+                {
+                  "type": "frame",
+                  "id": "L3qQS",
+                  "name": "Difference Legend",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "fiEVS",
+                      "name": "Difference Swatch",
+                      "fill": "$secondary",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "text",
+                      "id": "kVTK6",
+                      "name": "Difference Legend Label",
+                      "fill": "$foreground",
+                      "content": "Difference",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
                 }
               ]
             },
@@ -30596,6 +30795,34 @@
                       "fontWeight": "normal"
                     }
                   ]
+                },
+                {
+                  "type": "frame",
+                  "id": "e6tWaO",
+                  "name": "Difference Legend",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "N5xWnO",
+                      "name": "Difference Swatch",
+                      "fill": "$secondary",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "text",
+                      "id": "ETtx4",
+                      "name": "Difference Legend Label",
+                      "fill": "$foreground",
+                      "content": "Difference",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
                 }
               ]
             },
@@ -33463,6 +33690,34 @@
                       "fontWeight": "normal"
                     }
                   ]
+                },
+                {
+                  "type": "frame",
+                  "id": "E8WZo",
+                  "name": "Difference Legend",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "wcRIz",
+                      "name": "Difference Swatch",
+                      "fill": "$secondary",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "text",
+                      "id": "OcEok",
+                      "name": "Difference Legend Label",
+                      "fill": "$foreground",
+                      "content": "Difference",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
                 }
               ]
             },
@@ -36208,6 +36463,34 @@
                       "name": "Incomes Legend Label",
                       "fill": "$foreground",
                       "content": "Incomes",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "qcTa4",
+                  "name": "Difference Legend",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "m9FFJ",
+                      "name": "Difference Swatch",
+                      "fill": "$secondary",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "text",
+                      "id": "VkI7z",
+                      "name": "Difference Legend Label",
+                      "fill": "$foreground",
+                      "content": "Difference",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"

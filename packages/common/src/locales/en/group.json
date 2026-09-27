@@ -11,9 +11,20 @@
 			"description": "Your budgets could not be loaded. Please try again later."
 		}
 	},
+	"documents": {
+		"title": "Group budget",
+		"subtitle": "Shared expenses and incomes in this budget.",
+		"empty": {
+			"title": "No transactions yet",
+			"description": "Expenses and incomes added to this budget will appear here."
+		},
+		"error": {
+			"title": "Could not load transactions",
+			"description": "Expenses and incomes for this budget could not be loaded. Please try again later."
+		}
+	},
 	"invitations": {
 		"title": "Invitations",
-		"invited-by": "Invited by {{email}}",
 		"waiting-for-acceptance": "Waiting for acceptance by {{email}}",
 		"empty": {
 			"title": "No invitations",

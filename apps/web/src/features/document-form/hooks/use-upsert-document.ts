@@ -1,3 +1,5 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { documentCreatePayloadSchema } from "@repo/api/schemas";
 import type {
 	DocumentCreatePayload,
 	DocumentUpdatePayload,
@@ -9,6 +11,11 @@ import type {
 import { normalizeDocumentDateForApi } from "@repo/common/helpers";
 import { logger, runWithRequestId } from "@repo/observability/browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { type Resolver, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import { getDocumentConfig } from "@/features/config/document-config";
 import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
@@ -20,19 +27,41 @@ type DocumentUpsertResponse =
 	| IncomeDocumentCreateResponse
 	| IncomeDocumentUpdateResponse;
 
+const DEFAULT_DOCUMENT_VALUES: DocumentCreatePayload = {
+	date: new Date(),
+	lineItems: [{ title: "", singleAmount: 1, quantity: 1 }],
+};
+
 export type UseUpsertDocumentProps = {
 	kind: RecordKind;
-	onSuccess?: (data: DocumentUpsertResponse) => void;
-	onError?: (error: Error) => void;
+	documentId?: string;
+	initialValues?: DocumentCreatePayload;
 };
 
 export function useUpsertDocument({
 	kind,
-	onSuccess,
-	onError,
+	documentId,
+	initialValues,
 }: UseUpsertDocumentProps) {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
 	const config = getDocumentConfig(kind);
 	const queryClient = useQueryClient();
+	const isEditMode = Boolean(documentId);
+	const defaultValues = initialValues ?? DEFAULT_DOCUMENT_VALUES;
+
+	const form = useForm<DocumentCreatePayload>({
+		resolver: zodResolver(
+			documentCreatePayloadSchema,
+		) as Resolver<DocumentCreatePayload>,
+		defaultValues,
+	});
+
+	useEffect(() => {
+		if (initialValues) {
+			form.reset(initialValues);
+		}
+	}, [form, initialValues]);
 
 	const mutation = useMutation<
 		DocumentUpsertResponse,
@@ -60,22 +89,32 @@ export function useUpsertDocument({
 				logger.info(isUpdated ? config.events.update : config.events.create);
 				return data;
 			}),
-		onSuccess: (data) => {
+		onSuccess: () => {
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.dashboard.all(),
 			});
-			onSuccess?.(data);
+			toast.success(
+				t(isEditMode ? config.toast.updated : config.toast.created, {
+					ns: "common",
+				}),
+			);
+			navigate(config.listRoute);
 		},
-		onError: (error) => {
-			onError?.(error);
+		onError: () => {
+			toast.error(
+				t(isEditMode ? config.toast.updateError : config.toast.createError, {
+					ns: "common",
+				}),
+			);
 		},
 	});
 
 	return {
-		upsertDocument: mutation.mutate,
+		form,
 		isPending: mutation.isPending,
-		isError: mutation.isError,
-		error: mutation.error,
-		data: mutation.data,
+		isEditMode,
+		onSubmit: form.handleSubmit((data) => {
+			mutation.mutate(documentId ? { ...data, id: documentId } : data);
+		}),
 	};
 }

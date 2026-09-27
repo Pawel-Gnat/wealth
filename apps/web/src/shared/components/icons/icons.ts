@@ -1,5 +1,6 @@
 import {
 	AlertCircle,
+	Banknote,
 	CalendarIcon,
 	Camera,
 	ChartArea,
@@ -11,6 +12,7 @@ import {
 	DoorOpen,
 	Eye,
 	FileImage,
+	Hash,
 	LayoutDashboard,
 	LoaderCircle,
 	Lock,
@@ -22,6 +24,7 @@ import {
 	Trash,
 	TrendingDown,
 	TrendingUp,
+	Type,
 	Upload,
 	User,
 	UserPlus,
@@ -58,6 +61,9 @@ export const icons = {
 	photo: Camera,
 	upload: Upload,
 	fileImage: FileImage,
+	text: Type,
+	number: Hash,
+	money: Banknote,
 };
 
 export type IconName = keyof typeof icons;
