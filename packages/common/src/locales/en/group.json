@@ -23,6 +23,14 @@
 			"description": "Expenses and incomes for this budget could not be loaded. Please try again later."
 		}
 	},
+	"members": {
+		"label": "Members",
+		"empty": "Select people to assign them to this budget.",
+		"search": {
+			"placeholder": "Search people to add",
+			"refine": "There may be more people. Refine your search."
+		}
+	},
 	"invitations": {
 		"title": "Invitations",
 		"waiting-for-acceptance": "Waiting for acceptance by {{email}}",

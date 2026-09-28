@@ -29,7 +29,7 @@ export const UserAvatar = ({
 		<>
 			<Avatar user={user} size={size} />
 			<div className="flex flex-col">
-				<Text size={showUserName && fullName ? "lg" : "sm"} weight="medium">
+				<Text size={size} weight="medium">
 					{primaryLabel}
 				</Text>
 				{showUserName && fullName && (

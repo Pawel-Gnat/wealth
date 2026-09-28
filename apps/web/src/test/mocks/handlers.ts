@@ -178,6 +178,21 @@ const putSettingsAvatarHandler = () => {
 	});
 };
 
+const getUsersSearchHandler = () => {
+	return HttpResponse.json({
+		data: [
+			{
+				id: "01JTZKQX2GT6PHGQER0M8FS6K9",
+				email: "anna@example.com",
+				firstName: "Anna",
+				lastName: "Kowalska",
+				image: null,
+			},
+		],
+		hasMore: false,
+	});
+};
+
 const postAuthRefreshHandler = () => {
 	return HttpResponse.json(
 		{ error: { message: "Unauthorized" } },
@@ -205,6 +220,7 @@ export const HANDLERS = [
 	http.get("*/dashboard/daily-chart", getDashboardDailyChartHandler),
 	http.put("*/settings/details", putSettingsDetailsHandler),
 	http.put("*/settings/avatar", putSettingsAvatarHandler),
+	http.get("*/users/search", getUsersSearchHandler),
 	http.get("*/auth/me", getAuthMeHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),

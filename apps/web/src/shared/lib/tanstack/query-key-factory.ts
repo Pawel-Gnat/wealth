@@ -16,6 +16,9 @@ export const queryKeys = {
 		documents: (id: string, kind?: BudgetDocumentKind) =>
 			["budgets", id, "documents", kind ?? "all"] as const,
 	},
+	users: {
+		search: (query: string) => ["users", "search", query] as const,
+	},
 	dashboard: {
 		all: () => ["dashboard"] as const,
 		summary: (days: Period) => ["dashboard", "summary", days] as const,

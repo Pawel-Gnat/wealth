@@ -56,6 +56,10 @@
 		"invalid": "Enter a valid price",
 		"min": "Price must be at least 0.01"
 	},
+	"search": {
+		"label": "Search",
+		"empty": "The list is empty"
+	},
 	"file": {
 		"label": "Drop or click to upload a new image",
 		"description": "PNG or JPG, up to {{size}} MB",

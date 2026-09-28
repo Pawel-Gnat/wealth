@@ -63,6 +63,7 @@ export const useCreateGroupBudgetForm = ({
 	return {
 		control: form.control,
 		isPending: mutation.isPending,
+		setValue: form.setValue,
 		reset: () => form.reset(DEFAULT_CREATE_GROUP_BUDGET_VALUES),
 		createGroupBudget: form.handleSubmit((payload) => mutation.mutate(payload)),
 	};

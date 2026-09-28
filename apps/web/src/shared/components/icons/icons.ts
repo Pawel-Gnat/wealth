@@ -21,6 +21,7 @@ import {
 	Pencil,
 	PlusCircle,
 	Scale,
+	Search,
 	Trash,
 	TrendingDown,
 	TrendingUp,
@@ -62,6 +63,7 @@ export const icons = {
 	upload: Upload,
 	fileImage: FileImage,
 	text: Type,
+	search: Search,
 	number: Hash,
 	money: Banknote,
 };

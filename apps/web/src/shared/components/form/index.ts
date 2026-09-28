@@ -5,5 +5,6 @@ export { FormDatePicker } from "./form-date-picker";
 export { FormFile } from "./form-file";
 export { FormInput } from "./form-input";
 export { FormModal } from "./form-modal";
+export { FormSearch } from "./form-search";
 export { FormSelect } from "./form-select";
 export { FormTextarea } from "./form-textarea";

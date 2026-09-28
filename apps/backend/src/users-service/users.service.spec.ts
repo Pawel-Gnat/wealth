@@ -178,6 +178,64 @@ describe("Users service", () => {
 		});
 	});
 
+	it("searches users by name or email without the current user or password", async () => {
+		const self = await createTestUser(usersService, {
+			emailTag: "users-search-self",
+			passwordHash: "hashed-for-integration",
+			firstName: "Selfsearch",
+			lastName: "Owner",
+		});
+		const byName = await createTestUser(usersService, {
+			emailTag: "users-search-name",
+			passwordHash: "hashed-for-integration",
+			firstName: "Adasearch",
+			lastName: "Lovelace",
+		});
+		const byEmail = await createTestUser(usersService, {
+			email: uniqueTestUserEmail("zzqmail-token"),
+			passwordHash: "hashed-for-integration",
+			firstName: "Grace",
+			lastName: "Hopper",
+		});
+		const withPercent = await createTestUser(usersService, {
+			emailTag: "users-search-percent",
+			passwordHash: "hashed-for-integration",
+			firstName: "100%",
+			lastName: "Token",
+		});
+
+		const byNameResults = await usersService.searchUsers("Adasearch", self.id);
+		expect(byNameResults).toEqual({
+			hasMore: false,
+			data: [
+				{
+					id: byName.id,
+					email: byName.email,
+					image: null,
+					firstName: "Adasearch",
+					lastName: "Lovelace",
+				},
+			],
+		});
+		expect(byNameResults.data[0]).not.toHaveProperty("password");
+
+		const byEmailResults = await usersService.searchUsers(
+			"zzqmail-token",
+			self.id,
+		);
+		expect(byEmailResults.data.map((user) => user.id)).toContain(byEmail.id);
+		expect(byEmailResults.data.map((user) => user.id)).not.toContain(self.id);
+
+		const selfResults = await usersService.searchUsers("Selfsearch", self.id);
+		expect(selfResults.data.map((user) => user.id)).not.toContain(self.id);
+
+		const percentResults = await usersService.searchUsers("100%", self.id);
+		expect(percentResults.data.map((user) => user.id)).toContain(
+			withPercent.id,
+		);
+		expect(percentResults.data.map((user) => user.id)).not.toContain(byName.id);
+	});
+
 	it("rejects when trying to create user with duplicated email", async () => {
 		const email = uniqueTestUserEmail("users-duplicate");
 		await usersService.createUser({ email, passwordHash: "hash-1" });
