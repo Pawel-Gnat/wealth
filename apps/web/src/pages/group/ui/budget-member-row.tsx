@@ -21,6 +21,7 @@ export const BudgetMemberRow = ({
 			<UserAvatar user={user} showUserName />
 
 			<Button
+				type="button"
 				size="icon"
 				variant={action === "remove" ? "secondary" : "default"}
 				onClick={onAction}

@@ -2,7 +2,7 @@ import type { User } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Text } from "@/shared/components";
 import { BudgetMemberRow, BudgetMemberRowSkeleton } from "./budget-member-row";
-import { BudgetMembersList } from "./budget-members-list";
+import { BudgetMembers } from "./budget-members";
 
 type BudgetMemberResultsProps = {
 	users: User[];
@@ -23,15 +23,13 @@ export const BudgetMemberResults = ({
 }: BudgetMemberResultsProps) => {
 	const { t } = useTranslation();
 
-	if (isLoading && !hasData) {
+	if (isLoading) {
 		return (
-			<BudgetMembersList className="mt-2">
+			<BudgetMembers className="mt-2">
 				{SKELETON_ROW_KEYS.map((key) => (
-					<li key={key}>
-						<BudgetMemberRowSkeleton />
-					</li>
+					<BudgetMemberRowSkeleton key={key} />
 				))}
-			</BudgetMembersList>
+			</BudgetMembers>
 		);
 	}
 
@@ -40,23 +38,22 @@ export const BudgetMemberResults = ({
 	}
 
 	return (
-		<BudgetMembersList className="mt-2">
+		<BudgetMembers className="mt-2">
 			{users.length === 0 ? (
 				<Text size="sm" color="muted" className="text-center">
 					{t("search.empty", { ns: "form" })}
 				</Text>
 			) : (
-				<ul className="flex flex-col gap-4">
+				<div className="flex flex-col gap-4">
 					{users.map((user) => (
-						<li key={user.id}>
-							<BudgetMemberRow
-								user={user}
-								action="add"
-								onAction={() => onAdd(user)}
-							/>
-						</li>
+						<BudgetMemberRow
+							key={user.id}
+							user={user}
+							action="add"
+							onAction={() => onAdd(user)}
+						/>
 					))}
-				</ul>
+				</div>
 			)}
 
 			{hasMore && (
@@ -64,6 +61,6 @@ export const BudgetMemberResults = ({
 					{t("members.search.refine", { ns: "group" })}
 				</Text>
 			)}
-		</BudgetMembersList>
+		</BudgetMembers>
 	);
 };

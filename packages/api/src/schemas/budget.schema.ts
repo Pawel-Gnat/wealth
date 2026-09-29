@@ -5,6 +5,7 @@ import { userSchema } from "./user.schema";
 
 export const BUDGET_CREATED_MESSAGE = "budget_created" as const;
 export const BUDGET_TITLE_MAX_LENGTH = 80;
+export const BUDGET_MEMBER_IDS_MAX = 25;
 
 export const budgetMemberStatuses = ["active", "pending"] as const;
 
@@ -51,6 +52,7 @@ export const budgetCreatePayloadSchema = z.object({
 		.max(BUDGET_TITLE_MAX_LENGTH, "form:title.max"),
 	memberIds: z
 		.array(z.string().min(1))
+		.max(BUDGET_MEMBER_IDS_MAX, "form:member-ids.max")
 		.refine((memberIds) => new Set(memberIds).size === memberIds.length, {
 			message: "form:member-ids.unique",
 		}),

@@ -1,3 +1,4 @@
+import { BUDGET_MEMBER_IDS_MAX } from "@repo/api/schemas";
 import type { User } from "@repo/api/types";
 import { useState } from "react";
 import { useDebounce } from "@/shared/hooks/use-debounce";
@@ -37,7 +38,10 @@ export const useBudgetModalForm = () => {
 	};
 
 	const addMember = (user: User) => {
-		if (selectedIds.has(user.id)) {
+		if (
+			selectedIds.has(user.id) ||
+			selectedMembers.length >= BUDGET_MEMBER_IDS_MAX
+		) {
 			return;
 		}
 

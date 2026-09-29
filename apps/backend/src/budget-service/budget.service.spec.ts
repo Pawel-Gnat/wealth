@@ -1,6 +1,9 @@
 import type { TestingModule } from "@nestjs/testing";
 import { ORPCError } from "@orpc/nest";
-import { BUDGET_CREATED_MESSAGE } from "@repo/api/schemas";
+import {
+	BUDGET_CREATED_MESSAGE,
+	BUDGET_MEMBER_IDS_MAX,
+} from "@repo/api/schemas";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { DBS } from "../database-service/constants";
@@ -426,6 +429,31 @@ describe("Budget service", () => {
 					}),
 				],
 			});
+		});
+
+		it("rejects a member list above the maximum and does not persist a budget", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hashed-password",
+				emailTag: "budget-create-too-many",
+			});
+
+			await expect(
+				budgetService.createBudgetByUserId(owner.id, {
+					title: "Too many",
+					memberIds: Array.from(
+						{ length: BUDGET_MEMBER_IDS_MAX + 1 },
+						(_, index) => `01K1MEMBER${String(index).padStart(16, "0")}`,
+					),
+				}),
+			).rejects.toThrow(ORPCError);
+
+			const createdBudgets = await db
+				.select()
+				.from(budgetTable)
+				.where(eq(budgetTable.ownerId, owner.id));
+
+			expect(createdBudgets).toHaveLength(0);
 		});
 
 		it("throws when the owner does not exist and does not persist a budget", async () => {

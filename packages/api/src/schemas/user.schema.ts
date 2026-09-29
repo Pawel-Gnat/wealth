@@ -10,7 +10,7 @@ export const USER_AVATAR_MAX_SIZE_MB = 5;
 export const USER_AVATAR_MAX_SIZE_BYTES = USER_AVATAR_MAX_SIZE_MB * 1024 * 1024;
 export const USER_AVATAR_MIME_TYPES = ["image/png", "image/jpeg"] as const;
 
-export const USER_SEARCH_QUERY_MIN_LENGTH = 2;
+export const USER_SEARCH_QUERY_MIN_LENGTH = 4;
 export const USER_SEARCH_QUERY_MAX_LENGTH = 80;
 export const USER_SEARCH_RESULT_LIMIT = 5;
 

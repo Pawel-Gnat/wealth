@@ -1,18 +1,15 @@
 import { cn } from "cn";
 
-type BudgetMembersListProps = {
+type BudgetMembersProps = {
 	children: React.ReactNode;
 	className?: string;
 };
-export const BudgetMembersList = ({
-	children,
-	className,
-}: BudgetMembersListProps) => {
+export const BudgetMembers = ({ children, className }: BudgetMembersProps) => {
 	return (
-		<ul
+		<div
 			className={cn("flex flex-col gap-4 bg-muted rounded-md p-4", className)}
 		>
 			{children}
-		</ul>
+		</div>
 	);
 };

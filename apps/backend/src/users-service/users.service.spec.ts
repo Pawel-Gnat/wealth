@@ -1,9 +1,10 @@
 import type { TestingModule } from "@nestjs/testing";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { DBS } from "../database-service/constants";
 import { storageTable } from "../database-service/tables/index";
+import { StorageService } from "../storage-service/storage.service";
 import { createTestApp } from "../test/helpers/modules";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users";
 import { UsersService } from "./users.service";
@@ -202,6 +203,23 @@ describe("Users service", () => {
 			lastName: "Token",
 		});
 
+		const [stored] = await db
+			.insert(storageTable)
+			.values({ objectKey: `avatars/${byName.id}/avatar.jpg` })
+			.returning({ id: storageTable.id });
+
+		if (!stored) {
+			throw new Error("storage insert failed");
+		}
+
+		await usersService.updateImage(byName.id, stored.id);
+		const image = `http://localhost:9000/wealth-storage/avatars/${byName.id}/avatar.jpg`;
+		const storageService = moduleRef.get(StorageService);
+
+		vi.mocked(storageService.resolvePublicUrl).mockResolvedValueOnce(
+			new Map([[stored.id, image]]),
+		);
+
 		const byNameResults = await usersService.searchUsers("Adasearch", self.id);
 		expect(byNameResults).toEqual({
 			hasMore: false,
@@ -209,7 +227,7 @@ describe("Users service", () => {
 				{
 					id: byName.id,
 					email: byName.email,
-					image: null,
+					image,
 					firstName: "Adasearch",
 					lastName: "Lovelace",
 				},

@@ -2,7 +2,7 @@ import type { User } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Text } from "@/shared/components";
 import { BudgetMemberRow } from "./budget-member-row";
-import { BudgetMembersList } from "./budget-members-list";
+import { BudgetMembers } from "./budget-members";
 
 type BudgetSelectedMembersProps = {
 	members: User[];
@@ -26,17 +26,16 @@ export const BudgetSelectedMembers = ({
 					{t("members.empty", { ns: "group" })}
 				</Text>
 			) : (
-				<BudgetMembersList>
+				<BudgetMembers>
 					{members.map((member) => (
-						<li key={member.id}>
-							<BudgetMemberRow
-								user={member}
-								action="remove"
-								onAction={() => onRemove(member.id)}
-							/>
-						</li>
+						<BudgetMemberRow
+							key={member.id}
+							user={member}
+							action="remove"
+							onAction={() => onRemove(member.id)}
+						/>
 					))}
-				</BudgetMembersList>
+				</BudgetMembers>
 			)}
 		</>
 	);

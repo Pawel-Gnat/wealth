@@ -35,7 +35,8 @@
 		"max": "Title must be at most 80 characters"
 	},
 	"member-ids": {
-		"unique": "Members must be unique"
+		"unique": "Members must be unique",
+		"max": "You can add at most 25 members"
 	},
 	"date": {
 		"label": "Date"

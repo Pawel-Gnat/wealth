@@ -1,6 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ORPCError } from "@orpc/nest";
-import { BUDGET_CREATED_MESSAGE } from "@repo/api/schemas";
+import {
+	BUDGET_CREATED_MESSAGE,
+	BUDGET_MEMBER_IDS_MAX,
+} from "@repo/api/schemas";
 import type {
 	BudgetCreatePayload,
 	BudgetCreateResponse,
@@ -179,6 +182,12 @@ export class BudgetService {
 		ownerId: string,
 		payload: BudgetCreatePayload,
 	): Promise<BudgetCreateResponse> {
+		if (payload.memberIds.length > BUDGET_MEMBER_IDS_MAX) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "Too many members",
+			});
+		}
+
 		const inviteeIds = payload.memberIds.filter(
 			(memberId) => memberId !== ownerId,
 		);

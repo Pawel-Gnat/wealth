@@ -138,6 +138,7 @@ export class UsersService {
 			.select({
 				id: usersTable.id,
 				email: usersTable.email,
+				image: usersTable.image,
 				firstName: usersTable.firstName,
 				lastName: usersTable.lastName,
 			})
@@ -160,15 +161,18 @@ export class UsersService {
 			? rows.slice(0, USER_SEARCH_RESULT_LIMIT)
 			: rows;
 
+		const imageUrls = await this.storageService.resolvePublicUrl(
+			limitedRows.flatMap((row) => (row.image ? [row.image] : [])),
+		);
+
 		return {
 			hasMore,
-			data: limitedRows.map((row) => ({
-				id: String(row.id),
-				email: row.email,
-				image: null,
-				firstName: row.firstName ?? null,
-				lastName: row.lastName ?? null,
-			})),
+			data: limitedRows.map((row) =>
+				this.mapToUser(
+					row,
+					row.image ? (imageUrls.get(row.image) ?? null) : null,
+				),
+			),
 		};
 	}
 
