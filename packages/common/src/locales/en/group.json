@@ -28,7 +28,11 @@
 		"empty": "Select people to assign them to this budget.",
 		"search": {
 			"placeholder": "Search people to add",
-			"refine": "There may be more people. Refine your search."
+			"refine": "There may be more people. Refine your search.",
+			"error": {
+				"title": "Could not search people",
+				"description": "People could not be loaded. Please try again later."
+			}
 		}
 	},
 	"invitations": {

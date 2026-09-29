@@ -1,15 +1,16 @@
 import type { User } from "@repo/api/types";
 import { useState } from "react";
+import { useDebounce } from "@/shared/hooks/use-debounce";
 import { useCreateGroupBudgetForm } from "./use-create-group-budget-form";
 import { useSearchUsers } from "./use-search-users";
 
 export const useBudgetModalForm = () => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [query, setQuery] = useState("");
+	const [search, setSearch] = useState("");
 	const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
 
 	const clearSelection = () => {
-		setQuery("");
+		setSearch("");
 		setSelectedMembers([]);
 	};
 
@@ -21,7 +22,9 @@ export const useBudgetModalForm = () => {
 			},
 		});
 
-	const { users, hasMore, hasData, isLoading } = useSearchUsers(query);
+	const debouncedSearch = useDebounce(search);
+	const { users, hasMore, hasData, isLoading, isError } =
+		useSearchUsers(debouncedSearch);
 	const selectedIds = new Set(selectedMembers.map((member) => member.id));
 	const availableUsers = users.filter((user) => !selectedIds.has(user.id));
 
@@ -61,12 +64,13 @@ export const useBudgetModalForm = () => {
 	return {
 		isOpen,
 		onOpenChange,
-		query,
-		setQuery,
+		search,
+		setSearch,
 		selectedMembers,
 		availableUsers,
 		hasData,
 		isLoading,
+		isError,
 		hasMore,
 		addMember,
 		removeMember,

@@ -1,4 +1,4 @@
-import { Test, type TestingModule } from "@nestjs/testing";
+import type { TestingModule } from "@nestjs/testing";
 import {
 	EXPENSE_CREATED_MESSAGE,
 	EXPENSE_DELETED_MESSAGE,
@@ -12,8 +12,8 @@ import {
 	expenseDocumentsTable,
 	expenseLineItemsTable,
 } from "../database-service/tables/index";
+import { createTestApp } from "../test/helpers/modules";
 import { createTestUser } from "../test/mocks/users";
-import { TestModule } from "../test/test.module";
 import { UsersService } from "../users-service/users.service";
 import { ExpensesService } from "./expenses.service";
 
@@ -23,10 +23,7 @@ describe("Expenses service", () => {
 	let usersService: UsersService;
 
 	beforeAll(async () => {
-		moduleRef = await Test.createTestingModule({
-			imports: [TestModule],
-			providers: [ExpensesService],
-		}).compile();
+		moduleRef = await createTestApp([ExpensesService]).compile();
 		expensesService = moduleRef.get(ExpensesService);
 		usersService = moduleRef.get(UsersService);
 	});

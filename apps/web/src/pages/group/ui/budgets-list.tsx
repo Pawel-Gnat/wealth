@@ -17,7 +17,7 @@ export const BudgetsList = ({ budgets, userId }: BudgetsListProps) => {
 						id={budget.id}
 						title={budget.title}
 						userId={userId}
-						ownerId={budget.ownerId}
+						owner={budget.owner}
 						members={budget.members}
 					/>
 					{index !== budgets.length - 1 && (

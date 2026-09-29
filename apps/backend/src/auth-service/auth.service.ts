@@ -492,8 +492,14 @@ export class AuthService {
 	}
 
 	private async withResolvedAvatarUrl(user: UserRow): Promise<User> {
-		const imageUrl = await this.storageService.resolvePublicUrl(user.image);
-		return this.usersService.mapToUser(user, imageUrl);
+		const imageUrls = user.image
+			? await this.storageService.resolvePublicUrl([user.image])
+			: new Map<string, string>();
+
+		return this.usersService.mapToUser(
+			user,
+			user.image ? (imageUrls.get(user.image) ?? null) : null,
+		);
 	}
 
 	private async endOtherSessions(

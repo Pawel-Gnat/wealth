@@ -1,15 +1,17 @@
-import { Test, type TestingModule } from "@nestjs/testing";
+import type { TestingModule } from "@nestjs/testing";
 import { ORPCError } from "@orpc/nest";
 import { BUDGET_CREATED_MESSAGE } from "@repo/api/schemas";
 import { eq } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { DBS } from "../database-service/constants";
 import {
 	budgetMemberTable,
 	budgetTable,
+	storageTable,
 } from "../database-service/tables/index";
+import { StorageService } from "../storage-service/storage.service";
+import { createTestApp } from "../test/helpers/modules";
 import { createTestUser } from "../test/mocks/users";
-import { TestModule } from "../test/test.module";
 import { UsersService } from "../users-service/users.service";
 import { BudgetService } from "./budget.service";
 
@@ -17,14 +19,13 @@ describe("Budget service", () => {
 	let moduleRef: TestingModule;
 	let budgetService: BudgetService;
 	let usersService: UsersService;
+	let storageService: StorageService;
 
 	beforeAll(async () => {
-		moduleRef = await Test.createTestingModule({
-			imports: [TestModule],
-			providers: [BudgetService],
-		}).compile();
+		moduleRef = await createTestApp([BudgetService]).compile();
 		budgetService = moduleRef.get(BudgetService);
 		usersService = moduleRef.get(UsersService);
+		storageService = moduleRef.get(StorageService);
 	});
 
 	afterAll(async () => {
@@ -142,7 +143,7 @@ describe("Budget service", () => {
 			]);
 			expect(forOwner.data[0]).toMatchObject({
 				id: newerBudget.id,
-				ownerId: owner.id,
+				owner: { id: owner.id },
 			});
 			expect(forOwner.data[0]?.members).toEqual(
 				expect.arrayContaining([
@@ -267,14 +268,14 @@ describe("Budget service", () => {
 				"Weekend",
 			]);
 			expect(forOwner.data[0]).toMatchObject({
-				budget: { id: ownedBudget.id, ownerId: owner.id },
+				budget: { id: ownedBudget.id, owner: { id: owner.id } },
 				invitee: { id: pendingMember.id, status: "pending" },
 			});
 			expect(
 				forOwner.data[0]?.budget.members.map((member) => member.id),
 			).toEqual(expect.arrayContaining([activeMember.id, pendingMember.id]));
 			expect(forOwner.data[1]).toMatchObject({
-				budget: { id: incomingBudget.id, ownerId: otherOwner.id },
+				budget: { id: incomingBudget.id, owner: { id: otherOwner.id } },
 				invitee: { id: owner.id, status: "pending" },
 			});
 
@@ -376,6 +377,7 @@ describe("Budget service", () => {
 		});
 
 		it("exposes the newly created budget in the user list", async () => {
+			const db = moduleRef.get(DBS.APP);
 			const owner = await createTestUser(usersService, {
 				passwordHash: "hashed-password",
 				emailTag: "budget-create-list",
@@ -390,12 +392,33 @@ describe("Budget service", () => {
 				memberIds: [invitee.id],
 			});
 
+			const [stored] = await db
+				.insert(storageTable)
+				.values({ objectKey: `avatars/${owner.id}/avatar.jpg` })
+				.returning({ id: storageTable.id });
+
+			if (!stored) {
+				throw new Error("storage insert failed");
+			}
+
+			await usersService.updateImage(owner.id, stored.id);
+			const image = `http://localhost:9000/wealth-storage/avatars/${owner.id}/avatar.jpg`;
+			vi.mocked(storageService.resolvePublicUrl).mockResolvedValueOnce(
+				new Map([[stored.id, image]]),
+			);
+
 			const result = await budgetService.listBudgetsByUserId(owner.id);
 
 			expect(result.data).toHaveLength(1);
 			expect(result.data[0]).toMatchObject({
 				title: "Trip",
-				ownerId: owner.id,
+				owner: {
+					id: owner.id,
+					email: owner.email,
+					image,
+					firstName: owner.firstName,
+					lastName: owner.lastName,
+				},
 				members: [
 					expect.objectContaining({
 						id: invitee.id,

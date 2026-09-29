@@ -9,16 +9,16 @@ import {
 import { Icon, type IconName } from "../icons";
 
 type FormSearchProps = {
-	query: string;
-	onQueryChange: (query: string) => void;
+	search: string;
+	onSearchChange: (search: string) => void;
 	label: ReactNode;
 	placeholder?: string;
 	icon?: IconName;
 };
 
 export const FormSearch = ({
-	query,
-	onQueryChange,
+	search,
+	onSearchChange,
 	label,
 	placeholder,
 	icon,
@@ -36,9 +36,9 @@ export const FormSearch = ({
 				)}
 				<InputGroupInput
 					id={id}
-					value={query}
+					value={search}
 					placeholder={placeholder}
-					onChange={(event) => onQueryChange(event.target.value)}
+					onChange={(event) => onSearchChange(event.target.value)}
 				/>
 			</InputGroup>
 		</Field>

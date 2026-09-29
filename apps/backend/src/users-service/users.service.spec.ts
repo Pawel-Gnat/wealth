@@ -1,11 +1,11 @@
-import { Test, type TestingModule } from "@nestjs/testing";
+import type { TestingModule } from "@nestjs/testing";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DBS } from "../database-service/constants";
 import { storageTable } from "../database-service/tables/index";
+import { createTestApp } from "../test/helpers/modules";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users";
-import { TestModule } from "../test/test.module";
 import { UsersService } from "./users.service";
 
 describe("Users service", () => {
@@ -14,9 +14,7 @@ describe("Users service", () => {
 	let db: NodePgDatabase;
 
 	beforeAll(async () => {
-		moduleRef = await Test.createTestingModule({
-			imports: [TestModule],
-		}).compile();
+		moduleRef = await createTestApp().compile();
 		usersService = moduleRef.get(UsersService);
 		db = moduleRef.get(DBS.APP);
 	});

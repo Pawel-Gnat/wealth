@@ -1,17 +1,21 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { USER_SEARCH_RESULT_LIMIT } from "@repo/api/schemas";
 import type { User, UserSearchResponse } from "@repo/api/types";
-import { and, asc, eq, ilike, isNull, ne, or } from "drizzle-orm";
+import { and, asc, eq, ilike, inArray, isNull, ne, or } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants";
 import { usersTable } from "../database-service/tables/index";
 import type { UserRow } from "../database-service/types/types";
+import { StorageService } from "../storage-service/storage.service";
 import { escapeLikePattern } from "./helpers/escape-like-pattern";
 import { CreateUserInput, UpdateUserDetailsInput } from "./types/users";
 
 @Injectable()
 export class UsersService {
-	constructor(@Inject(DBS.APP) private readonly db: NodePgDatabase) {}
+	constructor(
+		@Inject(DBS.APP) private readonly db: NodePgDatabase,
+		private readonly storageService: StorageService,
+	) {}
 
 	async findUserByEmail(email: string): Promise<UserRow | null> {
 		const [user] = await this.db
@@ -91,6 +95,39 @@ export class UsersService {
 		return updated.length > 0;
 	}
 
+	async findUsersByIds(ids: string[]): Promise<Map<string, User>> {
+		const uniqueIds = [...new Set(ids)];
+
+		if (uniqueIds.length === 0) {
+			return new Map();
+		}
+
+		const rows = await this.db
+			.select({
+				id: usersTable.id,
+				email: usersTable.email,
+				image: usersTable.image,
+				firstName: usersTable.firstName,
+				lastName: usersTable.lastName,
+			})
+			.from(usersTable)
+			.where(inArray(usersTable.id, uniqueIds));
+
+		const imageUrls = await this.storageService.resolvePublicUrl(
+			rows.flatMap((row) => (row.image ? [row.image] : [])),
+		);
+
+		return new Map(
+			rows.map((row) => [
+				row.id,
+				this.mapToUser(
+					row,
+					row.image ? (imageUrls.get(row.image) ?? null) : null,
+				),
+			]),
+		);
+	}
+
 	async searchUsers(
 		query: string,
 		excludeUserId: string,
@@ -135,7 +172,10 @@ export class UsersService {
 		};
 	}
 
-	mapToUser(user: UserRow, imageUrl: string | null = null): User {
+	mapToUser(
+		user: Pick<UserRow, "id" | "email" | "firstName" | "lastName">,
+		imageUrl: string | null = null,
+	): User {
 		return {
 			id: String(user.id),
 			email: user.email,

@@ -1,5 +1,10 @@
 import { useTranslation } from "react-i18next";
-import { FormInput, FormModal, FormSearch } from "@/shared/components";
+import {
+	ErrorState,
+	FormInput,
+	FormModal,
+	FormSearch,
+} from "@/shared/components";
 import { useBudgetModalForm } from "../hooks/use-budget-modal-form";
 import { BudgetMemberResults } from "./budget-member-results";
 import { BudgetSelectedMembers } from "./budget-selected-members";
@@ -9,12 +14,13 @@ export const BudgetModalForm = () => {
 	const {
 		isOpen,
 		onOpenChange,
-		query,
-		setQuery,
+		search,
+		setSearch,
 		selectedMembers,
 		availableUsers,
 		hasData,
 		isLoading,
+		isError,
 		hasMore,
 		addMember,
 		removeMember,
@@ -40,25 +46,32 @@ export const BudgetModalForm = () => {
 				control={control}
 				icon="text"
 			/>
-			<div className="flex flex-col gap-4">
+			<div className="flex flex-col gap-3">
 				<BudgetSelectedMembers
 					members={selectedMembers}
 					onRemove={removeMember}
 				/>
 				<FormSearch
-					query={query}
-					onQueryChange={setQuery}
+					search={search}
+					onSearchChange={setSearch}
 					label={t("search.label", { ns: "form" })}
 					placeholder={t("members.search.placeholder", { ns: "group" })}
 					icon="search"
 				/>
-				<BudgetMemberResults
-					users={availableUsers}
-					hasData={hasData}
-					isLoading={isLoading}
-					hasMore={hasMore}
-					onAdd={addMember}
-				/>
+				{isError ? (
+					<ErrorState
+						title={t("members.search.error.title", { ns: "group" })}
+						description={t("members.search.error.description", { ns: "group" })}
+					/>
+				) : (
+					<BudgetMemberResults
+						users={availableUsers}
+						hasData={hasData}
+						isLoading={isLoading}
+						hasMore={hasMore}
+						onAdd={addMember}
+					/>
+				)}
 			</div>
 		</FormModal>
 	);

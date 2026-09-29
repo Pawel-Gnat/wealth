@@ -5,7 +5,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { Inject, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { ulid } from "ulid";
 import { DBS } from "../database-service/constants";
@@ -65,24 +65,21 @@ export class StorageService {
 		}
 	}
 
-	async resolvePublicUrl(
-		id: string | null | undefined,
-	): Promise<string | null> {
-		if (!id) {
-			return null;
+	async resolvePublicUrl(ids: string[]): Promise<Map<string, string>> {
+		const uniqueIds = [...new Set(ids)];
+
+		if (uniqueIds.length === 0) {
+			return new Map();
 		}
 
-		const [row] = await this.db
-			.select({ objectKey: storageTable.objectKey })
+		const rows = await this.db
+			.select({ id: storageTable.id, objectKey: storageTable.objectKey })
 			.from(storageTable)
-			.where(eq(storageTable.id, id))
-			.limit(1);
+			.where(inArray(storageTable.id, uniqueIds));
 
-		if (!row) {
-			return null;
-		}
-
-		return `${this.publicUrlBase}/${row.objectKey}`;
+		return new Map(
+			rows.map((row) => [row.id, `${this.publicUrlBase}/${row.objectKey}`]),
+		);
 	}
 
 	async delete(id: string): Promise<void> {

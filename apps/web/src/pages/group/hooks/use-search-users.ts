@@ -27,5 +27,6 @@ export const useSearchUsers = (query: string) => {
 		hasMore: enabled && (result.data?.hasMore ?? false),
 		hasData: enabled && result.data !== undefined,
 		isLoading: useLoader({ isLoading: result.isFetching }),
+		isError: result.isError,
 	};
 };

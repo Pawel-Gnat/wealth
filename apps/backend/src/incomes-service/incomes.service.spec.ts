@@ -1,4 +1,4 @@
-import { Test, type TestingModule } from "@nestjs/testing";
+import type { TestingModule } from "@nestjs/testing";
 import {
 	INCOME_CREATED_MESSAGE,
 	INCOME_DELETED_MESSAGE,
@@ -12,8 +12,8 @@ import {
 	incomeDocumentsTable,
 	incomeLineItemsTable,
 } from "../database-service/tables/index";
+import { createTestApp } from "../test/helpers/modules";
 import { createTestUser } from "../test/mocks/users";
-import { TestModule } from "../test/test.module";
 import { UsersService } from "../users-service/users.service";
 import { IncomesService } from "./incomes.service";
 
@@ -23,10 +23,7 @@ describe("Incomes service", () => {
 	let usersService: UsersService;
 
 	beforeAll(async () => {
-		moduleRef = await Test.createTestingModule({
-			imports: [TestModule],
-			providers: [IncomesService],
-		}).compile();
+		moduleRef = await createTestApp([IncomesService]).compile();
 		incomesService = moduleRef.get(IncomesService);
 		usersService = moduleRef.get(UsersService);
 	});

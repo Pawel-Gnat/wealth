@@ -17,7 +17,7 @@ export const budgetMemberSchema = userSchema.extend({
 export const budgetSchema = z.object({
 	id: z.string(),
 	title: z.string(),
-	ownerId: z.string(),
+	owner: userSchema,
 	members: z.array(budgetMemberSchema),
 	expenses: z.array(documentSchema),
 	incomes: z.array(documentSchema),
@@ -26,7 +26,7 @@ export const budgetSchema = z.object({
 export const budgetListItemSchema = budgetSchema.pick({
 	id: true,
 	title: true,
-	ownerId: true,
+	owner: true,
 	members: true,
 });
 

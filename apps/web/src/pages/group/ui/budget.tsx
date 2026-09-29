@@ -1,4 +1,4 @@
-import type { BudgetMember } from "@repo/api/types";
+import type { BudgetMember, User } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { APP_ROUTES } from "@/app/routes";
@@ -9,19 +9,13 @@ type BudgetProps = {
 	id: string;
 	title: string;
 	members: BudgetMember[];
-	ownerId: string;
+	owner: User;
 	userId: string;
 };
 
-export const Budget = ({
-	id,
-	title,
-	members,
-	ownerId,
-	userId,
-}: BudgetProps) => {
+export const Budget = ({ id, title, members, owner, userId }: BudgetProps) => {
 	const { t } = useTranslation();
-	const isOwner = ownerId === userId;
+	const isOwner = owner.id === userId;
 
 	return (
 		<Link
@@ -37,7 +31,7 @@ export const Budget = ({
 							: t("common.member", { ns: "common" })}
 					</Badge>
 				</div>
-				<AvatarGroup users={members} />
+				<AvatarGroup users={[owner, ...members]} />
 			</div>
 			<div className="flex flex-row gap-2">
 				{isOwner ? (
