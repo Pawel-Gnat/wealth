@@ -1,11 +1,12 @@
-import { Test, type TestingModule } from "@nestjs/testing";
+import type { TestingModule } from "@nestjs/testing";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { DBS } from "../database-service/constants";
 import { storageTable } from "../database-service/tables/index";
+import { StorageService } from "../storage-service/storage.service";
+import { createTestApp } from "../test/helpers/modules";
 import { createTestUser, uniqueTestUserEmail } from "../test/mocks/users";
-import { TestModule } from "../test/test.module";
 import { UsersService } from "./users.service";
 
 describe("Users service", () => {
@@ -14,9 +15,7 @@ describe("Users service", () => {
 	let db: NodePgDatabase;
 
 	beforeAll(async () => {
-		moduleRef = await Test.createTestingModule({
-			imports: [TestModule],
-		}).compile();
+		moduleRef = await createTestApp().compile();
 		usersService = moduleRef.get(UsersService);
 		db = moduleRef.get(DBS.APP);
 	});
@@ -176,6 +175,81 @@ describe("Users service", () => {
 			firstName: null,
 			lastName: null,
 		});
+	});
+
+	it("searches users by name or email without the current user or password", async () => {
+		const self = await createTestUser(usersService, {
+			emailTag: "users-search-self",
+			passwordHash: "hashed-for-integration",
+			firstName: "Selfsearch",
+			lastName: "Owner",
+		});
+		const byName = await createTestUser(usersService, {
+			emailTag: "users-search-name",
+			passwordHash: "hashed-for-integration",
+			firstName: "Adasearch",
+			lastName: "Lovelace",
+		});
+		const byEmail = await createTestUser(usersService, {
+			email: uniqueTestUserEmail("zzqmail-token"),
+			passwordHash: "hashed-for-integration",
+			firstName: "Grace",
+			lastName: "Hopper",
+		});
+		const withPercent = await createTestUser(usersService, {
+			emailTag: "users-search-percent",
+			passwordHash: "hashed-for-integration",
+			firstName: "100%",
+			lastName: "Token",
+		});
+
+		const [stored] = await db
+			.insert(storageTable)
+			.values({ objectKey: `avatars/${byName.id}/avatar.jpg` })
+			.returning({ id: storageTable.id });
+
+		if (!stored) {
+			throw new Error("storage insert failed");
+		}
+
+		await usersService.updateImage(byName.id, stored.id);
+		const image = `http://localhost:9000/wealth-storage/avatars/${byName.id}/avatar.jpg`;
+		const storageService = moduleRef.get(StorageService);
+
+		vi.mocked(storageService.resolvePublicUrl).mockResolvedValueOnce(
+			new Map([[stored.id, image]]),
+		);
+
+		const byNameResults = await usersService.searchUsers("Adasearch", self.id);
+		expect(byNameResults).toEqual({
+			hasMore: false,
+			data: [
+				{
+					id: byName.id,
+					email: byName.email,
+					image,
+					firstName: "Adasearch",
+					lastName: "Lovelace",
+				},
+			],
+		});
+		expect(byNameResults.data[0]).not.toHaveProperty("password");
+
+		const byEmailResults = await usersService.searchUsers(
+			"zzqmail-token",
+			self.id,
+		);
+		expect(byEmailResults.data.map((user) => user.id)).toContain(byEmail.id);
+		expect(byEmailResults.data.map((user) => user.id)).not.toContain(self.id);
+
+		const selfResults = await usersService.searchUsers("Selfsearch", self.id);
+		expect(selfResults.data.map((user) => user.id)).not.toContain(self.id);
+
+		const percentResults = await usersService.searchUsers("100%", self.id);
+		expect(percentResults.data.map((user) => user.id)).toContain(
+			withPercent.id,
+		);
+		expect(percentResults.data.map((user) => user.id)).not.toContain(byName.id);
 	});
 
 	it("rejects when trying to create user with duplicated email", async () => {

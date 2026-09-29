@@ -13,9 +13,13 @@ import type {
 	userEditPasswordResponseSchema,
 	userEditPasswordSchema,
 	userSchema,
+	userSearchParamsSchema,
+	userSearchResponseSchema,
 } from "../schemas/user.schema";
 
 export type User = z.infer<typeof userSchema>;
+export type UserSearchParams = z.infer<typeof userSearchParamsSchema>;
+export type UserSearchResponse = z.infer<typeof userSearchResponseSchema>;
 export type CreateUserPayload = z.infer<typeof createUserPayloadSchema>;
 export type CreateUserResponseData = z.infer<
 	typeof createUserResponseDataSchema

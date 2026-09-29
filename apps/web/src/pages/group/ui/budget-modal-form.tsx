@@ -1,26 +1,38 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FormInput, FormModal } from "@/shared/components";
-import { useCreateGroupBudgetForm } from "../hooks/use-create-group-budget-form";
+import {
+	ErrorState,
+	FormInput,
+	FormModal,
+	FormSearch,
+} from "@/shared/components";
+import { useBudgetModalForm } from "../hooks/use-budget-modal-form";
+import { BudgetMemberResults } from "./budget-member-results";
+import { BudgetSelectedMembers } from "./budget-selected-members";
 
 export const BudgetModalForm = () => {
 	const { t } = useTranslation();
-	const [isOpen, setIsOpen] = useState(false);
-
-	const { control, isPending, reset, createGroupBudget } =
-		useCreateGroupBudgetForm({
-			onCreated: () => setIsOpen(false),
-		});
+	const {
+		isOpen,
+		onOpenChange,
+		search,
+		setSearch,
+		selectedMembers,
+		availableUsers,
+		hasData,
+		isLoading,
+		isError,
+		hasMore,
+		addMember,
+		removeMember,
+		control,
+		isPending,
+		createGroupBudget,
+	} = useBudgetModalForm();
 
 	return (
 		<FormModal
 			open={isOpen}
-			onOpenChange={(open) => {
-				setIsOpen(open);
-				if (!open) {
-					reset();
-				}
-			}}
+			onOpenChange={onOpenChange}
 			triggerText={t("action.create", { ns: "common" })}
 			triggerIcon="add"
 			title={t("title", { ns: "group" })}
@@ -34,6 +46,33 @@ export const BudgetModalForm = () => {
 				control={control}
 				icon="text"
 			/>
+			<div className="flex flex-col gap-3">
+				<BudgetSelectedMembers
+					members={selectedMembers}
+					onRemove={removeMember}
+				/>
+				<FormSearch
+					search={search}
+					onSearchChange={setSearch}
+					label={t("search.label", { ns: "form" })}
+					placeholder={t("members.search.placeholder", { ns: "group" })}
+					icon="search"
+				/>
+				{isError ? (
+					<ErrorState
+						title={t("members.search.error.title", { ns: "group" })}
+						description={t("members.search.error.description", { ns: "group" })}
+					/>
+				) : (
+					<BudgetMemberResults
+						users={availableUsers}
+						hasData={hasData}
+						isLoading={isLoading}
+						hasMore={hasMore}
+						onAdd={addMember}
+					/>
+				)}
+			</div>
 		</FormModal>
 	);
 };

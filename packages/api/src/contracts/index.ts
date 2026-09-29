@@ -30,6 +30,7 @@ import {
 import { logoutContract } from "./logout.contract";
 import { meContract } from "./me.contract";
 import { refreshContract } from "./refresh.contract";
+import { searchUsersContract } from "./search-users.contract";
 import { signInContract } from "./signin.contract";
 import { signUpContract } from "./signup.contract";
 
@@ -40,6 +41,7 @@ export const rpcContract = populateContractRouterPaths({
 		refresh: refreshContract,
 		logout: logoutContract,
 		me: meContract,
+		search: searchUsersContract,
 	},
 	settings: {
 		password: userEditPasswordContract,

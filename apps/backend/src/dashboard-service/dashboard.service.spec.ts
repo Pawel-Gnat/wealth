@@ -1,4 +1,4 @@
-import { Test, type TestingModule } from "@nestjs/testing";
+import type { TestingModule } from "@nestjs/testing";
 import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import {
 	afterAll,
@@ -15,8 +15,8 @@ import {
 	expenseDocumentsTable,
 	incomeDocumentsTable,
 } from "../database-service/tables/index";
+import { createTestApp } from "../test/helpers/modules";
 import { createTestUser } from "../test/mocks/users";
-import { TestModule } from "../test/test.module";
 import { UsersService } from "../users-service/users.service";
 import { DashboardService } from "./dashboard.service";
 
@@ -28,10 +28,7 @@ describe("Dashboard service", () => {
 	let usersService: UsersService;
 
 	beforeAll(async () => {
-		moduleRef = await Test.createTestingModule({
-			imports: [TestModule],
-			providers: [DashboardService],
-		}).compile();
+		moduleRef = await createTestApp([DashboardService]).compile();
 		dashboardService = moduleRef.get(DashboardService);
 		usersService = moduleRef.get(UsersService);
 	});

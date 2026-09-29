@@ -1,4 +1,5 @@
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { ConfigModule } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
@@ -12,8 +13,8 @@ import {
 	vi,
 } from "vitest";
 import { DBS } from "../database-service/constants";
+import { DatabaseModule } from "../database-service/database.module";
 import { storageTable } from "../database-service/tables/index";
-import { TestModule } from "../test/test.module";
 import { S3_CLIENT } from "./constants";
 import { StorageService } from "./storage.service";
 
@@ -35,7 +36,13 @@ describe("Storage service", () => {
 		process.env.STORAGE_PUBLIC_URL = PUBLIC_URL_BASE;
 
 		moduleRef = await Test.createTestingModule({
-			imports: [TestModule],
+			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					ignoreEnvFile: true,
+				}),
+				DatabaseModule,
+			],
 			providers: [
 				StorageService,
 				{
@@ -84,6 +91,32 @@ describe("Storage service", () => {
 		expect(row?.objectKey).toBe(command.input.Key);
 	});
 
+	it("returns public urls for many storage ids", async () => {
+		const first = await upload("one.jpg");
+		const second = await upload("two.jpg");
+
+		const [firstRow] = await db
+			.select({ objectKey: storageTable.objectKey })
+			.from(storageTable)
+			.where(eq(storageTable.id, first.id))
+			.limit(1);
+
+		const [secondRow] = await db
+			.select({ objectKey: storageTable.objectKey })
+			.from(storageTable)
+			.where(eq(storageTable.id, second.id))
+			.limit(1);
+
+		await expect(
+			storageService.resolvePublicUrl([first.id, second.id, first.id]),
+		).resolves.toEqual(
+			new Map([
+				[first.id, `${PUBLIC_URL_BASE}/${firstRow?.objectKey}`],
+				[second.id, `${PUBLIC_URL_BASE}/${secondRow?.objectKey}`],
+			]),
+		);
+	});
+
 	it("returns a public url from STORAGE_PUBLIC_URL", async () => {
 		const { id } = await upload("pic.jpg");
 		const [row] = await db
@@ -92,8 +125,8 @@ describe("Storage service", () => {
 			.where(eq(storageTable.id, id))
 			.limit(1);
 
-		await expect(storageService.resolvePublicUrl(id)).resolves.toBe(
-			`${PUBLIC_URL_BASE}/${row?.objectKey}`,
+		await expect(storageService.resolvePublicUrl([id])).resolves.toEqual(
+			new Map([[id, `${PUBLIC_URL_BASE}/${row?.objectKey}`]]),
 		);
 	});
 
@@ -114,9 +147,9 @@ describe("Storage service", () => {
 		expect(row).toBeUndefined();
 	});
 
-	it("returns null when the storage row is missing", async () => {
+	it("returns an empty map when the storage row is missing", async () => {
 		await expect(
-			storageService.resolvePublicUrl("01ARZ3NDEKTSV4RRFFQ69G5FAZ"),
-		).resolves.toBeNull();
+			storageService.resolvePublicUrl(["01ARZ3NDEKTSV4RRFFQ69G5FAZ"]),
+		).resolves.toEqual(new Map());
 	});
 });

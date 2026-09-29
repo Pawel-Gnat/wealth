@@ -93,7 +93,7 @@ describe("Auth service", () => {
 			id: "storage-id",
 		});
 		vi.mocked(storageService.delete).mockResolvedValue(undefined);
-		vi.mocked(storageService.resolvePublicUrl).mockResolvedValue(null);
+		vi.mocked(storageService.resolvePublicUrl).mockResolvedValue(new Map());
 	});
 
 	afterAll(async () => {
