@@ -1,59 +1,39 @@
 import { relations } from "drizzle-orm";
 import { budgetMemberTable } from "./budget-members.table";
 import { budgetTable } from "./budgets.table";
-import { expenseDocumentsTable } from "./expense-documents.table";
-import { expenseLineItemsTable } from "./expense-line-items.table";
-import { incomeDocumentsTable } from "./income-documents.table";
-import { incomeLineItemsTable } from "./income-line-items.table";
+import { documentLineItemsTable } from "./document-line-items.table";
+import { documentsTable } from "./documents.table";
 import { sessionsTable } from "./sessions.table";
 import { usersTable } from "./users.table";
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
-	expenseDocuments: many(expenseDocumentsTable),
-	incomeDocuments: many(incomeDocumentsTable),
+	documents: many(documentsTable),
 	sessions: many(sessionsTable),
 	budgets: many(budgetTable),
 	budgetMembers: many(budgetMemberTable),
 }));
 
-export const expenseDocumentsRelations = relations(
-	expenseDocumentsTable,
+export const documentsRelations = relations(
+	documentsTable,
 	({ one, many }) => ({
 		user: one(usersTable, {
-			fields: [expenseDocumentsTable.userId],
+			fields: [documentsTable.userId],
 			references: [usersTable.id],
 		}),
-		lineItems: many(expenseLineItemsTable),
-	}),
-);
-
-export const expenseLineItemsRelations = relations(
-	expenseLineItemsTable,
-	({ one }) => ({
-		expenseDocument: one(expenseDocumentsTable, {
-			fields: [expenseLineItemsTable.expenseDocumentId],
-			references: [expenseDocumentsTable.id],
+		budget: one(budgetTable, {
+			fields: [documentsTable.budgetId],
+			references: [budgetTable.id],
 		}),
+		lineItems: many(documentLineItemsTable),
 	}),
 );
 
-export const incomeDocumentsRelations = relations(
-	incomeDocumentsTable,
-	({ one, many }) => ({
-		user: one(usersTable, {
-			fields: [incomeDocumentsTable.userId],
-			references: [usersTable.id],
-		}),
-		lineItems: many(incomeLineItemsTable),
-	}),
-);
-
-export const incomeLineItemsRelations = relations(
-	incomeLineItemsTable,
+export const documentLineItemsRelations = relations(
+	documentLineItemsTable,
 	({ one }) => ({
-		incomeDocument: one(incomeDocumentsTable, {
-			fields: [incomeLineItemsTable.incomeDocumentId],
-			references: [incomeDocumentsTable.id],
+		document: one(documentsTable, {
+			fields: [documentLineItemsTable.documentId],
+			references: [documentsTable.id],
 		}),
 	}),
 );
@@ -64,6 +44,7 @@ export const budgetRelations = relations(budgetTable, ({ one, many }) => ({
 		references: [usersTable.id],
 	}),
 	members: many(budgetMemberTable),
+	documents: many(documentsTable),
 }));
 
 export const budgetMemberRelations = relations(

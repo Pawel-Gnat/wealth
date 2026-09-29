@@ -1,5 +1,5 @@
 {
-  "version": "2.18",
+  "version": "2.19",
   "children": [
     {
       "type": "frame",
@@ -1457,6 +1457,162 @@
               "fill": "$border",
               "width": "fill_container",
               "height": 1
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "UqhD8",
+          "name": "Toasts",
+          "layout": "vertical",
+          "gap": 12,
+          "children": [
+            {
+              "type": "frame",
+              "id": "D6w3Hv",
+              "name": "Toast",
+              "reusable": true,
+              "width": 348,
+              "fill": "$card",
+              "cornerRadius": "$radius",
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#0000000D",
+                "offset": {
+                  "x": 0,
+                  "y": 8
+                },
+                "blur": 20
+              },
+              "gap": 8,
+              "padding": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "JyqUM",
+                  "name": "Type icon",
+                  "width": 20,
+                  "height": 20,
+                  "fill": "$accent",
+                  "cornerRadius": 10,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "U6aFCH",
+                      "name": "Type glyph",
+                      "width": 12,
+                      "height": 12,
+                      "icon": "circle-check",
+                      "library": "lucide",
+                      "fill": "$accent-foreground"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "rmf4j",
+                  "name": "Content",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "h6KSQ",
+                      "name": "Title",
+                      "fill": "$foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Expense created",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "g9xcr",
+                      "name": "Body",
+                      "fill": "$muted-foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "The expense was saved to this month.",
+                      "lineHeight": 1.35,
+                      "fontFamily": "$font-sans",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "ywEvR",
+              "type": "ref",
+              "ref": "D6w3Hv",
+              "name": "Toast Error",
+              "descendants": {
+                "JyqUM": {
+                  "fill": "$destructive-soft"
+                },
+                "U6aFCH": {
+                  "icon": "circle-alert",
+                  "fill": "$destructive"
+                },
+                "h6KSQ": {
+                  "content": "Could not save expense"
+                },
+                "g9xcr": {
+                  "content": "Something went wrong. Try again."
+                }
+              }
+            },
+            {
+              "id": "LeIky",
+              "type": "ref",
+              "ref": "D6w3Hv",
+              "name": "Toast Warning",
+              "descendants": {
+                "JyqUM": {
+                  "fill": "$warning-soft"
+                },
+                "U6aFCH": {
+                  "icon": "triangle-alert",
+                  "fill": "$warning"
+                },
+                "h6KSQ": {
+                  "content": "Check the amount"
+                },
+                "g9xcr": {
+                  "content": "This looks higher than usual."
+                }
+              }
+            },
+            {
+              "id": "kOx3u",
+              "type": "ref",
+              "ref": "D6w3Hv",
+              "name": "Toast Info",
+              "descendants": {
+                "JyqUM": {
+                  "fill": "$muted"
+                },
+                "U6aFCH": {
+                  "icon": "info",
+                  "fill": "$foreground"
+                },
+                "h6KSQ": {
+                  "content": "Invitation sent"
+                },
+                "g9xcr": {
+                  "content": "Anna Kowalska will see it in notifications."
+                }
+              }
             }
           ]
         }

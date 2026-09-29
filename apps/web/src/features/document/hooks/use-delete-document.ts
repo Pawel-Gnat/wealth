@@ -1,17 +1,10 @@
-import type {
-	ExpenseDocumentDeleteResponse,
-	IncomeDocumentDeleteResponse,
-} from "@repo/api/types";
+import type { DocumentDeleteResponse } from "@repo/api/types";
 import { logger, runWithRequestId } from "@repo/observability/browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/features/config/document-config";
 import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
-
-type DocumentDeleteResponse =
-	| ExpenseDocumentDeleteResponse
-	| IncomeDocumentDeleteResponse;
 
 export type UseDeleteDocumentProps = {
 	kind: RecordKind;
@@ -31,7 +24,7 @@ export function useDeleteDocument({
 		mutationFn: (documentId) =>
 			runWithRequestId(async () => {
 				const data = await controlledAsync<DocumentDeleteResponse>(async () =>
-					config.client.delete({ id: documentId }),
+					config.client.delete({ id: documentId, kind }),
 				);
 				logger.info(config.events.delete);
 				return data;

@@ -10,23 +10,16 @@ import {
 	getDashboardDailyChartContract,
 	getDashboardSummaryContract,
 } from "./dashboard.contract";
+import {
+	createDocumentContract,
+	deleteDocumentContract,
+	getDocumentContract,
+	listDocumentsContract,
+	updateDocumentContract,
+} from "./document.contract";
 import { userEditAvatarContract } from "./edit-avatar.contract";
 import { userEditDetailsContract } from "./edit-details.contract";
 import { userEditPasswordContract } from "./edit-password.contract";
-import {
-	createExpenseContract,
-	deleteExpenseContract,
-	getExpenseContract,
-	listExpensesContract,
-	updateExpenseContract,
-} from "./expenses.contract";
-import {
-	createIncomeContract,
-	deleteIncomeContract,
-	getIncomeContract,
-	listIncomesContract,
-	updateIncomeContract,
-} from "./incomes.contract";
 import { logoutContract } from "./logout.contract";
 import { meContract } from "./me.contract";
 import { refreshContract } from "./refresh.contract";
@@ -48,25 +41,18 @@ export const rpcContract = populateContractRouterPaths({
 		details: userEditDetailsContract,
 		avatar: userEditAvatarContract,
 	},
-	expenses: {
-		create: createExpenseContract,
-		list: listExpensesContract,
-		get: getExpenseContract,
-		update: updateExpenseContract,
-		delete: deleteExpenseContract,
+	documents: {
+		create: createDocumentContract,
+		list: listDocumentsContract,
+		get: getDocumentContract,
+		update: updateDocumentContract,
+		delete: deleteDocumentContract,
 	},
 	budget: {
 		list: listBudgetsContract,
 		invites: listBudgetInvitesContract,
 		create: createBudgetContract,
 		documents: listBudgetDocumentsContract,
-	},
-	incomes: {
-		create: createIncomeContract,
-		list: listIncomesContract,
-		get: getIncomeContract,
-		update: updateIncomeContract,
-		delete: deleteIncomeContract,
 	},
 	dashboard: {
 		getSummary: getDashboardSummaryContract,

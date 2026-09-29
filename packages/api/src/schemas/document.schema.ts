@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { apiPaginatedPayload, apiPayload } from "./common.schema";
 
-export const EXPENSE_CREATED_MESSAGE = "expense_created" as const;
-export const INCOME_CREATED_MESSAGE = "income_created" as const;
-export const EXPENSE_UPDATED_MESSAGE = "expense_updated" as const;
-export const INCOME_UPDATED_MESSAGE = "income_updated" as const;
-export const EXPENSE_DELETED_MESSAGE = "expense_deleted" as const;
-export const INCOME_DELETED_MESSAGE = "income_deleted" as const;
+export const DOCUMENT_CREATED_MESSAGE = "document_created" as const;
+export const DOCUMENT_UPDATED_MESSAGE = "document_updated" as const;
+export const DOCUMENT_DELETED_MESSAGE = "document_deleted" as const;
+
+export const documentKinds = ["expense", "income"] as const;
+
+export const documentKindSchema = z.enum(documentKinds);
 
 export const documentListItemSchema = z.object({
 	id: z.string(),
@@ -47,54 +48,43 @@ export const documentUpdatePayloadSchema = documentCreatePayloadSchema.extend({
 	id: z.string(),
 });
 
-export const expenseDocumentCreateResponseDataSchema = z.object({
-	message: z.literal(EXPENSE_CREATED_MESSAGE),
+export const documentListParamsSchema = z.object({
+	kind: documentKindSchema,
 });
 
-export const expenseDocumentCreateResponseSchema = apiPayload(
-	expenseDocumentCreateResponseDataSchema,
+export const documentCreateInputSchema = documentCreatePayloadSchema.extend({
+	kind: documentKindSchema,
+});
+
+export const documentUpdateInputSchema = documentUpdatePayloadSchema.extend({
+	kind: documentKindSchema,
+});
+
+export const documentCreateResponseDataSchema = z.object({
+	message: z.literal(DOCUMENT_CREATED_MESSAGE),
+});
+
+export const documentCreateResponseSchema = apiPayload(
+	documentCreateResponseDataSchema,
 );
 
-export const incomeDocumentCreateResponseDataSchema = z.object({
-	message: z.literal(INCOME_CREATED_MESSAGE),
+export const documentUpdateResponseDataSchema = z.object({
+	message: z.literal(DOCUMENT_UPDATED_MESSAGE),
 });
 
-export const incomeDocumentCreateResponseSchema = apiPayload(
-	incomeDocumentCreateResponseDataSchema,
-);
-
-export const expenseDocumentUpdateResponseDataSchema = z.object({
-	message: z.literal(EXPENSE_UPDATED_MESSAGE),
-});
-
-export const expenseDocumentUpdateResponseSchema = apiPayload(
-	expenseDocumentUpdateResponseDataSchema,
-);
-
-export const incomeDocumentUpdateResponseDataSchema = z.object({
-	message: z.literal(INCOME_UPDATED_MESSAGE),
-});
-
-export const incomeDocumentUpdateResponseSchema = apiPayload(
-	incomeDocumentUpdateResponseDataSchema,
+export const documentUpdateResponseSchema = apiPayload(
+	documentUpdateResponseDataSchema,
 );
 
 export const documentParamsSchema = z.object({
 	id: z.string(),
+	kind: documentKindSchema,
 });
 
-export const expenseDocumentDeleteResponseDataSchema = z.object({
-	message: z.literal(EXPENSE_DELETED_MESSAGE),
+export const documentDeleteResponseDataSchema = z.object({
+	message: z.literal(DOCUMENT_DELETED_MESSAGE),
 });
 
-export const expenseDocumentDeleteResponseSchema = apiPayload(
-	expenseDocumentDeleteResponseDataSchema,
-);
-
-export const incomeDocumentDeleteResponseDataSchema = z.object({
-	message: z.literal(INCOME_DELETED_MESSAGE),
-});
-
-export const incomeDocumentDeleteResponseSchema = apiPayload(
-	incomeDocumentDeleteResponseDataSchema,
+export const documentDeleteResponseSchema = apiPayload(
+	documentDeleteResponseDataSchema,
 );

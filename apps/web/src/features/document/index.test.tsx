@@ -26,25 +26,18 @@ vi.mock("react-router", async (importOriginal) => {
 const documentKinds = [
 	{
 		kind: "expense",
-		apiSegment: "expenses",
 		lineItemTitle: "Taxi",
 	},
 	{
 		kind: "income",
-		apiSegment: "incomes",
 		lineItemTitle: "Salary",
 	},
 ] as const satisfies readonly {
 	kind: RecordKind;
-	apiSegment: string;
 	lineItemTitle: string;
 }[];
 
-describe.each(documentKinds)("$kind Document", ({
-	kind,
-	apiSegment,
-	lineItemTitle,
-}) => {
+describe.each(documentKinds)("$kind Document", ({ kind, lineItemTitle }) => {
 	const config = DOCUMENT_CONFIG[kind];
 	let t: TFunction;
 
@@ -108,7 +101,7 @@ describe.each(documentKinds)("$kind Document", ({
 
 	it("shows an error when the document cannot be loaded", async () => {
 		server.use(
-			http.get(`*/${apiSegment}/${documentId}`, () =>
+			http.get(`*/documents/${documentId}`, () =>
 				HttpResponse.json({ error: { message: "Not Found" } }, { status: 404 }),
 			),
 		);

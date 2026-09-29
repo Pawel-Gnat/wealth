@@ -2,11 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { documentCreatePayloadSchema } from "@repo/api/schemas";
 import type {
 	DocumentCreatePayload,
+	DocumentCreateResponse,
 	DocumentUpdatePayload,
-	ExpenseDocumentCreateResponse,
-	ExpenseDocumentUpdateResponse,
-	IncomeDocumentCreateResponse,
-	IncomeDocumentUpdateResponse,
+	DocumentUpdateResponse,
 } from "@repo/api/types";
 import { normalizeDocumentDateForApi } from "@repo/common/helpers";
 import { logger, runWithRequestId } from "@repo/observability/browser";
@@ -21,11 +19,7 @@ import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
-type DocumentUpsertResponse =
-	| ExpenseDocumentCreateResponse
-	| ExpenseDocumentUpdateResponse
-	| IncomeDocumentCreateResponse
-	| IncomeDocumentUpdateResponse;
+type DocumentUpsertResponse = DocumentCreateResponse | DocumentUpdateResponse;
 
 const DEFAULT_DOCUMENT_VALUES: DocumentCreatePayload = {
 	date: new Date(),
@@ -79,10 +73,14 @@ export function useUpsertDocument({
 					"id" in normalizedPayload
 						? await controlledAsync<DocumentUpsertResponse>(async () => {
 								const { id, ...updatePayload } = normalizedPayload;
-								return config.client.update({ id, ...updatePayload });
+								return config.client.update({
+									id,
+									kind,
+									...updatePayload,
+								});
 							})
 						: await controlledAsync<DocumentUpsertResponse>(async () =>
-								config.client.create(normalizedPayload),
+								config.client.create({ ...normalizedPayload, kind }),
 							);
 
 				const isUpdated = data.data.message === config.updatedMessage;

@@ -1,7 +1,4 @@
-import {
-	EXPENSE_UPDATED_MESSAGE,
-	INCOME_UPDATED_MESSAGE,
-} from "@repo/api/schemas";
+import { DOCUMENT_UPDATED_MESSAGE } from "@repo/api/schemas";
 import type { ParseKeys } from "@repo/common/i18n";
 import { getDocumentObservabilityEvents } from "@repo/observability/browser";
 import { APP_ROUTES } from "@/app/routes";
@@ -31,8 +28,8 @@ export const DOCUMENT_CONFIG = {
 		viewRoute: APP_ROUTES.expenses.view,
 		editRoute: APP_ROUTES.expenses.edit,
 		queryKeys: queryKeys.expenses,
-		client: orpcClient.expenses,
-		updatedMessage: EXPENSE_UPDATED_MESSAGE,
+		client: orpcClient.documents,
+		updatedMessage: DOCUMENT_UPDATED_MESSAGE,
 		events: getDocumentObservabilityEvents("expense"),
 		toast: documentToast({
 			created: "toast.success.expense-created",
@@ -52,8 +49,8 @@ export const DOCUMENT_CONFIG = {
 		viewRoute: APP_ROUTES.incomes.view,
 		editRoute: APP_ROUTES.incomes.edit,
 		queryKeys: queryKeys.incomes,
-		client: orpcClient.incomes,
-		updatedMessage: INCOME_UPDATED_MESSAGE,
+		client: orpcClient.documents,
+		updatedMessage: DOCUMENT_UPDATED_MESSAGE,
 		events: getDocumentObservabilityEvents("income"),
 		toast: documentToast({
 			created: "toast.success.income-created",

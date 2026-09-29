@@ -21,6 +21,7 @@ export function useDocument({ kind, documentId }: UseDocumentProps) {
 			return controlledAsync(() =>
 				config.client.get({
 					id: documentId ?? "",
+					kind,
 				}),
 			);
 		},

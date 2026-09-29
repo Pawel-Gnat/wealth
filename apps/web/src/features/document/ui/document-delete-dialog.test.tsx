@@ -23,11 +23,11 @@ const documentId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 const dialogKinds = [
 	{
 		kind: "expense",
-		apiSegment: "expenses",
+		apiSegment: "documents",
 	},
 	{
 		kind: "income",
-		apiSegment: "incomes",
+		apiSegment: "documents",
 	},
 ] as const satisfies readonly {
 	kind: RecordKind;

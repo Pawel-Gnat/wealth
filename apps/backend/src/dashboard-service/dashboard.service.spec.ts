@@ -11,10 +11,7 @@ import {
 	vi,
 } from "vitest";
 import { DBS } from "../database-service/constants";
-import {
-	expenseDocumentsTable,
-	incomeDocumentsTable,
-} from "../database-service/tables/index";
+import { budgetTable, documentsTable } from "../database-service/tables/index";
 import { createTestApp } from "../test/helpers/modules";
 import { createTestUser } from "../test/mocks/users";
 import { UsersService } from "../users-service/users.service";
@@ -71,28 +68,36 @@ describe("Dashboard service", () => {
 				emailTag: "dash-summary-sum",
 			});
 
-			await db.insert(expenseDocumentsTable).values([
+			await db.insert(documentsTable).values([
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "100",
-					expenseDate: "2026-07-01",
+					documentDate: "2026-07-01",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "50",
-					expenseDate: "2026-07-10",
+					documentDate: "2026-07-10",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "999",
-					expenseDate: "2026-06-15",
+					documentDate: "2026-06-15",
 				},
 			]);
 
-			await db.insert(incomeDocumentsTable).values({
+			await db.insert(documentsTable).values({
 				userId: user.id,
+				kind: "income",
+				budgetId: null,
 				totalAmount: "300",
-				incomeDate: "2026-07-05",
+				documentDate: "2026-07-05",
 			});
 
 			const result = await dashboardService.getSummary(user.id, 30, "UTC");
@@ -102,6 +107,43 @@ describe("Dashboard service", () => {
 			expect(result.data.netBalance.amount).toBe(150);
 		});
 
+		it("ignores documents that belong to a group budget", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const user = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "dash-group-excluded",
+			});
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared", ownerId: user.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(documentsTable).values([
+				{
+					userId: user.id,
+					kind: "expense",
+					budgetId: null,
+					totalAmount: "40",
+					documentDate: "2026-07-10",
+				},
+				{
+					userId: user.id,
+					kind: "expense",
+					budgetId: budget.id,
+					totalAmount: "500",
+					documentDate: "2026-07-10",
+				},
+			]);
+
+			const result = await dashboardService.getSummary(user.id, 30, "UTC");
+
+			expect(result.data.expenses.amount).toBe(40);
+		});
+
 		it("uses a rolling last-7-days window for amounts", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
@@ -109,16 +151,20 @@ describe("Dashboard service", () => {
 				emailTag: "dash-summary-7",
 			});
 
-			await db.insert(expenseDocumentsTable).values([
+			await db.insert(documentsTable).values([
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "40",
-					expenseDate: "2026-07-10",
+					documentDate: "2026-07-10",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "999",
-					expenseDate: "2026-07-08",
+					documentDate: "2026-07-08",
 				},
 			]);
 
@@ -134,10 +180,12 @@ describe("Dashboard service", () => {
 				emailTag: "dash-null-pct",
 			});
 
-			await db.insert(expenseDocumentsTable).values({
+			await db.insert(documentsTable).values({
 				userId: user.id,
+				kind: "expense",
+				budgetId: null,
 				totalAmount: "200",
-				expenseDate: "2026-07-10",
+				documentDate: "2026-07-10",
 			});
 
 			const result = await dashboardService.getSummary(user.id, 30, "UTC");
@@ -152,16 +200,20 @@ describe("Dashboard service", () => {
 				emailTag: "dash-pct",
 			});
 
-			await db.insert(expenseDocumentsTable).values([
+			await db.insert(documentsTable).values([
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "150",
-					expenseDate: "2026-06-01",
+					documentDate: "2026-06-01",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "300",
-					expenseDate: "2026-07-01",
+					documentDate: "2026-07-01",
 				},
 			]);
 
@@ -184,16 +236,20 @@ describe("Dashboard service", () => {
 				emailTag: "dash-neg-net",
 			});
 
-			await db.insert(expenseDocumentsTable).values([
+			await db.insert(documentsTable).values([
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "300",
-					expenseDate: "2026-06-01",
+					documentDate: "2026-06-01",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "100",
-					expenseDate: "2026-07-01",
+					documentDate: "2026-07-01",
 				},
 			]);
 
@@ -218,16 +274,20 @@ describe("Dashboard service", () => {
 				emailTag: "dash-prev-window",
 			});
 
-			await db.insert(expenseDocumentsTable).values([
+			await db.insert(documentsTable).values([
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "70",
-					expenseDate: "2026-07-05",
+					documentDate: "2026-07-05",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "140",
-					expenseDate: "2026-07-12",
+					documentDate: "2026-07-12",
 				},
 			]);
 
@@ -251,16 +311,20 @@ describe("Dashboard service", () => {
 				emailTag: "dash-future",
 			});
 
-			await db.insert(expenseDocumentsTable).values([
+			await db.insert(documentsTable).values([
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "100",
-					expenseDate: "2026-07-15",
+					documentDate: "2026-07-15",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "999",
-					expenseDate: "2026-07-16",
+					documentDate: "2026-07-16",
 				},
 			]);
 
@@ -278,16 +342,20 @@ describe("Dashboard service", () => {
 				emailTag: "dash-tz-boundary",
 			});
 
-			await db.insert(expenseDocumentsTable).values([
+			await db.insert(documentsTable).values([
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "100",
-					expenseDate: "2026-07-15",
+					documentDate: "2026-07-15",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "50",
-					expenseDate: "2026-07-16",
+					documentDate: "2026-07-16",
 				},
 			]);
 
@@ -332,23 +400,29 @@ describe("Dashboard service", () => {
 				emailTag: "dash-chart-cum",
 			});
 
-			await db.insert(expenseDocumentsTable).values([
+			await db.insert(documentsTable).values([
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "100",
-					expenseDate: "2026-07-01",
+					documentDate: "2026-07-01",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "50",
-					expenseDate: "2026-07-03",
+					documentDate: "2026-07-03",
 				},
 			]);
 
-			await db.insert(incomeDocumentsTable).values({
+			await db.insert(documentsTable).values({
 				userId: user.id,
+				kind: "income",
+				budgetId: null,
 				totalAmount: "200",
-				incomeDate: "2026-07-02",
+				documentDate: "2026-07-02",
 			});
 
 			const result = await dashboardService.getCumulativeChart(
@@ -446,23 +520,29 @@ describe("Dashboard service", () => {
 				emailTag: "dash-daily-sums",
 			});
 
-			await db.insert(expenseDocumentsTable).values([
+			await db.insert(documentsTable).values([
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "100",
-					expenseDate: "2026-07-01",
+					documentDate: "2026-07-01",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "50",
-					expenseDate: "2026-07-03",
+					documentDate: "2026-07-03",
 				},
 			]);
 
-			await db.insert(incomeDocumentsTable).values({
+			await db.insert(documentsTable).values({
 				userId: user.id,
+				kind: "income",
+				budgetId: null,
 				totalAmount: "200",
-				incomeDate: "2026-07-02",
+				documentDate: "2026-07-02",
 			});
 
 			const result = await dashboardService.getDailyChart(user.id, 30, "UTC");
@@ -495,23 +575,29 @@ describe("Dashboard service", () => {
 				emailTag: "dash-daily-outside",
 			});
 
-			await db.insert(expenseDocumentsTable).values([
+			await db.insert(documentsTable).values([
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "999",
-					expenseDate: "2026-07-08",
+					documentDate: "2026-07-08",
 				},
 				{
 					userId: user.id,
+					kind: "expense",
+					budgetId: null,
 					totalAmount: "50",
-					expenseDate: "2026-07-10",
+					documentDate: "2026-07-10",
 				},
 			]);
 
-			await db.insert(incomeDocumentsTable).values({
+			await db.insert(documentsTable).values({
 				userId: user.id,
+				kind: "income",
+				budgetId: null,
 				totalAmount: "400",
-				incomeDate: "2026-07-08",
+				documentDate: "2026-07-08",
 			});
 
 			const result = await dashboardService.getDailyChart(user.id, 7, "UTC");
@@ -549,16 +635,20 @@ describe("Dashboard service", () => {
 				emailTag: "dash-smoke",
 			});
 
-			await db.insert(expenseDocumentsTable).values({
+			await db.insert(documentsTable).values({
 				userId: user.id,
+				kind: "expense",
+				budgetId: null,
 				totalAmount: "75",
-				expenseDate: "2026-07-14",
+				documentDate: "2026-07-14",
 			});
 
-			await db.insert(incomeDocumentsTable).values({
+			await db.insert(documentsTable).values({
 				userId: user.id,
+				kind: "income",
+				budgetId: null,
 				totalAmount: "125",
-				incomeDate: "2026-07-14",
+				documentDate: "2026-07-14",
 			});
 
 			const summary = await dashboardService.getSummary(user.id, 30, "UTC");

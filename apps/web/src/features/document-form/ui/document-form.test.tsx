@@ -32,11 +32,11 @@ vi.mock("sonner", () => ({
 }));
 
 const formKinds = [
-	{ kind: "expense", apiSegment: "expenses" },
-	{ kind: "income", apiSegment: "incomes" },
-] as const satisfies readonly { kind: RecordKind; apiSegment: string }[];
+	{ kind: "expense" },
+	{ kind: "income" },
+] as const satisfies readonly { kind: RecordKind }[];
 
-describe.each(formKinds)("$kind DocumentForm", ({ kind, apiSegment }) => {
+describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
 	const config = DOCUMENT_CONFIG[kind];
 	let t: TFunction;
 
@@ -160,7 +160,7 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind, apiSegment }) => {
 		it("shows error toast on API error", async () => {
 			const user = userEvent.setup();
 			server.use(
-				http.post(`*/${apiSegment}`, () =>
+				http.post("*/documents", () =>
 					HttpResponse.json(
 						{ error: { message: "Bad Request" } },
 						{ status: 400 },
