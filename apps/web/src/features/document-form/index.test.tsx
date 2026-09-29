@@ -65,7 +65,7 @@ describe("DocumentForm page", () => {
 	it("shows an error when the document cannot be loaded", async () => {
 		useParamsMock.mockReturnValue({ id: documentId });
 		server.use(
-			http.get(`*/expenses/${documentId}`, () =>
+			http.get(`*/documents/${documentId}`, () =>
 				HttpResponse.json({ error: { message: "Not Found" } }, { status: 404 }),
 			),
 		);

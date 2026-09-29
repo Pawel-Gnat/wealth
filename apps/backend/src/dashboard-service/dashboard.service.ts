@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type {
 	DashboardChartResponse,
+	DocumentKind,
 	Period,
 	SummaryResponse,
 } from "@repo/api/types";
@@ -8,13 +9,10 @@ import {
 	decodeDocumentDateFromStorage,
 	encodeDocumentDateForStorage,
 } from "@repo/common/helpers";
-import { and, eq, gte, lte, sum } from "drizzle-orm";
+import { and, eq, gte, isNull, lte, sum } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants";
-import {
-	expenseDocumentsTable,
-	incomeDocumentsTable,
-} from "../database-service/tables/index";
+import { documentsTable } from "../database-service/tables/index";
 import { getTodayInTimeZone } from "../shared/time-zone/get-today-in-time-zone";
 import type { AmountRow } from "./types/amount-row";
 
@@ -157,25 +155,20 @@ export class DashboardService {
 		userId: string,
 		rangeStart: string,
 		rangeEnd: string,
-		documentKind: "expense" | "income",
+		documentKind: DocumentKind,
 	): Promise<number> {
-		const table =
-			documentKind === "expense" ? expenseDocumentsTable : incomeDocumentsTable;
-		const dateColumn =
-			documentKind === "expense"
-				? expenseDocumentsTable.expenseDate
-				: incomeDocumentsTable.incomeDate;
-
 		const [row] = await this.db
 			.select({
-				amount: sum(table.totalAmount),
+				amount: sum(documentsTable.totalAmount),
 			})
-			.from(table)
+			.from(documentsTable)
 			.where(
 				and(
-					eq(table.userId, userId),
-					gte(dateColumn, rangeStart),
-					lte(dateColumn, rangeEnd),
+					eq(documentsTable.userId, userId),
+					isNull(documentsTable.budgetId),
+					eq(documentsTable.kind, documentKind),
+					gte(documentsTable.documentDate, rangeStart),
+					lte(documentsTable.documentDate, rangeEnd),
 				),
 			);
 
@@ -186,29 +179,24 @@ export class DashboardService {
 		userId: string,
 		rangeStart: string,
 		rangeEnd: string,
-		documentKind: "expense" | "income",
+		documentKind: DocumentKind,
 	): Promise<Map<string, number>> {
-		const table =
-			documentKind === "expense" ? expenseDocumentsTable : incomeDocumentsTable;
-		const dateColumn =
-			documentKind === "expense"
-				? expenseDocumentsTable.expenseDate
-				: incomeDocumentsTable.incomeDate;
-
 		const rows = await this.db
 			.select({
-				date: dateColumn,
-				amount: sum(table.totalAmount),
+				date: documentsTable.documentDate,
+				amount: sum(documentsTable.totalAmount),
 			})
-			.from(table)
+			.from(documentsTable)
 			.where(
 				and(
-					eq(table.userId, userId),
-					gte(dateColumn, rangeStart),
-					lte(dateColumn, rangeEnd),
+					eq(documentsTable.userId, userId),
+					isNull(documentsTable.budgetId),
+					eq(documentsTable.kind, documentKind),
+					gte(documentsTable.documentDate, rangeStart),
+					lte(documentsTable.documentDate, rangeEnd),
 				),
 			)
-			.groupBy(dateColumn);
+			.groupBy(documentsTable.documentDate);
 
 		return this.toDailyTotalsMap(
 			rows.map((row) => ({

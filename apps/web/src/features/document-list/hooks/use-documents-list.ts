@@ -11,7 +11,7 @@ export function useDocumentsList(kind: RecordKind) {
 	const query = useQuery({
 		queryKey: config.queryKeys.all(),
 		queryFn: async (): Promise<DocumentListResponse> => {
-			return controlledAsync(() => config.client.list({}));
+			return controlledAsync(() => config.client.list({ kind }));
 		},
 		select: (response) => response.data,
 	});
