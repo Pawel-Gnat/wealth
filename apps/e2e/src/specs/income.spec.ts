@@ -1,4 +1,4 @@
-import { USER_EMAIL, USER_PASSWORD } from './helpers/consts'
+import { INCOME_USER_EMAIL, USER_PASSWORD } from './helpers/consts'
 import { ensureI18nInit, getI18nText } from './helpers/i18n'
 import { signupAsUser } from './helpers/signup-as-user'
 import { expect, test } from './helpers/test'
@@ -12,8 +12,8 @@ function formatUsd(amount: number) {
 
 test('income document lifecycle', async ({ page, loginAsUser }) => {
 	await ensureI18nInit()
-	await signupAsUser(page, { email: USER_EMAIL, password: USER_PASSWORD })
-	await loginAsUser({ email: USER_EMAIL, password: USER_PASSWORD })
+	await signupAsUser(page, { email: INCOME_USER_EMAIL, password: USER_PASSWORD })
+	await loginAsUser({ email: INCOME_USER_EMAIL, password: USER_PASSWORD })
 
 	const incomeLabel = getI18nText('form', 'line-item.income-label')
 	const priceLabel = getI18nText('form', 'single-amount.label')
