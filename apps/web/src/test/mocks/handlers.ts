@@ -1,7 +1,7 @@
 import {
-	DOCUMENT_CREATED_MESSAGE,
-	DOCUMENT_DELETED_MESSAGE,
-	DOCUMENT_UPDATED_MESSAGE,
+	RECORD_CREATED_MESSAGE,
+	RECORD_DELETED_MESSAGE,
+	RECORD_UPDATED_MESSAGE,
 	USER_AVATAR_UPDATED_MESSAGE,
 	USER_DETAILS_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
@@ -31,12 +31,13 @@ const postAuthSignUpHandler = () => {
 	});
 };
 
-const getDocumentsListHandler = () => {
+const getRecordsListHandler = () => {
 	return HttpResponse.json({
 		data: [
 			{
 				id: "01JTZKQX2GT6PHGQER0M8FS6K8",
 				date: "2024-03-01T12:00:00.000Z",
+				kind: "expense",
 				totalAmount: 123.45,
 			},
 		],
@@ -44,27 +45,23 @@ const getDocumentsListHandler = () => {
 	});
 };
 
-const postDocumentCreateHandler = () => {
+const postRecordCreateHandler = () => {
 	return HttpResponse.json({
-		data: { message: DOCUMENT_CREATED_MESSAGE },
+		data: { message: RECORD_CREATED_MESSAGE },
 	});
 };
 
-const getDocumentByIdHandler = ({ request }: { request: Request }) => {
-	const kind = new URL(request.url).searchParams.get("kind");
-	const isIncome = kind === "income";
-
+const getRecordByIdHandler = () => {
 	return HttpResponse.json({
 		data: {
 			id: "01JTZKQX2GT6PHGQER0M8FS6K8",
 			date: "2024-03-01T12:00:00.000Z",
+			kind: "expense",
 			totalAmount: 123.45,
 			lineItems: [
 				{
-					id: isIncome
-						? "01JTZKQX2GT6PHGQER0M8FS6KA"
-						: "01JTZKQX2GT6PHGQER0M8FS6K9",
-					title: isIncome ? "Salary" : "Taxi",
+					id: "01JTZKQX2GT6PHGQER0M8FS6K9",
+					title: "Taxi",
 					quantity: 1,
 					singleAmount: 123.45,
 				},
@@ -73,15 +70,15 @@ const getDocumentByIdHandler = ({ request }: { request: Request }) => {
 	});
 };
 
-const putDocumentUpdateHandler = () => {
+const putRecordUpdateHandler = () => {
 	return HttpResponse.json({
-		data: { message: DOCUMENT_UPDATED_MESSAGE },
+		data: { message: RECORD_UPDATED_MESSAGE },
 	});
 };
 
-const deleteDocumentHandler = () => {
+const deleteRecordHandler = () => {
 	return HttpResponse.json({
-		data: { message: DOCUMENT_DELETED_MESSAGE },
+		data: { message: RECORD_DELETED_MESSAGE },
 	});
 };
 
@@ -162,11 +159,11 @@ const postAuthLogoutHandler = () => {
 };
 
 export const HANDLERS = [
-	http.get("*/documents/:id", getDocumentByIdHandler),
-	http.get("*/documents", getDocumentsListHandler),
-	http.post("*/documents", postDocumentCreateHandler),
-	http.put("*/documents/:id", putDocumentUpdateHandler),
-	http.delete("*/documents/:id", deleteDocumentHandler),
+	http.get("*/records/:id", getRecordByIdHandler),
+	http.get("*/records", getRecordsListHandler),
+	http.post("*/records", postRecordCreateHandler),
+	http.put("*/records/:id", putRecordUpdateHandler),
+	http.delete("*/records/:id", deleteRecordHandler),
 	http.get("*/dashboard/summary", getDashboardSummaryHandler),
 	http.get("*/dashboard/cumulative-chart", getDashboardCumulativeChartHandler),
 	http.get("*/dashboard/daily-chart", getDashboardDailyChartHandler),

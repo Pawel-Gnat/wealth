@@ -9,10 +9,9 @@ export type { Namespace, ParseKeys, TOptionsBase } from "i18next";
 import enAuth from "./locales/en/auth.json" with { type: "json" };
 import enCommon from "./locales/en/common.json" with { type: "json" };
 import enDashboard from "./locales/en/dashboard.json" with { type: "json" };
-import enExpenses from "./locales/en/expenses.json" with { type: "json" };
 import enForm from "./locales/en/form.json" with { type: "json" };
 import enGroup from "./locales/en/group.json" with { type: "json" };
-import enIncomes from "./locales/en/incomes.json" with { type: "json" };
+import enRecords from "./locales/en/records.json" with { type: "json" };
 import enSettings from "./locales/en/settings.json" with { type: "json" };
 
 export type ParseNsKeys<Ns extends Namespace> =
@@ -24,8 +23,7 @@ export const I18N_RESOURCES = {
 		common: enCommon,
 		dashboard: enDashboard,
 		group: enGroup,
-		incomes: enIncomes,
-		expenses: enExpenses,
+		records: enRecords,
 		form: enForm,
 		auth: enAuth,
 		settings: enSettings,

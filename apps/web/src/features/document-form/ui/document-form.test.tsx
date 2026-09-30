@@ -160,7 +160,7 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
 		it("shows error toast on API error", async () => {
 			const user = userEvent.setup();
 			server.use(
-				http.post("*/documents", () =>
+				http.post("*/records", () =>
 					HttpResponse.json(
 						{ error: { message: "Bad Request" } },
 						{ status: 400 },
@@ -197,6 +197,7 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
 					kind={kind}
 					documentId={documentId}
 					initialValues={{
+						kind,
 						date: new Date("2024-03-01T12:00:00.000Z"),
 						lineItems: [{ title: "Taxi", quantity: 1, singleAmount: 123.45 }],
 					}}

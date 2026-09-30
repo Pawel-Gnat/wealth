@@ -1,33 +1,30 @@
-import type { DocumentDetails } from "@repo/api/types";
+import type { RecordDetails } from "@repo/api/types";
 import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { useQuery } from "@tanstack/react-query";
-import { getDocumentConfig } from "@/features/config/document-config";
-import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useLoader } from "@/shared/hooks/use-loader";
+import { orpcClient } from "@/shared/lib/orpc/orpc-client";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
 type UseDocumentProps = {
-	kind: RecordKind;
 	documentId?: string;
 };
 
-export function useDocument({ kind, documentId }: UseDocumentProps) {
-	const config = getDocumentConfig(kind);
-
+export function useDocument({ documentId }: UseDocumentProps) {
 	const query = useQuery({
-		queryKey: config.queryKeys.single(documentId ?? ""),
+		queryKey: queryKeys.records.single(documentId ?? ""),
 		enabled: Boolean(documentId),
 		queryFn: async () => {
 			return controlledAsync(() =>
-				config.client.get({
+				orpcClient.records.get({
 					id: documentId ?? "",
-					kind,
 				}),
 			);
 		},
-		select: (response): DocumentDetails => ({
+		select: (response): RecordDetails => ({
 			id: response.data.id,
 			date: decodeDocumentDateFromStorage(response.data.date),
+			kind: response.data.kind,
 			totalAmount: response.data.totalAmount,
 			lineItems: response.data.lineItems,
 		}),

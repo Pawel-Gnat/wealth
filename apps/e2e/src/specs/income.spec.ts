@@ -23,12 +23,17 @@ test('income document lifecycle', async ({ page, loginAsUser }) => {
 	const addLineButton = getI18nText('common', 'action.add')
 	const editButton = getI18nText('common', 'action.edit')
 	const deleteButton = getI18nText('common', 'action.delete')
-	const createIncomeText = getI18nText('incomes', 'single.title-create')
-	const editIncomeText = getI18nText('incomes', 'single.title-edit')
-	const deleteIncomeTitle = getI18nText('incomes', 'delete.title')
+	const typeLabel = getI18nText('records', 'single.type')
+	const createRecordText = getI18nText('records', 'single.title-create')
+	const editRecordText = getI18nText('records', 'single.title-edit')
+	const deleteIncomeTitle = getI18nText('records', 'delete.income.title')
+	const previewButton = getI18nText('common', 'action.preview')
 
-	await page.goto('/incomes/new')
-	await expect(page.getByRole('heading', { name: createIncomeText })).toBeVisible()
+	await page.goto('/records/new')
+	await expect(page.getByRole('heading', { name: createRecordText })).toBeVisible()
+
+	await page.getByLabel(typeLabel).click()
+	await page.getByRole('option', { name: 'income', exact: true }).click()
 
 	await page.getByLabel(incomeLabel).nth(0).fill('Salary')
 	await page.getByLabel(priceLabel).nth(0).fill('10')
@@ -44,14 +49,15 @@ test('income document lifecycle', async ({ page, loginAsUser }) => {
 	const initialFormatted = formatUsd(initialTotal)
 
 	await page.getByRole('button', { name: createButton }).click()
-	await expect(page).toHaveURL('/incomes')
+	await expect(page).toHaveURL('/records')
 
 	const tbody = page.locator('[data-slot="table-body"]')
 	const initialRow = tbody.getByRole('row').filter({ hasText: initialFormatted })
 	await expect(initialRow).toBeVisible()
 
-	await initialRow.getByRole('link', { name: editButton }).click()
-	await expect(page.getByRole('heading', { name: editIncomeText })).toBeVisible()
+	await initialRow.getByRole('link', { name: previewButton }).click()
+	await page.getByRole('link', { name: editButton }).click()
+	await expect(page.getByRole('heading', { name: editRecordText })).toBeVisible()
 
 	await page.getByLabel(incomeLabel).nth(0).fill('Salary XL')
 	await page.getByLabel(priceLabel).nth(0).fill('25')
@@ -64,13 +70,14 @@ test('income document lifecycle', async ({ page, loginAsUser }) => {
 	const updatedFormatted = formatUsd(updatedTotal)
 
 	await page.getByRole('button', { name: saveButton }).click()
-	await expect(page).toHaveURL('/incomes')
+	await expect(page).toHaveURL('/records')
 
 	const updatedRow = tbody.getByRole('row').filter({ hasText: updatedFormatted })
 	await expect(updatedRow).toBeVisible()
 	await expect(tbody.getByRole('row').filter({ hasText: initialFormatted })).toHaveCount(0)
 
-	await updatedRow.getByRole('button', { name: deleteButton }).click()
+	await updatedRow.getByRole('link', { name: previewButton }).click()
+	await page.getByRole('button', { name: deleteButton }).click()
 
 	const deleteDialog = page.getByRole('alertdialog')
 	await expect(deleteDialog).toBeVisible()

@@ -1,4 +1,3 @@
-import type { DocumentCreatePayload } from "@repo/api/types";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
@@ -10,10 +9,11 @@ import {
 	Tooltip,
 } from "@/shared/components";
 import type { LineItemTitleLabelKey } from "../../model/line-item-title-label-key";
+import type { RecordFormValues } from "../hooks/use-upsert-document";
 
 type DocumentLineItemProps = {
 	index: number;
-	form: UseFormReturn<DocumentCreatePayload>;
+	form: UseFormReturn<RecordFormValues>;
 	remove: (index: number) => void;
 	lineTotal: number;
 	titleLabelKey: LineItemTitleLabelKey;

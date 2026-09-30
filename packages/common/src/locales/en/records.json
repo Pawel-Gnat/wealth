@@ -1,0 +1,42 @@
+{
+	"single": {
+		"title": "Record details",
+		"description": "Read-only view of the record.",
+		"title-create": "Create a new record",
+		"description-create": "Choose a type, add a date and line items, then save the record.",
+		"title-edit": "Edit record",
+		"description-edit": "Update the date and line items for this record.",
+		"type": "Type",
+		"error": {
+			"title": "Could not load record",
+			"description": "The record could not be loaded."
+		}
+	},
+	"list": {
+		"title": "Manage your records",
+		"subtitle": "Track and edit your personal income and expense records.",
+		"type": "Type",
+		"empty": {
+			"title": "No records found",
+			"description": "Create your first record to start tracking."
+		},
+		"error": {
+			"title": "Could not load records",
+			"description": "The record list could not be loaded. Please try again later."
+		}
+	},
+	"line-items": {
+		"expense": "Expenses",
+		"income": "Incomes"
+	},
+	"delete": {
+		"expense": {
+			"title": "Delete expense?",
+			"description": "Deleting an expense cannot be undone."
+		},
+		"income": {
+			"title": "Delete income?",
+			"description": "Deleting an income cannot be undone."
+		}
+	}
+}

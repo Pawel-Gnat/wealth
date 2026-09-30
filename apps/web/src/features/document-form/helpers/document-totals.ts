@@ -1,4 +1,4 @@
-import type { DocumentCreatePayload } from "@repo/api/types";
+import type { RecordCreatePayload } from "@repo/api/types";
 
 export function calculateLineTotal(
 	singleAmount: number | undefined,
@@ -9,7 +9,7 @@ export function calculateLineTotal(
 
 export function calculateDocumentTotal(
 	lineItems: Pick<
-		DocumentCreatePayload["lineItems"][number],
+		RecordCreatePayload["lineItems"][number],
 		"singleAmount" | "quantity"
 	>[],
 ): number {

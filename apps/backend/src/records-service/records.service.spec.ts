@@ -1,11 +1,11 @@
 import type { TestingModule } from "@nestjs/testing";
 import { ORPCError } from "@orpc/nest";
 import {
-	DOCUMENT_CREATED_MESSAGE,
-	DOCUMENT_DELETED_MESSAGE,
-	DOCUMENT_UPDATED_MESSAGE,
+	RECORD_CREATED_MESSAGE,
+	RECORD_DELETED_MESSAGE,
+	RECORD_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
-import type { DocumentKind } from "@repo/api/types";
+import type { RecordKind } from "@repo/api/types";
 import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -13,40 +13,40 @@ import { DBS } from "../database-service/constants";
 import {
 	budgetMemberTable,
 	budgetTable,
-	documentLineItemsTable,
-	documentsTable,
+	recordLineItemsTable,
+	recordsTable,
 } from "../database-service/tables/index";
 import { createTestApp } from "../test/helpers/modules";
 import { createTestUser } from "../test/mocks/users";
 import { UsersService } from "../users-service/users.service";
-import { DocumentsService } from "./documents.service";
+import { RecordsService } from "./records.service";
 
 const documentMessages = {
 	expense: {
-		created: DOCUMENT_CREATED_MESSAGE,
-		updated: DOCUMENT_UPDATED_MESSAGE,
-		deleted: DOCUMENT_DELETED_MESSAGE,
+		created: RECORD_CREATED_MESSAGE,
+		updated: RECORD_UPDATED_MESSAGE,
+		deleted: RECORD_DELETED_MESSAGE,
 		notFound: "Expense not found",
 	},
 	income: {
-		created: DOCUMENT_CREATED_MESSAGE,
-		updated: DOCUMENT_UPDATED_MESSAGE,
-		deleted: DOCUMENT_DELETED_MESSAGE,
+		created: RECORD_CREATED_MESSAGE,
+		updated: RECORD_UPDATED_MESSAGE,
+		deleted: RECORD_DELETED_MESSAGE,
 		notFound: "Income not found",
 	},
 } as const;
 
-const otherKind = (kind: DocumentKind): DocumentKind =>
+const otherKind = (kind: RecordKind): RecordKind =>
 	kind === "expense" ? "income" : "expense";
 
-describe("Documents service", () => {
+describe("Records service", () => {
 	let moduleRef: TestingModule;
-	let documentsService: DocumentsService;
+	let recordsService: RecordsService;
 	let usersService: UsersService;
 
 	beforeAll(async () => {
-		moduleRef = await createTestApp([DocumentsService]).compile();
-		documentsService = moduleRef.get(DocumentsService);
+		moduleRef = await createTestApp([RecordsService]).compile();
+		recordsService = moduleRef.get(RecordsService);
 		usersService = moduleRef.get(UsersService);
 	});
 
@@ -66,9 +66,9 @@ describe("Documents service", () => {
 				emailTag: `${kind}-empty`,
 			});
 
-			await expect(
-				documentsService.listByUserId(user.id, kind),
-			).resolves.toEqual({ data: [], pagination: {} });
+			await expect(recordsService.listByUserId(user.id, kind)).resolves.toEqual(
+				{ data: [], pagination: {} },
+			);
 		});
 
 		it("lists only personal documents of that kind, newest date first", async () => {
@@ -93,7 +93,7 @@ describe("Documents service", () => {
 				throw new Error("Expected seeded budget");
 			}
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: userA.id,
 					kind,
@@ -131,11 +131,12 @@ describe("Documents service", () => {
 				},
 			]);
 
-			const forA = await documentsService.listByUserId(userA.id, kind);
+			const forA = await recordsService.listByUserId(userA.id, kind);
 
 			expect(forA.pagination).toEqual({});
 			expect(forA.data).toHaveLength(2);
 			expect(forA.data[0]).toMatchObject({
+				kind,
 				totalAmount: 50.5,
 				date: decodeDocumentDateFromStorage("2024-06-01"),
 			});
@@ -144,7 +145,7 @@ describe("Documents service", () => {
 				date: decodeDocumentDateFromStorage("2024-01-15"),
 			});
 
-			const forB = await documentsService.listByUserId(userB.id, kind);
+			const forB = await recordsService.listByUserId(userB.id, kind);
 			expect(forB.data).toHaveLength(1);
 		});
 
@@ -163,15 +164,15 @@ describe("Documents service", () => {
 			};
 
 			await expect(
-				documentsService.createByUserId(user.id, kind, payload),
+				recordsService.createByUserId(user.id, kind, payload),
 			).resolves.toEqual({
 				data: { message: messages.created },
 			});
 
 			const [createdDocument] = await db
 				.select()
-				.from(documentsTable)
-				.where(eq(documentsTable.userId, user.id));
+				.from(recordsTable)
+				.where(eq(recordsTable.userId, user.id));
 
 			expect(createdDocument).toMatchObject({
 				kind,
@@ -186,8 +187,8 @@ describe("Documents service", () => {
 
 			const createdLineItems = await db
 				.select()
-				.from(documentLineItemsTable)
-				.where(eq(documentLineItemsTable.documentId, createdDocument.id));
+				.from(recordLineItemsTable)
+				.where(eq(recordLineItemsTable.documentId, createdDocument.id));
 
 			expect(createdLineItems).toEqual(
 				expect.arrayContaining([
@@ -215,8 +216,8 @@ describe("Documents service", () => {
 				lineItems: [{ title: "Coffee", quantity: 3, singleAmount: 4 }],
 			};
 
-			await documentsService.createByUserId(user.id, kind, payload);
-			const result = await documentsService.listByUserId(user.id, kind);
+			await recordsService.createByUserId(user.id, kind, payload);
+			const result = await recordsService.listByUserId(user.id, kind);
 
 			expect(result.data).toHaveLength(1);
 			expect(result.data[0]).toMatchObject({
@@ -234,13 +235,13 @@ describe("Documents service", () => {
 			};
 
 			await expect(
-				documentsService.createByUserId(missingUserId, kind, payload),
+				recordsService.createByUserId(missingUserId, kind, payload),
 			).rejects.toThrow();
 
 			const rows = await db
 				.select()
-				.from(documentsTable)
-				.where(eq(documentsTable.userId, missingUserId));
+				.from(recordsTable)
+				.where(eq(recordsTable.userId, missingUserId));
 
 			expect(rows).toHaveLength(0);
 		});
@@ -255,22 +256,19 @@ describe("Documents service", () => {
 				lineItems: [{ title: "Ticket", quantity: 1, singleAmount: 18 }],
 			};
 
-			await documentsService.createByUserId(user.id, kind, payload);
-			const listed = await documentsService.listByUserId(user.id, kind);
+			await recordsService.createByUserId(user.id, kind, payload);
+			const listed = await recordsService.listByUserId(user.id, kind);
 			const documentId = listed.data[0]?.id;
 
 			if (!documentId) {
 				throw new Error("Expected listed document");
 			}
 
-			const details = await documentsService.getByUserId(
-				user.id,
-				documentId,
-				kind,
-			);
+			const details = await recordsService.getByUserId(user.id, documentId);
 
 			expect(details.data).toMatchObject({
 				id: documentId,
+				kind,
 				date: payload.date,
 				totalAmount: 18,
 			});
@@ -296,7 +294,7 @@ describe("Documents service", () => {
 			});
 
 			const [ownerDocument] = await db
-				.insert(documentsTable)
+				.insert(recordsTable)
 				.values({
 					userId: owner.id,
 					kind,
@@ -304,10 +302,10 @@ describe("Documents service", () => {
 					totalAmount: "20.00",
 					documentDate: "2026-05-04",
 				})
-				.returning({ id: documentsTable.id });
+				.returning({ id: recordsTable.id });
 
 			const [otherDocument] = await db
-				.insert(documentsTable)
+				.insert(recordsTable)
 				.values({
 					userId: otherUser.id,
 					kind,
@@ -315,13 +313,13 @@ describe("Documents service", () => {
 					totalAmount: "30.00",
 					documentDate: "2026-05-05",
 				})
-				.returning({ id: documentsTable.id });
+				.returning({ id: recordsTable.id });
 
 			if (!ownerDocument || !otherDocument) {
 				throw new Error("Expected seeded documents");
 			}
 
-			await db.insert(documentLineItemsTable).values({
+			await db.insert(recordLineItemsTable).values({
 				documentId: ownerDocument.id,
 				title: "Line item to delete",
 				quantity: 1,
@@ -329,25 +327,25 @@ describe("Documents service", () => {
 			});
 
 			await expect(
-				documentsService.deleteByUserId(owner.id, ownerDocument.id, kind),
+				recordsService.deleteByUserId(owner.id, ownerDocument.id, kind),
 			).resolves.toEqual({
 				data: { message: messages.deleted },
 			});
 
 			const ownerAfterDelete = await db
 				.select()
-				.from(documentsTable)
-				.where(eq(documentsTable.id, ownerDocument.id));
+				.from(recordsTable)
+				.where(eq(recordsTable.id, ownerDocument.id));
 
 			const lineItemsAfterDelete = await db
 				.select()
-				.from(documentLineItemsTable)
-				.where(eq(documentLineItemsTable.documentId, ownerDocument.id));
+				.from(recordLineItemsTable)
+				.where(eq(recordLineItemsTable.documentId, ownerDocument.id));
 
 			const otherAfterDelete = await db
 				.select()
-				.from(documentsTable)
-				.where(eq(documentsTable.id, otherDocument.id));
+				.from(recordsTable)
+				.where(eq(recordsTable.id, otherDocument.id));
 
 			expect(ownerAfterDelete).toHaveLength(0);
 			expect(lineItemsAfterDelete).toHaveLength(0);
@@ -369,7 +367,7 @@ describe("Documents service", () => {
 			});
 
 			const [otherDocument] = await db
-				.insert(documentsTable)
+				.insert(recordsTable)
 				.values({
 					userId: otherUser.id,
 					kind,
@@ -377,14 +375,14 @@ describe("Documents service", () => {
 					totalAmount: "44.00",
 					documentDate: "2026-05-06",
 				})
-				.returning({ id: documentsTable.id });
+				.returning({ id: recordsTable.id });
 
 			if (!otherDocument) {
 				throw new Error("Expected seeded document");
 			}
 
 			await expect(
-				documentsService.deleteByUserId(owner.id, otherDocument.id, kind),
+				recordsService.deleteByUserId(owner.id, otherDocument.id, kind),
 			).rejects.toThrow(messages.notFound);
 		});
 
@@ -397,7 +395,7 @@ describe("Documents service", () => {
 			});
 
 			const [document] = await db
-				.insert(documentsTable)
+				.insert(recordsTable)
 				.values({
 					userId: user.id,
 					kind,
@@ -405,13 +403,13 @@ describe("Documents service", () => {
 					totalAmount: "20.00",
 					documentDate: "2024-01-01",
 				})
-				.returning({ id: documentsTable.id });
+				.returning({ id: recordsTable.id });
 
 			if (!document) {
 				throw new Error("Expected seeded document");
 			}
 
-			await db.insert(documentLineItemsTable).values({
+			await db.insert(recordLineItemsTable).values({
 				documentId: document.id,
 				title: "Old item",
 				quantity: 1,
@@ -424,20 +422,20 @@ describe("Documents service", () => {
 			};
 
 			await expect(
-				documentsService.updateByUserId(user.id, document.id, kind, payload),
+				recordsService.updateByUserId(user.id, document.id, kind, payload),
 			).resolves.toEqual({
 				data: { message: messages.updated },
 			});
 
 			const [documentAfter] = await db
 				.select()
-				.from(documentsTable)
-				.where(eq(documentsTable.id, document.id));
+				.from(recordsTable)
+				.where(eq(recordsTable.id, document.id));
 
 			const lineItemsAfter = await db
 				.select()
-				.from(documentLineItemsTable)
-				.where(eq(documentLineItemsTable.documentId, document.id));
+				.from(recordLineItemsTable)
+				.where(eq(recordLineItemsTable.documentId, document.id));
 
 			expect(documentAfter).toMatchObject({
 				totalAmount: "30.00",
@@ -462,7 +460,7 @@ describe("Documents service", () => {
 			const documentDate = "2026-05-10";
 
 			const [document] = await db
-				.insert(documentsTable)
+				.insert(recordsTable)
 				.values({
 					userId: user.id,
 					kind,
@@ -470,33 +468,33 @@ describe("Documents service", () => {
 					totalAmount: "55.00",
 					documentDate,
 				})
-				.returning({ id: documentsTable.id });
+				.returning({ id: recordsTable.id });
 
 			if (!document) {
 				throw new Error("Expected seeded document");
 			}
 
-			await db.insert(documentLineItemsTable).values({
+			await db.insert(recordLineItemsTable).values({
 				documentId: document.id,
 				title: "Taxi",
 				quantity: 2,
 				singleAmount: "12.50",
 			});
 
-			await documentsService.updateByUserId(user.id, document.id, kind, {
+			await recordsService.updateByUserId(user.id, document.id, kind, {
 				date: decodeDocumentDateFromStorage(documentDate),
 				lineItems: [{ title: "Coffee", quantity: 11, singleAmount: 5 }],
 			});
 
 			const [documentAfter] = await db
 				.select()
-				.from(documentsTable)
-				.where(eq(documentsTable.id, document.id));
+				.from(recordsTable)
+				.where(eq(recordsTable.id, document.id));
 
 			const lineItemsAfter = await db
 				.select()
-				.from(documentLineItemsTable)
-				.where(eq(documentLineItemsTable.documentId, document.id));
+				.from(recordLineItemsTable)
+				.where(eq(recordLineItemsTable.documentId, document.id));
 
 			expect(documentAfter).toMatchObject({
 				totalAmount: "55.00",
@@ -526,7 +524,7 @@ describe("Documents service", () => {
 			});
 
 			const [otherDocument] = await db
-				.insert(documentsTable)
+				.insert(recordsTable)
 				.values({
 					userId: otherUser.id,
 					kind,
@@ -534,13 +532,13 @@ describe("Documents service", () => {
 					totalAmount: "22.00",
 					documentDate: "2026-05-07",
 				})
-				.returning({ id: documentsTable.id });
+				.returning({ id: recordsTable.id });
 
 			if (!otherDocument) {
 				throw new Error("Expected seeded document");
 			}
 
-			await db.insert(documentLineItemsTable).values({
+			await db.insert(recordLineItemsTable).values({
 				documentId: otherDocument.id,
 				title: "Item",
 				quantity: 1,
@@ -548,7 +546,7 @@ describe("Documents service", () => {
 			});
 
 			await expect(
-				documentsService.updateByUserId(owner.id, otherDocument.id, kind, {
+				recordsService.updateByUserId(owner.id, otherDocument.id, kind, {
 					date: decodeDocumentDateFromStorage("2026-05-08"),
 					lineItems: [{ title: "X", quantity: 1, singleAmount: 10 }],
 				}),
@@ -556,8 +554,8 @@ describe("Documents service", () => {
 
 			const lineItems = await db
 				.select()
-				.from(documentLineItemsTable)
-				.where(eq(documentLineItemsTable.documentId, otherDocument.id));
+				.from(recordLineItemsTable)
+				.where(eq(recordLineItemsTable.documentId, otherDocument.id));
 
 			expect(lineItems).toHaveLength(1);
 			expect(lineItems[0]?.title).toBe("Item");
@@ -581,7 +579,7 @@ describe("Documents service", () => {
 			}
 
 			const [groupDocument] = await db
-				.insert(documentsTable)
+				.insert(recordsTable)
 				.values({
 					userId: user.id,
 					kind,
@@ -589,13 +587,13 @@ describe("Documents service", () => {
 					totalAmount: "40.00",
 					documentDate: "2026-05-09",
 				})
-				.returning({ id: documentsTable.id });
+				.returning({ id: recordsTable.id });
 
 			if (!groupDocument) {
 				throw new Error("Expected seeded document");
 			}
 
-			await db.insert(documentLineItemsTable).values({
+			await db.insert(recordLineItemsTable).values({
 				documentId: groupDocument.id,
 				title: "Rent",
 				quantity: 1,
@@ -603,7 +601,7 @@ describe("Documents service", () => {
 			});
 
 			await expect(
-				documentsService.updateByUserId(user.id, groupDocument.id, kind, {
+				recordsService.updateByUserId(user.id, groupDocument.id, kind, {
 					date: decodeDocumentDateFromStorage("2026-05-11"),
 					lineItems: [{ title: "Changed", quantity: 1, singleAmount: 1 }],
 				}),
@@ -611,13 +609,86 @@ describe("Documents service", () => {
 
 			const [documentAfter] = await db
 				.select()
-				.from(documentsTable)
-				.where(eq(documentsTable.id, groupDocument.id));
+				.from(recordsTable)
+				.where(eq(recordsTable.id, groupDocument.id));
 
 			expect(documentAfter).toMatchObject({
 				totalAmount: "40.00",
 				documentDate: "2026-05-09",
 				budgetId: budget.id,
+			});
+		});
+	});
+
+	describe("listByUserId budget scope", () => {
+		it("returns group records for the budget and skips personal ones", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+			const owner = await createTestUser(usersService, {
+				email: `list-budget-owner-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared list", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			const [otherBudget] = await db
+				.insert(budgetTable)
+				.values({ title: "Other", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget || !otherBudget) {
+				throw new Error("Expected seeded budgets");
+			}
+
+			await db.insert(recordsTable).values([
+				{
+					userId: owner.id,
+					kind: "expense",
+					budgetId: null,
+					totalAmount: "5.00",
+					documentDate: "2026-01-01",
+				},
+				{
+					userId: owner.id,
+					kind: "income",
+					budgetId: budget.id,
+					totalAmount: "25.50",
+					documentDate: "2026-04-01",
+				},
+				{
+					userId: owner.id,
+					kind: "expense",
+					budgetId: budget.id,
+					totalAmount: "10.00",
+					documentDate: "2026-02-01",
+				},
+				{
+					userId: owner.id,
+					kind: "expense",
+					budgetId: otherBudget.id,
+					totalAmount: "99.00",
+					documentDate: "2026-06-01",
+				},
+			]);
+
+			const listed = await recordsService.listByUserId(
+				owner.id,
+				undefined,
+				budget.id,
+			);
+
+			expect(listed.data).toHaveLength(2);
+			expect(listed.data[0]).toMatchObject({
+				kind: "income",
+				totalAmount: 25.5,
+			});
+			expect(listed.data[1]).toMatchObject({
+				kind: "expense",
+				totalAmount: 10,
 			});
 		});
 	});
@@ -652,7 +723,7 @@ describe("Documents service", () => {
 				status: "active",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: owner.id,
 					kind: "expense",
@@ -676,11 +747,8 @@ describe("Documents service", () => {
 				},
 			]);
 
-			const forOwner = await documentsService.listByBudgetId(
-				owner.id,
-				budget.id,
-			);
-			const forMember = await documentsService.listByBudgetId(
+			const forOwner = await recordsService.listByBudgetId(owner.id, budget.id);
+			const forMember = await recordsService.listByBudgetId(
 				activeMember.id,
 				budget.id,
 			);
@@ -716,7 +784,7 @@ describe("Documents service", () => {
 				throw new Error("Expected seeded budget");
 			}
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: owner.id,
 					kind: "expense",
@@ -733,7 +801,7 @@ describe("Documents service", () => {
 				},
 			]);
 
-			const expenses = await documentsService.listByBudgetId(
+			const expenses = await recordsService.listByBudgetId(
 				owner.id,
 				budget.id,
 				"expense",
@@ -781,16 +849,13 @@ describe("Documents service", () => {
 			});
 
 			await expect(
-				documentsService.listByBudgetId(pendingMember.id, budget.id),
+				recordsService.listByBudgetId(pendingMember.id, budget.id),
 			).rejects.toBeInstanceOf(ORPCError);
 			await expect(
-				documentsService.listByBudgetId(stranger.id, budget.id),
+				recordsService.listByBudgetId(stranger.id, budget.id),
 			).rejects.toBeInstanceOf(ORPCError);
 			await expect(
-				documentsService.listByBudgetId(
-					owner.id,
-					"01K1MISSINGBUDGET00000000000",
-				),
+				recordsService.listByBudgetId(owner.id, "01K1MISSINGBUDGET00000000000"),
 			).rejects.toBeInstanceOf(ORPCError);
 		});
 	});

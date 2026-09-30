@@ -1,4 +1,4 @@
-import type { DocumentDetails } from "@repo/api/types";
+import type { RecordDetails } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import {
 	calculateDocumentTotal,
@@ -7,7 +7,7 @@ import {
 import { Price, Text } from "@/shared/components";
 
 type DocumentViewProps = {
-	document: DocumentDetails;
+	document: RecordDetails;
 };
 
 export const DocumentView = ({ document }: DocumentViewProps) => {

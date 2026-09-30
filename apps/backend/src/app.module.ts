@@ -12,13 +12,13 @@ import { AuthModule } from "./auth-service/auth.module";
 import { BudgetModule } from "./budget-service/budget.module";
 import { DashboardModule } from "./dashboard-service/dashboard.module";
 import { DatabaseModule } from "./database-service/database.module";
-import { DocumentsModule } from "./documents-service/documents.module";
 import {
 	ObservabilityExceptionFilter,
 	shouldCaptureException,
 } from "./filters/observability-exception.filter";
 import { HealthModule } from "./health-service/health.module";
 import { RequestIdMiddleware } from "./middleware/request-id.middleware";
+import { RecordsModule } from "./records-service/records.module";
 import { RedisModule } from "./redis-service/redis.module";
 import { SseHttpModule } from "./sse-service/sse-http.module";
 import { SseRealtimeModule } from "./sse-service/sse-realtime.module";
@@ -59,7 +59,7 @@ declare module "@orpc/nest" {
 		}),
 		UsersModule,
 		StorageModule,
-		DocumentsModule,
+		RecordsModule,
 		BudgetModule,
 		DashboardModule,
 		AuthModule,

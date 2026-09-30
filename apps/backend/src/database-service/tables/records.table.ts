@@ -1,4 +1,4 @@
-import { documentKinds } from "@repo/api/schemas";
+import { recordKinds } from "@repo/api/schemas";
 import { sql } from "drizzle-orm";
 import {
 	check,
@@ -13,10 +13,10 @@ import { budgetTable } from "./budgets.table";
 import { timestamp, ulidPrimaryKey } from "./helpers";
 import { usersTable } from "./users.table";
 
-export const documentKindEnum = pgEnum("document_kind", documentKinds);
+export const recordKindEnum = pgEnum("document_kind", recordKinds);
 
-export const documentsTable = pgTable(
-	"documents",
+export const recordsTable = pgTable(
+	"records",
 	{
 		id: ulidPrimaryKey(),
 		userId: text("user_id")
@@ -25,7 +25,7 @@ export const documentsTable = pgTable(
 		budgetId: text("budget_id").references(() => budgetTable.id, {
 			onDelete: "cascade",
 		}),
-		kind: documentKindEnum("kind").notNull(),
+		kind: recordKindEnum("kind").notNull(),
 		totalAmount: numeric("total_amount", { precision: 14, scale: 2 })
 			.notNull()
 			.default("0"),

@@ -2,8 +2,7 @@ import { screen, waitFor } from "@testing-library/react";
 import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
 import { beforeAll, describe, expect, it } from "vitest";
-import { DOCUMENT_CONFIG } from "@/features/config/document-config";
-import type { RecordKind } from "@/features/model/record-kind";
+import { APP_ROUTES } from "@/app/routes";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
@@ -11,22 +10,7 @@ import { DocumentTable } from "./document-table";
 
 const documentId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 
-const tableKinds = [
-	{
-		kind: "expense",
-		apiSegment: "documents",
-	},
-	{
-		kind: "income",
-		apiSegment: "documents",
-	},
-] as const satisfies readonly {
-	kind: RecordKind;
-	apiSegment: string;
-}[];
-
-describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
-	const config = DOCUMENT_CONFIG[kind];
+describe("DocumentTable", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -35,33 +19,33 @@ describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
 
 	it("shows error state when the list request fails", async () => {
 		server.use(
-			http.get(`*/${apiSegment}`, () =>
+			http.get("*/records", () =>
 				HttpResponse.json({ message: "Server error" }, { status: 500 }),
 			),
 		);
 
-		renderWithProviders(<DocumentTable kind={kind} />);
-		const errorMessage = t("list.error.title", { ns: config.i18nNamespace });
+		renderWithProviders(<DocumentTable />);
 
 		await waitFor(() => {
-			expect(screen.getByText(errorMessage)).toBeInTheDocument();
+			expect(
+				screen.getByText(t("list.error.title", { ns: "records" })),
+			).toBeInTheDocument();
 		});
 	});
 
 	it("shows empty state when the list has no items", async () => {
 		server.use(
-			http.get(`*/${apiSegment}`, () =>
+			http.get("*/records", () =>
 				HttpResponse.json({ data: [], pagination: {} }),
 			),
 		);
 
-		renderWithProviders(<DocumentTable kind={kind} />);
-		const noResultsMessage = t("list.empty.title", {
-			ns: config.i18nNamespace,
-		});
+		renderWithProviders(<DocumentTable />);
 
 		await waitFor(() => {
-			expect(screen.getByText(noResultsMessage)).toBeInTheDocument();
+			expect(
+				screen.getByText(t("list.empty.title", { ns: "records" })),
+			).toBeInTheDocument();
 		});
 	});
 
@@ -78,7 +62,7 @@ describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
 		}).format(123.45);
 		const previewActionLabel = t("action.preview", { ns: "common" });
 
-		renderWithProviders(<DocumentTable kind={kind} />);
+		renderWithProviders(<DocumentTable />);
 
 		await waitFor(() => {
 			expect(screen.getByText(formattedDate)).toBeInTheDocument();
@@ -88,7 +72,11 @@ describe.each(tableKinds)("$kind DocumentTable", ({ kind, apiSegment }) => {
 			name: previewActionLabel,
 		});
 
+		expect(screen.getByText("expense")).toBeInTheDocument();
 		expect(screen.getByText(formattedAmount)).toBeInTheDocument();
-		expect(previewLink).toHaveAttribute("href", config.viewRoute(documentId));
+		expect(previewLink).toHaveAttribute(
+			"href",
+			APP_ROUTES.records.view(documentId),
+		);
 	});
 });

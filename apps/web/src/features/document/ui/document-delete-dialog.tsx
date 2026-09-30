@@ -33,6 +33,17 @@ export const DocumentDeleteDialog = ({
 		},
 	});
 
+	const kindText = {
+		expense: {
+			title: t("delete.expense.title", { ns: "records" }),
+			description: t("delete.expense.description", { ns: "records" }),
+		},
+		income: {
+			title: t("delete.income.title", { ns: "records" }),
+			description: t("delete.income.description", { ns: "records" }),
+		},
+	}[kind];
+
 	return (
 		<AlertModal
 			open
@@ -41,8 +52,8 @@ export const DocumentDeleteDialog = ({
 					onClose();
 				}
 			}}
-			title={t("delete.title", { ns: config.i18nNamespace })}
-			description={t("delete.description", { ns: config.i18nNamespace })}
+			title={kindText.title}
+			description={kindText.description}
 			cancelText={t("action.cancel", { ns: "common" })}
 			confirmText={t("action.delete", { ns: "common" })}
 			onConfirm={() => {

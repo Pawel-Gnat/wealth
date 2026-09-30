@@ -1,8 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type {
 	DashboardChartResponse,
-	DocumentKind,
 	Period,
+	RecordKind,
 	SummaryResponse,
 } from "@repo/api/types";
 import {
@@ -12,7 +12,7 @@ import {
 import { and, eq, gte, isNull, lte, sum } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants";
-import { documentsTable } from "../database-service/tables/index";
+import { recordsTable } from "../database-service/tables/index";
 import { getTodayInTimeZone } from "../shared/time-zone/get-today-in-time-zone";
 import type { AmountRow } from "./types/amount-row";
 
@@ -155,20 +155,20 @@ export class DashboardService {
 		userId: string,
 		rangeStart: string,
 		rangeEnd: string,
-		documentKind: DocumentKind,
+		recordKind: RecordKind,
 	): Promise<number> {
 		const [row] = await this.db
 			.select({
-				amount: sum(documentsTable.totalAmount),
+				amount: sum(recordsTable.totalAmount),
 			})
-			.from(documentsTable)
+			.from(recordsTable)
 			.where(
 				and(
-					eq(documentsTable.userId, userId),
-					isNull(documentsTable.budgetId),
-					eq(documentsTable.kind, documentKind),
-					gte(documentsTable.documentDate, rangeStart),
-					lte(documentsTable.documentDate, rangeEnd),
+					eq(recordsTable.userId, userId),
+					isNull(recordsTable.budgetId),
+					eq(recordsTable.kind, recordKind),
+					gte(recordsTable.documentDate, rangeStart),
+					lte(recordsTable.documentDate, rangeEnd),
 				),
 			);
 
@@ -179,24 +179,24 @@ export class DashboardService {
 		userId: string,
 		rangeStart: string,
 		rangeEnd: string,
-		documentKind: DocumentKind,
+		recordKind: RecordKind,
 	): Promise<Map<string, number>> {
 		const rows = await this.db
 			.select({
-				date: documentsTable.documentDate,
-				amount: sum(documentsTable.totalAmount),
+				date: recordsTable.documentDate,
+				amount: sum(recordsTable.totalAmount),
 			})
-			.from(documentsTable)
+			.from(recordsTable)
 			.where(
 				and(
-					eq(documentsTable.userId, userId),
-					isNull(documentsTable.budgetId),
-					eq(documentsTable.kind, documentKind),
-					gte(documentsTable.documentDate, rangeStart),
-					lte(documentsTable.documentDate, rangeEnd),
+					eq(recordsTable.userId, userId),
+					isNull(recordsTable.budgetId),
+					eq(recordsTable.kind, recordKind),
+					gte(recordsTable.documentDate, rangeStart),
+					lte(recordsTable.documentDate, rangeEnd),
 				),
 			)
-			.groupBy(documentsTable.documentDate);
+			.groupBy(recordsTable.documentDate);
 
 		return this.toDailyTotalsMap(
 			rows.map((row) => ({

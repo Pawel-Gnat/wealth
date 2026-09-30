@@ -20,8 +20,7 @@
 	},
 	"navigation": {
 		"dashboard": "Dashboard",
-		"incomes": "Incomes",
-		"expenses": "Expenses",
+		"records": "Records",
 		"group": "Group budgets",
 		"settings": "Settings"
 	},

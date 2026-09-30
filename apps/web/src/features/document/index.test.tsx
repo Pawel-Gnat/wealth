@@ -3,8 +3,7 @@ import userEvent from "@testing-library/user-event";
 import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { DOCUMENT_CONFIG } from "@/features/config/document-config";
-import type { RecordKind } from "@/features/model/record-kind";
+import { APP_ROUTES } from "@/app/routes";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
@@ -23,22 +22,7 @@ vi.mock("react-router", async (importOriginal) => {
 	};
 });
 
-const documentKinds = [
-	{
-		kind: "expense",
-		lineItemTitle: "Taxi",
-	},
-	{
-		kind: "income",
-		lineItemTitle: "Salary",
-	},
-] as const satisfies readonly {
-	kind: RecordKind;
-	lineItemTitle: string;
-}[];
-
-describe.each(documentKinds)("$kind Document", ({ kind, lineItemTitle }) => {
-	const config = DOCUMENT_CONFIG[kind];
+describe("Document", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -51,33 +35,36 @@ describe.each(documentKinds)("$kind Document", ({ kind, lineItemTitle }) => {
 
 	it("renders nothing when document id is missing", () => {
 		useParamsMock.mockReturnValue({});
-		const { container } = renderWithProviders(<Document kind={kind} />);
+		const { container } = renderWithProviders(<Document />);
 
 		expect(container).toBeEmptyDOMElement();
 	});
 
 	it("renders page copy, actions, and document content", async () => {
-		renderWithProviders(<Document kind={kind} />);
+		renderWithProviders(<Document />);
 
 		expect(
-			screen.getByText(t("single.title", { ns: config.i18nNamespace })),
+			screen.getByText(t("single.title", { ns: "records" })),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText(t("single.description", { ns: config.i18nNamespace })),
+			screen.getByText(t("single.description", { ns: "records" })),
 		).toBeInTheDocument();
 
 		const editLink = await screen.findByRole("link", {
 			name: t("action.edit", { ns: "common" }),
 		});
 
-		expect(editLink).toHaveAttribute("href", config.editRoute(documentId));
+		expect(editLink).toHaveAttribute(
+			"href",
+			APP_ROUTES.records.edit(documentId),
+		);
 		expect(
 			screen.getByRole("button", {
 				name: t("action.delete", { ns: "common" }),
 			}),
 		).toBeInTheDocument();
 
-		expect(await screen.findByText(lineItemTitle)).toBeInTheDocument();
+		expect(await screen.findByText("Taxi")).toBeInTheDocument();
 		expect(
 			screen.getByText(t("common.total", { ns: "common" })),
 		).toBeInTheDocument();
@@ -85,7 +72,7 @@ describe.each(documentKinds)("$kind Document", ({ kind, lineItemTitle }) => {
 
 	it("opens the delete dialog from the delete action", async () => {
 		const user = userEvent.setup();
-		renderWithProviders(<Document kind={kind} />);
+		renderWithProviders(<Document />);
 
 		await user.click(
 			await screen.findByRole("button", {
@@ -95,24 +82,24 @@ describe.each(documentKinds)("$kind Document", ({ kind, lineItemTitle }) => {
 
 		expect(screen.getByRole("alertdialog")).toBeInTheDocument();
 		expect(
-			screen.getByText(t("delete.title", { ns: config.i18nNamespace })),
+			screen.getByText(t("delete.expense.title", { ns: "records" })),
 		).toBeInTheDocument();
 	});
 
 	it("shows an error when the document cannot be loaded", async () => {
 		server.use(
-			http.get(`*/documents/${documentId}`, () =>
+			http.get(`*/records/${documentId}`, () =>
 				HttpResponse.json({ error: { message: "Not Found" } }, { status: 404 }),
 			),
 		);
 
-		renderWithProviders(<Document kind={kind} />);
+		renderWithProviders(<Document />);
 
 		await waitFor(() => {
 			expect(
-				screen.getByText(t("single.error.title", { ns: config.i18nNamespace })),
+				screen.getByText(t("single.error.title", { ns: "records" })),
 			).toBeInTheDocument();
 		});
-		expect(screen.queryByText(lineItemTitle)).not.toBeInTheDocument();
+		expect(screen.queryByText("Taxi")).not.toBeInTheDocument();
 	});
 });

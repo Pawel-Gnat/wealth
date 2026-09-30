@@ -1,4 +1,4 @@
-import type { BudgetDocument } from "@repo/api/types";
+import type { RecordListItem } from "@repo/api/types";
 import {
 	decodeDocumentDateFromStorage,
 	formatDocumentDate,
@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { Badge, Price, Separator, Text } from "@/shared/components";
 
 type BudgetDocumentsProps = {
-	documents: BudgetDocument[];
+	documents: RecordListItem[];
 };
 
 export const BudgetDocuments = ({ documents }: BudgetDocumentsProps) => {

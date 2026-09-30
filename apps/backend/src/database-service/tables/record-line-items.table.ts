@@ -7,16 +7,16 @@ import {
 	pgTable,
 	text,
 } from "drizzle-orm/pg-core";
-import { documentsTable } from "./documents.table";
 import { timestamp, ulidPrimaryKey } from "./helpers";
+import { recordsTable } from "./records.table";
 
-export const documentLineItemsTable = pgTable(
-	"document_line_items",
+export const recordLineItemsTable = pgTable(
+	"record_line_items",
 	{
 		id: ulidPrimaryKey(),
 		documentId: text("document_id")
 			.notNull()
-			.references(() => documentsTable.id, { onDelete: "cascade" }),
+			.references(() => recordsTable.id, { onDelete: "cascade" }),
 		title: text("title").notNull(),
 		quantity: integer("quantity").notNull().default(1),
 		singleAmount: numeric("single_amount", {

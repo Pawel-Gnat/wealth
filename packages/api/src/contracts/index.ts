@@ -10,18 +10,18 @@ import {
 	getDashboardDailyChartContract,
 	getDashboardSummaryContract,
 } from "./dashboard.contract";
-import {
-	createDocumentContract,
-	deleteDocumentContract,
-	getDocumentContract,
-	listDocumentsContract,
-	updateDocumentContract,
-} from "./document.contract";
 import { userEditAvatarContract } from "./edit-avatar.contract";
 import { userEditDetailsContract } from "./edit-details.contract";
 import { userEditPasswordContract } from "./edit-password.contract";
 import { logoutContract } from "./logout.contract";
 import { meContract } from "./me.contract";
+import {
+	createRecordContract,
+	deleteRecordContract,
+	getRecordContract,
+	listRecordsContract,
+	updateRecordContract,
+} from "./record.contract";
 import { refreshContract } from "./refresh.contract";
 import { searchUsersContract } from "./search-users.contract";
 import { signInContract } from "./signin.contract";
@@ -41,12 +41,12 @@ export const rpcContract = populateContractRouterPaths({
 		details: userEditDetailsContract,
 		avatar: userEditAvatarContract,
 	},
-	documents: {
-		create: createDocumentContract,
-		list: listDocumentsContract,
-		get: getDocumentContract,
-		update: updateDocumentContract,
-		delete: deleteDocumentContract,
+	records: {
+		create: createRecordContract,
+		list: listRecordsContract,
+		get: getRecordContract,
+		update: updateRecordContract,
+		delete: deleteRecordContract,
 	},
 	budget: {
 		list: listBudgetsContract,

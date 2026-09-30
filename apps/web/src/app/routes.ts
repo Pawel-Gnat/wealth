@@ -1,22 +1,15 @@
-export const NEW_DOCUMENT_SEGMENT = "new" as const;
-export const EDIT_DOCUMENT_SEGMENT = "edit" as const;
+export const NEW_RECORD_SEGMENT = "new" as const;
+export const EDIT_RECORD_SEGMENT = "edit" as const;
 
 export const APP_ROUTES = {
 	auth: "/auth",
 	dashboard: "/",
-	incomes: {
-		list: "/incomes",
-		add: `/incomes/${NEW_DOCUMENT_SEGMENT}`,
-		view: (id: string): `/incomes/${string}` => `/incomes/${id}`,
-		edit: (id: string): `/incomes/${string}/${typeof EDIT_DOCUMENT_SEGMENT}` =>
-			`/incomes/${id}/${EDIT_DOCUMENT_SEGMENT}`,
-	},
-	expenses: {
-		list: "/expenses",
-		add: `/expenses/${NEW_DOCUMENT_SEGMENT}`,
-		view: (id: string): `/expenses/${string}` => `/expenses/${id}`,
-		edit: (id: string): `/expenses/${string}/${typeof EDIT_DOCUMENT_SEGMENT}` =>
-			`/expenses/${id}/${EDIT_DOCUMENT_SEGMENT}`,
+	records: {
+		list: "/records",
+		add: `/records/${NEW_RECORD_SEGMENT}`,
+		view: (id: string): `/records/${string}` => `/records/${id}`,
+		edit: (id: string): `/records/${string}/${typeof EDIT_RECORD_SEGMENT}` =>
+			`/records/${id}/${EDIT_RECORD_SEGMENT}`,
 	},
 	group: {
 		list: "/group",

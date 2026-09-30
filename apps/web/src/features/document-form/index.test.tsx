@@ -32,10 +32,10 @@ describe("DocumentForm page", () => {
 	});
 
 	it("renders the create form without fetching a document", () => {
-		renderWithProviders(<DocumentForm kind="expense" />);
+		renderWithProviders(<DocumentForm />);
 
 		expect(
-			screen.getByText(t("single.title-create", { ns: "expenses" })),
+			screen.getByText(t("single.title-create", { ns: "records" })),
 		).toBeInTheDocument();
 		expect(
 			screen.getByRole("button", {
@@ -43,16 +43,16 @@ describe("DocumentForm page", () => {
 			}),
 		).toBeInTheDocument();
 		expect(
-			screen.queryByText(t("single.error.title", { ns: "expenses" })),
+			screen.queryByText(t("single.error.title", { ns: "records" })),
 		).not.toBeInTheDocument();
 	});
 
 	it("loads the edit form from the default document handler", async () => {
 		useParamsMock.mockReturnValue({ id: documentId });
-		renderWithProviders(<DocumentForm kind="expense" />);
+		renderWithProviders(<DocumentForm />);
 
 		expect(
-			await screen.findByText(t("single.title-edit", { ns: "expenses" })),
+			await screen.findByText(t("single.title-edit", { ns: "records" })),
 		).toBeInTheDocument();
 		expect(
 			await screen.findByRole("button", {
@@ -65,16 +65,16 @@ describe("DocumentForm page", () => {
 	it("shows an error when the document cannot be loaded", async () => {
 		useParamsMock.mockReturnValue({ id: documentId });
 		server.use(
-			http.get(`*/documents/${documentId}`, () =>
+			http.get(`*/records/${documentId}`, () =>
 				HttpResponse.json({ error: { message: "Not Found" } }, { status: 404 }),
 			),
 		);
 
-		renderWithProviders(<DocumentForm kind="expense" />);
+		renderWithProviders(<DocumentForm />);
 
 		await waitFor(() => {
 			expect(
-				screen.getByText(t("single.error.title", { ns: "expenses" })),
+				screen.getByText(t("single.error.title", { ns: "records" })),
 			).toBeInTheDocument();
 		});
 		expect(

@@ -3,7 +3,6 @@ import type {
 	budgetCreatePayloadSchema,
 	budgetCreateResponseDataSchema,
 	budgetCreateResponseSchema,
-	budgetDocumentSchema,
 	budgetDocumentsParamsSchema,
 	budgetDocumentsResponseSchema,
 	budgetInviteSchema,
@@ -27,7 +26,6 @@ export type BudgetCreateResponseData = z.infer<
 	typeof budgetCreateResponseDataSchema
 >;
 export type BudgetCreateResponse = z.infer<typeof budgetCreateResponseSchema>;
-export type BudgetDocument = z.infer<typeof budgetDocumentSchema>;
 export type BudgetDocumentsParams = z.infer<typeof budgetDocumentsParamsSchema>;
 export type BudgetDocumentsResponse = z.infer<
 	typeof budgetDocumentsResponseSchema

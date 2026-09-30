@@ -1,4 +1,4 @@
-import type { DocumentListItem } from "@repo/api/types";
+import type { RecordListItem } from "@repo/api/types";
 import {
 	decodeDocumentDateFromStorage,
 	formatDocumentDate,
@@ -6,7 +6,7 @@ import {
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TFunction } from "i18next";
 import { Link } from "react-router";
-import { Button, Icon, Price, Text, Tooltip } from "@/shared/components";
+import { Badge, Button, Icon, Price, Text, Tooltip } from "@/shared/components";
 
 type DocumentColumnsProps = {
 	t: TFunction<"common">;
@@ -18,7 +18,7 @@ export const documentColumns = ({
 	t,
 	language,
 	getViewPath,
-}: DocumentColumnsProps): ColumnDef<DocumentListItem>[] => {
+}: DocumentColumnsProps): ColumnDef<RecordListItem>[] => {
 	return [
 		{
 			accessorKey: "date",
@@ -36,6 +36,24 @@ export const documentColumns = ({
 							language,
 						)}
 					</Text>
+				);
+			},
+		},
+		{
+			accessorKey: "kind",
+			meta: { className: "w-[1%] whitespace-nowrap" },
+			header: () => (
+				<Text size="sm" weight="medium">
+					{t("list.type", { ns: "records" })}
+				</Text>
+			),
+			cell: ({ row }) => {
+				const kind = row.original.kind;
+
+				return (
+					<Badge variant={kind === "expense" ? "default" : "secondary"}>
+						{kind}
+					</Badge>
 				);
 			},
 		},

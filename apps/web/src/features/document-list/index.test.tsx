@@ -1,19 +1,12 @@
 import { screen, waitFor } from "@testing-library/react";
 import type { TFunction } from "i18next";
 import { beforeAll, describe, expect, it } from "vitest";
-import { DOCUMENT_CONFIG } from "@/features/config/document-config";
-import type { RecordKind } from "@/features/model/record-kind";
+import { APP_ROUTES } from "@/app/routes";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { DocumentList } from "./index";
 
-const listKinds = [
-	"expense",
-	"income",
-] as const satisfies readonly RecordKind[];
-
-describe.each(listKinds)("$kind DocumentList", (kind) => {
-	const config = DOCUMENT_CONFIG[kind];
+describe("DocumentList", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -21,20 +14,20 @@ describe.each(listKinds)("$kind DocumentList", (kind) => {
 	});
 
 	it("renders page copy and an add link to the create route", async () => {
-		renderWithProviders(<DocumentList kind={kind} />);
+		renderWithProviders(<DocumentList />);
 
 		expect(
-			screen.getByText(t("list.title", { ns: config.i18nNamespace })),
+			screen.getByText(t("list.title", { ns: "records" })),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText(t("list.subtitle", { ns: config.i18nNamespace })),
+			screen.getByText(t("list.subtitle", { ns: "records" })),
 		).toBeInTheDocument();
 
 		const addLink = screen.getByRole("link", {
 			name: t("action.add", { ns: "common" }),
 		});
 
-		expect(addLink).toHaveAttribute("href", config.addRoute);
+		expect(addLink).toHaveAttribute("href", APP_ROUTES.records.add);
 
 		await waitFor(() => {
 			expect(

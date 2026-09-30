@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
 import {
 	APP_ROUTES,
-	EDIT_DOCUMENT_SEGMENT,
-	NEW_DOCUMENT_SEGMENT,
+	EDIT_RECORD_SEGMENT,
+	NEW_RECORD_SEGMENT,
 } from "@/app/routes";
 import {
 	BreadcrumbItem,
@@ -30,11 +30,11 @@ const getSegmentLabel = (
 		return t(`navigation.${segment}`, { ns: "common" });
 	}
 
-	if (segment === NEW_DOCUMENT_SEGMENT) {
+	if (segment === NEW_RECORD_SEGMENT) {
 		return t("action.add", { ns: "common" });
 	}
 
-	if (segment === EDIT_DOCUMENT_SEGMENT) {
+	if (segment === EDIT_RECORD_SEGMENT) {
 		return t("action.edit", { ns: "common" });
 	}
 

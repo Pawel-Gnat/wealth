@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { apiPayload } from "./common.schema";
 import {
-	documentKindSchema,
-	documentListItemSchema,
-	documentSchema,
-} from "./document.schema";
+	recordKindSchema,
+	recordListItemSchema,
+	recordSchema,
+} from "./record.schema";
 import { userSchema } from "./user.schema";
 
 export const BUDGET_CREATED_MESSAGE = "budget_created" as const;
@@ -24,8 +24,8 @@ export const budgetSchema = z.object({
 	title: z.string(),
 	owner: userSchema,
 	members: z.array(budgetMemberSchema),
-	expenses: z.array(documentSchema),
-	incomes: z.array(documentSchema),
+	expenses: z.array(recordSchema),
+	incomes: z.array(recordSchema),
 });
 
 export const budgetListItemSchema = budgetSchema.pick({
@@ -70,15 +70,11 @@ export const budgetCreateResponseSchema = apiPayload(
 	budgetCreateResponseDataSchema,
 );
 
-export const budgetDocumentSchema = documentListItemSchema.extend({
-	kind: documentKindSchema,
-});
-
 export const budgetDocumentsParamsSchema = z.object({
 	id: z.string(),
-	kind: documentKindSchema.optional(),
+	kind: recordKindSchema.optional(),
 });
 
 export const budgetDocumentsResponseSchema = apiPayload(
-	z.array(budgetDocumentSchema),
+	z.array(recordListItemSchema),
 );

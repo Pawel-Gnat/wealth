@@ -3,34 +3,27 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 import { getDocumentConfig } from "@/features/config/document-config";
 import { useDocument } from "@/features/document-form/hooks/use-document";
-import type { RecordKind } from "@/features/model/record-kind";
 import { PageLayout } from "@/shared/layouts";
 import { CardState } from "@/shared/widgets/card-state";
 import { DocumentActions } from "./ui/document-actions";
 import { DocumentDeleteDialog } from "./ui/document-delete-dialog";
 import { DocumentView } from "./ui/document-view";
 
-type DocumentProps = {
-	kind: RecordKind;
-};
-
-export const Document = ({ kind }: DocumentProps) => {
+export const Document = () => {
 	const { t } = useTranslation();
 	const { id } = useParams();
-	const config = getDocumentConfig(kind);
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
 	const { data, isLoading, isError } = useDocument({
-		kind,
 		...(id ? { documentId: id } : {}),
 	});
+	const kind = data?.kind ?? "expense";
+	const config = getDocumentConfig(kind);
 
-	const title = t("single.title", { ns: config.i18nNamespace });
-	const description = t("single.description", { ns: config.i18nNamespace });
-	const errorTitle = t("single.error.title", { ns: config.i18nNamespace });
-	const errorDescription = t("single.error.description", {
-		ns: config.i18nNamespace,
-	});
+	const title = t("single.title", { ns: "records" });
+	const description = t("single.description", { ns: "records" });
+	const errorTitle = t("single.error.title", { ns: "records" });
+	const errorDescription = t("single.error.description", { ns: "records" });
 
 	if (!id) {
 		return null;
@@ -57,13 +50,13 @@ export const Document = ({ kind }: DocumentProps) => {
 				{(document) => <DocumentView document={document} />}
 			</CardState>
 
-			{isDeleteOpen && (
+			{isDeleteOpen && data ? (
 				<DocumentDeleteDialog
 					id={id}
-					kind={kind}
+					kind={data.kind}
 					onClose={() => setIsDeleteOpen(false)}
 				/>
-			)}
+			) : null}
 		</PageLayout>
 	);
 };

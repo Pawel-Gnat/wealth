@@ -1,9 +1,9 @@
 import { Controller, UseGuards } from "@nestjs/common";
 import { Implement, implement } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
-import { DocumentsService } from "../documents-service/documents.service";
 import { SessionGuard } from "../guards/session.guard";
 import { userIdFromRequest } from "../guards/user-id-from-request";
+import { RecordsService } from "../records-service/records.service";
 import { BudgetService } from "./budget.service";
 
 @Controller()
@@ -11,7 +11,7 @@ import { BudgetService } from "./budget.service";
 export class BudgetController {
 	constructor(
 		private readonly budgetService: BudgetService,
-		private readonly documentsService: DocumentsService,
+		private readonly recordsService: RecordsService,
 	) {}
 
 	@Implement(rpcContract.budget.list)
@@ -36,7 +36,7 @@ export class BudgetController {
 	listBudgetDocumentsRpc() {
 		return implement(rpcContract.budget.documents).handler(
 			({ context, input }) => {
-				return this.documentsService.listByBudgetId(
+				return this.recordsService.listByBudgetId(
 					userIdFromRequest(context.request),
 					input.id,
 					input.kind,

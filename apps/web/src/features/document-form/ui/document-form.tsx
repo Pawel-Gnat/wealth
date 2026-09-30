@@ -1,14 +1,16 @@
-import type { DocumentCreatePayload } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import type { RecordKind } from "@/features/model/record-kind";
 import { Form } from "@/shared/components";
-import { useUpsertDocument } from "../hooks/use-upsert-document";
+import {
+	type RecordFormValues,
+	useUpsertDocument,
+} from "../hooks/use-upsert-document";
 import { DocumentFields } from "./document-fields";
 
 export type DocumentFormProps = {
-	kind: RecordKind;
+	kind?: RecordKind;
 	documentId?: string;
-	initialValues?: DocumentCreatePayload;
+	initialValues?: RecordFormValues;
 };
 
 export const DocumentForm = ({
@@ -18,7 +20,7 @@ export const DocumentForm = ({
 }: DocumentFormProps) => {
 	const { t } = useTranslation();
 	const { form, isPending, isEditMode, onSubmit } = useUpsertDocument({
-		kind,
+		...(kind ? { kind } : {}),
 		...(documentId ? { documentId } : {}),
 		...(initialValues ? { initialValues } : {}),
 	});
@@ -31,7 +33,7 @@ export const DocumentForm = ({
 			})}
 			isPending={isPending}
 		>
-			<DocumentFields form={form} kind={kind} />
+			<DocumentFields form={form} isKindLocked={isEditMode} />
 		</Form>
 	);
 };

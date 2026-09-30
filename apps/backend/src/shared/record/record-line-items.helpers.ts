@@ -1,7 +1,7 @@
-import type { DocumentCreatePayload } from "@repo/api/types";
+import type { RecordCreatePayload } from "@repo/api/types";
 
-export function calculateDocumentTotalAmount(
-	payload: DocumentCreatePayload,
+export function calculateRecordTotalAmount(
+	payload: RecordCreatePayload,
 ): number {
 	return payload.lineItems.reduce(
 		(sum, item) => sum + item.quantity * item.singleAmount,
@@ -9,15 +9,15 @@ export function calculateDocumentTotalAmount(
 	);
 }
 
-export type DocumentLineItemInsertRow = {
+export type RecordLineItemInsertRow = {
 	title: string;
 	quantity: number;
 	singleAmount: string;
 };
 
 export function mapPayloadLineItemsToInsertRows(
-	payload: DocumentCreatePayload,
-): DocumentLineItemInsertRow[] {
+	payload: RecordCreatePayload,
+): RecordLineItemInsertRow[] {
 	return payload.lineItems.map((lineItem) => ({
 		title: lineItem.title,
 		quantity: lineItem.quantity,

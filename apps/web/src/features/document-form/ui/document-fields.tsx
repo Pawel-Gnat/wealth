@@ -1,34 +1,38 @@
-import type { DocumentCreatePayload } from "@repo/api/types";
+import { recordKinds } from "@repo/api/schemas";
 import { type UseFormReturn, useFieldArray, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { getDocumentConfig } from "@/features/config/document-config";
-import type { RecordKind } from "@/features/model/record-kind";
 import {
 	FormDatePicker,
+	FormSelect,
 	Icon,
 	Price,
 	Separator,
 	Text,
 } from "@/shared/components";
 import { Button } from "@/shared/lib/ui/button";
+import { SelectItem } from "@/shared/lib/ui/select";
 import {
 	calculateDocumentTotal,
 	calculateLineTotal,
 } from "../helpers/document-totals";
+import type { RecordFormValues } from "../hooks/use-upsert-document";
 import { DocumentLineItem } from "./document-line-item";
 
-const EMPTY_LINE_ITEM: DocumentCreatePayload["lineItems"][number] = {
+const EMPTY_LINE_ITEM: RecordFormValues["lineItems"][number] = {
 	title: "",
 	singleAmount: 1,
 	quantity: 1,
 };
 
 type DocumentFieldsProps = {
-	form: UseFormReturn<DocumentCreatePayload>;
-	kind: RecordKind;
+	form: UseFormReturn<RecordFormValues>;
+	isKindLocked: boolean;
 };
 
-export const DocumentFields = ({ form, kind }: DocumentFieldsProps) => {
+export const DocumentFields = ({ form, isKindLocked }: DocumentFieldsProps) => {
+	const kind =
+		useWatch({ control: form.control, name: "kind" }) ?? recordKinds[0];
 	const config = getDocumentConfig(kind);
 	const { t, i18n } = useTranslation();
 	const { fields, append, remove } = useFieldArray({
@@ -48,6 +52,19 @@ export const DocumentFields = ({ form, kind }: DocumentFieldsProps) => {
 				label={t("date.label", { ns: "form" })}
 				control={form.control}
 			/>
+
+			<FormSelect
+				name="kind"
+				label={t("single.type", { ns: "records" })}
+				control={form.control}
+				disabled={isKindLocked}
+			>
+				{recordKinds.map((recordKind) => (
+					<SelectItem key={recordKind} value={recordKind}>
+						{recordKind}
+					</SelectItem>
+				))}
+			</FormSelect>
 
 			<div className="flex items-center justify-between">
 				<Text weight="medium">

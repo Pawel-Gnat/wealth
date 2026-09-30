@@ -1,35 +1,29 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { getDocumentConfig } from "@/features/config/document-config";
-import type { RecordKind } from "@/features/model/record-kind";
+import { APP_ROUTES } from "@/app/routes";
 import { Button, Card, Icon } from "@/shared/components";
 import { PageLayout } from "@/shared/layouts";
 import { DocumentTable } from "./ui/document-table";
 
-type DocumentListProps = {
-	kind: RecordKind;
-};
-
-export const DocumentList = ({ kind }: DocumentListProps) => {
+export const DocumentList = () => {
 	const { t } = useTranslation();
-	const config = getDocumentConfig(kind);
 
 	return (
 		<PageLayout
-			title={t("list.title", { ns: config.i18nNamespace })}
-			subtitle={t("list.subtitle", { ns: config.i18nNamespace })}
+			title={t("list.title", { ns: "records" })}
+			subtitle={t("list.subtitle", { ns: "records" })}
 		>
 			<Card
 				actions={
 					<Button variant="secondary" className="w-fit ml-auto" asChild>
-						<Link to={config.addRoute}>
+						<Link to={APP_ROUTES.records.add}>
 							<Icon name="add" />
 							{t("action.add", { ns: "common" })}
 						</Link>
 					</Button>
 				}
 			>
-				<DocumentTable kind={kind} />
+				<DocumentTable />
 			</Card>
 		</PageLayout>
 	);

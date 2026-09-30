@@ -1,4 +1,4 @@
-import { DOCUMENT_UPDATED_MESSAGE } from "@repo/api/schemas";
+import { RECORD_UPDATED_MESSAGE } from "@repo/api/schemas";
 import type { ParseKeys } from "@repo/common/i18n";
 import { getDocumentObservabilityEvents } from "@repo/observability/browser";
 import { APP_ROUTES } from "@/app/routes";
@@ -7,7 +7,7 @@ import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import type { LineItemTitleLabelKey } from "../../features/model/line-item-title-label-key";
 
-type DocumentToast = {
+type RecordToast = {
 	created: ParseKeys<"common">;
 	updated: ParseKeys<"common">;
 	createError: ParseKeys<"common">;
@@ -16,22 +16,26 @@ type DocumentToast = {
 	deleteError: ParseKeys<"common">;
 };
 
-const documentToast = (toast: DocumentToast): DocumentToast => toast;
+const recordToast = (toast: RecordToast): RecordToast => toast;
+
+const sharedRecordConfig = {
+	i18nNamespace: "records",
+	listRoute: APP_ROUTES.records.list,
+	addRoute: APP_ROUTES.records.add,
+	viewRoute: APP_ROUTES.records.view,
+	editRoute: APP_ROUTES.records.edit,
+	queryKeys: queryKeys.records,
+	client: orpcClient.records,
+	updatedMessage: RECORD_UPDATED_MESSAGE,
+} as const;
 
 export const DOCUMENT_CONFIG = {
 	expense: {
-		i18nNamespace: "expenses",
+		...sharedRecordConfig,
 		lineItemLabelKey: "line-item.expense-label" satisfies LineItemTitleLabelKey,
-		sectionTitleKey: "single.expenses",
-		listRoute: APP_ROUTES.expenses.list,
-		addRoute: APP_ROUTES.expenses.add,
-		viewRoute: APP_ROUTES.expenses.view,
-		editRoute: APP_ROUTES.expenses.edit,
-		queryKeys: queryKeys.expenses,
-		client: orpcClient.documents,
-		updatedMessage: DOCUMENT_UPDATED_MESSAGE,
+		sectionTitleKey: "line-items.expense",
 		events: getDocumentObservabilityEvents("expense"),
-		toast: documentToast({
+		toast: recordToast({
 			created: "toast.success.expense-created",
 			updated: "toast.success.expense-updated",
 			createError: "toast.error.expense-created",
@@ -41,18 +45,11 @@ export const DOCUMENT_CONFIG = {
 		}),
 	},
 	income: {
-		i18nNamespace: "incomes",
+		...sharedRecordConfig,
 		lineItemLabelKey: "line-item.income-label" satisfies LineItemTitleLabelKey,
-		sectionTitleKey: "single.incomes",
-		listRoute: APP_ROUTES.incomes.list,
-		addRoute: APP_ROUTES.incomes.add,
-		viewRoute: APP_ROUTES.incomes.view,
-		editRoute: APP_ROUTES.incomes.edit,
-		queryKeys: queryKeys.incomes,
-		client: orpcClient.documents,
-		updatedMessage: DOCUMENT_UPDATED_MESSAGE,
+		sectionTitleKey: "line-items.income",
 		events: getDocumentObservabilityEvents("income"),
-		toast: documentToast({
+		toast: recordToast({
 			created: "toast.success.income-created",
 			updated: "toast.success.income-updated",
 			createError: "toast.error.income-created",

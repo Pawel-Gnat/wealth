@@ -1,4 +1,4 @@
-import type { BudgetDocumentsResponse, DocumentKind } from "@repo/api/types";
+import type { BudgetDocumentsResponse, RecordKind } from "@repo/api/types";
 import { useQuery } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useLoader } from "@/shared/hooks/use-loader";
@@ -7,7 +7,7 @@ import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
 type UseBudgetDocumentsProps = {
 	id: string | undefined;
-	kind?: DocumentKind;
+	kind?: RecordKind;
 };
 
 export const useBudgetDocuments = ({ id, kind }: UseBudgetDocumentsProps) => {
