@@ -17,12 +17,12 @@
 		"subtitle": "Track and edit your personal income and expense records.",
 		"type": "Type",
 		"empty": {
-			"title": "No records found",
-			"description": "Create your first record to start tracking."
+			"title": "No transactions found",
+			"description": "Expenses and incomes added to this budget will appear here."
 		},
 		"error": {
-			"title": "Could not load records",
-			"description": "The record list could not be loaded. Please try again later."
+			"title": "Could not load transactions",
+			"description": "Transactions could not be loaded. Please try again later."
 		}
 	},
 	"line-items": {

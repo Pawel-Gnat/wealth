@@ -5,9 +5,19 @@ import { ErrorState, Table } from "@/shared/components";
 import { recordColumns } from "../config/record-columns";
 import { useRecordsList } from "../hooks/use-records-list";
 
-export const RecordTable = () => {
+type RecordTableProps = {
+	budgetId?: string;
+};
+
+export const RecordTable = ({ budgetId }: RecordTableProps) => {
 	const { t, i18n } = useTranslation();
-	const { data, isLoading, isError } = useRecordsList();
+	const { data, isLoading, isError } = useRecordsList(
+		budgetId ? { budgetId } : {},
+	);
+	const errorTitle = t("list.error.title", { ns: "records" });
+	const errorDescription = t("list.error.description", { ns: "records" });
+	const emptyTitle = t("list.empty.title", { ns: "records" });
+	const emptyDescription = t("list.empty.description", { ns: "records" });
 
 	const columns = useMemo(
 		() =>
@@ -20,21 +30,16 @@ export const RecordTable = () => {
 	);
 
 	if (isError) {
-		return (
-			<ErrorState
-				title={t("list.error.title", { ns: "records" })}
-				description={t("list.error.description", { ns: "records" })}
-			/>
-		);
+		return <ErrorState title={errorTitle} description={errorDescription} />;
 	}
 
 	return (
 		<Table
 			columns={columns}
 			data={data}
-			noResultsTitle={t("list.empty.title", { ns: "records" })}
-			noResultsDescription={t("list.empty.description", { ns: "records" })}
-			noResultsIcon="money"
+			noResultsTitle={emptyTitle}
+			noResultsDescription={emptyDescription}
+			noResultsIcon={budgetId ? "group" : "money"}
 			isLoading={isLoading}
 		/>
 	);

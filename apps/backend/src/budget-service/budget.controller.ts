@@ -3,16 +3,12 @@ import { Implement, implement } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
 import { SessionGuard } from "../guards/session.guard";
 import { userIdFromRequest } from "../guards/user-id-from-request";
-import { RecordsService } from "../records-service/records.service";
 import { BudgetService } from "./budget.service";
 
 @Controller()
 @UseGuards(SessionGuard)
 export class BudgetController {
-	constructor(
-		private readonly budgetService: BudgetService,
-		private readonly recordsService: RecordsService,
-	) {}
+	constructor(private readonly budgetService: BudgetService) {}
 
 	@Implement(rpcContract.budget.list)
 	listBudgetsRpc() {
@@ -30,19 +26,6 @@ export class BudgetController {
 				userIdFromRequest(context.request),
 			);
 		});
-	}
-
-	@Implement(rpcContract.budget.documents)
-	listBudgetDocumentsRpc() {
-		return implement(rpcContract.budget.documents).handler(
-			({ context, input }) => {
-				return this.recordsService.listByBudgetId(
-					userIdFromRequest(context.request),
-					input.id,
-					input.kind,
-				);
-			},
-		);
 	}
 
 	@Implement(rpcContract.budget.create)

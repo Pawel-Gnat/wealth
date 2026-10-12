@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { apiPayload } from "./common.schema";
-import {
-	recordKindSchema,
-	recordListItemSchema,
-	recordSchema,
-} from "./record.schema";
+import { recordSchema } from "./record.schema";
 import { userSchema } from "./user.schema";
 
 export const BUDGET_CREATED_MESSAGE = "budget_created" as const;
@@ -68,13 +64,4 @@ export const budgetCreateResponseDataSchema = z.object({
 
 export const budgetCreateResponseSchema = apiPayload(
 	budgetCreateResponseDataSchema,
-);
-
-export const budgetDocumentsParamsSchema = z.object({
-	id: z.string(),
-	kind: recordKindSchema.optional(),
-});
-
-export const budgetDocumentsResponseSchema = apiPayload(
-	z.array(recordListItemSchema),
 );

@@ -5,11 +5,17 @@ import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
-export const useRecordsList = () => {
+type UseRecordsListProps = {
+	budgetId?: string;
+};
+
+export const useRecordsList = ({ budgetId }: UseRecordsListProps = {}) => {
 	const query = useQuery({
-		queryKey: queryKeys.records.all(),
+		queryKey: queryKeys.records.list(budgetId),
 		queryFn: async (): Promise<RecordListResponse> => {
-			return controlledAsync(() => orpcClient.records.list({}));
+			return controlledAsync(() =>
+				orpcClient.records.list(budgetId ? { budgetId } : {}),
+			);
 		},
 		select: (response) => response.data,
 	});

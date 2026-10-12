@@ -18,12 +18,12 @@ export const BudgetSelectedMembers = ({
 	return (
 		<>
 			<Text size="sm" weight="medium">
-				{t("members.label", { ns: "group" })}
+				{t("members.label", { ns: "budgets" })}
 			</Text>
 
 			{members.length === 0 ? (
 				<Text size="sm" color="muted">
-					{t("members.empty", { ns: "group" })}
+					{t("members.empty", { ns: "budgets" })}
 				</Text>
 			) : (
 				<BudgetMembers>

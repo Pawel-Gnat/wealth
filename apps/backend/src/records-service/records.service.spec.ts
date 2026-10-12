@@ -693,7 +693,7 @@ describe("Records service", () => {
 		});
 	});
 
-	describe("list by budget id", () => {
+	describe("list budget access by user id", () => {
 		it("returns group documents for the owner and an active member, newest first", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -747,9 +747,14 @@ describe("Records service", () => {
 				},
 			]);
 
-			const forOwner = await recordsService.listByBudgetId(owner.id, budget.id);
-			const forMember = await recordsService.listByBudgetId(
+			const forOwner = await recordsService.listByUserId(
+				owner.id,
+				undefined,
+				budget.id,
+			);
+			const forMember = await recordsService.listByUserId(
 				activeMember.id,
+				undefined,
 				budget.id,
 			);
 
@@ -801,10 +806,10 @@ describe("Records service", () => {
 				},
 			]);
 
-			const expenses = await recordsService.listByBudgetId(
+			const expenses = await recordsService.listByUserId(
 				owner.id,
-				budget.id,
 				"expense",
+				budget.id,
 			);
 
 			expect(expenses.data).toHaveLength(1);
@@ -849,13 +854,17 @@ describe("Records service", () => {
 			});
 
 			await expect(
-				recordsService.listByBudgetId(pendingMember.id, budget.id),
+				recordsService.listByUserId(pendingMember.id, undefined, budget.id),
 			).rejects.toBeInstanceOf(ORPCError);
 			await expect(
-				recordsService.listByBudgetId(stranger.id, budget.id),
+				recordsService.listByUserId(stranger.id, undefined, budget.id),
 			).rejects.toBeInstanceOf(ORPCError);
 			await expect(
-				recordsService.listByBudgetId(owner.id, "01K1MISSINGBUDGET00000000000"),
+				recordsService.listByUserId(
+					owner.id,
+					undefined,
+					"01K1MISSINGBUDGET00000000000",
+				),
 			).rejects.toBeInstanceOf(ORPCError);
 		});
 	});

@@ -9,7 +9,6 @@ import {
 export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";
 
 import { AuthLayout } from "@/pages/auth/layouts";
-import { BudgetPage } from "@/pages/budget";
 import { BudgetsPage } from "@/pages/budgets";
 import { DashboardPage } from "@/pages/dashboard";
 import { RecordsListPage } from "@/pages/records";
@@ -39,7 +38,7 @@ export function AppRouter() {
 					</Route>
 					<Route path={APP_ROUTES.budgets.list}>
 						<Route index element={<BudgetsPage />} />
-						<Route path=":id" element={<BudgetPage />} />
+						<Route path=":id" element={<RecordsListPage />} />
 					</Route>
 					<Route path={APP_ROUTES.settings} element={<SettingsPage />} />
 				</Route>

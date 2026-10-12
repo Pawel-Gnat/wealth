@@ -28,27 +28,27 @@ Layered layout inspired by FSD, with **page-centric** ownership of screen logic.
 Layers (top → bottom):
 
 - **`app`** — `src/app/` — router, route constants, auth layouts.
-- **`pages`** — `src/pages/<slice>/` — route entry points. **Own the full screen logic** (hooks, helpers, UI) unless that logic is reused elsewhere.
-- **`features`** — `src/features/<slice>/` — reused slices that contain **behavior / data logic** (API hooks, forms, tables). Example: `document-list-page`, `document-form-page` shared by incomes and expenses via `kind`.
-- **`widgets`** — `src/widgets/<slice>/` — reused **presentational** composites (little or no domain logic). Example: `dashboard-layout`, `page-loader`.
+- **`pages`** — `src/pages/<slice>/` — route entry points. **Own the full screen logic** (hooks, helpers, UI), including pieces shared by routes of that same slice.
+- **`widgets`** — `src/shared/widgets/<slice>/` — reused **presentational** composites (little or no domain logic). Example: `page-loader`, `card-state`. Route shells live in `src/shared/layouts` (example: `dashboard-layout`).
 - **`shared`** — `src/shared/` — UI kit, config, helpers, oRPC, i18n.
 
 There is **no `entities` layer**. Domain types and Zod schemas live in `@repo/api` (`packages/api`).
 
 Placement rules:
 
-1. Logic used by **one** route/domain → keep it in that **`pages`** slice.
-2. Reused + has logic → extract to **`features`**.
-3. Reused + mostly presentation → extract to **`widgets`**.
-4. Cross-cutting primitives / config / clients → **`shared`**.
-5. API contracts and schemas → **`packages/api`**, not `apps/web`.
+1. Screen logic stays in the **`pages`** slice that owns the domain, including when several of its routes share it.
+2. Reused + mostly presentation → extract to **`widgets`**.
+3. Cross-cutting primitives / config / clients → **`shared`**.
+4. API contracts and schemas → **`packages/api`**, not `apps/web`.
 
 Conventions:
 
 - Slice names: kebab-case.
 - Prefer public API via slice `index.ts` / `index.tsx`; other layers import from the barrel, not deep `ui/` paths.
 - Alias: `@/` → `src/`.
-- Income and expense share document UI via `kind: 'income' | 'expense'` and `getDocumentConfig(kind)` — do not add separate `expense-*` / `income-*` feature wrappers for the same behavior.
+- Income and expense share the records screens via `kind: 'income' | 'expense'` (`RecordKind` from `@repo/api/types`) and `getRecordConfig(kind)` in `pages/records/config`. Do not add separate `expense-*` / `income-*` page wrappers.
+- `pages/records` owns the list, the form (`/records/new`, `/records/:id/edit`), and the detail (`/records/:id`). `/records` lists personal records. `/budgets/:id` reuses that list with `records.list({ budgetId })`. Create, get, update, and delete stay personal (`budgetId` null) until those endpoints accept a budget id.
+- `pages/budgets` is the budget list at `/budgets`.
 
 ## ShadCN UI
 

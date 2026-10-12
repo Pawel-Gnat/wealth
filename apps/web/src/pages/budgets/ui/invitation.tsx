@@ -23,7 +23,7 @@ export const Invitation = ({
 
 	const subtitle = inviteeEmail
 		? t("invitations.waiting-for-acceptance", {
-				ns: "group",
+				ns: "budgets",
 				email: inviteeEmail,
 			})
 		: null;

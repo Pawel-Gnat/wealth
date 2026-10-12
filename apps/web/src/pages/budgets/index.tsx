@@ -24,18 +24,18 @@ export const BudgetsPage = () => {
 
 	return (
 		<div className="flex flex-col gap-6">
-			<Heading>{t("title", { ns: "group" })}</Heading>
+			<Heading>{t("title", { ns: "budgets" })}</Heading>
 
 			<CardState
-				title={t("budgets.title", { ns: "group" })}
+				title={t("budgets.title", { ns: "budgets" })}
 				actions={<BudgetModalForm />}
 				data={budgets}
 				isLoading={isLoading}
 				isError={isError}
-				errorTitle={t("budgets.error.title", { ns: "group" })}
-				errorDescription={t("budgets.error.description", { ns: "group" })}
-				emptyTitle={t("budgets.empty.title", { ns: "group" })}
-				emptyDescription={t("budgets.empty.description", { ns: "group" })}
+				errorTitle={t("budgets.error.title", { ns: "budgets" })}
+				errorDescription={t("budgets.error.description", { ns: "budgets" })}
+				emptyTitle={t("budgets.empty.title", { ns: "budgets" })}
+				emptyDescription={t("budgets.empty.description", { ns: "budgets" })}
 				emptyIcon="group"
 				skeletonClassName="h-24"
 			>
@@ -43,17 +43,17 @@ export const BudgetsPage = () => {
 			</CardState>
 
 			<CardState
-				title={t("invitations.title", { ns: "group" })}
+				title={t("invitations.title", { ns: "budgets" })}
 				data={invitations}
 				isLoading={isInvitesLoading}
 				isError={isInvitesError}
-				errorTitle={t("invitations.error.title", { ns: "group" })}
+				errorTitle={t("invitations.error.title", { ns: "budgets" })}
 				errorDescription={t("invitations.error.description", {
-					ns: "group",
+					ns: "budgets",
 				})}
-				emptyTitle={t("invitations.empty.title", { ns: "group" })}
+				emptyTitle={t("invitations.empty.title", { ns: "budgets" })}
 				emptyDescription={t("invitations.empty.description", {
-					ns: "group",
+					ns: "budgets",
 				})}
 				emptyIcon="email"
 				skeletonClassName="h-24"

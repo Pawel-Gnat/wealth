@@ -35,7 +35,7 @@ export const BudgetModalForm = () => {
 			onOpenChange={onOpenChange}
 			triggerText={t("action.create", { ns: "common" })}
 			triggerIcon="add"
-			title={t("title", { ns: "group" })}
+			title={t("title", { ns: "budgets" })}
 			isPending={isPending}
 			onSubmit={createGroupBudget}
 		>
@@ -55,13 +55,15 @@ export const BudgetModalForm = () => {
 					search={search}
 					onSearchChange={setSearch}
 					label={t("search.label", { ns: "form" })}
-					placeholder={t("members.search.placeholder", { ns: "group" })}
+					placeholder={t("members.search.placeholder", { ns: "budgets" })}
 					icon="search"
 				/>
 				{isError ? (
 					<ErrorState
-						title={t("members.search.error.title", { ns: "group" })}
-						description={t("members.search.error.description", { ns: "group" })}
+						title={t("members.search.error.title", { ns: "budgets" })}
+						description={t("members.search.error.description", {
+							ns: "budgets",
+						})}
 					/>
 				) : (
 					<BudgetMemberResults

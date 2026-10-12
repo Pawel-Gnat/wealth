@@ -58,7 +58,7 @@ export const BudgetMemberResults = ({
 
 			{hasMore && (
 				<Text size="sm" color="muted" className="text-center">
-					{t("members.search.refine", { ns: "group" })}
+					{t("members.search.refine", { ns: "budgets" })}
 				</Text>
 			)}
 		</BudgetMembers>

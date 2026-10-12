@@ -6,7 +6,6 @@ import {
 	RECORD_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
 import type {
-	BudgetDocumentsResponse,
 	RecordCreatePayload,
 	RecordCreateResponse,
 	RecordDeleteResponse,
@@ -239,16 +238,6 @@ export class RecordsService {
 		logDocumentSucceeded(kind, "delete");
 
 		return { data: { message: RECORD_DELETED_MESSAGE } };
-	}
-
-	async listByBudgetId(
-		userId: string,
-		budgetId: string,
-		kind?: RecordKind,
-	): Promise<BudgetDocumentsResponse> {
-		const listed = await this.listByUserId(userId, kind, budgetId);
-
-		return { data: listed.data };
 	}
 
 	private async assertBudgetAccess(userId: string, budgetId: string) {

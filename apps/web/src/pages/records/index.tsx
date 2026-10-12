@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { Link, useParams } from "react-router";
 import { APP_ROUTES } from "@/app/routes";
 import { Button, Card, Icon } from "@/shared/components";
 import { PageLayout } from "@/shared/layouts";
@@ -7,12 +7,17 @@ import { RecordTable } from "./ui/record-table";
 
 export const RecordsListPage = () => {
 	const { t } = useTranslation();
+	const { id: budgetId } = useParams();
+
+	const title = budgetId
+		? t("records.title", { ns: "budgets" })
+		: t("list.title", { ns: "records" });
+	const subtitle = budgetId
+		? t("records.subtitle", { ns: "budgets" })
+		: t("list.subtitle", { ns: "records" });
 
 	return (
-		<PageLayout
-			title={t("list.title", { ns: "records" })}
-			subtitle={t("list.subtitle", { ns: "records" })}
-		>
+		<PageLayout title={title} subtitle={subtitle}>
 			<Card
 				actions={
 					<Button variant="secondary" className="w-fit ml-auto" asChild>
@@ -23,7 +28,7 @@ export const RecordsListPage = () => {
 					</Button>
 				}
 			>
-				<RecordTable />
+				<RecordTable {...(budgetId ? { budgetId } : {})} />
 			</Card>
 		</PageLayout>
 	);
