@@ -4,9 +4,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { APP_ROUTES } from "@/app/routes";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
-import { DocumentList } from "./index";
+import { RecordsListPage } from "./index";
 
-describe("DocumentList", () => {
+describe("RecordsListPage", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -14,7 +14,7 @@ describe("DocumentList", () => {
 	});
 
 	it("renders page copy and an add link to the create route", async () => {
-		renderWithProviders(<DocumentList />);
+		renderWithProviders(<RecordsListPage />);
 
 		expect(
 			screen.getByText(t("list.title", { ns: "records" })),

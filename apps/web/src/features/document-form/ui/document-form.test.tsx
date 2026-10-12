@@ -1,3 +1,4 @@
+import type { RecordKind } from "@repo/api/types";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { TFunction } from "i18next";
@@ -5,7 +6,6 @@ import { HttpResponse, http } from "msw";
 import { toast } from "sonner";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { DOCUMENT_CONFIG } from "@/features/config/document-config";
-import type { RecordKind } from "@/features/model/record-kind";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { renderWithProviders } from "@/test/render-with-providers";

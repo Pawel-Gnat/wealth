@@ -6,11 +6,11 @@ import { APP_ROUTES } from "@/app/routes";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
-import { DocumentTable } from "./document-table";
+import { RecordTable } from "./record-table";
 
-const documentId = "01JTZKQX2GT6PHGQER0M8FS6K8";
+const recordId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 
-describe("DocumentTable", () => {
+describe("RecordTable", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -24,7 +24,7 @@ describe("DocumentTable", () => {
 			),
 		);
 
-		renderWithProviders(<DocumentTable />);
+		renderWithProviders(<RecordTable />);
 
 		await waitFor(() => {
 			expect(
@@ -40,7 +40,7 @@ describe("DocumentTable", () => {
 			),
 		);
 
-		renderWithProviders(<DocumentTable />);
+		renderWithProviders(<RecordTable />);
 
 		await waitFor(() => {
 			expect(
@@ -50,8 +50,8 @@ describe("DocumentTable", () => {
 	});
 
 	it("renders rows when data is returned", async () => {
-		const documentDate = new Date("2024-03-01T12:00:00.000Z");
-		const formattedDate = documentDate.toLocaleDateString("en", {
+		const recordDate = new Date("2024-03-01T12:00:00.000Z");
+		const formattedDate = recordDate.toLocaleDateString("en", {
 			day: "numeric",
 			month: "long",
 			year: "numeric",
@@ -62,7 +62,7 @@ describe("DocumentTable", () => {
 		}).format(123.45);
 		const previewActionLabel = t("action.preview", { ns: "common" });
 
-		renderWithProviders(<DocumentTable />);
+		renderWithProviders(<RecordTable />);
 
 		await waitFor(() => {
 			expect(screen.getByText(formattedDate)).toBeInTheDocument();
@@ -76,7 +76,7 @@ describe("DocumentTable", () => {
 		expect(screen.getByText(formattedAmount)).toBeInTheDocument();
 		expect(previewLink).toHaveAttribute(
 			"href",
-			APP_ROUTES.records.view(documentId),
+			APP_ROUTES.records.view(recordId),
 		);
 	});
 });

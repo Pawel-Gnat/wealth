@@ -6,13 +6,13 @@ import {
 } from "@/features/document-form/helpers/document-totals";
 import { Price, Text } from "@/shared/components";
 
-type DocumentViewProps = {
-	document: RecordDetails;
+type RecordViewProps = {
+	record: RecordDetails;
 };
 
-export const DocumentView = ({ document }: DocumentViewProps) => {
+export const RecordView = ({ record }: RecordViewProps) => {
 	const { t, i18n } = useTranslation();
-	const totalAmount = calculateDocumentTotal(document.lineItems);
+	const totalAmount = calculateDocumentTotal(record.lineItems);
 
 	return (
 		<div className="flex flex-col">
@@ -25,7 +25,7 @@ export const DocumentView = ({ document }: DocumentViewProps) => {
 				</Text>
 			</div>
 
-			{document.lineItems.map((item) => {
+			{record.lineItems.map((item) => {
 				const lineTotal = calculateLineTotal(item.singleAmount, item.quantity);
 
 				return (

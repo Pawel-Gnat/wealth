@@ -1,27 +1,27 @@
+import type { RecordKind } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { getDocumentConfig } from "@/features/config/document-config";
-import type { RecordKind } from "@/features/model/record-kind";
 import { AlertModal } from "@/shared/components";
-import { useDeleteDocument } from "../hooks/use-delete-document";
+import { useDeleteRecord } from "../hooks/use-delete-record";
 
-type DocumentDeleteDialogProps = {
+type RecordDeleteDialogProps = {
 	id: string;
 	kind: RecordKind;
 	onClose: () => void;
 };
 
-export const DocumentDeleteDialog = ({
+export const RecordDeleteDialog = ({
 	id,
 	kind,
 	onClose,
-}: DocumentDeleteDialogProps) => {
+}: RecordDeleteDialogProps) => {
 	const { t } = useTranslation();
 	const config = getDocumentConfig(kind);
 	const navigate = useNavigate();
 
-	const { deleteDocument, isLoading } = useDeleteDocument({
+	const { deleteRecord, isLoading } = useDeleteRecord({
 		kind,
 		onSuccess: () => {
 			toast.success(t(config.toast.deleted, { ns: "common" }));
@@ -57,7 +57,7 @@ export const DocumentDeleteDialog = ({
 			cancelText={t("action.cancel", { ns: "common" })}
 			confirmText={t("action.delete", { ns: "common" })}
 			onConfirm={() => {
-				deleteDocument(id);
+				deleteRecord(id);
 			}}
 			isConfirming={isLoading}
 		/>

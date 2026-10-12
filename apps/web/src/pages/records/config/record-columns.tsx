@@ -8,17 +8,17 @@ import type { TFunction } from "i18next";
 import { Link } from "react-router";
 import { Badge, Button, Icon, Price, Text, Tooltip } from "@/shared/components";
 
-type DocumentColumnsProps = {
+type RecordColumnsProps = {
 	t: TFunction<"common">;
 	language: string;
 	getViewPath: (id: string) => string;
 };
 
-export const documentColumns = ({
+export const recordColumns = ({
 	t,
 	language,
 	getViewPath,
-}: DocumentColumnsProps): ColumnDef<RecordListItem>[] => {
+}: RecordColumnsProps): ColumnDef<RecordListItem>[] => {
 	return [
 		{
 			accessorKey: "date",

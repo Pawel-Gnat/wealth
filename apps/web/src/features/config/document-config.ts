@@ -1,8 +1,8 @@
 import { RECORD_UPDATED_MESSAGE } from "@repo/api/schemas";
+import type { RecordKind } from "@repo/api/types";
 import type { ParseKeys } from "@repo/common/i18n";
 import { getDocumentObservabilityEvents } from "@repo/observability/browser";
 import { APP_ROUTES } from "@/app/routes";
-import type { RecordKind } from "@/features/model/record-kind";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import type { LineItemTitleLabelKey } from "../../features/model/line-item-title-label-key";

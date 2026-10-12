@@ -12,9 +12,9 @@ import { AuthLayout } from "@/pages/auth/layouts";
 import { BudgetPage } from "@/pages/budget";
 import { DashboardPage } from "@/pages/dashboard";
 import { GroupDocumentsPage } from "@/pages/group";
-import { RecordPage } from "@/pages/record";
 import { RecordFormPage } from "@/pages/record-form";
 import { RecordsListPage } from "@/pages/records";
+import { RecordPage } from "@/pages/records/[id]";
 import { SettingsPage } from "@/pages/settings";
 import { APP_ROUTES, EDIT_RECORD_SEGMENT, NEW_RECORD_SEGMENT } from "./routes";
 

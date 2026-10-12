@@ -33,57 +33,20 @@ export const Budget = ({ id, title, members, owner, userId }: BudgetProps) => {
 				</div>
 				<AvatarGroup users={[owner, ...members]} />
 			</div>
-			<div className="flex flex-row gap-2">
-				{isOwner ? (
-					<>
-						<Tooltip
-							trigger={
-								<Button variant="secondary" size="icon">
-									<Icon name="addUser" />
-									<span className="sr-only">
-										{t("action.add", { ns: "common" })}
-									</span>
-								</Button>
-							}
-							text={t("action.add", { ns: "common" })}
-						/>
-						<Tooltip
-							trigger={
-								<Button variant="secondary" size="icon">
-									<Icon name="edit" />
-									<span className="sr-only">
-										{t("action.edit", { ns: "common" })}
-									</span>
-								</Button>
-							}
-							text={t("action.edit", { ns: "common" })}
-						/>
-						<Tooltip
-							trigger={
-								<Button variant="destructive" size="icon" onClick={() => {}}>
-									<Icon name="delete" />
-									<span className="sr-only">
-										{t("action.delete", { ns: "common" })}
-									</span>
-								</Button>
-							}
-							text={t("action.delete", { ns: "common" })}
-						/>
-					</>
-				) : (
-					<Tooltip
-						trigger={
-							<Button variant="destructive" size="icon" onClick={() => {}}>
-								<Icon name="leave" />
-								<span className="sr-only">
-									{t("action.leave", { ns: "common" })}
-								</span>
-							</Button>
-						}
-						text={t("action.leave", { ns: "common" })}
-					/>
-				)}
-			</div>
+
+			{!isOwner && (
+				<Tooltip
+					trigger={
+						<Button variant="destructive" size="icon" onClick={() => {}}>
+							<Icon name="leave" />
+							<span className="sr-only">
+								{t("action.leave", { ns: "common" })}
+							</span>
+						</Button>
+					}
+					text={t("action.leave", { ns: "common" })}
+				/>
+			)}
 		</Link>
 	);
 };

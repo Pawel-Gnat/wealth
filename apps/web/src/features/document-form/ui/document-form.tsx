@@ -1,5 +1,5 @@
+import type { RecordKind } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
-import type { RecordKind } from "@/features/model/record-kind";
 import { Form } from "@/shared/components";
 import {
 	type RecordFormValues,

@@ -2,19 +2,19 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button, Icon, Skeleton } from "@/shared/components";
 
-type DocumentActionsProps = {
+type RecordActionsProps = {
 	editPath: string;
 	isLoading: boolean;
 	isReady: boolean;
 	onDelete: () => void;
 };
 
-export const DocumentActions = ({
+export const RecordActions = ({
 	editPath,
 	isLoading,
 	isReady,
 	onDelete,
-}: DocumentActionsProps) => {
+}: RecordActionsProps) => {
 	const { t } = useTranslation();
 
 	if (isReady) {

@@ -7,9 +7,9 @@ import { APP_ROUTES } from "@/app/routes";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
-import { Document } from "./index";
+import { RecordPage } from "./index";
 
-const documentId = "01JTZKQX2GT6PHGQER0M8FS6K8";
+const recordId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 
 const useParamsMock = vi.hoisted(() => vi.fn(() => ({})));
 
@@ -22,7 +22,7 @@ vi.mock("react-router", async (importOriginal) => {
 	};
 });
 
-describe("Document", () => {
+describe("RecordPage", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -30,18 +30,18 @@ describe("Document", () => {
 	});
 
 	beforeEach(() => {
-		useParamsMock.mockReturnValue({ id: documentId });
+		useParamsMock.mockReturnValue({ id: recordId });
 	});
 
-	it("renders nothing when document id is missing", () => {
+	it("renders nothing when record id is missing", () => {
 		useParamsMock.mockReturnValue({});
-		const { container } = renderWithProviders(<Document />);
+		const { container } = renderWithProviders(<RecordPage />);
 
 		expect(container).toBeEmptyDOMElement();
 	});
 
-	it("renders page copy, actions, and document content", async () => {
-		renderWithProviders(<Document />);
+	it("renders page copy, actions, and record content", async () => {
+		renderWithProviders(<RecordPage />);
 
 		expect(
 			screen.getByText(t("single.title", { ns: "records" })),
@@ -54,10 +54,7 @@ describe("Document", () => {
 			name: t("action.edit", { ns: "common" }),
 		});
 
-		expect(editLink).toHaveAttribute(
-			"href",
-			APP_ROUTES.records.edit(documentId),
-		);
+		expect(editLink).toHaveAttribute("href", APP_ROUTES.records.edit(recordId));
 		expect(
 			screen.getByRole("button", {
 				name: t("action.delete", { ns: "common" }),
@@ -72,7 +69,7 @@ describe("Document", () => {
 
 	it("opens the delete dialog from the delete action", async () => {
 		const user = userEvent.setup();
-		renderWithProviders(<Document />);
+		renderWithProviders(<RecordPage />);
 
 		await user.click(
 			await screen.findByRole("button", {
@@ -86,14 +83,14 @@ describe("Document", () => {
 		).toBeInTheDocument();
 	});
 
-	it("shows an error when the document cannot be loaded", async () => {
+	it("shows an error when the record cannot be loaded", async () => {
 		server.use(
-			http.get(`*/records/${documentId}`, () =>
+			http.get(`*/records/${recordId}`, () =>
 				HttpResponse.json({ error: { message: "Not Found" } }, { status: 404 }),
 			),
 		);
 
-		renderWithProviders(<Document />);
+		renderWithProviders(<RecordPage />);
 
 		await waitFor(() => {
 			expect(

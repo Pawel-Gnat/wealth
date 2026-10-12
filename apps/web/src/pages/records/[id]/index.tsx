@@ -5,11 +5,11 @@ import { getDocumentConfig } from "@/features/config/document-config";
 import { useDocument } from "@/features/document-form/hooks/use-document";
 import { PageLayout } from "@/shared/layouts";
 import { CardState } from "@/shared/widgets/card-state";
-import { DocumentActions } from "./ui/document-actions";
-import { DocumentDeleteDialog } from "./ui/document-delete-dialog";
-import { DocumentView } from "./ui/document-view";
+import { RecordActions } from "./ui/record-actions";
+import { RecordDeleteDialog } from "./ui/record-delete-dialog";
+import { RecordView } from "./ui/record-view";
 
-export const Document = () => {
+export const RecordPage = () => {
 	const { t } = useTranslation();
 	const { id } = useParams();
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -39,7 +39,7 @@ export const Document = () => {
 				errorDescription={errorDescription}
 				skeletonClassName="h-100"
 				actions={
-					<DocumentActions
+					<RecordActions
 						editPath={config.editRoute(id)}
 						isLoading={isLoading}
 						isReady={Boolean(data)}
@@ -47,11 +47,11 @@ export const Document = () => {
 					/>
 				}
 			>
-				{(document) => <DocumentView document={document} />}
+				{(record) => <RecordView record={record} />}
 			</CardState>
 
 			{isDeleteOpen && data ? (
-				<DocumentDeleteDialog
+				<RecordDeleteDialog
 					id={id}
 					kind={data.kind}
 					onClose={() => setIsDeleteOpen(false)}

@@ -1,30 +1,29 @@
-import type { RecordDeleteResponse } from "@repo/api/types";
+import type { RecordDeleteResponse, RecordKind } from "@repo/api/types";
 import { logger, runWithRequestId } from "@repo/observability/browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDocumentConfig } from "@/features/config/document-config";
-import type { RecordKind } from "@/features/model/record-kind";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
-export type UseDeleteDocumentProps = {
+export type UseDeleteRecordProps = {
 	kind: RecordKind;
 	onSuccess?: (data: RecordDeleteResponse) => void;
 	onError?: (error: Error) => void;
 };
 
-export function useDeleteDocument({
+export const useDeleteRecord = ({
 	kind,
 	onSuccess,
 	onError,
-}: UseDeleteDocumentProps) {
+}: UseDeleteRecordProps) => {
 	const config = getDocumentConfig(kind);
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation<RecordDeleteResponse, Error, string>({
-		mutationFn: (documentId) =>
+		mutationFn: (recordId) =>
 			runWithRequestId(async () => {
 				const data = await controlledAsync<RecordDeleteResponse>(async () =>
-					config.client.delete({ id: documentId, kind }),
+					config.client.delete({ id: recordId, kind }),
 				);
 				logger.info(config.events.delete);
 				return data;
@@ -44,7 +43,7 @@ export function useDeleteDocument({
 	});
 
 	return {
-		deleteDocument: mutation.mutate,
+		deleteRecord: mutation.mutate,
 		isLoading: mutation.isPending,
 	};
-}
+};

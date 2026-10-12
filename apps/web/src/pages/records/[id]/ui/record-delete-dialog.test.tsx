@@ -9,7 +9,7 @@ import { DOCUMENT_CONFIG } from "@/features/config/document-config";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
-import { DocumentDeleteDialog } from "./document-delete-dialog";
+import { RecordDeleteDialog } from "./record-delete-dialog";
 
 vi.mock("sonner", () => ({
 	toast: {
@@ -18,9 +18,9 @@ vi.mock("sonner", () => ({
 	},
 }));
 
-const documentId = "01JTZKQX2GT6PHGQER0M8FS6K8";
+const recordId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 
-describe.each(recordKinds)("%s DocumentDeleteDialog", (kind) => {
+describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
 	const config = DOCUMENT_CONFIG[kind];
 	let t: TFunction;
 
@@ -37,7 +37,7 @@ describe.each(recordKinds)("%s DocumentDeleteDialog", (kind) => {
 		const onClose = vi.fn();
 
 		renderWithProviders(
-			<DocumentDeleteDialog id={documentId} kind={kind} onClose={onClose} />,
+			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
 		);
 
 		expect(
@@ -74,7 +74,7 @@ describe.each(recordKinds)("%s DocumentDeleteDialog", (kind) => {
 		const onClose = vi.fn();
 
 		renderWithProviders(
-			<DocumentDeleteDialog id={documentId} kind={kind} onClose={onClose} />,
+			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
 		);
 
 		const dialog = screen.getByRole("alertdialog");
@@ -105,7 +105,7 @@ describe.each(recordKinds)("%s DocumentDeleteDialog", (kind) => {
 		);
 
 		renderWithProviders(
-			<DocumentDeleteDialog id={documentId} kind={kind} onClose={onClose} />,
+			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
 		);
 
 		await user.click(
@@ -130,7 +130,7 @@ describe.each(recordKinds)("%s DocumentDeleteDialog", (kind) => {
 		);
 
 		renderWithProviders(
-			<DocumentDeleteDialog id={documentId} kind={kind} onClose={onClose} />,
+			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
 		);
 
 		const dialog = screen.getByRole("alertdialog");
@@ -162,7 +162,7 @@ describe.each(recordKinds)("%s DocumentDeleteDialog", (kind) => {
 		);
 
 		renderWithProviders(
-			<DocumentDeleteDialog id={documentId} kind={kind} onClose={onClose} />,
+			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
 		);
 
 		const dialog = screen.getByRole("alertdialog");

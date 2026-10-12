@@ -5,7 +5,7 @@ import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
-export function useDocumentsList() {
+export const useRecordsList = () => {
 	const query = useQuery({
 		queryKey: queryKeys.records.all(),
 		queryFn: async (): Promise<RecordListResponse> => {
@@ -20,4 +20,4 @@ export function useDocumentsList() {
 		isError: query.isError,
 		error: query.error,
 	};
-}
+};

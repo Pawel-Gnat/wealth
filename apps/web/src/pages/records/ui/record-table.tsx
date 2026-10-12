@@ -2,16 +2,16 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { APP_ROUTES } from "@/app/routes";
 import { ErrorState, Table } from "@/shared/components";
-import { documentColumns } from "../config/document-columns";
-import { useDocumentsList } from "../hooks/use-documents-list";
+import { recordColumns } from "../config/record-columns";
+import { useRecordsList } from "../hooks/use-records-list";
 
-export const DocumentTable = () => {
+export const RecordTable = () => {
 	const { t, i18n } = useTranslation();
-	const { data, isLoading, isError } = useDocumentsList();
+	const { data, isLoading, isError } = useRecordsList();
 
 	const columns = useMemo(
 		() =>
-			documentColumns({
+			recordColumns({
 				t,
 				language: i18n.language,
 				getViewPath: APP_ROUTES.records.view,
