@@ -5,10 +5,10 @@ import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
 import { toast } from "sonner";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { DOCUMENT_CONFIG } from "@/features/config/document-config";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
+import { RECORD_CONFIG } from "../../config/record-config";
 import { RecordDeleteDialog } from "./record-delete-dialog";
 
 vi.mock("sonner", () => ({
@@ -21,7 +21,7 @@ vi.mock("sonner", () => ({
 const recordId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 
 describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
-	const config = DOCUMENT_CONFIG[kind];
+	const config = RECORD_CONFIG[kind];
 	let t: TFunction;
 
 	beforeAll(async () => {

@@ -1,7 +1,6 @@
 import { recordKinds } from "@repo/api/schemas";
 import { type UseFormReturn, useFieldArray, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { getDocumentConfig } from "@/features/config/document-config";
 import {
 	FormDatePicker,
 	FormSelect,
@@ -12,12 +11,13 @@ import {
 } from "@/shared/components";
 import { Button } from "@/shared/lib/ui/button";
 import { SelectItem } from "@/shared/lib/ui/select";
+import { getRecordConfig } from "../../config/record-config";
 import {
-	calculateDocumentTotal,
 	calculateLineTotal,
-} from "../helpers/document-totals";
-import type { RecordFormValues } from "../hooks/use-upsert-document";
-import { DocumentLineItem } from "./document-line-item";
+	calculateRecordTotal,
+} from "../helpers/record-totals";
+import type { RecordFormValues } from "../hooks/use-upsert-record";
+import { RecordLineItem } from "./record-line-item";
 
 const EMPTY_LINE_ITEM: RecordFormValues["lineItems"][number] = {
 	title: "",
@@ -25,15 +25,15 @@ const EMPTY_LINE_ITEM: RecordFormValues["lineItems"][number] = {
 	quantity: 1,
 };
 
-type DocumentFieldsProps = {
+type RecordFieldsProps = {
 	form: UseFormReturn<RecordFormValues>;
 	isKindLocked: boolean;
 };
 
-export const DocumentFields = ({ form, isKindLocked }: DocumentFieldsProps) => {
+export const RecordFields = ({ form, isKindLocked }: RecordFieldsProps) => {
 	const kind =
 		useWatch({ control: form.control, name: "kind" }) ?? recordKinds[0];
-	const config = getDocumentConfig(kind);
+	const config = getRecordConfig(kind);
 	const { t, i18n } = useTranslation();
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
@@ -43,7 +43,7 @@ export const DocumentFields = ({ form, isKindLocked }: DocumentFieldsProps) => {
 		control: form.control,
 		name: "lineItems",
 	});
-	const totalAmount = calculateDocumentTotal(watchedLineItems ?? []);
+	const totalAmount = calculateRecordTotal(watchedLineItems ?? []);
 
 	return (
 		<>
@@ -91,7 +91,7 @@ export const DocumentFields = ({ form, isKindLocked }: DocumentFieldsProps) => {
 					);
 
 					return (
-						<DocumentLineItem
+						<RecordLineItem
 							key={field.id}
 							index={index}
 							form={form}

@@ -5,12 +5,12 @@ import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
 import { toast } from "sonner";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { DOCUMENT_CONFIG } from "@/features/config/document-config";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
-import { DocumentForm } from "./document-form";
+import { RECORD_CONFIG } from "../../config/record-config";
+import { RecordForm } from "./record-form";
 
 const { navigateMock } = vi.hoisted(() => ({
 	navigateMock: vi.fn(),
@@ -36,8 +36,8 @@ const formKinds = [
 	{ kind: "income" },
 ] as const satisfies readonly { kind: RecordKind }[];
 
-describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
-	const config = DOCUMENT_CONFIG[kind];
+describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
+	const config = RECORD_CONFIG[kind];
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -53,7 +53,7 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
 	describe("validation", () => {
 		it("shows title field error when submitting with empty line title", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<DocumentForm kind={kind} />);
+			renderWithProviders(<RecordForm kind={kind} />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -68,7 +68,7 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
 
 		it("shows price field error when submitting with price below 0.01", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<DocumentForm kind={kind} />);
+			renderWithProviders(<RecordForm kind={kind} />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -91,7 +91,7 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
 
 		it("shows quantity field error when submitting with quantity below 1", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<DocumentForm kind={kind} />);
+			renderWithProviders(<RecordForm kind={kind} />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -114,7 +114,7 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
 
 		it("add button click creates a new line item", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<DocumentForm kind={kind} />);
+			renderWithProviders(<RecordForm kind={kind} />);
 
 			const addButton = screen.getByRole("button", {
 				name: t("action.add", { ns: "common" }),
@@ -132,7 +132,7 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
 	describe("form submission", () => {
 		it("shows success toast and navigates after create", async () => {
 			const user = userEvent.setup();
-			const { queryClient } = renderWithProviders(<DocumentForm kind={kind} />);
+			const { queryClient } = renderWithProviders(<RecordForm kind={kind} />);
 			const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
 			const createButton = screen.getByRole("button", {
@@ -168,7 +168,7 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
 				),
 			);
 
-			renderWithProviders(<DocumentForm kind={kind} />);
+			renderWithProviders(<RecordForm kind={kind} />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -189,13 +189,13 @@ describe.each(formKinds)("$kind DocumentForm", ({ kind }) => {
 			expect(navigateMock).not.toHaveBeenCalled();
 		});
 
-		it("updates document when documentId is provided", async () => {
+		it("updates the record when recordId is provided", async () => {
 			const user = userEvent.setup();
-			const documentId = "01JTZKQX2GT6PHGQER0M8FS6K8";
+			const recordId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 			renderWithProviders(
-				<DocumentForm
+				<RecordForm
 					kind={kind}
-					documentId={documentId}
+					recordId={recordId}
 					initialValues={{
 						kind,
 						date: new Date("2024-03-01T12:00:00.000Z"),

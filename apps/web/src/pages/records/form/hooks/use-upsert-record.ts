@@ -14,9 +14,9 @@ import { type Resolver, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { getDocumentConfig } from "@/features/config/document-config";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
+import { getRecordConfig } from "../../config/record-config";
 
 type RecordUpsertResponse = RecordCreateResponse | RecordUpdateResponse;
 
@@ -31,21 +31,21 @@ const DEFAULT_RECORD_VALUES: RecordCreatePayload = {
 	lineItems: [{ title: "", singleAmount: 1, quantity: 1 }],
 };
 
-export type UseUpsertDocumentProps = {
+export type UseUpsertRecordProps = {
 	kind?: RecordKind;
-	documentId?: string;
+	recordId?: string;
 	initialValues?: RecordFormValues;
 };
 
-export function useUpsertDocument({
+export const useUpsertRecord = ({
 	kind,
-	documentId,
+	recordId,
 	initialValues,
-}: UseUpsertDocumentProps) {
+}: UseUpsertRecordProps) => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
-	const isEditMode = Boolean(documentId);
+	const isEditMode = Boolean(recordId);
 	const defaultValues = {
 		...(initialValues ?? DEFAULT_RECORD_VALUES),
 		...(kind ? { kind } : {}),
@@ -65,17 +65,17 @@ export function useUpsertDocument({
 	const mutation = useMutation<RecordUpsertResponse, Error, RecordFormValues>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
-				const config = getDocumentConfig(payload.kind);
+				const config = getRecordConfig(payload.kind);
 				const normalizedPayload = {
 					...payload,
 					date: normalizeDocumentDateForApi(payload.date),
 				};
 
-				const data = documentId
+				const data = recordId
 					? await controlledAsync<RecordUpsertResponse>(async () => {
 							const { kind: recordKind, ...updatePayload } = normalizedPayload;
 							return config.client.update({
-								id: documentId,
+								id: recordId,
 								kind: recordKind,
 								...updatePayload,
 							});
@@ -89,7 +89,7 @@ export function useUpsertDocument({
 				return data;
 			}),
 		onSuccess: (_data, payload) => {
-			const config = getDocumentConfig(payload.kind);
+			const config = getRecordConfig(payload.kind);
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.dashboard.all(),
 			});
@@ -104,7 +104,7 @@ export function useUpsertDocument({
 			navigate(config.listRoute);
 		},
 		onError: (_error, payload) => {
-			const config = getDocumentConfig(payload.kind);
+			const config = getRecordConfig(payload.kind);
 			toast.error(
 				t(isEditMode ? config.toast.updateError : config.toast.createError, {
 					ns: "common",
@@ -121,4 +121,4 @@ export function useUpsertDocument({
 			mutation.mutate(data);
 		}),
 	};
-}
+};

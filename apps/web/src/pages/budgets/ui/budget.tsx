@@ -19,7 +19,7 @@ export const Budget = ({ id, title, members, owner, userId }: BudgetProps) => {
 
 	return (
 		<Link
-			to={APP_ROUTES.group.view(id)}
+			to={APP_ROUTES.budgets.view(id)}
 			className="flex items-center justify-between pb-4 hover:bg-muted transition-colors rounded-md p-4"
 		>
 			<div className="space-y-2">

@@ -38,7 +38,7 @@ const getSegmentLabel = (
 		return t("action.edit", { ns: "common" });
 	}
 
-	return t("common.document", { ns: "common" });
+	return t("common.record", { ns: "common" });
 };
 
 export const Breadcrumbs = () => {

@@ -1,10 +1,10 @@
 import type { RecordDetails } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
-import {
-	calculateDocumentTotal,
-	calculateLineTotal,
-} from "@/features/document-form/helpers/document-totals";
 import { Price, Text } from "@/shared/components";
+import {
+	calculateLineTotal,
+	calculateRecordTotal,
+} from "../../form/helpers/record-totals";
 
 type RecordViewProps = {
 	record: RecordDetails;
@@ -12,7 +12,7 @@ type RecordViewProps = {
 
 export const RecordView = ({ record }: RecordViewProps) => {
 	const { t, i18n } = useTranslation();
-	const totalAmount = calculateDocumentTotal(record.lineItems);
+	const totalAmount = calculateRecordTotal(record.lineItems);
 
 	return (
 		<div className="flex flex-col">

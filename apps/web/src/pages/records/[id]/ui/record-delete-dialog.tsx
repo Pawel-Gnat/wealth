@@ -2,8 +2,8 @@ import type { RecordKind } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { getDocumentConfig } from "@/features/config/document-config";
 import { AlertModal } from "@/shared/components";
+import { getRecordConfig } from "../../config/record-config";
 import { useDeleteRecord } from "../hooks/use-delete-record";
 
 type RecordDeleteDialogProps = {
@@ -18,7 +18,7 @@ export const RecordDeleteDialog = ({
 	onClose,
 }: RecordDeleteDialogProps) => {
 	const { t } = useTranslation();
-	const config = getDocumentConfig(kind);
+	const config = getRecordConfig(kind);
 	const navigate = useNavigate();
 
 	const { deleteRecord, isLoading } = useDeleteRecord({

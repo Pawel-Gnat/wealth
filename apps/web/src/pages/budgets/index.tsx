@@ -8,7 +8,7 @@ import { BudgetModalForm } from "./ui/budget-modal-form";
 import { BudgetsList } from "./ui/budgets-list";
 import { InvitationsList } from "./ui/invitations-list";
 
-export const GroupDocumentsPage = () => {
+export const BudgetsPage = () => {
 	const { t } = useTranslation();
 	const { data: user } = useUser();
 	const { data: budgets, isLoading, isError } = useBudgets();

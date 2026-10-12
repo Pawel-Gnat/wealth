@@ -3,15 +3,15 @@ import { useParams } from "react-router";
 import { Card } from "@/shared/components";
 import { PageLayout } from "@/shared/layouts";
 import { CardState } from "@/shared/widgets/card-state";
-import { useDocument } from "./hooks/use-document";
-import { DocumentForm as DocumentFormUI } from "./ui/document-form";
+import { useRecord } from "./hooks/use-record";
+import { RecordForm } from "./ui/record-form";
 
-export function DocumentForm() {
+export const RecordFormPage = () => {
 	const { t } = useTranslation();
 	const { id } = useParams();
 	const isEditMode = Boolean(id);
-	const { data, isLoading, isError } = useDocument({
-		...(id ? { documentId: id } : {}),
+	const { data, isLoading, isError } = useRecord({
+		...(id ? { recordId: id } : {}),
 	});
 
 	const title = isEditMode
@@ -34,13 +34,13 @@ export function DocumentForm() {
 					errorDescription={errorDescription}
 					skeletonClassName="h-100"
 				>
-					{(document) => (
-						<DocumentFormUI
-							{...(id ? { documentId: id } : {})}
+					{(record) => (
+						<RecordForm
+							{...(id ? { recordId: id } : {})}
 							initialValues={{
-								kind: document.kind,
-								date: document.date,
-								lineItems: document.lineItems.map(
+								kind: record.kind,
+								date: record.date,
+								lineItems: record.lineItems.map(
 									({ title, quantity, singleAmount }) => ({
 										title,
 										quantity,
@@ -53,9 +53,9 @@ export function DocumentForm() {
 				</CardState>
 			) : (
 				<Card>
-					<DocumentFormUI />
+					<RecordForm />
 				</Card>
 			)}
 		</PageLayout>
 	);
-}
+};

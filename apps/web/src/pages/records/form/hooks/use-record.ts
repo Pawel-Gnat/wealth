@@ -6,18 +6,18 @@ import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
-type UseDocumentProps = {
-	documentId?: string;
+type UseRecordProps = {
+	recordId?: string;
 };
 
-export function useDocument({ documentId }: UseDocumentProps) {
+export const useRecord = ({ recordId }: UseRecordProps) => {
 	const query = useQuery({
-		queryKey: queryKeys.records.single(documentId ?? ""),
-		enabled: Boolean(documentId),
+		queryKey: queryKeys.records.single(recordId ?? ""),
+		enabled: Boolean(recordId),
 		queryFn: async () => {
 			return controlledAsync(() =>
 				orpcClient.records.get({
-					id: documentId ?? "",
+					id: recordId ?? "",
 				}),
 			);
 		},
@@ -36,4 +36,4 @@ export function useDocument({ documentId }: UseDocumentProps) {
 		isError: query.isError,
 		error: query.error,
 	};
-}
+};

@@ -3,25 +3,25 @@ import { useTranslation } from "react-i18next";
 import { Form } from "@/shared/components";
 import {
 	type RecordFormValues,
-	useUpsertDocument,
-} from "../hooks/use-upsert-document";
-import { DocumentFields } from "./document-fields";
+	useUpsertRecord,
+} from "../hooks/use-upsert-record";
+import { RecordFields } from "./record-fields";
 
-export type DocumentFormProps = {
+export type RecordFormProps = {
 	kind?: RecordKind;
-	documentId?: string;
+	recordId?: string;
 	initialValues?: RecordFormValues;
 };
 
-export const DocumentForm = ({
+export const RecordForm = ({
 	kind,
-	documentId,
+	recordId,
 	initialValues,
-}: DocumentFormProps) => {
+}: RecordFormProps) => {
 	const { t } = useTranslation();
-	const { form, isPending, isEditMode, onSubmit } = useUpsertDocument({
+	const { form, isPending, isEditMode, onSubmit } = useUpsertRecord({
 		...(kind ? { kind } : {}),
-		...(documentId ? { documentId } : {}),
+		...(recordId ? { recordId } : {}),
 		...(initialValues ? { initialValues } : {}),
 	});
 
@@ -33,7 +33,7 @@ export const DocumentForm = ({
 			})}
 			isPending={isPending}
 		>
-			<DocumentFields form={form} isKindLocked={isEditMode} />
+			<RecordFields form={form} isKindLocked={isEditMode} />
 		</Form>
 	);
 };

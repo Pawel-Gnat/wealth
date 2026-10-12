@@ -10,11 +10,11 @@ export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";
 
 import { AuthLayout } from "@/pages/auth/layouts";
 import { BudgetPage } from "@/pages/budget";
+import { BudgetsPage } from "@/pages/budgets";
 import { DashboardPage } from "@/pages/dashboard";
-import { GroupDocumentsPage } from "@/pages/group";
-import { RecordFormPage } from "@/pages/record-form";
 import { RecordsListPage } from "@/pages/records";
 import { RecordPage } from "@/pages/records/[id]";
+import { RecordFormPage } from "@/pages/records/form";
 import { SettingsPage } from "@/pages/settings";
 import { APP_ROUTES, EDIT_RECORD_SEGMENT, NEW_RECORD_SEGMENT } from "./routes";
 
@@ -37,8 +37,8 @@ export function AppRouter() {
 							<Route path={EDIT_RECORD_SEGMENT} element={<RecordFormPage />} />
 						</Route>
 					</Route>
-					<Route path={APP_ROUTES.group.list}>
-						<Route index element={<GroupDocumentsPage />} />
+					<Route path={APP_ROUTES.budgets.list}>
+						<Route index element={<BudgetsPage />} />
 						<Route path=":id" element={<BudgetPage />} />
 					</Route>
 					<Route path={APP_ROUTES.settings} element={<SettingsPage />} />

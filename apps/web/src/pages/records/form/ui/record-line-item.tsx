@@ -8,10 +8,10 @@ import {
 	Price,
 	Tooltip,
 } from "@/shared/components";
-import type { LineItemTitleLabelKey } from "../../model/line-item-title-label-key";
-import type { RecordFormValues } from "../hooks/use-upsert-document";
+import type { LineItemTitleLabelKey } from "../../config/record-config";
+import type { RecordFormValues } from "../hooks/use-upsert-record";
 
-type DocumentLineItemProps = {
+type RecordLineItemProps = {
 	index: number;
 	form: UseFormReturn<RecordFormValues>;
 	remove: (index: number) => void;
@@ -19,13 +19,13 @@ type DocumentLineItemProps = {
 	titleLabelKey: LineItemTitleLabelKey;
 };
 
-export const DocumentLineItem = ({
+export const RecordLineItem = ({
 	index,
 	form,
 	remove,
 	lineTotal,
 	titleLabelKey,
-}: DocumentLineItemProps) => {
+}: RecordLineItemProps) => {
 	const { t, i18n } = useTranslation();
 	const deleteText = t("action.delete", { ns: "common" });
 

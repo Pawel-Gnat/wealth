@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
-import { getDocumentConfig } from "@/features/config/document-config";
-import { useDocument } from "@/features/document-form/hooks/use-document";
 import { PageLayout } from "@/shared/layouts";
 import { CardState } from "@/shared/widgets/card-state";
+import { getRecordConfig } from "../config/record-config";
+import { useRecord } from "../form/hooks/use-record";
 import { RecordActions } from "./ui/record-actions";
 import { RecordDeleteDialog } from "./ui/record-delete-dialog";
 import { RecordView } from "./ui/record-view";
@@ -14,11 +14,11 @@ export const RecordPage = () => {
 	const { id } = useParams();
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-	const { data, isLoading, isError } = useDocument({
-		...(id ? { documentId: id } : {}),
+	const { data, isLoading, isError } = useRecord({
+		...(id ? { recordId: id } : {}),
 	});
 	const kind = data?.kind ?? "expense";
-	const config = getDocumentConfig(kind);
+	const config = getRecordConfig(kind);
 
 	const title = t("single.title", { ns: "records" });
 	const description = t("single.description", { ns: "records" });

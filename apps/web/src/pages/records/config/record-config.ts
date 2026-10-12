@@ -1,11 +1,10 @@
 import { RECORD_UPDATED_MESSAGE } from "@repo/api/schemas";
 import type { RecordKind } from "@repo/api/types";
-import type { ParseKeys } from "@repo/common/i18n";
+import type { ParseKeys, ParseNsKeys } from "@repo/common/i18n";
 import { getDocumentObservabilityEvents } from "@repo/observability/browser";
 import { APP_ROUTES } from "@/app/routes";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
-import type { LineItemTitleLabelKey } from "../../features/model/line-item-title-label-key";
 
 type RecordToast = {
 	created: ParseKeys<"common">;
@@ -15,6 +14,14 @@ type RecordToast = {
 	deleted: ParseKeys<"common">;
 	deleteError: ParseKeys<"common">;
 };
+
+type FormLineItemTitleLabelNsKey = Extract<
+	ParseNsKeys<"form">,
+	`form:line-item.${string}-label`
+>;
+
+export type LineItemTitleLabelKey =
+	FormLineItemTitleLabelNsKey extends `form:${infer Key}` ? Key : never;
 
 const recordToast = (toast: RecordToast): RecordToast => toast;
 
@@ -29,7 +36,7 @@ const sharedRecordConfig = {
 	updatedMessage: RECORD_UPDATED_MESSAGE,
 } as const;
 
-export const DOCUMENT_CONFIG = {
+export const RECORD_CONFIG = {
 	expense: {
 		...sharedRecordConfig,
 		lineItemLabelKey: "line-item.expense-label" satisfies LineItemTitleLabelKey,
@@ -60,6 +67,6 @@ export const DOCUMENT_CONFIG = {
 	},
 } as const;
 
-export function getDocumentConfig(kind: RecordKind) {
-	return DOCUMENT_CONFIG[kind];
-}
+export const getRecordConfig = (kind: RecordKind) => {
+	return RECORD_CONFIG[kind];
+};

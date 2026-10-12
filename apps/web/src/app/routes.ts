@@ -11,9 +11,9 @@ export const APP_ROUTES = {
 		edit: (id: string): `/records/${string}/${typeof EDIT_RECORD_SEGMENT}` =>
 			`/records/${id}/${EDIT_RECORD_SEGMENT}`,
 	},
-	group: {
-		list: "/group",
-		view: (id: string): `/group/${string}` => `/group/${id}`,
+	budgets: {
+		list: "/budgets",
+		view: (id: string): `/budgets/${string}` => `/budgets/${id}`,
 	},
 	settings: "/settings",
 } as const;
