@@ -1,7 +1,8 @@
 import type { RecordKind } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
+import { APP_ROUTES } from "@/app/routes";
 import { AlertModal } from "@/shared/components";
 import { getRecordConfig } from "../../config/record-config";
 import { useDeleteRecord } from "../hooks/use-delete-record";
@@ -18,6 +19,7 @@ export const RecordDeleteDialog = ({
 	onClose,
 }: RecordDeleteDialogProps) => {
 	const { t } = useTranslation();
+	const { budgetId } = useParams();
 	const config = getRecordConfig(kind);
 	const navigate = useNavigate();
 
@@ -26,7 +28,7 @@ export const RecordDeleteDialog = ({
 		onSuccess: () => {
 			toast.success(t(config.toast.deleted, { ns: "common" }));
 			onClose();
-			navigate(config.listRoute);
+			navigate(budgetId ? APP_ROUTES.budgets.view(budgetId) : config.listRoute);
 		},
 		onError: () => {
 			toast.error(t(config.toast.deleteError, { ns: "common" }));

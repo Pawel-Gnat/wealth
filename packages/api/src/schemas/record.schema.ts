@@ -14,6 +14,7 @@ export const lineItemSchema = z.object({
 	title: z.string().trim().min(1, "form:line-item.required"),
 	quantity: z
 		.number({ error: "form:quantity.invalid" })
+		.int("form:quantity.integer")
 		.min(1, "form:quantity.min"),
 	singleAmount: z
 		.number({ error: "form:single-amount.invalid" })
@@ -53,6 +54,7 @@ export const recordListParamsSchema = z.object({
 
 export const recordCreateInputSchema = recordCreatePayloadSchema.extend({
 	kind: recordKindSchema,
+	budgetId: z.string().optional(),
 });
 
 export const recordUpdateInputSchema = recordUpdatePayloadSchema.extend({

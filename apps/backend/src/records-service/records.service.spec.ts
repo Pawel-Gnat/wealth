@@ -561,7 +561,7 @@ describe("Records service", () => {
 			expect(lineItems[0]?.title).toBe("Item");
 		});
 
-		it("does not update a group document through the personal endpoint", async () => {
+		it("updates a group document for someone with budget access", async () => {
 			const db = moduleRef.get(DBS.APP);
 
 			const user = await createTestUser(usersService, {
@@ -605,7 +605,9 @@ describe("Records service", () => {
 					date: decodeDocumentDateFromStorage("2026-05-11"),
 					lineItems: [{ title: "Changed", quantity: 1, singleAmount: 1 }],
 				}),
-			).rejects.toThrow(messages.notFound);
+			).resolves.toEqual({
+				data: { message: messages.updated },
+			});
 
 			const [documentAfter] = await db
 				.select()
@@ -613,8 +615,8 @@ describe("Records service", () => {
 				.where(eq(recordsTable.id, groupDocument.id));
 
 			expect(documentAfter).toMatchObject({
-				totalAmount: "40.00",
-				documentDate: "2026-05-09",
+				totalAmount: "1.00",
+				documentDate: "2026-05-11",
 				budgetId: budget.id,
 			});
 		});
@@ -690,6 +692,92 @@ describe("Records service", () => {
 				kind: "expense",
 				totalAmount: 10,
 			});
+		});
+
+		it("stores a created record on the budget and leaves the personal list unchanged", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+			const owner = await createTestUser(usersService, {
+				email: `create-budget-owner-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Create target", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await recordsService.createByUserId(
+				owner.id,
+				"expense",
+				{
+					date: decodeDocumentDateFromStorage("2026-07-01"),
+					lineItems: [{ title: "Groceries", quantity: 1, singleAmount: 18 }],
+				},
+				budget.id,
+			);
+
+			const personal = await recordsService.listByUserId(owner.id);
+			const shared = await recordsService.listByUserId(
+				owner.id,
+				undefined,
+				budget.id,
+			);
+
+			expect(personal.data).toHaveLength(0);
+			expect(shared.data).toHaveLength(1);
+			expect(shared.data[0]).toMatchObject({
+				kind: "expense",
+				totalAmount: 18,
+			});
+		});
+
+		it("orders records from the same day by id descending", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+			const owner = await createTestUser(usersService, {
+				email: `same-day-order-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+
+			await db.insert(recordsTable).values([
+				{
+					id: "01J00000000000000000000000",
+					userId: owner.id,
+					kind: "expense",
+					budgetId: null,
+					totalAmount: "10.00",
+					documentDate: "2026-08-01",
+				},
+				{
+					id: "01K00000000000000000000000",
+					userId: owner.id,
+					kind: "income",
+					budgetId: null,
+					totalAmount: "30.00",
+					documentDate: "2026-08-01",
+				},
+				{
+					id: "01M00000000000000000000000",
+					userId: owner.id,
+					kind: "expense",
+					budgetId: null,
+					totalAmount: "5.00",
+					documentDate: "2026-07-01",
+				},
+			]);
+
+			const listed = await recordsService.listByUserId(owner.id);
+
+			expect(listed.data.map((record) => record.totalAmount)).toEqual([
+				30, 10, 5,
+			]);
 		});
 	});
 

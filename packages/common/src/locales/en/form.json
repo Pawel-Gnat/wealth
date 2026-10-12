@@ -50,6 +50,7 @@
 	"quantity": {
 		"label": "Quantity",
 		"invalid": "Enter a valid quantity",
+		"integer": "Quantity must be a whole number",
 		"min": "Quantity must be at least 1"
 	},
 	"single-amount": {

@@ -5,6 +5,7 @@ import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
 import { toast } from "sonner";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { APP_ROUTES } from "@/app/routes";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { renderWithProviders } from "@/test/render-with-providers";
@@ -112,6 +113,29 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 			).toBeInTheDocument();
 		});
 
+		it("shows quantity field error when submitting a fractional quantity", async () => {
+			const user = userEvent.setup();
+			renderWithProviders(<RecordForm kind={kind} />);
+
+			const createButton = screen.getByRole("button", {
+				name: t("action.create", { ns: "common" }),
+			});
+			const lineItemLabel = screen.getByLabelText(
+				t(config.lineItemLabelKey, { ns: "form" }),
+			);
+			const quantityInput = screen.getByLabelText(
+				t("quantity.label", { ns: "form" }),
+			);
+
+			await user.type(lineItemLabel, "Taxi");
+			fireEvent.input(quantityInput, { target: { value: "1.5" } });
+			await user.click(createButton);
+
+			expect(
+				await screen.findByText(t("quantity.integer", { ns: "form" })),
+			).toBeInTheDocument();
+		});
+
 		it("add button click creates a new line item", async () => {
 			const user = userEvent.setup();
 			renderWithProviders(<RecordForm kind={kind} />);
@@ -154,6 +178,28 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 			expect(navigateMock).toHaveBeenCalledWith(config.listRoute);
 			expect(invalidateSpy).toHaveBeenCalledWith({
 				queryKey: queryKeys.dashboard.all(),
+			});
+		});
+
+		it("navigates to the budget after create when budgetId is set", async () => {
+			const user = userEvent.setup();
+			const budgetId = "01M3NXV9X1Q10Y2MAJB5RED0P8";
+			renderWithProviders(<RecordForm kind={kind} budgetId={budgetId} />);
+
+			const createButton = screen.getByRole("button", {
+				name: t("action.create", { ns: "common" }),
+			});
+			const lineItemLabel = screen.getByLabelText(
+				t(config.lineItemLabelKey, { ns: "form" }),
+			);
+
+			await user.type(lineItemLabel, "Shared lunch");
+			await user.click(createButton);
+
+			await waitFor(() => {
+				expect(navigateMock).toHaveBeenCalledWith(
+					APP_ROUTES.budgets.view(budgetId),
+				);
 			});
 		});
 

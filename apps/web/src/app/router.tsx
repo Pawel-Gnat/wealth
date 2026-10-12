@@ -38,7 +38,17 @@ export function AppRouter() {
 					</Route>
 					<Route path={APP_ROUTES.budgets.list}>
 						<Route index element={<BudgetsPage />} />
-						<Route path=":id" element={<RecordsListPage />} />
+						<Route path=":budgetId">
+							<Route index element={<RecordsListPage />} />
+							<Route path={NEW_RECORD_SEGMENT} element={<RecordFormPage />} />
+							<Route path=":id">
+								<Route index element={<RecordPage />} />
+								<Route
+									path={EDIT_RECORD_SEGMENT}
+									element={<RecordFormPage />}
+								/>
+							</Route>
+						</Route>
 					</Route>
 					<Route path={APP_ROUTES.settings} element={<SettingsPage />} />
 				</Route>

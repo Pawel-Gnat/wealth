@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
+import { APP_ROUTES } from "@/app/routes";
 import { PageLayout } from "@/shared/layouts";
 import { CardState } from "@/shared/widgets/card-state";
 import { getRecordConfig } from "../config/record-config";
@@ -11,7 +12,7 @@ import { RecordView } from "./ui/record-view";
 
 export const RecordPage = () => {
 	const { t } = useTranslation();
-	const { id } = useParams();
+	const { id, budgetId } = useParams();
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
 	const { data, isLoading, isError } = useRecord({
@@ -40,7 +41,11 @@ export const RecordPage = () => {
 				skeletonClassName="h-100"
 				actions={
 					<RecordActions
-						editPath={config.editRoute(id)}
+						editPath={
+							budgetId
+								? APP_ROUTES.budgets.edit(budgetId, id)
+								: config.editRoute(id)
+						}
 						isLoading={isLoading}
 						isReady={Boolean(data)}
 						onDelete={() => setIsDeleteOpen(true)}

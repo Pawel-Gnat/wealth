@@ -47,7 +47,7 @@ Conventions:
 - Prefer public API via slice `index.ts` / `index.tsx`; other layers import from the barrel, not deep `ui/` paths.
 - Alias: `@/` → `src/`.
 - Income and expense share the records screens via `kind: 'income' | 'expense'` (`RecordKind` from `@repo/api/types`) and `getRecordConfig(kind)` in `pages/records/config`. Do not add separate `expense-*` / `income-*` page wrappers.
-- `pages/records` owns the list, the form (`/records/new`, `/records/:id/edit`), and the detail (`/records/:id`). `/records` lists personal records. `/budgets/:id` reuses that list with `records.list({ budgetId })`. Create, get, update, and delete stay personal (`budgetId` null) until those endpoints accept a budget id.
+- `pages/records` owns the list, the form, and the detail (`/records/:id`). Personal routes are `/records/new` and `/records/:id/edit`. The same form is also mounted at `/budgets/:budgetId/new` and `/budgets/:budgetId/:recordId/edit`, and the preview at `/budgets/:budgetId/:recordId`. `/records` lists personal records. `/budgets/:budgetId` reuses that list with `records.list({ budgetId })`. Create stores `budgetId` when the form was opened from a budget and then returns to that budget; otherwise it stores `null` and returns to `/records`. Get, update, and delete allow a personal record for its owner and a budget record for someone with access to that budget. After delete, navigation returns to the budget when the record belongs to one, otherwise to `/records`. Lists are ordered by document date descending, then by record id descending.
 - `pages/budgets` is the budget list at `/budgets`.
 
 ## ShadCN UI

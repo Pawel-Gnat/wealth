@@ -14,6 +14,7 @@ import { type Resolver, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
+import { APP_ROUTES } from "@/app/routes";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { getRecordConfig } from "../../config/record-config";
@@ -34,12 +35,14 @@ const DEFAULT_RECORD_VALUES: RecordCreatePayload = {
 export type UseUpsertRecordProps = {
 	kind?: RecordKind;
 	recordId?: string;
+	budgetId?: string;
 	initialValues?: RecordFormValues;
 };
 
 export const useUpsertRecord = ({
 	kind,
 	recordId,
+	budgetId,
 	initialValues,
 }: UseUpsertRecordProps) => {
 	const { t } = useTranslation();
@@ -81,7 +84,10 @@ export const useUpsertRecord = ({
 							});
 						})
 					: await controlledAsync<RecordUpsertResponse>(async () =>
-							config.client.create(normalizedPayload),
+							config.client.create({
+								...normalizedPayload,
+								...(budgetId ? { budgetId } : {}),
+							}),
 						);
 
 				const isUpdated = data.data.message === config.updatedMessage;
@@ -101,7 +107,7 @@ export const useUpsertRecord = ({
 					ns: "common",
 				}),
 			);
-			navigate(config.listRoute);
+			navigate(budgetId ? APP_ROUTES.budgets.view(budgetId) : config.listRoute);
 		},
 		onError: (_error, payload) => {
 			const config = getRecordConfig(payload.kind);

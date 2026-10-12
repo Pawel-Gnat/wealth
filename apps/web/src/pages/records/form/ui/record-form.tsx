@@ -10,18 +10,21 @@ import { RecordFields } from "./record-fields";
 export type RecordFormProps = {
 	kind?: RecordKind;
 	recordId?: string;
+	budgetId?: string;
 	initialValues?: RecordFormValues;
 };
 
 export const RecordForm = ({
 	kind,
 	recordId,
+	budgetId,
 	initialValues,
 }: RecordFormProps) => {
 	const { t } = useTranslation();
 	const { form, isPending, isEditMode, onSubmit } = useUpsertRecord({
 		...(kind ? { kind } : {}),
 		...(recordId ? { recordId } : {}),
+		...(budgetId ? { budgetId } : {}),
 		...(initialValues ? { initialValues } : {}),
 	});
 

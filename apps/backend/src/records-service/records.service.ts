@@ -64,14 +64,14 @@ export class RecordsService {
 			.select()
 			.from(recordsTable)
 			.where(
-				budgetId
-					? and(
-							eq(recordsTable.budgetId, budgetId),
-							...(kind ? [eq(recordsTable.kind, kind)] : []),
-						)
-					: this.personalScope(userId, kind),
+				and(
+					...(budgetId
+						? [eq(recordsTable.budgetId, budgetId)]
+						: [eq(recordsTable.userId, userId), isNull(recordsTable.budgetId)]),
+					...(kind ? [eq(recordsTable.kind, kind)] : []),
+				),
 			)
-			.orderBy(desc(recordsTable.documentDate));
+			.orderBy(desc(recordsTable.documentDate), desc(recordsTable.id));
 
 		return {
 			data: rows.map((row) => ({
@@ -91,14 +91,22 @@ export class RecordsService {
 		const [record] = await this.db
 			.select({
 				id: recordsTable.id,
+				userId: recordsTable.userId,
+				budgetId: recordsTable.budgetId,
 				date: recordsTable.documentDate,
 				kind: recordsTable.kind,
 				totalAmount: recordsTable.totalAmount,
 			})
 			.from(recordsTable)
-			.where(this.personalScope(userId, undefined, recordId));
+			.where(eq(recordsTable.id, recordId));
 
 		if (!record) {
+			throw new ORPCError("NOT_FOUND", { message: RECORD_NOT_FOUND });
+		}
+
+		if (record.budgetId) {
+			await this.assertBudgetAccess(userId, record.budgetId);
+		} else if (record.userId !== userId) {
 			throw new ORPCError("NOT_FOUND", { message: RECORD_NOT_FOUND });
 		}
 
@@ -132,7 +140,12 @@ export class RecordsService {
 		userId: string,
 		kind: RecordKind,
 		payload: RecordCreatePayload,
+		budgetId?: string,
 	): Promise<RecordCreateResponse> {
+		if (budgetId) {
+			await this.assertBudgetAccess(userId, budgetId);
+		}
+
 		const totalAmount = calculateRecordTotalAmount(payload);
 
 		await this.db.transaction(async (tx) => {
@@ -140,7 +153,7 @@ export class RecordsService {
 				.insert(recordsTable)
 				.values({
 					userId,
-					budgetId: null,
+					budgetId: budgetId ?? null,
 					kind,
 					documentDate: encodeDocumentDateForStorage(payload.date),
 					totalAmount: totalAmount.toFixed(2),
@@ -177,15 +190,19 @@ export class RecordsService {
 			const [existing] = await tx
 				.select({
 					id: recordsTable.id,
+					userId: recordsTable.userId,
+					budgetId: recordsTable.budgetId,
 					documentDate: recordsTable.documentDate,
 					totalAmount: recordsTable.totalAmount,
 				})
 				.from(recordsTable)
-				.where(this.personalScope(userId, kind, recordId));
+				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)));
 
 			if (!existing) {
 				this.throwNotFound(kind);
 			}
+
+			await this.assertRecordWritable(userId, existing, kind);
 
 			const dateChanged = !isStoredDocumentDateEqual(
 				existing.documentDate,
@@ -226,9 +243,24 @@ export class RecordsService {
 		recordId: string,
 		kind: RecordKind,
 	): Promise<RecordDeleteResponse> {
+		const [existing] = await this.db
+			.select({
+				id: recordsTable.id,
+				userId: recordsTable.userId,
+				budgetId: recordsTable.budgetId,
+			})
+			.from(recordsTable)
+			.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)));
+
+		if (!existing) {
+			this.throwNotFound(kind);
+		}
+
+		await this.assertRecordWritable(userId, existing, kind);
+
 		const [deletedRecord] = await this.db
 			.delete(recordsTable)
-			.where(this.personalScope(userId, kind, recordId))
+			.where(eq(recordsTable.id, recordId))
 			.returning({ id: recordsTable.id });
 
 		if (!deletedRecord) {
@@ -238,6 +270,21 @@ export class RecordsService {
 		logDocumentSucceeded(kind, "delete");
 
 		return { data: { message: RECORD_DELETED_MESSAGE } };
+	}
+
+	private async assertRecordWritable(
+		userId: string,
+		record: { userId: string; budgetId: string | null },
+		kind: RecordKind,
+	) {
+		if (record.budgetId) {
+			await this.assertBudgetAccess(userId, record.budgetId);
+			return;
+		}
+
+		if (record.userId !== userId) {
+			this.throwNotFound(kind);
+		}
 	}
 
 	private async assertBudgetAccess(userId: string, budgetId: string) {
@@ -273,14 +320,5 @@ export class RecordsService {
 		throw new ORPCError("NOT_FOUND", {
 			message: recordCopy[kind].notFound,
 		});
-	}
-
-	private personalScope(userId: string, kind?: RecordKind, recordId?: string) {
-		return and(
-			eq(recordsTable.userId, userId),
-			isNull(recordsTable.budgetId),
-			...(kind ? [eq(recordsTable.kind, kind)] : []),
-			...(recordId ? [eq(recordsTable.id, recordId)] : []),
-		);
 	}
 }

@@ -13,7 +13,20 @@ export const APP_ROUTES = {
 	},
 	budgets: {
 		list: "/budgets",
-		view: (id: string): `/budgets/${string}` => `/budgets/${id}`,
+		add: (
+			budgetId: string,
+		): `/budgets/${string}/${typeof NEW_RECORD_SEGMENT}` =>
+			`/budgets/${budgetId}/${NEW_RECORD_SEGMENT}`,
+		view: (budgetId: string): `/budgets/${string}` => `/budgets/${budgetId}`,
+		edit: (
+			budgetId: string,
+			recordId: string,
+		): `/budgets/${string}/${string}/${typeof EDIT_RECORD_SEGMENT}` =>
+			`/budgets/${budgetId}/${recordId}/${EDIT_RECORD_SEGMENT}`,
+		record: (
+			budgetId: string,
+			recordId: string,
+		): `/budgets/${string}/${string}` => `/budgets/${budgetId}/${recordId}`,
 	},
 	settings: "/settings",
 } as const;

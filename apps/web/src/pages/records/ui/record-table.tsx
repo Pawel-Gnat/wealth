@@ -24,9 +24,12 @@ export const RecordTable = ({ budgetId }: RecordTableProps) => {
 			recordColumns({
 				t,
 				language: i18n.language,
-				getViewPath: APP_ROUTES.records.view,
+				getViewPath: (id) =>
+					budgetId
+						? APP_ROUTES.budgets.record(budgetId, id)
+						: APP_ROUTES.records.view(id),
 			}),
-		[i18n.language, t],
+		[budgetId, i18n.language, t],
 	);
 
 	if (isError) {

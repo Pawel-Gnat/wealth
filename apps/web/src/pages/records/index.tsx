@@ -7,7 +7,7 @@ import { RecordTable } from "./ui/record-table";
 
 export const RecordsListPage = () => {
 	const { t } = useTranslation();
-	const { id: budgetId } = useParams();
+	const { budgetId } = useParams();
 
 	const title = budgetId
 		? t("records.title", { ns: "budgets" })
@@ -21,7 +21,13 @@ export const RecordsListPage = () => {
 			<Card
 				actions={
 					<Button variant="secondary" className="w-fit ml-auto" asChild>
-						<Link to={APP_ROUTES.records.add}>
+						<Link
+							to={
+								budgetId
+									? APP_ROUTES.budgets.add(budgetId)
+									: APP_ROUTES.records.add
+							}
+						>
 							<Icon name="add" />
 							{t("action.add", { ns: "common" })}
 						</Link>

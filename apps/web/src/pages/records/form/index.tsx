@@ -8,7 +8,7 @@ import { RecordForm } from "./ui/record-form";
 
 export const RecordFormPage = () => {
 	const { t } = useTranslation();
-	const { id } = useParams();
+	const { id, budgetId } = useParams();
 	const isEditMode = Boolean(id);
 	const { data, isLoading, isError } = useRecord({
 		...(id ? { recordId: id } : {}),
@@ -37,6 +37,7 @@ export const RecordFormPage = () => {
 					{(record) => (
 						<RecordForm
 							{...(id ? { recordId: id } : {})}
+							{...(budgetId ? { budgetId } : {})}
 							initialValues={{
 								kind: record.kind,
 								date: record.date,
@@ -53,7 +54,7 @@ export const RecordFormPage = () => {
 				</CardState>
 			) : (
 				<Card>
-					<RecordForm />
+					<RecordForm {...(budgetId ? { budgetId } : {})} />
 				</Card>
 			)}
 		</PageLayout>

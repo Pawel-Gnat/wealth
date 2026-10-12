@@ -29,6 +29,7 @@ export class RecordsController {
 					userIdFromRequest(context.request),
 					input.kind,
 					{ date: input.date, lineItems: input.lineItems },
+					input.budgetId,
 				);
 			},
 		);
