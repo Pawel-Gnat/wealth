@@ -9,21 +9,13 @@ import {
 export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";
 
 import { AuthLayout } from "@/pages/auth/layouts";
-import { BudgetPage } from "@/pages/budget";
+import { BudgetsPage } from "@/pages/budgets";
 import { DashboardPage } from "@/pages/dashboard";
-import { ExpensePage } from "@/pages/expense";
-import { ExpenseFormPage } from "@/pages/expense-form";
-import { ExpensesListPage } from "@/pages/expenses";
-import { GroupDocumentsPage } from "@/pages/group";
-import { IncomePage } from "@/pages/income";
-import { IncomeFormPage } from "@/pages/income-form";
-import { IncomesListPage } from "@/pages/incomes";
+import { RecordsListPage } from "@/pages/records";
+import { RecordPage } from "@/pages/records/[id]";
+import { RecordFormPage } from "@/pages/records/form";
 import { SettingsPage } from "@/pages/settings";
-import {
-	APP_ROUTES,
-	EDIT_DOCUMENT_SEGMENT,
-	NEW_DOCUMENT_SEGMENT,
-} from "./routes";
+import { APP_ROUTES, EDIT_RECORD_SEGMENT, NEW_RECORD_SEGMENT } from "./routes";
 
 export function AppRouter() {
 	return (
@@ -36,31 +28,27 @@ export function AppRouter() {
 			<Route element={<AuthenticatedLayout />}>
 				<Route element={<DashboardLayout />}>
 					<Route path={APP_ROUTES.dashboard} element={<DashboardPage />} />
-					<Route path={APP_ROUTES.incomes.list}>
-						<Route index element={<IncomesListPage />} />
-						<Route path={NEW_DOCUMENT_SEGMENT} element={<IncomeFormPage />} />
+					<Route path={APP_ROUTES.records.list}>
+						<Route index element={<RecordsListPage />} />
+						<Route path={NEW_RECORD_SEGMENT} element={<RecordFormPage />} />
 						<Route path=":id">
-							<Route index element={<IncomePage />} />
-							<Route
-								path={EDIT_DOCUMENT_SEGMENT}
-								element={<IncomeFormPage />}
-							/>
+							<Route index element={<RecordPage />} />
+							<Route path={EDIT_RECORD_SEGMENT} element={<RecordFormPage />} />
 						</Route>
 					</Route>
-					<Route path={APP_ROUTES.expenses.list}>
-						<Route index element={<ExpensesListPage />} />
-						<Route path={NEW_DOCUMENT_SEGMENT} element={<ExpenseFormPage />} />
-						<Route path=":id">
-							<Route index element={<ExpensePage />} />
-							<Route
-								path={EDIT_DOCUMENT_SEGMENT}
-								element={<ExpenseFormPage />}
-							/>
+					<Route path={APP_ROUTES.budgets.list}>
+						<Route index element={<BudgetsPage />} />
+						<Route path=":budgetId">
+							<Route index element={<RecordsListPage />} />
+							<Route path={NEW_RECORD_SEGMENT} element={<RecordFormPage />} />
+							<Route path=":id">
+								<Route index element={<RecordPage />} />
+								<Route
+									path={EDIT_RECORD_SEGMENT}
+									element={<RecordFormPage />}
+								/>
+							</Route>
 						</Route>
-					</Route>
-					<Route path={APP_ROUTES.group.list}>
-						<Route index element={<GroupDocumentsPage />} />
-						<Route path=":id" element={<BudgetPage />} />
 					</Route>
 					<Route path={APP_ROUTES.settings} element={<SettingsPage />} />
 				</Route>

@@ -6,7 +6,8 @@
 		"total": "Total",
 		"date": "Date",
 		"actions": "Actions",
-		"document": "Document",
+		"record": "Record",
+		"budget": "Budget",
 		"loading": "Loading",
 		"expenses": "Expenses",
 		"incomes": "Incomes",
@@ -20,9 +21,8 @@
 	},
 	"navigation": {
 		"dashboard": "Dashboard",
-		"incomes": "Incomes",
-		"expenses": "Expenses",
-		"group": "Group budgets",
+		"records": "Records",
+		"budgets": "Budgets",
 		"settings": "Settings"
 	},
 	"pagination": {

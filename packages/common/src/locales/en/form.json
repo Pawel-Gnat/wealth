@@ -45,11 +45,13 @@
 		"expense-label": "Expense",
 		"income-label": "Income",
 		"placeholder": "Description",
-		"required": "Description is required"
+		"required": "Description is required",
+		"min": "Add at least one item"
 	},
 	"quantity": {
 		"label": "Quantity",
 		"invalid": "Enter a valid quantity",
+		"integer": "Quantity must be a whole number",
 		"min": "Quantity must be at least 1"
 	},
 	"single-amount": {

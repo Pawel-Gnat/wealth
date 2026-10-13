@@ -11,17 +11,13 @@ export const Navigation = () => {
 				<Icon name="dashboard" />
 				{t("navigation.dashboard", { ns: "common" })}
 			</NavLink>
-			<NavLink to={APP_ROUTES.incomes.list}>
-				<Icon name="income" />
-				{t("navigation.incomes", { ns: "common" })}
+			<NavLink to={APP_ROUTES.records.list}>
+				<Icon name="money" />
+				{t("navigation.records", { ns: "common" })}
 			</NavLink>
-			<NavLink to={APP_ROUTES.expenses.list}>
-				<Icon name="expense" />
-				{t("navigation.expenses", { ns: "common" })}
-			</NavLink>
-			<NavLink to={APP_ROUTES.group.list}>
+			<NavLink to={APP_ROUTES.budgets.list}>
 				<Icon name="group" />
-				{t("navigation.group", { ns: "common" })}
+				{t("navigation.budgets", { ns: "common" })}
 			</NavLink>
 			<NavLink to={APP_ROUTES.settings}>
 				<Icon name="settings" />

@@ -1,20 +1,16 @@
-import type { DocumentKind, Period } from "@repo/api/types";
+import type { Period } from "@repo/api/types";
 
 export const queryKeys = {
 	me: () => ["me"] as const,
-	expenses: {
-		all: () => ["expenses"] as const,
-		single: (id: string) => ["expenses", id] as const,
-	},
-	incomes: {
-		all: () => ["incomes"] as const,
-		single: (id: string) => ["incomes", id] as const,
+	records: {
+		all: () => ["records"] as const,
+		list: (budgetId?: string) =>
+			["records", "list", budgetId ?? "personal"] as const,
+		single: (id: string) => ["records", id] as const,
 	},
 	budgets: {
 		all: () => ["budgets"] as const,
 		invites: () => ["budgets", "invites"] as const,
-		documents: (id: string, kind?: DocumentKind) =>
-			["budgets", id, "documents", kind ?? "all"] as const,
 	},
 	users: {
 		search: (query: string) => ["users", "search", query] as const,

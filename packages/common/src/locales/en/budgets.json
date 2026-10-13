@@ -1,0 +1,42 @@
+{
+	"title": "Budgets",
+	"budgets": {
+		"title": "Your budgets",
+		"empty": {
+			"title": "No group budgets yet",
+			"description": "Create a budget and invite others to track shared transactions."
+		},
+		"error": {
+			"title": "Could not load group budgets",
+			"description": "Your budgets could not be loaded. Please try again later."
+		}
+	},
+	"records": {
+		"title": "Budget",
+		"subtitle": "Shared expenses and incomes in this budget."
+	},
+	"members": {
+		"label": "Members",
+		"empty": "Select people to assign them to this budget.",
+		"search": {
+			"placeholder": "Search people to add",
+			"refine": "There may be more people. Refine your search.",
+			"error": {
+				"title": "Could not search people",
+				"description": "People could not be loaded. Please try again later."
+			}
+		}
+	},
+	"invitations": {
+		"title": "Invitations",
+		"waiting-for-acceptance": "Waiting for acceptance by {{email}}",
+		"empty": {
+			"title": "No invitations",
+			"description": "Invites you send or receive will appear here."
+		},
+		"error": {
+			"title": "Could not load invitations",
+			"description": "Your invitations could not be loaded. Please try again later."
+		}
+	}
+}

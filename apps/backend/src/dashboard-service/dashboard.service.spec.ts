@@ -11,7 +11,7 @@ import {
 	vi,
 } from "vitest";
 import { DBS } from "../database-service/constants";
-import { budgetTable, documentsTable } from "../database-service/tables/index";
+import { budgetTable, recordsTable } from "../database-service/tables/index";
 import { createTestApp } from "../test/helpers/modules";
 import { createTestUser } from "../test/mocks/users";
 import { UsersService } from "../users-service/users.service";
@@ -68,7 +68,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-summary-sum",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -92,7 +92,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			await db.insert(documentsTable).values({
+			await db.insert(recordsTable).values({
 				userId: user.id,
 				kind: "income",
 				budgetId: null,
@@ -122,7 +122,7 @@ describe("Dashboard service", () => {
 				throw new Error("Expected seeded budget");
 			}
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -151,7 +151,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-summary-7",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -180,7 +180,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-null-pct",
 			});
 
-			await db.insert(documentsTable).values({
+			await db.insert(recordsTable).values({
 				userId: user.id,
 				kind: "expense",
 				budgetId: null,
@@ -200,7 +200,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-pct",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -236,7 +236,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-neg-net",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -274,7 +274,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-prev-window",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -311,7 +311,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-future",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -342,7 +342,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-tz-boundary",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -400,7 +400,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-chart-cum",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -417,7 +417,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			await db.insert(documentsTable).values({
+			await db.insert(recordsTable).values({
 				userId: user.id,
 				kind: "income",
 				budgetId: null,
@@ -520,7 +520,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-daily-sums",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -537,7 +537,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			await db.insert(documentsTable).values({
+			await db.insert(recordsTable).values({
 				userId: user.id,
 				kind: "income",
 				budgetId: null,
@@ -575,7 +575,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-daily-outside",
 			});
 
-			await db.insert(documentsTable).values([
+			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
 					kind: "expense",
@@ -592,7 +592,7 @@ describe("Dashboard service", () => {
 				},
 			]);
 
-			await db.insert(documentsTable).values({
+			await db.insert(recordsTable).values({
 				userId: user.id,
 				kind: "income",
 				budgetId: null,
@@ -635,7 +635,7 @@ describe("Dashboard service", () => {
 				emailTag: "dash-smoke",
 			});
 
-			await db.insert(documentsTable).values({
+			await db.insert(recordsTable).values({
 				userId: user.id,
 				kind: "expense",
 				budgetId: null,
@@ -643,7 +643,7 @@ describe("Dashboard service", () => {
 				documentDate: "2026-07-14",
 			});
 
-			await db.insert(documentsTable).values({
+			await db.insert(recordsTable).values({
 				userId: user.id,
 				kind: "income",
 				budgetId: null,

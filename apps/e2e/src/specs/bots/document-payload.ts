@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
-import type { DocumentCreatePayload } from '@repo/api/types'
+import type { RecordCreatePayload } from '@repo/api/types'
 
-type CreateLineItem = DocumentCreatePayload['lineItems'][number]
+type CreateLineItem = RecordCreatePayload['lineItems'][number]
 
 const CREATE_PROBABILITY = 0.75
 

@@ -654,7 +654,7 @@
             {
               "type": "frame",
               "id": "h6OfuU",
-              "name": "Tab Expenses",
+              "name": "Tab Records",
               "width": "fill_container",
               "height": "fill_container",
               "cornerRadius": 22,
@@ -666,19 +666,19 @@
                 {
                   "type": "icon",
                   "id": "jSLQT",
-                  "name": "Expenses Icon",
+                  "name": "Records Icon",
                   "width": 18,
                   "height": 18,
-                  "icon": "trending-down",
+                  "icon": "wallet",
                   "library": "lucide",
                   "fill": "$muted-foreground"
                 },
                 {
                   "type": "text",
                   "id": "ZxIx1",
-                  "name": "Expenses Label",
+                  "name": "Records Label",
                   "fill": "$muted-foreground",
-                  "content": "Expenses",
+                  "content": "Records",
                   "fontFamily": "$font-sans",
                   "fontSize": 10,
                   "fontWeight": "normal"
@@ -1684,33 +1684,17 @@
                       }
                     },
                     {
-                      "id": "TQGq6",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "pOkYR",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -3127,33 +3111,17 @@
                       }
                     },
                     {
-                      "id": "VSshz",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "cJ3He",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -4333,33 +4301,17 @@
                       }
                     },
                     {
-                      "id": "rHSVY",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "RRs95",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -5508,33 +5460,17 @@
                       }
                     },
                     {
-                      "id": "qpQwx",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "lHZt2",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -7240,7 +7176,7 @@
       "id": "Lm6tT",
       "x": 1720,
       "y": 1992,
-      "name": "Personal expenses",
+      "name": "Personal records",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -7301,34 +7237,18 @@
                       }
                     },
                     {
-                      "id": "gblgD",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "M2YR62",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -7469,7 +7389,7 @@
                       "id": "D9xu2p",
                       "name": "Crumb Current",
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -7497,7 +7417,7 @@
                   "id": "gY4bH",
                   "name": "Page Title",
                   "fill": "$foreground",
-                  "content": "Manage your expenses",
+                  "content": "Manage your records",
                   "fontFamily": "$font-sans",
                   "fontSize": 26,
                   "fontWeight": "700"
@@ -7509,7 +7429,7 @@
                   "fill": "$muted-foreground",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Track and edit your personal expense records.",
+                  "content": "Track and edit your personal income and expense records.",
                   "fontFamily": "$font-sans",
                   "fontSize": 14,
                   "fontWeight": "normal"
@@ -7519,14 +7439,14 @@
             {
               "type": "frame",
               "id": "LTB3F",
-              "name": "Expense Metrics",
+              "name": "Record Metrics",
               "width": "fill_container",
               "gap": 16,
               "children": [
                 {
                   "type": "frame",
                   "id": "D1UWJ",
-                  "name": "This Month Card",
+                  "name": "Expenses Card",
                   "width": "fill_container",
                   "fill": "$card",
                   "cornerRadius": 32,
@@ -7549,7 +7469,7 @@
                       "id": "W0EdGq",
                       "name": "This Month Label",
                       "fill": "$muted-foreground",
-                      "content": "This month",
+                      "content": "Expenses",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -7569,7 +7489,7 @@
                 {
                   "type": "frame",
                   "id": "g20pA",
-                  "name": "Count Card",
+                  "name": "Income Card",
                   "width": "fill_container",
                   "fill": "$card",
                   "cornerRadius": 32,
@@ -7592,7 +7512,7 @@
                       "id": "xw4zc",
                       "name": "Count Label",
                       "fill": "$muted-foreground",
-                      "content": "Records",
+                      "content": "Income",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -7602,7 +7522,7 @@
                       "id": "gqf8m",
                       "name": "Count Value",
                       "fill": "$foreground",
-                      "content": "24",
+                      "content": "$1,560.00",
                       "fontFamily": "$font-sans",
                       "fontSize": 22,
                       "fontWeight": "700"
@@ -7614,7 +7534,7 @@
             {
               "type": "frame",
               "id": "LjAOB",
-              "name": "Expenses Card",
+              "name": "Records Card",
               "width": "fill_container",
               "fill": "$card",
               "cornerRadius": 32,
@@ -7662,6 +7582,107 @@
                     },
                     {
                       "type": "frame",
+                      "id": "J0a9sx",
+                      "name": "Type Filter",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Q298Z",
+                          "name": "Type Label",
+                          "fill": "$foreground",
+                          "content": "Type",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "KJiCx",
+                          "name": "Type Pills",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$muted",
+                          "cornerRadius": "$radius-pill",
+                          "gap": 4,
+                          "padding": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "idaXR",
+                              "name": "Type All",
+                              "width": "fill_container",
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "SHfiA",
+                                  "name": "All Label",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "EQS0V",
+                              "name": "Type Expense",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "CMcSK",
+                                  "name": "Expense Label",
+                                  "fill": "$foreground",
+                                  "content": "Expense",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "E0jdI0",
+                              "name": "Type Income",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "eticT",
+                                  "name": "Income Label",
+                                  "fill": "$foreground",
+                                  "content": "Income",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
                       "id": "u9ll24",
                       "name": "Create Button",
                       "height": 36,
@@ -7702,7 +7723,7 @@
                 {
                   "type": "frame",
                   "id": "k6VcjE",
-                  "name": "Expenses Table",
+                  "name": "Records Table",
                   "width": "fill_container",
                   "cornerRadius": 12,
                   "stroke": "$border",
@@ -7735,6 +7756,19 @@
                         },
                         {
                           "type": "text",
+                          "id": "euuzu",
+                          "name": "Col Type",
+                          "fill": "$foreground",
+                          "textGrowth": "fixed-width",
+                          "width": 80,
+                          "content": "Type",
+                          "textAlign": "center",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
                           "id": "nl4EA",
                           "name": "Col Amount",
                           "fill": "$foreground",
@@ -7745,6 +7779,13 @@
                           "fontFamily": "$font-sans",
                           "fontSize": 13,
                           "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Kvreq",
+                          "name": "Col Actions",
+                          "width": 44,
+                          "height": 16
                         }
                       ]
                     },
@@ -7774,6 +7815,20 @@
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
                           "fontWeight": "normal"
+                        },
+                        {
+                          "id": "v1X9G",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$muted",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Expense",
+                              "fill": "$muted-foreground"
+                            }
+                          }
                         },
                         {
                           "type": "text",
@@ -7840,13 +7895,27 @@
                           "fontWeight": "normal"
                         },
                         {
+                          "id": "YWNZA",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$accent",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Income",
+                              "fill": "$accent-foreground"
+                            }
+                          }
+                        },
+                        {
                           "type": "text",
                           "id": "sK3Hr",
                           "name": "14 Aug 2026 Amount",
                           "fill": "$foreground",
                           "textGrowth": "fixed-width",
                           "width": 140,
-                          "content": "$32.00",
+                          "content": "+$320.00",
                           "textAlign": "right",
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
@@ -7902,6 +7971,20 @@
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
                           "fontWeight": "normal"
+                        },
+                        {
+                          "id": "hL3kT",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$muted",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Expense",
+                              "fill": "$muted-foreground"
+                            }
+                          }
                         },
                         {
                           "type": "text",
@@ -7968,13 +8051,27 @@
                           "fontWeight": "normal"
                         },
                         {
+                          "id": "uBOFU",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$accent",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Income",
+                              "fill": "$accent-foreground"
+                            }
+                          }
+                        },
+                        {
                           "type": "text",
                           "id": "W6SKV",
                           "name": "8 Aug 2026 Amount",
                           "fill": "$foreground",
                           "textGrowth": "fixed-width",
                           "width": 140,
-                          "content": "$48.00",
+                          "content": "+$1,200.00",
                           "textAlign": "right",
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
@@ -8030,6 +8127,20 @@
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
                           "fontWeight": "normal"
+                        },
+                        {
+                          "id": "u1NfGv",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$muted",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Expense",
+                              "fill": "$muted-foreground"
+                            }
+                          }
                         },
                         {
                           "type": "text",
@@ -8092,13 +8203,27 @@
                           "fontWeight": "normal"
                         },
                         {
+                          "id": "AnVrz",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$accent",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Income",
+                              "fill": "$accent-foreground"
+                            }
+                          }
+                        },
+                        {
                           "type": "text",
                           "id": "KJXfy",
                           "name": "1 Aug 2026 Amount",
                           "fill": "$foreground",
                           "textGrowth": "fixed-width",
                           "width": 140,
-                          "content": "$19.90",
+                          "content": "+$40.00",
                           "textAlign": "right",
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
@@ -8360,26 +8485,10 @@
                       }
                     },
                     {
-                      "id": "I1D7T",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "XnGdk",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": {
                         "type": "color",
@@ -8388,10 +8497,10 @@
                       },
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -8538,7 +8647,7 @@
                       "name": "Crumb Current",
                       "enabled": false,
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -12107,26 +12216,10 @@
                       }
                     },
                     {
-                      "id": "a6UHqJ",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "Xu8rC",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": {
                         "type": "color",
@@ -12135,10 +12228,10 @@
                       },
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "normal",
                           "fill": "$foreground"
                         }
@@ -13056,26 +13149,10 @@
                       }
                     },
                     {
-                      "id": "EHBOB",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "u15LdK",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": {
                         "type": "color",
@@ -13084,10 +13161,10 @@
                       },
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "normal",
                           "fill": "$foreground"
                         }
@@ -16252,26 +16329,10 @@
                       }
                     },
                     {
-                      "id": "TPOrq",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "owlnW",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": {
                         "type": "color",
@@ -16280,10 +16341,10 @@
                       },
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -16431,7 +16492,7 @@
                       "name": "Crumb Current",
                       "enabled": false,
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -17965,7 +18026,7 @@
       "id": "Ykdn6",
       "x": 655,
       "y": 5798,
-      "name": "Personal expenses Mobile",
+      "name": "Personal records Mobile",
       "clip": true,
       "width": 375,
       "fill": "$background",
@@ -18029,34 +18090,18 @@
                       }
                     },
                     {
-                      "id": "v8cCci",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "TZdJq",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -18198,7 +18243,7 @@
                       "id": "ZlCTA",
                       "name": "Crumb Current",
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -18231,7 +18276,7 @@
                   "id": "xsmnW",
                   "name": "Page Title",
                   "fill": "$foreground",
-                  "content": "Manage your expenses",
+                  "content": "Manage your records",
                   "fontFamily": "$font-sans",
                   "fontSize": 26,
                   "fontWeight": "700"
@@ -18243,7 +18288,7 @@
                   "fill": "$muted-foreground",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Track and edit your personal expense records.",
+                  "content": "Track and edit your personal income and expense records.",
                   "fontFamily": "$font-sans",
                   "fontSize": 14,
                   "fontWeight": "normal"
@@ -18284,7 +18329,7 @@
                       "id": "P6s7s",
                       "name": "This Month Label",
                       "fill": "$muted-foreground",
-                      "content": "This month",
+                      "content": "Expenses",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -18327,7 +18372,7 @@
                       "id": "bmPRC",
                       "name": "Count Label",
                       "fill": "$muted-foreground",
-                      "content": "Records",
+                      "content": "Income",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -18337,7 +18382,7 @@
                       "id": "ZBbto",
                       "name": "Count Value",
                       "fill": "$foreground",
-                      "content": "24",
+                      "content": "$1,560.00",
                       "fontFamily": "$font-sans",
                       "fontSize": 22,
                       "fontWeight": "700"
@@ -18394,6 +18439,107 @@
                           "fill": "$foreground"
                         }
                       }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ujvyx",
+                      "name": "Type Filter",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "x0R4r",
+                          "name": "Type Label",
+                          "fill": "$foreground",
+                          "content": "Type",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "z4thBP",
+                          "name": "Type Pills",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$muted",
+                          "cornerRadius": "$radius-pill",
+                          "gap": 4,
+                          "padding": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "LpaDP",
+                              "name": "Type All",
+                              "width": "fill_container",
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "vh4uv",
+                                  "name": "All Label",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "QSkDy",
+                              "name": "Type Expense",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "GIHKb",
+                                  "name": "Expense Label",
+                                  "fill": "$foreground",
+                                  "content": "Expense",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "w7Q98Y",
+                              "name": "Type Income",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Ac8S9",
+                                  "name": "Income Label",
+                                  "fill": "$foreground",
+                                  "content": "Income",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "frame",
@@ -18507,14 +18653,36 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "obASh",
-                              "name": "18 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "18 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "UdGsa",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "obASh",
+                                  "name": "18 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "18 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "PDtNe",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$muted",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Expense",
+                                      "fill": "$muted-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
@@ -18578,21 +18746,43 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "Z1Tel3",
-                              "name": "14 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "14 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "A85Rd9",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Z1Tel3",
+                                  "name": "14 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "14 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "PhMu3",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$accent",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Income",
+                                      "fill": "$accent-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
                               "id": "pWM49",
                               "name": "14 Aug 2026 Amount",
                               "fill": "$foreground",
-                              "content": "$32.00",
+                              "content": "+$320.00",
                               "textAlign": "right",
                               "fontFamily": "$font-sans",
                               "fontSize": 14,
@@ -18649,14 +18839,36 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "n2LRiM",
-                              "name": "11 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "11 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "f8hf7",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "n2LRiM",
+                                  "name": "11 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "11 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "h45Bl",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$muted",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Expense",
+                                      "fill": "$muted-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
@@ -18720,21 +18932,43 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "HlvYz",
-                              "name": "8 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "8 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "c3il6v",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "HlvYz",
+                                  "name": "8 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "8 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "K8Gzk",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$accent",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Income",
+                                      "fill": "$accent-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
                               "id": "odZb1",
                               "name": "8 Aug 2026 Amount",
                               "fill": "$foreground",
-                              "content": "$48.00",
+                              "content": "+$1,200.00",
                               "textAlign": "right",
                               "fontFamily": "$font-sans",
                               "fontSize": 14,
@@ -18791,14 +19025,36 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "fyrqF",
-                              "name": "3 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "3 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "neGH6",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "fyrqF",
+                                  "name": "3 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "3 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "mJVQi",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$muted",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Expense",
+                                      "fill": "$muted-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
@@ -18858,21 +19114,43 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "bfiyr",
-                              "name": "1 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "1 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "KITsP",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "bfiyr",
+                                  "name": "1 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "1 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "oGPlv",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$accent",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Income",
+                                      "fill": "$accent-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
                               "id": "FAyCn",
                               "name": "1 Aug 2026 Amount",
                               "fill": "$foreground",
-                              "content": "$19.90",
+                              "content": "+$40.00",
                               "textAlign": "right",
                               "fontFamily": "$font-sans",
                               "fontSize": 14,
@@ -19160,26 +19438,10 @@
                       }
                     },
                     {
-                      "id": "vRg2L",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "mHCbm",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": {
                         "type": "color",
@@ -19188,10 +19450,10 @@
                       },
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "normal",
                           "fill": "$foreground"
                         }
@@ -20139,26 +20401,10 @@
                       }
                     },
                     {
-                      "id": "U2W2a",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "vv53f",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": {
                         "type": "color",
@@ -20167,10 +20413,10 @@
                       },
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "normal",
                           "fill": "$foreground"
                         }
@@ -21369,33 +21615,17 @@
                       }
                     },
                     {
-                      "id": "CB9aV",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "C9IRtn",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -22862,33 +23092,17 @@
                       }
                     },
                     {
-                      "id": "m7imgW",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "pL82D",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -24099,33 +24313,17 @@
                       }
                     },
                     {
-                      "id": "lJUa2",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "xdQ6j",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -25305,33 +25503,17 @@
                       }
                     },
                     {
-                      "id": "M3pzx9",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "JcIVm",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -27125,26 +27307,10 @@
                       }
                     },
                     {
-                      "id": "wwYe7",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "Z1HRf",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": {
                         "type": "color",
@@ -27153,10 +27319,10 @@
                       },
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -27303,7 +27469,7 @@
                       "name": "Crumb Current",
                       "enabled": false,
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -28208,7 +28374,7 @@
       "id": "PGN6w",
       "x": 1720,
       "y": 9841,
-      "name": "Personal expenses Empty",
+      "name": "Personal records Empty",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -28269,34 +28435,18 @@
                       }
                     },
                     {
-                      "id": "U3t1zu",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "AY0pl",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -28437,7 +28587,7 @@
                       "id": "H2DG3",
                       "name": "Crumb Current",
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -28465,7 +28615,7 @@
                   "id": "KkNN1",
                   "name": "Page Title",
                   "fill": "$foreground",
-                  "content": "Manage your expenses",
+                  "content": "Manage your records",
                   "fontFamily": "$font-sans",
                   "fontSize": 26,
                   "fontWeight": "700"
@@ -28477,7 +28627,7 @@
                   "fill": "$muted-foreground",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Track and edit your personal expense records.",
+                  "content": "Track and edit your personal income and expense records.",
                   "fontFamily": "$font-sans",
                   "fontSize": 14,
                   "fontWeight": "normal"
@@ -28517,7 +28667,7 @@
                       "id": "dOCrX",
                       "name": "This Month Label",
                       "fill": "$muted-foreground",
-                      "content": "This month",
+                      "content": "Expenses",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -28560,7 +28710,7 @@
                       "id": "cvJMi",
                       "name": "Count Label",
                       "fill": "$muted-foreground",
-                      "content": "Records",
+                      "content": "Income",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -28570,7 +28720,7 @@
                       "id": "PZkUt",
                       "name": "Count Value",
                       "fill": "$foreground",
-                      "content": "0",
+                      "content": "$0.00",
                       "fontFamily": "$font-sans",
                       "fontSize": 22,
                       "fontWeight": "700"
@@ -28627,6 +28777,107 @@
                           "fill": "$foreground"
                         }
                       }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "kMl2K",
+                      "name": "Type Filter",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "KyPs2",
+                          "name": "Type Label",
+                          "fill": "$foreground",
+                          "content": "Type",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Pxl9L",
+                          "name": "Type Pills",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$muted",
+                          "cornerRadius": "$radius-pill",
+                          "gap": 4,
+                          "padding": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "fdVsF",
+                              "name": "Type All",
+                              "width": "fill_container",
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "d74jR",
+                                  "name": "All Label",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "bJKf1",
+                              "name": "Type Expense",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "eTNIh",
+                                  "name": "Expense Label",
+                                  "fill": "$foreground",
+                                  "content": "Expense",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "bn7g6",
+                              "name": "Type Income",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "i2St7I",
+                                  "name": "Income Label",
+                                  "fill": "$foreground",
+                                  "content": "Income",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "frame",
@@ -28703,6 +28954,19 @@
                         },
                         {
                           "type": "text",
+                          "id": "NiGI9",
+                          "name": "Col Type",
+                          "fill": "$foreground",
+                          "textGrowth": "fixed-width",
+                          "width": 80,
+                          "content": "Type",
+                          "textAlign": "center",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
                           "id": "o72HLX",
                           "name": "Col Amount",
                           "fill": "$foreground",
@@ -28713,6 +28977,13 @@
                           "fontFamily": "$font-sans",
                           "fontSize": 13,
                           "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "TLBJp",
+                          "name": "Col Actions",
+                          "width": 44,
+                          "height": 16
                         }
                       ]
                     },
@@ -28727,10 +28998,10 @@
                           "icon": "receipt"
                         },
                         "srYdT": {
-                          "content": "No expenses found."
+                          "content": "No records yet"
                         },
                         "l8NGWI": {
-                          "content": "Create your first expense to start tracking spending."
+                          "content": "Add an expense or income to start tracking."
                         }
                       }
                     }
@@ -28808,33 +29079,17 @@
                       }
                     },
                     {
-                      "id": "yQQIi",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "V26G7W",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -29295,33 +29550,17 @@
                       }
                     },
                     {
-                      "id": "x0c1b",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "wLD0J",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -30229,26 +30468,10 @@
                       }
                     },
                     {
-                      "id": "g8QEs",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "bii2g",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": {
                         "type": "color",
@@ -30257,10 +30480,10 @@
                       },
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -30408,7 +30631,7 @@
                       "name": "Crumb Current",
                       "enabled": false,
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -31347,7 +31570,7 @@
       "id": "y4kli",
       "x": 655,
       "y": 11321,
-      "name": "Personal expenses Mobile Empty",
+      "name": "Personal records Mobile Empty",
       "clip": true,
       "width": 375,
       "fill": "$background",
@@ -31411,34 +31634,18 @@
                       }
                     },
                     {
-                      "id": "LopzN",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "f4C4AE",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -31580,7 +31787,7 @@
                       "id": "h1cdJ",
                       "name": "Crumb Current",
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -31613,7 +31820,7 @@
                   "id": "ItcC9",
                   "name": "Page Title",
                   "fill": "$foreground",
-                  "content": "Manage your expenses",
+                  "content": "Manage your records",
                   "fontFamily": "$font-sans",
                   "fontSize": 26,
                   "fontWeight": "700"
@@ -31625,7 +31832,7 @@
                   "fill": "$muted-foreground",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Track and edit your personal expense records.",
+                  "content": "Track and edit your personal income and expense records.",
                   "fontFamily": "$font-sans",
                   "fontSize": 14,
                   "fontWeight": "normal"
@@ -31666,7 +31873,7 @@
                       "id": "chaWc",
                       "name": "This Month Label",
                       "fill": "$muted-foreground",
-                      "content": "This month",
+                      "content": "Expenses",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -31709,7 +31916,7 @@
                       "id": "uZP7H",
                       "name": "Count Label",
                       "fill": "$muted-foreground",
-                      "content": "Records",
+                      "content": "Income",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -31719,7 +31926,7 @@
                       "id": "ik64V",
                       "name": "Count Value",
                       "fill": "$foreground",
-                      "content": "0",
+                      "content": "$0.00",
                       "fontFamily": "$font-sans",
                       "fontSize": 22,
                       "fontWeight": "700"
@@ -31776,6 +31983,107 @@
                           "fill": "$foreground"
                         }
                       }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "OecWP",
+                      "name": "Type Filter",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Rp6tZ",
+                          "name": "Type Label",
+                          "fill": "$foreground",
+                          "content": "Type",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "an5by",
+                          "name": "Type Pills",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$muted",
+                          "cornerRadius": "$radius-pill",
+                          "gap": 4,
+                          "padding": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "fQeA4",
+                              "name": "Type All",
+                              "width": "fill_container",
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "ZVeh9",
+                                  "name": "All Label",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "lU5uU",
+                              "name": "Type Expense",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "ILh0i",
+                                  "name": "Expense Label",
+                                  "fill": "$foreground",
+                                  "content": "Expense",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "pxQmN",
+                              "name": "Type Income",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "jFnvy",
+                                  "name": "Income Label",
+                                  "fill": "$foreground",
+                                  "content": "Income",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "frame",
@@ -31875,10 +32183,10 @@
                           "icon": "receipt"
                         },
                         "srYdT": {
-                          "content": "No expenses found."
+                          "content": "No records yet"
                         },
                         "l8NGWI": {
-                          "content": "Create your first expense to start tracking spending."
+                          "content": "Add an expense or income to start tracking."
                         }
                       }
                     }
@@ -31978,33 +32286,17 @@
                       }
                     },
                     {
-                      "id": "zjRva",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "jyYzZ",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -32493,33 +32785,17 @@
                       }
                     },
                     {
-                      "id": "MaowJ",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "X3zqyy",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -33450,26 +33726,10 @@
                       }
                     },
                     {
-                      "id": "gKwdF",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "KcqJy",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": {
                         "type": "color",
@@ -33478,10 +33738,10 @@
                       },
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -33628,7 +33888,7 @@
                       "name": "Crumb Current",
                       "enabled": false,
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -34210,7 +34470,7 @@
       "id": "gCFU3",
       "x": 1720,
       "y": 12996,
-      "name": "Personal expenses Error",
+      "name": "Personal records Error",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -34271,34 +34531,18 @@
                       }
                     },
                     {
-                      "id": "rawF8",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "L8kl1T",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -34439,7 +34683,7 @@
                       "id": "RYn6p",
                       "name": "Crumb Current",
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -34467,7 +34711,7 @@
                   "id": "JMTQz",
                   "name": "Page Title",
                   "fill": "$foreground",
-                  "content": "Manage your expenses",
+                  "content": "Manage your records",
                   "fontFamily": "$font-sans",
                   "fontSize": 26,
                   "fontWeight": "700"
@@ -34479,7 +34723,7 @@
                   "fill": "$muted-foreground",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Track and edit your personal expense records.",
+                  "content": "Track and edit your personal income and expense records.",
                   "fontFamily": "$font-sans",
                   "fontSize": 14,
                   "fontWeight": "normal"
@@ -34519,7 +34763,7 @@
                       "id": "auZ0V",
                       "name": "This Month Label",
                       "fill": "$muted-foreground",
-                      "content": "This month",
+                      "content": "Expenses",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -34562,7 +34806,7 @@
                       "id": "G3Llv",
                       "name": "Count Label",
                       "fill": "$muted-foreground",
-                      "content": "Records",
+                      "content": "Income",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -34572,7 +34816,7 @@
                       "id": "C6CeHh",
                       "name": "Count Value",
                       "fill": "$foreground",
-                      "content": "0",
+                      "content": "$0.00",
                       "fontFamily": "$font-sans",
                       "fontSize": 22,
                       "fontWeight": "700"
@@ -34629,6 +34873,107 @@
                           "fill": "$foreground"
                         }
                       }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZSrqL",
+                      "name": "Type Filter",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "zGaIR",
+                          "name": "Type Label",
+                          "fill": "$foreground",
+                          "content": "Type",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "JP89j",
+                          "name": "Type Pills",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$muted",
+                          "cornerRadius": "$radius-pill",
+                          "gap": 4,
+                          "padding": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "q08N8b",
+                              "name": "Type All",
+                              "width": "fill_container",
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "b4A8F",
+                                  "name": "All Label",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "gqU77",
+                              "name": "Type Expense",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "zDsWu",
+                                  "name": "Expense Label",
+                                  "fill": "$foreground",
+                                  "content": "Expense",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "hx0qC",
+                              "name": "Type Income",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "wvGq0",
+                                  "name": "Income Label",
+                                  "fill": "$foreground",
+                                  "content": "Income",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "frame",
@@ -34705,6 +35050,19 @@
                         },
                         {
                           "type": "text",
+                          "id": "teZiV",
+                          "name": "Col Type",
+                          "fill": "$foreground",
+                          "textGrowth": "fixed-width",
+                          "width": 80,
+                          "content": "Type",
+                          "textAlign": "center",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
                           "id": "cDRkR",
                           "name": "Col Amount",
                           "fill": "$foreground",
@@ -34715,6 +35073,13 @@
                           "fontFamily": "$font-sans",
                           "fontSize": 13,
                           "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "T6Il1",
+                          "name": "Col Actions",
+                          "width": 44,
+                          "height": 16
                         }
                       ]
                     },
@@ -34726,10 +35091,10 @@
                       "width": "fill_container",
                       "descendants": {
                         "rcXxW": {
-                          "content": "Could not load expenses."
+                          "content": "Could not load records."
                         },
                         "a1ZCKy": {
-                          "content": "The expense list could not be loaded. Try again."
+                          "content": "Income and expenses could not be loaded. Try again."
                         }
                       }
                     }
@@ -34807,33 +35172,17 @@
                       }
                     },
                     {
-                      "id": "Bop8H",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "oN6nk",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -35288,33 +35637,17 @@
                       }
                     },
                     {
-                      "id": "MP4vU",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "GCz6K",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -36219,26 +36552,10 @@
                       }
                     },
                     {
-                      "id": "KCj7v",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "WaKzO",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": {
                         "type": "color",
@@ -36247,10 +36564,10 @@
                       },
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -36398,7 +36715,7 @@
                       "name": "Crumb Current",
                       "enabled": false,
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -37014,7 +37331,7 @@
       "id": "nAQIK",
       "x": 655,
       "y": 14476,
-      "name": "Personal expenses Mobile Error",
+      "name": "Personal records Mobile Error",
       "clip": true,
       "width": 375,
       "fill": "$background",
@@ -37078,34 +37395,18 @@
                       }
                     },
                     {
-                      "id": "dR7eW",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "WpUDU",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -37247,7 +37548,7 @@
                       "id": "hCW4k",
                       "name": "Crumb Current",
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -37280,7 +37581,7 @@
                   "id": "AOKec",
                   "name": "Page Title",
                   "fill": "$foreground",
-                  "content": "Manage your expenses",
+                  "content": "Manage your records",
                   "fontFamily": "$font-sans",
                   "fontSize": 26,
                   "fontWeight": "700"
@@ -37292,7 +37593,7 @@
                   "fill": "$muted-foreground",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Track and edit your personal expense records.",
+                  "content": "Track and edit your personal income and expense records.",
                   "fontFamily": "$font-sans",
                   "fontSize": 14,
                   "fontWeight": "normal"
@@ -37333,7 +37634,7 @@
                       "id": "c6qbN",
                       "name": "This Month Label",
                       "fill": "$muted-foreground",
-                      "content": "This month",
+                      "content": "Expenses",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -37376,7 +37677,7 @@
                       "id": "ssYHc",
                       "name": "Count Label",
                       "fill": "$muted-foreground",
-                      "content": "Records",
+                      "content": "Income",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -37386,7 +37687,7 @@
                       "id": "GprSZ",
                       "name": "Count Value",
                       "fill": "$foreground",
-                      "content": "0",
+                      "content": "$0.00",
                       "fontFamily": "$font-sans",
                       "fontSize": 22,
                       "fontWeight": "700"
@@ -37443,6 +37744,107 @@
                           "fill": "$foreground"
                         }
                       }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZPIkK",
+                      "name": "Type Filter",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ubOyW",
+                          "name": "Type Label",
+                          "fill": "$foreground",
+                          "content": "Type",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Zz5gn",
+                          "name": "Type Pills",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$muted",
+                          "cornerRadius": "$radius-pill",
+                          "gap": 4,
+                          "padding": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "hLec8",
+                              "name": "Type All",
+                              "width": "fill_container",
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "AFfJ5",
+                                  "name": "All Label",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "d4Am2",
+                              "name": "Type Expense",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Slvbv",
+                                  "name": "Expense Label",
+                                  "fill": "$foreground",
+                                  "content": "Expense",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "sFvAf",
+                              "name": "Type Income",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "B0tkA",
+                                  "name": "Income Label",
+                                  "fill": "$foreground",
+                                  "content": "Income",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "frame",
@@ -37539,10 +37941,10 @@
                       "width": "fill_container",
                       "descendants": {
                         "rcXxW": {
-                          "content": "Could not load expenses."
+                          "content": "Could not load records."
                         },
                         "a1ZCKy": {
-                          "content": "The expense list could not be loaded. Try again."
+                          "content": "Income and expenses could not be loaded. Try again."
                         }
                       }
                     }
@@ -37642,33 +38044,17 @@
                       }
                     },
                     {
-                      "id": "O0DOf",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "Z81zP",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -38151,33 +38537,17 @@
                       }
                     },
                     {
-                      "id": "T2CFQF",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "j2iFA",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "400"
                         }
                       }
@@ -39104,34 +39474,18 @@
                       }
                     },
                     {
-                      "id": "xjZxG",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "xjxjX",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -39272,7 +39626,7 @@
                       "id": "rHQ3d",
                       "name": "Crumb Current",
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -39300,7 +39654,7 @@
                   "id": "pRjws",
                   "name": "Page Title",
                   "fill": "$foreground",
-                  "content": "Manage your expenses",
+                  "content": "Manage your records",
                   "fontFamily": "$font-sans",
                   "fontSize": 26,
                   "fontWeight": "700"
@@ -39312,7 +39666,7 @@
                   "fill": "$muted-foreground",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Track and edit your personal expense records.",
+                  "content": "Track and edit your personal income and expense records.",
                   "fontFamily": "$font-sans",
                   "fontSize": 14,
                   "fontWeight": "normal"
@@ -39352,7 +39706,7 @@
                       "id": "Q4RyP3",
                       "name": "This Month Label",
                       "fill": "$muted-foreground",
-                      "content": "This month",
+                      "content": "Expenses",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -39395,7 +39749,7 @@
                       "id": "C9HB8",
                       "name": "Count Label",
                       "fill": "$muted-foreground",
-                      "content": "Records",
+                      "content": "Income",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -39405,7 +39759,7 @@
                       "id": "pncYW",
                       "name": "Count Value",
                       "fill": "$foreground",
-                      "content": "24",
+                      "content": "$1,560.00",
                       "fontFamily": "$font-sans",
                       "fontSize": 22,
                       "fontWeight": "700"
@@ -39462,6 +39816,107 @@
                           "fill": "$foreground"
                         }
                       }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "h22da",
+                      "name": "Type Filter",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Pfbt0",
+                          "name": "Type Label",
+                          "fill": "$foreground",
+                          "content": "Type",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "JHCVr",
+                          "name": "Type Pills",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$muted",
+                          "cornerRadius": "$radius-pill",
+                          "gap": 4,
+                          "padding": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "BYyq7",
+                              "name": "Type All",
+                              "width": "fill_container",
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "ajEII",
+                                  "name": "All Label",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "yvPEJ",
+                              "name": "Type Expense",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "e37u2K",
+                                  "name": "Expense Label",
+                                  "fill": "$foreground",
+                                  "content": "Expense",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "lKos6",
+                              "name": "Type Income",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "EO6gC",
+                                  "name": "Income Label",
+                                  "fill": "$foreground",
+                                  "content": "Income",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "frame",
@@ -39538,6 +39993,19 @@
                         },
                         {
                           "type": "text",
+                          "id": "eAzyj",
+                          "name": "Col Type",
+                          "fill": "$foreground",
+                          "textGrowth": "fixed-width",
+                          "width": 80,
+                          "content": "Type",
+                          "textAlign": "center",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
                           "id": "R0mqD",
                           "name": "Col Amount",
                           "fill": "$foreground",
@@ -39548,6 +40016,13 @@
                           "fontFamily": "$font-sans",
                           "fontSize": 13,
                           "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "dYZs8",
+                          "name": "Col Actions",
+                          "width": 44,
+                          "height": 16
                         }
                       ]
                     },
@@ -39577,6 +40052,20 @@
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
                           "fontWeight": "normal"
+                        },
+                        {
+                          "id": "dtfVL",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$muted",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Expense",
+                              "fill": "$muted-foreground"
+                            }
+                          }
                         },
                         {
                           "type": "text",
@@ -39643,13 +40132,27 @@
                           "fontWeight": "normal"
                         },
                         {
+                          "id": "ZtOkL",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$accent",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Income",
+                              "fill": "$accent-foreground"
+                            }
+                          }
+                        },
+                        {
                           "type": "text",
                           "id": "rVFSU",
                           "name": "14 Aug 2026 Amount",
                           "fill": "$foreground",
                           "textGrowth": "fixed-width",
                           "width": 140,
-                          "content": "$32.00",
+                          "content": "+$320.00",
                           "textAlign": "right",
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
@@ -39705,6 +40208,20 @@
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
                           "fontWeight": "normal"
+                        },
+                        {
+                          "id": "OsA3H",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$muted",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Expense",
+                              "fill": "$muted-foreground"
+                            }
+                          }
                         },
                         {
                           "type": "text",
@@ -39771,13 +40288,27 @@
                           "fontWeight": "normal"
                         },
                         {
+                          "id": "JJmrb",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$accent",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Income",
+                              "fill": "$accent-foreground"
+                            }
+                          }
+                        },
+                        {
                           "type": "text",
                           "id": "lA2TJ",
                           "name": "8 Aug 2026 Amount",
                           "fill": "$foreground",
                           "textGrowth": "fixed-width",
                           "width": 140,
-                          "content": "$48.00",
+                          "content": "+$1,200.00",
                           "textAlign": "right",
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
@@ -39833,6 +40364,20 @@
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
                           "fontWeight": "normal"
+                        },
+                        {
+                          "id": "skQ5W",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$muted",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Expense",
+                              "fill": "$muted-foreground"
+                            }
+                          }
                         },
                         {
                           "type": "text",
@@ -39895,13 +40440,27 @@
                           "fontWeight": "normal"
                         },
                         {
+                          "id": "wF7AM",
+                          "type": "ref",
+                          "ref": "X4el9",
+                          "name": "Kind",
+                          "fill": "$accent",
+                          "width": 80,
+                          "descendants": {
+                            "IJ5hx": {
+                              "content": "Income",
+                              "fill": "$accent-foreground"
+                            }
+                          }
+                        },
+                        {
                           "type": "text",
                           "id": "QSX5F",
                           "name": "1 Aug 2026 Amount",
                           "fill": "$foreground",
                           "textGrowth": "fixed-width",
                           "width": 140,
-                          "content": "$19.90",
+                          "content": "+$40.00",
                           "textAlign": "right",
                           "fontFamily": "$font-sans",
                           "fontSize": 14,
@@ -40350,34 +40909,18 @@
                       }
                     },
                     {
-                      "id": "J21ge0",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "Tr6El",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -40518,7 +41061,7 @@
                       "id": "p2Avd",
                       "name": "Crumb Current",
                       "fill": "$muted-foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -41098,40 +41641,19 @@
                       }
                     },
                     {
-                      "id": "QaX0R",
+                      "id": "j1IXu",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Incomes",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-up"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Incomes",
+                          "content": "Records",
                           "fontWeight": "500"
-                        }
-                      }
-                    },
-                    {
-                      "id": "j1IXu",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Expenses",
-                      "width": "fill_container",
-                      "fill": {
-                        "type": "color",
-                        "color": "#FFFFFF",
-                        "enabled": false
-                      },
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-down"
-                        },
-                        "qnf71": {
-                          "content": "Expenses",
-                          "fontWeight": "400"
                         }
                       }
                     },
@@ -41271,7 +41793,7 @@
                       "id": "m90zy",
                       "name": "Crumb Current",
                       "fill": "$muted-foreground",
-                      "content": "Incomes",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -41854,34 +42376,18 @@
                       }
                     },
                     {
-                      "id": "QbUMi",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "F4F08Q",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -42023,7 +42529,7 @@
                       "id": "GyUnI",
                       "name": "Crumb Current",
                       "fill": "$foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "500"
@@ -42056,7 +42562,7 @@
                   "id": "n2rSv",
                   "name": "Page Title",
                   "fill": "$foreground",
-                  "content": "Manage your expenses",
+                  "content": "Manage your records",
                   "fontFamily": "$font-sans",
                   "fontSize": 26,
                   "fontWeight": "700"
@@ -42068,7 +42574,7 @@
                   "fill": "$muted-foreground",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
-                  "content": "Track and edit your personal expense records.",
+                  "content": "Track and edit your personal income and expense records.",
                   "fontFamily": "$font-sans",
                   "fontSize": 14,
                   "fontWeight": "normal"
@@ -42109,7 +42615,7 @@
                       "id": "A2ZmjP",
                       "name": "This Month Label",
                       "fill": "$muted-foreground",
-                      "content": "This month",
+                      "content": "Expenses",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -42152,7 +42658,7 @@
                       "id": "uIq5x",
                       "name": "Count Label",
                       "fill": "$muted-foreground",
-                      "content": "Records",
+                      "content": "Income",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -42162,7 +42668,7 @@
                       "id": "Fa544",
                       "name": "Count Value",
                       "fill": "$foreground",
-                      "content": "24",
+                      "content": "$1,560.00",
                       "fontFamily": "$font-sans",
                       "fontSize": 22,
                       "fontWeight": "700"
@@ -42219,6 +42725,107 @@
                           "fill": "$foreground"
                         }
                       }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "m7L6t",
+                      "name": "Type Filter",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "iluad",
+                          "name": "Type Label",
+                          "fill": "$foreground",
+                          "content": "Type",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "jCDm8",
+                          "name": "Type Pills",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$muted",
+                          "cornerRadius": "$radius-pill",
+                          "gap": 4,
+                          "padding": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "v6WgNk",
+                              "name": "Type All",
+                              "width": "fill_container",
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "VGHYQ",
+                                  "name": "All Label",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "hwRkm",
+                              "name": "Type Expense",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "yUnLe",
+                                  "name": "Expense Label",
+                                  "fill": "$foreground",
+                                  "content": "Expense",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "D1xqp",
+                              "name": "Type Income",
+                              "width": "fill_container",
+                              "height": 28,
+                              "cornerRadius": 24,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "jNKa1",
+                                  "name": "Income Label",
+                                  "fill": "$foreground",
+                                  "content": "Income",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "frame",
@@ -42332,14 +42939,36 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "WST4Z",
-                              "name": "18 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "18 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "y9VTE",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "WST4Z",
+                                  "name": "18 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "18 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "T0FI9p",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$muted",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Expense",
+                                      "fill": "$muted-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
@@ -42403,21 +43032,43 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "MqTQ4",
-                              "name": "14 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "14 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "JIHEY",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "MqTQ4",
+                                  "name": "14 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "14 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "J4BxKP",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$accent",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Income",
+                                      "fill": "$accent-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
                               "id": "JfYw6",
                               "name": "14 Aug 2026 Amount",
                               "fill": "$foreground",
-                              "content": "$32.00",
+                              "content": "+$320.00",
                               "textAlign": "right",
                               "fontFamily": "$font-sans",
                               "fontSize": 14,
@@ -42474,14 +43125,36 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "AxYIL",
-                              "name": "11 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "11 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "Kt4wC",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "AxYIL",
+                                  "name": "11 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "11 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "B4jSqx",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$muted",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Expense",
+                                      "fill": "$muted-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
@@ -42545,21 +43218,43 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "xQQIA",
-                              "name": "8 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "8 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "DfJvf",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "xQQIA",
+                                  "name": "8 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "8 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "w1lVn",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$accent",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Income",
+                                      "fill": "$accent-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
                               "id": "suJz2",
                               "name": "8 Aug 2026 Amount",
                               "fill": "$foreground",
-                              "content": "$48.00",
+                              "content": "+$1,200.00",
                               "textAlign": "right",
                               "fontFamily": "$font-sans",
                               "fontSize": 14,
@@ -42616,14 +43311,36 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "V2C8RI",
-                              "name": "3 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "3 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "gICpt",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "V2C8RI",
+                                  "name": "3 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "3 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "M7S0v",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$muted",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Expense",
+                                      "fill": "$muted-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
@@ -42683,21 +43400,43 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "EDkiI",
-                              "name": "1 Aug 2026 Date",
-                              "fill": "$foreground",
-                              "content": "1 Aug 2026",
-                              "fontFamily": "$font-sans",
-                              "fontSize": 14,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "nh2Oa",
+                              "name": "Date Kind",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "EDkiI",
+                                  "name": "1 Aug 2026 Date",
+                                  "fill": "$foreground",
+                                  "content": "1 Aug 2026",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "id": "t20dk",
+                                  "type": "ref",
+                                  "ref": "X4el9",
+                                  "name": "Kind",
+                                  "fill": "$accent",
+                                  "descendants": {
+                                    "IJ5hx": {
+                                      "content": "Income",
+                                      "fill": "$accent-foreground"
+                                    }
+                                  }
+                                }
+                              ]
                             },
                             {
                               "type": "text",
                               "id": "nlgYz",
                               "name": "1 Aug 2026 Amount",
                               "fill": "$foreground",
-                              "content": "$19.90",
+                              "content": "+$40.00",
                               "textAlign": "right",
                               "fontFamily": "$font-sans",
                               "fontSize": 14,
@@ -43173,34 +43912,18 @@
                       }
                     },
                     {
-                      "id": "mUEug",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "l6Pu5",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -43340,7 +44063,7 @@
                       "id": "XvefP",
                       "name": "Crumb Current",
                       "fill": "$muted-foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -43941,34 +44664,18 @@
                       }
                     },
                     {
-                      "id": "x2a0FB",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "y0zyix",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -44108,7 +44815,7 @@
                       "id": "Mimee",
                       "name": "Crumb Current",
                       "fill": "$muted-foreground",
-                      "content": "Incomes",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -44711,34 +45418,18 @@
                       }
                     },
                     {
-                      "id": "a1YHYN",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "o8Crge",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -44879,7 +45570,7 @@
                       "id": "DKAfL",
                       "name": "Crumb Current",
                       "fill": "$muted-foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -45088,34 +45779,18 @@
                       }
                     },
                     {
-                      "id": "eF0N7",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "JYTuF",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -45255,7 +45930,7 @@
                       "id": "FUoJR",
                       "name": "Crumb Current",
                       "fill": "$muted-foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -45479,34 +46154,18 @@
                       }
                     },
                     {
-                      "id": "S2dpO",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "mQHNm",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -45647,7 +46306,7 @@
                       "id": "ltgZN",
                       "name": "Crumb Current",
                       "fill": "$muted-foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -46181,39 +46840,18 @@
                       }
                     },
                     {
-                      "id": "svRvc",
+                      "id": "z1bMy",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Incomes",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-up"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
-                      "id": "z1bMy",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Expenses",
-                      "width": "fill_container",
-                      "fill": {
-                        "type": "color",
-                        "color": "#FFFFFF",
-                        "enabled": false
-                      },
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-down"
-                        },
-                        "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -46354,7 +46992,7 @@
                       "id": "d5K7B",
                       "name": "Crumb Current",
                       "fill": "$muted-foreground",
-                      "content": "Incomes",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -46892,34 +47530,18 @@
                       }
                     },
                     {
-                      "id": "A2KBts",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Incomes",
-                      "width": "fill_container",
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-up"
-                        },
-                        "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
                       "id": "nXlDs",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Expenses",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-down"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -47059,7 +47681,7 @@
                       "id": "hkp5n",
                       "name": "Crumb Current",
                       "fill": "$muted-foreground",
-                      "content": "Expenses",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"
@@ -47701,39 +48323,18 @@
                       }
                     },
                     {
-                      "id": "ZXL81",
+                      "id": "WyZe7",
                       "type": "ref",
                       "ref": "K8jXa",
-                      "name": "Nav Incomes",
+                      "name": "Nav Records",
                       "width": "fill_container",
                       "fill": "$primary",
                       "descendants": {
                         "A9tSTI": {
-                          "icon": "trending-up"
+                          "icon": "wallet"
                         },
                         "qnf71": {
-                          "content": "Incomes",
-                          "fontWeight": "400"
-                        }
-                      }
-                    },
-                    {
-                      "id": "WyZe7",
-                      "type": "ref",
-                      "ref": "K8jXa",
-                      "name": "Nav Expenses",
-                      "width": "fill_container",
-                      "fill": {
-                        "type": "color",
-                        "color": "#FFFFFF",
-                        "enabled": false
-                      },
-                      "descendants": {
-                        "A9tSTI": {
-                          "icon": "trending-down"
-                        },
-                        "qnf71": {
-                          "content": "Expenses",
+                          "content": "Records",
                           "fontWeight": "500"
                         }
                       }
@@ -47873,7 +48474,7 @@
                       "id": "vyP0P",
                       "name": "Crumb Current",
                       "fill": "$muted-foreground",
-                      "content": "Incomes",
+                      "content": "Records",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "normal"

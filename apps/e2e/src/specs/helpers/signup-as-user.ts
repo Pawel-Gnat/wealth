@@ -27,7 +27,7 @@ export const signupAsUser = async (
 	await page.getByLabel(confirmPasswordLabel).fill(password)
 
 	await page.getByRole('button', { name: signupButton }).click()
-	await expect(page.getByRole('button', { name: signupButton })).toBeEnabled({
+	await expect(page.getByRole('button', { name: getI18nText('common', 'action.signin') })).toBeVisible({
 		timeout: 30_000,
 	})
 }
