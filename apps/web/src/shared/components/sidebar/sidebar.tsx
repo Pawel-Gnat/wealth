@@ -34,7 +34,7 @@ export const Sidebar = ({
 					<SidebarContent>
 						<SidebarGroup>{navigation}</SidebarGroup>
 					</SidebarContent>
-					<SidebarFooter>{footer}</SidebarFooter>
+					<SidebarFooter className="pb-4">{footer}</SidebarFooter>
 				</SidebarUI>
 			</aside>
 			<SidebarInset className="p-2 sm:p-4 flex flex-col gap-6">

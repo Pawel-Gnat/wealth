@@ -1,7 +1,7 @@
 import { I18N_RESOURCES } from "@repo/common/i18n";
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useParams } from "react-router";
 import {
 	APP_ROUTES,
 	EDIT_RECORD_SEGMENT,
@@ -25,6 +25,7 @@ const isNavigationSegment = (segment: string): segment is NavigationSegment =>
 const getSegmentLabel = (
 	segment: string,
 	t: ReturnType<typeof useTranslation>["t"],
+	budgetId: string | undefined,
 ) => {
 	if (isNavigationSegment(segment)) {
 		return t(`navigation.${segment}`, { ns: "common" });
@@ -38,11 +39,16 @@ const getSegmentLabel = (
 		return t("action.edit", { ns: "common" });
 	}
 
+	if (segment === budgetId) {
+		return t("common.budget", { ns: "common" });
+	}
+
 	return t("common.record", { ns: "common" });
 };
 
 export const Breadcrumbs = () => {
 	const { pathname } = useLocation();
+	const { budgetId } = useParams();
 	const { t } = useTranslation();
 
 	const segments = pathname.split("/").filter(Boolean);
@@ -57,7 +63,7 @@ export const Breadcrumbs = () => {
 
 			return {
 				to,
-				label: getSegmentLabel(segment, t),
+				label: getSegmentLabel(segment, t, budgetId),
 			};
 		}),
 	];
