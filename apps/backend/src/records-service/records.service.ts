@@ -37,16 +37,14 @@ import { UsersService } from "../users-service/users.service";
 
 const recordCopy = {
 	expense: {
-		notFound: "Expense not found",
 		insertFailed: "Expense insert failed",
 	},
 	income: {
-		notFound: "Income not found",
 		insertFailed: "Income insert failed",
 	},
 } as const;
 
-const RECORD_NOT_FOUND = "Record not found";
+export const RECORD_NOT_FOUND = "Record not found";
 
 @Injectable()
 export class RecordsService {
@@ -118,7 +116,7 @@ export class RecordsService {
 		}
 
 		if (record.budgetId) {
-			await this.assertBudgetAccess(userId, record.budgetId);
+			await this.assertBudgetAccess(userId, record.budgetId, RECORD_NOT_FOUND);
 		} else if (record.userId !== userId) {
 			throw new ORPCError("NOT_FOUND", { message: RECORD_NOT_FOUND });
 		}
@@ -212,10 +210,10 @@ export class RecordsService {
 				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)));
 
 			if (!existing) {
-				this.throwNotFound(kind);
+				this.throwNotFound();
 			}
 
-			await this.assertRecordWritable(userId, existing, kind);
+			await this.assertRecordWritable(userId, existing);
 
 			const dateChanged = !isStoredDocumentDateEqual(
 				existing.documentDate,
@@ -256,29 +254,32 @@ export class RecordsService {
 		recordId: string,
 		kind: RecordKind,
 	): Promise<RecordDeleteResponse> {
-		const [existing] = await this.db
-			.select({
-				id: recordsTable.id,
-				userId: recordsTable.userId,
-				budgetId: recordsTable.budgetId,
-			})
-			.from(recordsTable)
-			.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)));
+		await this.db.transaction(async (tx) => {
+			const [existing] = await tx
+				.select({
+					id: recordsTable.id,
+					userId: recordsTable.userId,
+					budgetId: recordsTable.budgetId,
+				})
+				.from(recordsTable)
+				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)))
+				.for("update");
 
-		if (!existing) {
-			this.throwNotFound(kind);
-		}
+			if (!existing) {
+				this.throwNotFound();
+			}
 
-		await this.assertRecordWritable(userId, existing, kind);
+			await this.assertRecordWritable(userId, existing);
 
-		const [deletedRecord] = await this.db
-			.delete(recordsTable)
-			.where(eq(recordsTable.id, recordId))
-			.returning({ id: recordsTable.id });
+			const [deletedRecord] = await tx
+				.delete(recordsTable)
+				.where(eq(recordsTable.id, recordId))
+				.returning({ id: recordsTable.id });
 
-		if (!deletedRecord) {
-			this.throwNotFound(kind);
-		}
+			if (!deletedRecord) {
+				this.throwNotFound();
+			}
+		});
 
 		logDocumentSucceeded(kind, "delete");
 
@@ -288,19 +289,21 @@ export class RecordsService {
 	private async assertRecordWritable(
 		userId: string,
 		record: { userId: string; budgetId: string | null },
-		kind: RecordKind,
 	) {
-		if (record.budgetId) {
-			await this.assertBudgetAccess(userId, record.budgetId);
-			return;
+		if (record.userId !== userId) {
+			this.throwNotFound();
 		}
 
-		if (record.userId !== userId) {
-			this.throwNotFound(kind);
+		if (record.budgetId) {
+			await this.assertBudgetAccess(userId, record.budgetId, RECORD_NOT_FOUND);
 		}
 	}
 
-	private async assertBudgetAccess(userId: string, budgetId: string) {
+	private async assertBudgetAccess(
+		userId: string,
+		budgetId: string,
+		notFoundMessage = "Budget not found",
+	) {
 		const [accessibleBudget] = await this.db
 			.select({ id: budgetTable.id })
 			.from(budgetTable)
@@ -324,14 +327,14 @@ export class RecordsService {
 
 		if (!accessibleBudget) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "Budget not found",
+				message: notFoundMessage,
 			});
 		}
 	}
 
-	private throwNotFound(kind: RecordKind): never {
+	private throwNotFound(): never {
 		throw new ORPCError("NOT_FOUND", {
-			message: recordCopy[kind].notFound,
+			message: RECORD_NOT_FOUND,
 		});
 	}
 }

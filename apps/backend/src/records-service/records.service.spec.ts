@@ -19,20 +19,20 @@ import {
 import { createTestApp } from "../test/helpers/modules";
 import { createTestUser } from "../test/mocks/users";
 import { UsersService } from "../users-service/users.service";
-import { RecordsService } from "./records.service";
+import { RECORD_NOT_FOUND, RecordsService } from "./records.service";
 
 const documentMessages = {
 	expense: {
 		created: RECORD_CREATED_MESSAGE,
 		updated: RECORD_UPDATED_MESSAGE,
 		deleted: RECORD_DELETED_MESSAGE,
-		notFound: "Expense not found",
+		notFound: RECORD_NOT_FOUND,
 	},
 	income: {
 		created: RECORD_CREATED_MESSAGE,
 		updated: RECORD_UPDATED_MESSAGE,
 		deleted: RECORD_DELETED_MESSAGE,
-		notFound: "Income not found",
+		notFound: RECORD_NOT_FOUND,
 	},
 } as const;
 
@@ -561,7 +561,7 @@ describe("Records service", () => {
 			expect(lineItems[0]?.title).toBe("Item");
 		});
 
-		it("updates a group document for someone with budget access", async () => {
+		it("updates a group document for its creator", async () => {
 			const db = moduleRef.get(DBS.APP);
 
 			const user = await createTestUser(usersService, {
@@ -619,6 +619,87 @@ describe("Records service", () => {
 				documentDate: "2026-05-11",
 				budgetId: budget.id,
 			});
+		});
+
+		it("does not update or delete a group document created by someone else", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+			const creator = await createTestUser(usersService, {
+				email: `group-creator-${kind}-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+			const member = await createTestUser(usersService, {
+				email: `group-member-${kind}-${suffix}@example.com`,
+				passwordHash: "hash",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared", ownerId: creator.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: member.id,
+				status: "active",
+			});
+
+			const [groupDocument] = await db
+				.insert(recordsTable)
+				.values({
+					userId: creator.id,
+					kind,
+					budgetId: budget.id,
+					totalAmount: "12.00",
+					documentDate: "2026-05-12",
+				})
+				.returning({ id: recordsTable.id });
+
+			if (!groupDocument) {
+				throw new Error("Expected seeded document");
+			}
+
+			await db.insert(recordLineItemsTable).values({
+				documentId: groupDocument.id,
+				title: "Rent",
+				quantity: 1,
+				singleAmount: "12.00",
+			});
+
+			const payload = {
+				date: decodeDocumentDateFromStorage("2026-05-13"),
+				lineItems: [{ title: "Changed", quantity: 1, singleAmount: 3 }],
+			};
+
+			await expect(
+				recordsService.updateByUserId(
+					member.id,
+					groupDocument.id,
+					kind,
+					payload,
+				),
+			).rejects.toThrow(messages.notFound);
+			await expect(
+				recordsService.deleteByUserId(member.id, groupDocument.id, kind),
+			).rejects.toThrow(messages.notFound);
+			await expect(
+				recordsService.getByUserId(member.id, groupDocument.id),
+			).resolves.toMatchObject({
+				data: { id: groupDocument.id, kind },
+			});
+
+			const lineItems = await db
+				.select()
+				.from(recordLineItemsTable)
+				.where(eq(recordLineItemsTable.documentId, groupDocument.id));
+
+			expect(lineItems).toHaveLength(1);
+			expect(lineItems[0]?.title).toBe("Rent");
 		});
 	});
 

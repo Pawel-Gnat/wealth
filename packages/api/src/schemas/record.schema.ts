@@ -45,7 +45,9 @@ export const recordDetailsResponseSchema = apiPayload(recordSchema);
 
 export const recordCreatePayloadSchema = z.object({
 	date: z.coerce.date(),
-	lineItems: z.array(lineItemSchema.omit({ id: true })),
+	lineItems: z
+		.array(lineItemSchema.omit({ id: true }))
+		.min(1, "form:line-item.min"),
 });
 
 export const recordUpdatePayloadSchema = recordCreatePayloadSchema.extend({
