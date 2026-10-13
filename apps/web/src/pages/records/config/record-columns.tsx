@@ -6,20 +6,61 @@ import {
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TFunction } from "i18next";
 import { Link } from "react-router";
-import { Badge, Button, Icon, Price, Text, Tooltip } from "@/shared/components";
+import {
+	Avatar,
+	Badge,
+	Button,
+	Icon,
+	Price,
+	Text,
+	Tooltip,
+} from "@/shared/components";
 
 type RecordColumnsProps = {
 	t: TFunction<"common">;
 	language: string;
 	getViewPath: (id: string) => string;
+	showOwner: boolean;
 };
 
 export const recordColumns = ({
 	t,
 	language,
 	getViewPath,
+	showOwner,
 }: RecordColumnsProps): ColumnDef<RecordListItem>[] => {
 	return [
+		...(showOwner
+			? [
+					{
+						accessorKey: "owner",
+						meta: { className: "w-[1%] whitespace-nowrap" },
+						header: () => (
+							<Text size="sm" weight="medium">
+								{t("list.owner", { ns: "records" })}
+							</Text>
+						),
+						cell: ({ row }) => {
+							const owner = row.original.owner;
+
+							if (!owner) {
+								return null;
+							}
+
+							return (
+								<Tooltip
+									trigger={
+										<div className="inline-flex">
+											<Avatar user={owner} size="sm" />
+										</div>
+									}
+									text={owner.email}
+								/>
+							);
+						},
+					} satisfies ColumnDef<RecordListItem>,
+				]
+			: []),
 		{
 			accessorKey: "date",
 			meta: { className: "w-full" },

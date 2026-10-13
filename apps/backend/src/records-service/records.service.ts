@@ -33,6 +33,7 @@ import {
 	calculateRecordTotalAmount,
 	mapPayloadLineItemsToInsertRows,
 } from "../shared/record/record-line-items.helpers";
+import { UsersService } from "../users-service/users.service";
 
 const recordCopy = {
 	expense: {
@@ -49,7 +50,10 @@ const RECORD_NOT_FOUND = "Record not found";
 
 @Injectable()
 export class RecordsService {
-	constructor(@Inject(DBS.APP) private readonly db: NodePgDatabase) {}
+	constructor(
+		@Inject(DBS.APP) private readonly db: NodePgDatabase,
+		private readonly usersService: UsersService,
+	) {}
 
 	async listByUserId(
 		userId: string,
@@ -73,13 +77,22 @@ export class RecordsService {
 			)
 			.orderBy(desc(recordsTable.documentDate), desc(recordsTable.id));
 
+		const owners = budgetId
+			? await this.usersService.findUsersByIds(rows.map((row) => row.userId))
+			: undefined;
+
 		return {
-			data: rows.map((row) => ({
-				id: row.id,
-				date: decodeDocumentDateFromStorage(row.documentDate),
-				kind: row.kind,
-				totalAmount: Number(row.totalAmount),
-			})),
+			data: rows.map((row) => {
+				const owner = owners?.get(row.userId);
+
+				return {
+					id: row.id,
+					date: decodeDocumentDateFromStorage(row.documentDate),
+					kind: row.kind,
+					totalAmount: Number(row.totalAmount),
+					...(owner ? { owner } : {}),
+				};
+			}),
 			pagination: {},
 		};
 	}

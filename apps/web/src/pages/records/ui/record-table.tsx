@@ -24,6 +24,7 @@ export const RecordTable = ({ budgetId }: RecordTableProps) => {
 			recordColumns({
 				t,
 				language: i18n.language,
+				showOwner: Boolean(budgetId),
 				getViewPath: (id) =>
 					budgetId
 						? APP_ROUTES.budgets.record(budgetId, id)

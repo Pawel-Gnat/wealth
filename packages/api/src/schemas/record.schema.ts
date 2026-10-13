@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { apiPaginatedPayload, apiPayload } from "./common.schema";
+import { userSchema } from "./user.schema";
 
 export const RECORD_CREATED_MESSAGE = "record_created" as const;
 export const RECORD_UPDATED_MESSAGE = "record_updated" as const;
@@ -29,9 +30,13 @@ export const recordSchema = z.object({
 	lineItems: z.array(lineItemSchema),
 });
 
-export const recordListItemSchema = recordSchema.omit({
-	lineItems: true,
-});
+export const recordListItemSchema = recordSchema
+	.omit({
+		lineItems: true,
+	})
+	.extend({
+		owner: userSchema.optional(),
+	});
 
 export const recordListResponseSchema =
 	apiPaginatedPayload(recordListItemSchema);

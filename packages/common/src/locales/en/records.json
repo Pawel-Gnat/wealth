@@ -16,6 +16,7 @@
 		"title": "Manage your records",
 		"subtitle": "Track and edit your personal income and expense records.",
 		"type": "Type",
+		"owner": "Owner",
 		"empty": {
 			"title": "No transactions found",
 			"description": "Expenses and incomes added to this budget will appear here."

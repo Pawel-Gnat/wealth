@@ -852,11 +852,13 @@ describe("Records service", () => {
 				kind: "income",
 				totalAmount: 25.5,
 				date: decodeDocumentDateFromStorage("2026-04-01"),
+				owner: { id: activeMember.id, email: activeMember.email },
 			});
 			expect(forOwner.data[1]).toMatchObject({
 				kind: "expense",
 				totalAmount: 10,
 				date: decodeDocumentDateFromStorage("2026-01-01"),
+				owner: { id: owner.id, email: owner.email },
 			});
 		});
 
