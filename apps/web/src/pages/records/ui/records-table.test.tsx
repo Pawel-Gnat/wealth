@@ -6,7 +6,7 @@ import { APP_ROUTES } from "@/app/routes";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
-import { RecordTable } from "./record-table";
+import { RecordsTable } from "./records-table";
 
 const recordId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 
@@ -24,7 +24,7 @@ describe("RecordTable", () => {
 			),
 		);
 
-		renderWithProviders(<RecordTable />);
+		renderWithProviders(<RecordsTable />);
 
 		await waitFor(() => {
 			expect(
@@ -40,7 +40,7 @@ describe("RecordTable", () => {
 			),
 		);
 
-		renderWithProviders(<RecordTable />);
+		renderWithProviders(<RecordsTable />);
 
 		await waitFor(() => {
 			expect(
@@ -62,7 +62,7 @@ describe("RecordTable", () => {
 		}).format(123.45);
 		const previewActionLabel = t("action.preview", { ns: "common" });
 
-		renderWithProviders(<RecordTable />);
+		renderWithProviders(<RecordsTable />);
 
 		await waitFor(() => {
 			expect(screen.getByText(formattedDate)).toBeInTheDocument();

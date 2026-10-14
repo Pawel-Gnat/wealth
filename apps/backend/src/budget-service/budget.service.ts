@@ -2,14 +2,31 @@ import { Inject, Injectable } from "@nestjs/common";
 import { ORPCError } from "@orpc/nest";
 import {
 	BUDGET_CREATED_MESSAGE,
+	BUDGET_DELETED_MESSAGE,
+	BUDGET_INVITE_ACCEPTED_MESSAGE,
+	BUDGET_INVITE_CANCELLED_MESSAGE,
+	BUDGET_INVITE_REJECTED_MESSAGE,
+	BUDGET_LEFT_MESSAGE,
 	BUDGET_MEMBER_IDS_MAX,
+	BUDGET_MEMBERS_INVITED_MESSAGE,
+	BUDGET_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
 import type {
+	BudgetCancelInviteInput,
 	BudgetCreatePayload,
 	BudgetCreateResponse,
+	BudgetDeleteResponse,
+	BudgetInviteAcceptedResponse,
+	BudgetInviteCancelledResponse,
+	BudgetInviteMembersInput,
+	BudgetInviteMembersResponse,
+	BudgetInviteRejectedResponse,
 	BudgetInvitesResponse,
+	BudgetLeaveResponse,
 	BudgetListResponse,
 	BudgetMember,
+	BudgetUpdateInput,
+	BudgetUpdateResponse,
 	User,
 } from "@repo/api/types";
 import { and, asc, desc, eq, inArray, or } from "drizzle-orm";
@@ -230,5 +247,218 @@ export class BudgetService {
 				message: BUDGET_CREATED_MESSAGE,
 			},
 		};
+	}
+
+	async updateBudgetByUserId(
+		userId: string,
+		input: BudgetUpdateInput,
+	): Promise<BudgetUpdateResponse> {
+		await this.requireOwner(userId, input.id);
+
+		await this.db
+			.update(budgetTable)
+			.set({ title: input.title })
+			.where(eq(budgetTable.id, input.id));
+
+		return {
+			data: {
+				message: BUDGET_UPDATED_MESSAGE,
+			},
+		};
+	}
+
+	async inviteMembersByUserId(
+		userId: string,
+		input: BudgetInviteMembersInput,
+	): Promise<BudgetInviteMembersResponse> {
+		await this.requireOwner(userId, input.id);
+
+		const existingMembers = await this.db
+			.select({ userId: budgetMemberTable.userId })
+			.from(budgetMemberTable)
+			.where(eq(budgetMemberTable.budgetId, input.id));
+		const existingIds = new Set(existingMembers.map((row) => row.userId));
+		const inviteeIds = input.memberIds.filter(
+			(memberId) => memberId !== userId && !existingIds.has(memberId),
+		);
+
+		if (existingIds.size + inviteeIds.length > BUDGET_MEMBER_IDS_MAX) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "Too many members",
+			});
+		}
+
+		if (inviteeIds.length > 0) {
+			const existingUsers = await this.usersService.findUsersByIds(inviteeIds);
+
+			if (existingUsers.size !== inviteeIds.length) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: "One or more members do not exist",
+				});
+			}
+
+			await this.db.insert(budgetMemberTable).values(
+				inviteeIds.map((memberId) => ({
+					budgetId: input.id,
+					userId: memberId,
+				})),
+			);
+		}
+
+		return {
+			data: {
+				message: BUDGET_MEMBERS_INVITED_MESSAGE,
+			},
+		};
+	}
+
+	async deleteBudgetByUserId(
+		userId: string,
+		budgetId: string,
+	): Promise<BudgetDeleteResponse> {
+		await this.requireOwner(userId, budgetId);
+
+		await this.db.delete(budgetTable).where(eq(budgetTable.id, budgetId));
+
+		return {
+			data: {
+				message: BUDGET_DELETED_MESSAGE,
+			},
+		};
+	}
+
+	async leaveBudgetByUserId(
+		userId: string,
+		budgetId: string,
+	): Promise<BudgetLeaveResponse> {
+		const budget = await this.findBudget(budgetId);
+
+		if (!budget || budget.ownerId === userId) {
+			throw new ORPCError("NOT_FOUND", {
+				message: "Budget not found",
+			});
+		}
+
+		const deleted = await this.db
+			.delete(budgetMemberTable)
+			.where(
+				and(
+					eq(budgetMemberTable.budgetId, budgetId),
+					eq(budgetMemberTable.userId, userId),
+					eq(budgetMemberTable.status, "active"),
+				),
+			)
+			.returning({ userId: budgetMemberTable.userId });
+
+		if (deleted.length === 0) {
+			throw new ORPCError("NOT_FOUND", {
+				message: "Budget not found",
+			});
+		}
+
+		return {
+			data: {
+				message: BUDGET_LEFT_MESSAGE,
+			},
+		};
+	}
+
+	async acceptInviteByUserId(
+		userId: string,
+		budgetId: string,
+	): Promise<BudgetInviteAcceptedResponse> {
+		const updated = await this.db
+			.update(budgetMemberTable)
+			.set({ status: "active" })
+			.where(
+				and(
+					eq(budgetMemberTable.budgetId, budgetId),
+					eq(budgetMemberTable.userId, userId),
+					eq(budgetMemberTable.status, "pending"),
+				),
+			)
+			.returning({ userId: budgetMemberTable.userId });
+
+		if (updated.length === 0) {
+			throw new ORPCError("NOT_FOUND", {
+				message: "Budget not found",
+			});
+		}
+
+		return {
+			data: {
+				message: BUDGET_INVITE_ACCEPTED_MESSAGE,
+			},
+		};
+	}
+
+	async rejectInviteByUserId(
+		userId: string,
+		budgetId: string,
+	): Promise<BudgetInviteRejectedResponse> {
+		await this.deletePendingMembership(budgetId, userId);
+
+		return {
+			data: {
+				message: BUDGET_INVITE_REJECTED_MESSAGE,
+			},
+		};
+	}
+
+	async cancelInviteByUserId(
+		userId: string,
+		input: BudgetCancelInviteInput,
+	): Promise<BudgetInviteCancelledResponse> {
+		await this.requireOwner(userId, input.id);
+		await this.deletePendingMembership(input.id, input.userId);
+
+		return {
+			data: {
+				message: BUDGET_INVITE_CANCELLED_MESSAGE,
+			},
+		};
+	}
+
+	private async deletePendingMembership(budgetId: string, userId: string) {
+		const deleted = await this.db
+			.delete(budgetMemberTable)
+			.where(
+				and(
+					eq(budgetMemberTable.budgetId, budgetId),
+					eq(budgetMemberTable.userId, userId),
+					eq(budgetMemberTable.status, "pending"),
+				),
+			)
+			.returning({ userId: budgetMemberTable.userId });
+
+		if (deleted.length === 0) {
+			throw new ORPCError("NOT_FOUND", {
+				message: "Budget not found",
+			});
+		}
+	}
+
+	private async findBudget(budgetId: string) {
+		const [budget] = await this.db
+			.select({
+				id: budgetTable.id,
+				ownerId: budgetTable.ownerId,
+			})
+			.from(budgetTable)
+			.where(eq(budgetTable.id, budgetId));
+
+		return budget;
+	}
+
+	private async requireOwner(userId: string, budgetId: string) {
+		const budget = await this.findBudget(budgetId);
+
+		if (!budget || budget.ownerId !== userId) {
+			throw new ORPCError("NOT_FOUND", {
+				message: "Budget not found",
+			});
+		}
+
+		return budget;
 	}
 }

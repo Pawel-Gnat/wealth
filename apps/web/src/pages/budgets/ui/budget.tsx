@@ -2,7 +2,7 @@ import type { BudgetMember, User } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { APP_ROUTES } from "@/app/routes";
-import { Badge, Button, Icon, Text, Tooltip } from "@/shared/components";
+import { Badge, Text } from "@/shared/components";
 import { AvatarGroup } from "@/shared/widgets/avatar-group";
 
 type BudgetProps = {
@@ -22,31 +22,15 @@ export const Budget = ({ id, title, members, owner, userId }: BudgetProps) => {
 			to={APP_ROUTES.budgets.view(id)}
 			className="flex items-center justify-between pb-4 hover:bg-muted transition-colors rounded-md p-4"
 		>
-			<div className="space-y-2">
-				<div className="flex items-center gap-2">
-					<Text weight="medium">{title}</Text>
-					<Badge variant={isOwner ? "default" : "secondary"}>
-						{isOwner
-							? t("common.owner", { ns: "common" })
-							: t("common.member", { ns: "common" })}
-					</Badge>
-				</div>
-				<AvatarGroup users={[owner, ...members]} />
+			<div className="flex items-center gap-2">
+				<Text weight="medium">{title}</Text>
+				<Badge variant={isOwner ? "default" : "secondary"}>
+					{isOwner
+						? t("common.owner", { ns: "common" })
+						: t("common.member", { ns: "common" })}
+				</Badge>
 			</div>
-
-			{!isOwner && (
-				<Tooltip
-					trigger={
-						<Button variant="destructive" size="icon" onClick={() => {}}>
-							<Icon name="leave" />
-							<span className="sr-only">
-								{t("action.leave", { ns: "common" })}
-							</span>
-						</Button>
-					}
-					text={t("action.leave", { ns: "common" })}
-				/>
-			)}
+			<AvatarGroup users={[owner, ...members]} />
 		</Link>
 	);
 };

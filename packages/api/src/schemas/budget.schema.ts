@@ -4,8 +4,40 @@ import { recordSchema } from "./record.schema";
 import { userSchema } from "./user.schema";
 
 export const BUDGET_CREATED_MESSAGE = "budget_created" as const;
+export const BUDGET_UPDATED_MESSAGE = "budget_updated" as const;
+export const BUDGET_MEMBERS_INVITED_MESSAGE = "budget_members_invited" as const;
+export const BUDGET_DELETED_MESSAGE = "budget_deleted" as const;
+export const BUDGET_LEFT_MESSAGE = "budget_left" as const;
+export const BUDGET_INVITE_ACCEPTED_MESSAGE = "budget_invite_accepted" as const;
+export const BUDGET_INVITE_REJECTED_MESSAGE = "budget_invite_rejected" as const;
+export const BUDGET_INVITE_CANCELLED_MESSAGE =
+	"budget_invite_cancelled" as const;
 export const BUDGET_TITLE_MAX_LENGTH = 80;
 export const BUDGET_MEMBER_IDS_MAX = 25;
+
+const uniqueMemberIds = (memberIds: string[]) =>
+	new Set(memberIds).size === memberIds.length;
+
+export const budgetTitleSchema = z
+	.string()
+	.trim()
+	.min(1, "form:title.required")
+	.max(BUDGET_TITLE_MAX_LENGTH, "form:title.max");
+
+export const budgetMemberIdsSchema = z
+	.array(z.string().min(1))
+	.max(BUDGET_MEMBER_IDS_MAX, "form:member-ids.max")
+	.refine(uniqueMemberIds, {
+		message: "form:member-ids.unique",
+	});
+
+export const budgetInviteMemberIdsSchema = z
+	.array(z.string().min(1))
+	.min(1, "form:member-ids.min")
+	.max(BUDGET_MEMBER_IDS_MAX, "form:member-ids.max")
+	.refine(uniqueMemberIds, {
+		message: "form:member-ids.unique",
+	});
 
 export const budgetMemberStatuses = ["active", "pending"] as const;
 
@@ -44,18 +76,13 @@ export const budgetInvitesResponseSchema = apiPayload(
 	z.array(budgetInviteSchema),
 );
 
+export const budgetIdParamsSchema = z.object({
+	id: z.string().min(1),
+});
+
 export const budgetCreatePayloadSchema = z.object({
-	title: z
-		.string()
-		.trim()
-		.min(1, "form:title.required")
-		.max(BUDGET_TITLE_MAX_LENGTH, "form:title.max"),
-	memberIds: z
-		.array(z.string().min(1))
-		.max(BUDGET_MEMBER_IDS_MAX, "form:member-ids.max")
-		.refine((memberIds) => new Set(memberIds).size === memberIds.length, {
-			message: "form:member-ids.unique",
-		}),
+	title: budgetTitleSchema,
+	memberIds: budgetMemberIdsSchema,
 });
 
 export const budgetCreateResponseDataSchema = z.object({
@@ -64,4 +91,81 @@ export const budgetCreateResponseDataSchema = z.object({
 
 export const budgetCreateResponseSchema = apiPayload(
 	budgetCreateResponseDataSchema,
+);
+
+export const budgetUpdatePayloadSchema = z.object({
+	title: budgetTitleSchema,
+});
+
+export const budgetUpdateInputSchema = budgetUpdatePayloadSchema.extend({
+	id: budgetIdParamsSchema.shape.id,
+});
+
+export const budgetUpdateResponseDataSchema = z.object({
+	message: z.literal(BUDGET_UPDATED_MESSAGE),
+});
+
+export const budgetUpdateResponseSchema = apiPayload(
+	budgetUpdateResponseDataSchema,
+);
+
+export const budgetInviteMembersPayloadSchema = z.object({
+	memberIds: budgetInviteMemberIdsSchema,
+});
+
+export const budgetInviteMembersInputSchema =
+	budgetInviteMembersPayloadSchema.extend({
+		id: budgetIdParamsSchema.shape.id,
+	});
+
+export const budgetInviteMembersResponseDataSchema = z.object({
+	message: z.literal(BUDGET_MEMBERS_INVITED_MESSAGE),
+});
+
+export const budgetInviteMembersResponseSchema = apiPayload(
+	budgetInviteMembersResponseDataSchema,
+);
+
+export const budgetDeleteResponseDataSchema = z.object({
+	message: z.literal(BUDGET_DELETED_MESSAGE),
+});
+
+export const budgetDeleteResponseSchema = apiPayload(
+	budgetDeleteResponseDataSchema,
+);
+
+export const budgetLeaveResponseDataSchema = z.object({
+	message: z.literal(BUDGET_LEFT_MESSAGE),
+});
+
+export const budgetLeaveResponseSchema = apiPayload(
+	budgetLeaveResponseDataSchema,
+);
+
+export const budgetCancelInviteInputSchema = budgetIdParamsSchema.extend({
+	userId: z.string().min(1),
+});
+
+export const budgetInviteAcceptedResponseDataSchema = z.object({
+	message: z.literal(BUDGET_INVITE_ACCEPTED_MESSAGE),
+});
+
+export const budgetInviteAcceptedResponseSchema = apiPayload(
+	budgetInviteAcceptedResponseDataSchema,
+);
+
+export const budgetInviteRejectedResponseDataSchema = z.object({
+	message: z.literal(BUDGET_INVITE_REJECTED_MESSAGE),
+});
+
+export const budgetInviteRejectedResponseSchema = apiPayload(
+	budgetInviteRejectedResponseDataSchema,
+);
+
+export const budgetInviteCancelledResponseDataSchema = z.object({
+	message: z.literal(BUDGET_INVITE_CANCELLED_MESSAGE),
+});
+
+export const budgetInviteCancelledResponseSchema = apiPayload(
+	budgetInviteCancelledResponseDataSchema,
 );

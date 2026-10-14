@@ -15,6 +15,20 @@
 		"title": "Budget",
 		"subtitle": "Shared expenses and incomes in this budget."
 	},
+	"invite": {
+		"title": "Invite"
+	},
+	"edit": {
+		"title": "Edit budget"
+	},
+	"delete": {
+		"title": "Delete budget",
+		"description": "This permanently deletes the budget and all of its records."
+	},
+	"leave": {
+		"title": "Leave budget",
+		"description": "You will lose access to this budget."
+	},
 	"members": {
 		"label": "Members",
 		"empty": "Select people to assign them to this budget.",
