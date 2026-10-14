@@ -2,7 +2,11 @@ import type { TestingModule } from "@nestjs/testing";
 import { ORPCError } from "@orpc/nest";
 import {
 	BUDGET_CREATED_MESSAGE,
+	BUDGET_DELETED_MESSAGE,
+	BUDGET_LEFT_MESSAGE,
 	BUDGET_MEMBER_IDS_MAX,
+	BUDGET_MEMBERS_INVITED_MESSAGE,
+	BUDGET_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
@@ -10,6 +14,8 @@ import { DBS } from "../database-service/constants";
 import {
 	budgetMemberTable,
 	budgetTable,
+	recordLineItemsTable,
+	recordsTable,
 	storageTable,
 } from "../database-service/tables/index";
 import { StorageService } from "../storage-service/storage.service";
@@ -502,6 +508,495 @@ describe("Budget service", () => {
 				.where(eq(budgetTable.ownerId, owner.id));
 
 			expect(createdBudgets).toHaveLength(0);
+		});
+	});
+
+	describe("update budget by user id", () => {
+		it("updates the title for the owner", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-update-owner",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Old title", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await expect(
+				budgetService.updateBudgetByUserId(owner.id, {
+					id: budget.id,
+					title: "New title",
+				}),
+			).resolves.toEqual({
+				data: { message: BUDGET_UPDATED_MESSAGE },
+			});
+
+			const [stored] = await db
+				.select({ title: budgetTable.title })
+				.from(budgetTable)
+				.where(eq(budgetTable.id, budget.id));
+
+			expect(stored?.title).toBe("New title");
+		});
+
+		it("rejects a member and a missing budget", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-update-denied-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-update-denied-member",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Kept title", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: member.id,
+				status: "active",
+			});
+
+			await expect(
+				budgetService.updateBudgetByUserId(member.id, {
+					id: budget.id,
+					title: "Stolen title",
+				}),
+			).rejects.toBeInstanceOf(ORPCError);
+			await expect(
+				budgetService.updateBudgetByUserId(owner.id, {
+					id: "01K1MISSINGBUDGET00000000000",
+					title: "Missing",
+				}),
+			).rejects.toBeInstanceOf(ORPCError);
+
+			const [stored] = await db
+				.select({ title: budgetTable.title })
+				.from(budgetTable)
+				.where(eq(budgetTable.id, budget.id));
+
+			expect(stored?.title).toBe("Kept title");
+		});
+	});
+
+	describe("invite members by user id", () => {
+		it("stores new invitees as pending and skips the owner and existing members", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-invite-owner",
+			});
+			const activeMember = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-invite-active",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-invite-new",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Household", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: activeMember.id,
+				status: "active",
+			});
+
+			await expect(
+				budgetService.inviteMembersByUserId(owner.id, {
+					id: budget.id,
+					memberIds: [owner.id, activeMember.id, invitee.id],
+				}),
+			).resolves.toEqual({
+				data: { message: BUDGET_MEMBERS_INVITED_MESSAGE },
+			});
+
+			const members = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(members).toHaveLength(2);
+			expect(members).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						userId: activeMember.id,
+						status: "active",
+					}),
+					expect.objectContaining({
+						userId: invitee.id,
+						status: "pending",
+					}),
+				]),
+			);
+		});
+
+		it("does not insert anyone when an invitee does not exist", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-invite-missing-owner",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-invite-missing-real",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Household", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await expect(
+				budgetService.inviteMembersByUserId(owner.id, {
+					id: budget.id,
+					memberIds: [invitee.id, "01K1MISSINGINVITEE0000000000"],
+				}),
+			).rejects.toBeInstanceOf(ORPCError);
+
+			const members = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(members).toHaveLength(0);
+		});
+
+		it("rejects when existing members plus new invitees exceed the maximum", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-invite-limit-owner",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Full", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			const members = await Promise.all(
+				Array.from({ length: BUDGET_MEMBER_IDS_MAX }, (_, index) =>
+					createTestUser(usersService, {
+						passwordHash: "hash",
+						emailTag: `budget-invite-limit-${index}`,
+					}),
+				),
+			);
+
+			await db.insert(budgetMemberTable).values(
+				members.map((member) => ({
+					budgetId: budget.id,
+					userId: member.id,
+					status: "active" as const,
+				})),
+			);
+
+			const extra = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-invite-limit-extra",
+			});
+
+			await expect(
+				budgetService.inviteMembersByUserId(owner.id, {
+					id: budget.id,
+					memberIds: [extra.id],
+				}),
+			).rejects.toBeInstanceOf(ORPCError);
+
+			const stored = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(stored).toHaveLength(BUDGET_MEMBER_IDS_MAX);
+		});
+
+		it("rejects a member", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-invite-denied-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-invite-denied-member",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-invite-denied-invitee",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Household", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: member.id,
+				status: "active",
+			});
+
+			await expect(
+				budgetService.inviteMembersByUserId(member.id, {
+					id: budget.id,
+					memberIds: [invitee.id],
+				}),
+			).rejects.toBeInstanceOf(ORPCError);
+
+			const stored = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(stored).toHaveLength(1);
+		});
+	});
+
+	describe("delete budget by user id", () => {
+		it("deletes the budget together with its members and records", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-delete-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-delete-member",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "To delete", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: member.id,
+				status: "active",
+			});
+
+			const [record] = await db
+				.insert(recordsTable)
+				.values({
+					userId: owner.id,
+					budgetId: budget.id,
+					kind: "expense",
+					totalAmount: "12.00",
+					documentDate: "2024-04-01",
+				})
+				.returning({ id: recordsTable.id });
+
+			if (!record) {
+				throw new Error("Expected seeded record");
+			}
+
+			await db.insert(recordLineItemsTable).values({
+				documentId: record.id,
+				title: "Lunch",
+				quantity: 1,
+				singleAmount: "12.00",
+			});
+
+			await expect(
+				budgetService.deleteBudgetByUserId(owner.id, budget.id),
+			).resolves.toEqual({
+				data: { message: BUDGET_DELETED_MESSAGE },
+			});
+
+			const [budgets, members, records, lineItems] = await Promise.all([
+				db.select().from(budgetTable).where(eq(budgetTable.id, budget.id)),
+				db
+					.select()
+					.from(budgetMemberTable)
+					.where(eq(budgetMemberTable.budgetId, budget.id)),
+				db.select().from(recordsTable).where(eq(recordsTable.id, record.id)),
+				db
+					.select()
+					.from(recordLineItemsTable)
+					.where(eq(recordLineItemsTable.documentId, record.id)),
+			]);
+
+			expect(budgets).toHaveLength(0);
+			expect(members).toHaveLength(0);
+			expect(records).toHaveLength(0);
+			expect(lineItems).toHaveLength(0);
+		});
+
+		it("rejects a member and leaves the budget in place", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-delete-denied-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-delete-denied-member",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Kept", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: member.id,
+				status: "active",
+			});
+
+			await expect(
+				budgetService.deleteBudgetByUserId(member.id, budget.id),
+			).rejects.toBeInstanceOf(ORPCError);
+
+			const budgets = await db
+				.select()
+				.from(budgetTable)
+				.where(eq(budgetTable.id, budget.id));
+
+			expect(budgets).toHaveLength(1);
+		});
+	});
+
+	describe("leave budget by user id", () => {
+		it("removes an active membership", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-leave-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-leave-member",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: member.id,
+				status: "active",
+			});
+
+			await expect(
+				budgetService.leaveBudgetByUserId(member.id, budget.id),
+			).resolves.toEqual({
+				data: { message: BUDGET_LEFT_MESSAGE },
+			});
+
+			const members = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+			const budgets = await db
+				.select()
+				.from(budgetTable)
+				.where(eq(budgetTable.id, budget.id));
+
+			expect(members).toHaveLength(0);
+			expect(budgets).toHaveLength(1);
+		});
+
+		it("rejects the owner, a pending member, and a stranger", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-leave-denied-owner",
+			});
+			const pendingMember = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-leave-denied-pending",
+			});
+			const stranger = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-leave-denied-stranger",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: pendingMember.id,
+				status: "pending",
+			});
+
+			await expect(
+				budgetService.leaveBudgetByUserId(owner.id, budget.id),
+			).rejects.toBeInstanceOf(ORPCError);
+			await expect(
+				budgetService.leaveBudgetByUserId(pendingMember.id, budget.id),
+			).rejects.toBeInstanceOf(ORPCError);
+			await expect(
+				budgetService.leaveBudgetByUserId(stranger.id, budget.id),
+			).rejects.toBeInstanceOf(ORPCError);
+
+			const members = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(members).toEqual([
+				expect.objectContaining({
+					userId: pendingMember.id,
+					status: "pending",
+				}),
+			]);
 		});
 	});
 });

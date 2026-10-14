@@ -5,11 +5,11 @@ import { ErrorState, Table } from "@/shared/components";
 import { recordColumns } from "../config/record-columns";
 import { useRecordsList } from "../hooks/use-records-list";
 
-type RecordTableProps = {
+type RecordsTableProps = {
 	budgetId?: string;
 };
 
-export const RecordTable = ({ budgetId }: RecordTableProps) => {
+export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 	const { t, i18n } = useTranslation();
 	const { data, isLoading, isError } = useRecordsList(
 		budgetId ? { budgetId } : {},

@@ -35,6 +35,7 @@
 		"max": "Title must be at most 80 characters"
 	},
 	"member-ids": {
+		"min": "Select at least one member",
 		"unique": "Members must be unique",
 		"max": "You can add at most 25 members"
 	},

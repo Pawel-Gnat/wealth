@@ -38,7 +38,11 @@ export const Card = ({
 							)}
 						</div>
 					)}
-					{actions && <div className="ml-auto">{actions}</div>}
+					{actions && (
+						<div className="ml-auto flex w-fit items-center gap-2">
+							{actions}
+						</div>
+					)}
 				</CardHeader>
 			)}
 			<CardContent className={contentClassName}>{children}</CardContent>

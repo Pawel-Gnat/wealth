@@ -39,4 +39,50 @@ export class BudgetController {
 			},
 		);
 	}
+
+	@Implement(rpcContract.budget.update)
+	updateBudgetRpc() {
+		return implement(rpcContract.budget.update).handler(
+			({ context, input }) => {
+				return this.budgetService.updateBudgetByUserId(
+					userIdFromRequest(context.request),
+					input,
+				);
+			},
+		);
+	}
+
+	@Implement(rpcContract.budget.inviteMembers)
+	inviteBudgetMembersRpc() {
+		return implement(rpcContract.budget.inviteMembers).handler(
+			({ context, input }) => {
+				return this.budgetService.inviteMembersByUserId(
+					userIdFromRequest(context.request),
+					input,
+				);
+			},
+		);
+	}
+
+	@Implement(rpcContract.budget.delete)
+	deleteBudgetRpc() {
+		return implement(rpcContract.budget.delete).handler(
+			({ context, input }) => {
+				return this.budgetService.deleteBudgetByUserId(
+					userIdFromRequest(context.request),
+					input.id,
+				);
+			},
+		);
+	}
+
+	@Implement(rpcContract.budget.leave)
+	leaveBudgetRpc() {
+		return implement(rpcContract.budget.leave).handler(({ context, input }) => {
+			return this.budgetService.leaveBudgetByUserId(
+				userIdFromRequest(context.request),
+				input.id,
+			);
+		});
+	}
 }
