@@ -1,11 +1,15 @@
 import { oc } from "@orpc/contract";
 import {
+	budgetCancelInviteInputSchema,
 	budgetCreatePayloadSchema,
 	budgetCreateResponseSchema,
 	budgetDeleteResponseSchema,
 	budgetIdParamsSchema,
+	budgetInviteAcceptedResponseSchema,
+	budgetInviteCancelledResponseSchema,
 	budgetInviteMembersInputSchema,
 	budgetInviteMembersResponseSchema,
+	budgetInviteRejectedResponseSchema,
 	budgetInvitesResponseSchema,
 	budgetLeaveResponseSchema,
 	budgetListResponseSchema,
@@ -45,3 +49,18 @@ export const leaveBudgetContract = oc
 	.route({ method: "DELETE", path: "/budgets/{id}/membership" })
 	.input(budgetIdParamsSchema)
 	.output(budgetLeaveResponseSchema);
+
+export const acceptBudgetInviteContract = oc
+	.route({ method: "POST", path: "/budgets/{id}/invites/accept" })
+	.input(budgetIdParamsSchema)
+	.output(budgetInviteAcceptedResponseSchema);
+
+export const rejectBudgetInviteContract = oc
+	.route({ method: "DELETE", path: "/budgets/{id}/invites/reject" })
+	.input(budgetIdParamsSchema)
+	.output(budgetInviteRejectedResponseSchema);
+
+export const cancelBudgetInviteContract = oc
+	.route({ method: "DELETE", path: "/budgets/{id}/invites/{userId}" })
+	.input(budgetCancelInviteInputSchema)
+	.output(budgetInviteCancelledResponseSchema);

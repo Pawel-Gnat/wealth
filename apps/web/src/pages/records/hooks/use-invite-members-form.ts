@@ -9,7 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { invalidateBudgetQueries } from "@/pages/budgets/hooks/invalidate-budget-queries";
+import { invalidateBudgetQueries } from "@/features/budgets/helpers/invalidate-budget-queries";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 

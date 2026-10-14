@@ -3,6 +3,9 @@ import { ORPCError } from "@orpc/nest";
 import {
 	BUDGET_CREATED_MESSAGE,
 	BUDGET_DELETED_MESSAGE,
+	BUDGET_INVITE_ACCEPTED_MESSAGE,
+	BUDGET_INVITE_CANCELLED_MESSAGE,
+	BUDGET_INVITE_REJECTED_MESSAGE,
 	BUDGET_LEFT_MESSAGE,
 	BUDGET_MEMBER_IDS_MAX,
 	BUDGET_MEMBERS_INVITED_MESSAGE,
@@ -861,6 +864,57 @@ describe("Budget service", () => {
 			expect(lineItems).toHaveLength(0);
 		});
 
+		it("deletes pending invitations together with the budget", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-delete-invites-owner",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-delete-invites-invitee",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Pending invites", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: invitee.id,
+				status: "pending",
+			});
+
+			const [ownerInvites, inviteeInvites] = await Promise.all([
+				budgetService.listInvitesByUserId(owner.id),
+				budgetService.listInvitesByUserId(invitee.id),
+			]);
+
+			expect(ownerInvites.data).toHaveLength(1);
+			expect(inviteeInvites.data).toHaveLength(1);
+
+			await budgetService.deleteBudgetByUserId(owner.id, budget.id);
+
+			const [members, ownerInvitesAfter, inviteeInvitesAfter] =
+				await Promise.all([
+					db
+						.select()
+						.from(budgetMemberTable)
+						.where(eq(budgetMemberTable.budgetId, budget.id)),
+					budgetService.listInvitesByUserId(owner.id),
+					budgetService.listInvitesByUserId(invitee.id),
+				]);
+
+			expect(members).toHaveLength(0);
+			expect(ownerInvitesAfter.data).toEqual([]);
+			expect(inviteeInvitesAfter.data).toEqual([]);
+		});
+
 		it("rejects a member and leaves the budget in place", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const owner = await createTestUser(usersService, {
@@ -997,6 +1051,282 @@ describe("Budget service", () => {
 					status: "pending",
 				}),
 			]);
+		});
+	});
+
+	describe("accept invite by user id", () => {
+		it("activates a pending invitation", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-accept-owner",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-accept-invitee",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: invitee.id,
+				status: "pending",
+			});
+
+			await expect(
+				budgetService.acceptInviteByUserId(invitee.id, budget.id),
+			).resolves.toEqual({
+				data: { message: BUDGET_INVITE_ACCEPTED_MESSAGE },
+			});
+
+			const [member] = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(member).toMatchObject({
+				userId: invitee.id,
+				status: "active",
+			});
+		});
+
+		it("does not activate an invitation when the caller has none pending", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-accept-denied-owner",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-accept-denied-invitee",
+			});
+			const stranger = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-accept-denied-stranger",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: invitee.id,
+				status: "pending",
+			});
+
+			await expect(
+				budgetService.acceptInviteByUserId(owner.id, budget.id),
+			).rejects.toBeInstanceOf(ORPCError);
+			await expect(
+				budgetService.acceptInviteByUserId(stranger.id, budget.id),
+			).rejects.toBeInstanceOf(ORPCError);
+
+			const [member] = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(member).toMatchObject({ status: "pending" });
+		});
+	});
+
+	describe("reject invite by user id", () => {
+		it("removes a pending invitation", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-reject-owner",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-reject-invitee",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: invitee.id,
+				status: "pending",
+			});
+
+			await expect(
+				budgetService.rejectInviteByUserId(invitee.id, budget.id),
+			).resolves.toEqual({
+				data: { message: BUDGET_INVITE_REJECTED_MESSAGE },
+			});
+
+			const members = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(members).toHaveLength(0);
+		});
+
+		it("does not remove an active membership", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-reject-denied-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-reject-denied-member",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: member.id,
+				status: "active",
+			});
+
+			await expect(
+				budgetService.rejectInviteByUserId(owner.id, budget.id),
+			).rejects.toBeInstanceOf(ORPCError);
+			await expect(
+				budgetService.rejectInviteByUserId(member.id, budget.id),
+			).rejects.toBeInstanceOf(ORPCError);
+
+			const members = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(members).toHaveLength(1);
+		});
+	});
+
+	describe("cancel invite by user id", () => {
+		it("removes a pending invitation from the budget", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-cancel-owner",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-cancel-invitee",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values({
+				budgetId: budget.id,
+				userId: invitee.id,
+				status: "pending",
+			});
+
+			await expect(
+				budgetService.cancelInviteByUserId(owner.id, {
+					id: budget.id,
+					userId: invitee.id,
+				}),
+			).resolves.toEqual({
+				data: { message: BUDGET_INVITE_CANCELLED_MESSAGE },
+			});
+
+			const members = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(members).toHaveLength(0);
+		});
+
+		it("does not remove a pending invitation or an active membership when cancel is not allowed", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-cancel-denied-owner",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-cancel-denied-invitee",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-cancel-denied-member",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Shared", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(budgetMemberTable).values([
+				{
+					budgetId: budget.id,
+					userId: invitee.id,
+					status: "pending",
+				},
+				{
+					budgetId: budget.id,
+					userId: member.id,
+					status: "active",
+				},
+			]);
+
+			await expect(
+				budgetService.cancelInviteByUserId(invitee.id, {
+					id: budget.id,
+					userId: member.id,
+				}),
+			).rejects.toBeInstanceOf(ORPCError);
+			await expect(
+				budgetService.cancelInviteByUserId(owner.id, {
+					id: budget.id,
+					userId: member.id,
+				}),
+			).rejects.toBeInstanceOf(ORPCError);
+
+			const members = await db
+				.select()
+				.from(budgetMemberTable)
+				.where(eq(budgetMemberTable.budgetId, budget.id));
+
+			expect(members).toHaveLength(2);
 		});
 	});
 });

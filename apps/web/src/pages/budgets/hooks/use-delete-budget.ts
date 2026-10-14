@@ -3,9 +3,9 @@ import { runWithRequestId } from "@repo/observability/browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { invalidateBudgetQueries } from "@/features/budgets/helpers/invalidate-budget-queries";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
-import { invalidateBudgetQueries } from "./invalidate-budget-queries";
 
 type UseDeleteBudgetProps = {
 	budgetId: string;

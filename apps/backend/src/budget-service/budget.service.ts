@@ -3,17 +3,24 @@ import { ORPCError } from "@orpc/nest";
 import {
 	BUDGET_CREATED_MESSAGE,
 	BUDGET_DELETED_MESSAGE,
+	BUDGET_INVITE_ACCEPTED_MESSAGE,
+	BUDGET_INVITE_CANCELLED_MESSAGE,
+	BUDGET_INVITE_REJECTED_MESSAGE,
 	BUDGET_LEFT_MESSAGE,
 	BUDGET_MEMBER_IDS_MAX,
 	BUDGET_MEMBERS_INVITED_MESSAGE,
 	BUDGET_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
 import type {
+	BudgetCancelInviteInput,
 	BudgetCreatePayload,
 	BudgetCreateResponse,
 	BudgetDeleteResponse,
+	BudgetInviteAcceptedResponse,
+	BudgetInviteCancelledResponse,
 	BudgetInviteMembersInput,
 	BudgetInviteMembersResponse,
+	BudgetInviteRejectedResponse,
 	BudgetInvitesResponse,
 	BudgetLeaveResponse,
 	BudgetListResponse,
@@ -354,6 +361,81 @@ export class BudgetService {
 				message: BUDGET_LEFT_MESSAGE,
 			},
 		};
+	}
+
+	async acceptInviteByUserId(
+		userId: string,
+		budgetId: string,
+	): Promise<BudgetInviteAcceptedResponse> {
+		const updated = await this.db
+			.update(budgetMemberTable)
+			.set({ status: "active" })
+			.where(
+				and(
+					eq(budgetMemberTable.budgetId, budgetId),
+					eq(budgetMemberTable.userId, userId),
+					eq(budgetMemberTable.status, "pending"),
+				),
+			)
+			.returning({ userId: budgetMemberTable.userId });
+
+		if (updated.length === 0) {
+			throw new ORPCError("NOT_FOUND", {
+				message: "Budget not found",
+			});
+		}
+
+		return {
+			data: {
+				message: BUDGET_INVITE_ACCEPTED_MESSAGE,
+			},
+		};
+	}
+
+	async rejectInviteByUserId(
+		userId: string,
+		budgetId: string,
+	): Promise<BudgetInviteRejectedResponse> {
+		await this.deletePendingMembership(budgetId, userId);
+
+		return {
+			data: {
+				message: BUDGET_INVITE_REJECTED_MESSAGE,
+			},
+		};
+	}
+
+	async cancelInviteByUserId(
+		userId: string,
+		input: BudgetCancelInviteInput,
+	): Promise<BudgetInviteCancelledResponse> {
+		await this.requireOwner(userId, input.id);
+		await this.deletePendingMembership(input.id, input.userId);
+
+		return {
+			data: {
+				message: BUDGET_INVITE_CANCELLED_MESSAGE,
+			},
+		};
+	}
+
+	private async deletePendingMembership(budgetId: string, userId: string) {
+		const deleted = await this.db
+			.delete(budgetMemberTable)
+			.where(
+				and(
+					eq(budgetMemberTable.budgetId, budgetId),
+					eq(budgetMemberTable.userId, userId),
+					eq(budgetMemberTable.status, "pending"),
+				),
+			)
+			.returning({ userId: budgetMemberTable.userId });
+
+		if (deleted.length === 0) {
+			throw new ORPCError("NOT_FOUND", {
+				message: "Budget not found",
+			});
+		}
 	}
 
 	private async findBudget(budgetId: string) {

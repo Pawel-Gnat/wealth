@@ -85,4 +85,40 @@ export class BudgetController {
 			);
 		});
 	}
+
+	@Implement(rpcContract.budget.acceptInvite)
+	acceptBudgetInviteRpc() {
+		return implement(rpcContract.budget.acceptInvite).handler(
+			({ context, input }) => {
+				return this.budgetService.acceptInviteByUserId(
+					userIdFromRequest(context.request),
+					input.id,
+				);
+			},
+		);
+	}
+
+	@Implement(rpcContract.budget.rejectInvite)
+	rejectBudgetInviteRpc() {
+		return implement(rpcContract.budget.rejectInvite).handler(
+			({ context, input }) => {
+				return this.budgetService.rejectInviteByUserId(
+					userIdFromRequest(context.request),
+					input.id,
+				);
+			},
+		);
+	}
+
+	@Implement(rpcContract.budget.cancelInvite)
+	cancelBudgetInviteRpc() {
+		return implement(rpcContract.budget.cancelInvite).handler(
+			({ context, input }) => {
+				return this.budgetService.cancelInviteByUserId(
+					userIdFromRequest(context.request),
+					input,
+				);
+			},
+		);
+	}
 }

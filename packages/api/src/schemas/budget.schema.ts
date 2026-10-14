@@ -8,6 +8,10 @@ export const BUDGET_UPDATED_MESSAGE = "budget_updated" as const;
 export const BUDGET_MEMBERS_INVITED_MESSAGE = "budget_members_invited" as const;
 export const BUDGET_DELETED_MESSAGE = "budget_deleted" as const;
 export const BUDGET_LEFT_MESSAGE = "budget_left" as const;
+export const BUDGET_INVITE_ACCEPTED_MESSAGE = "budget_invite_accepted" as const;
+export const BUDGET_INVITE_REJECTED_MESSAGE = "budget_invite_rejected" as const;
+export const BUDGET_INVITE_CANCELLED_MESSAGE =
+	"budget_invite_cancelled" as const;
 export const BUDGET_TITLE_MAX_LENGTH = 80;
 export const BUDGET_MEMBER_IDS_MAX = 25;
 
@@ -136,4 +140,32 @@ export const budgetLeaveResponseDataSchema = z.object({
 
 export const budgetLeaveResponseSchema = apiPayload(
 	budgetLeaveResponseDataSchema,
+);
+
+export const budgetCancelInviteInputSchema = budgetIdParamsSchema.extend({
+	userId: z.string().min(1),
+});
+
+export const budgetInviteAcceptedResponseDataSchema = z.object({
+	message: z.literal(BUDGET_INVITE_ACCEPTED_MESSAGE),
+});
+
+export const budgetInviteAcceptedResponseSchema = apiPayload(
+	budgetInviteAcceptedResponseDataSchema,
+);
+
+export const budgetInviteRejectedResponseDataSchema = z.object({
+	message: z.literal(BUDGET_INVITE_REJECTED_MESSAGE),
+});
+
+export const budgetInviteRejectedResponseSchema = apiPayload(
+	budgetInviteRejectedResponseDataSchema,
+);
+
+export const budgetInviteCancelledResponseDataSchema = z.object({
+	message: z.literal(BUDGET_INVITE_CANCELLED_MESSAGE),
+});
+
+export const budgetInviteCancelledResponseSchema = apiPayload(
+	budgetInviteCancelledResponseDataSchema,
 );

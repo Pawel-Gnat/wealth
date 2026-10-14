@@ -1,15 +1,19 @@
 import type { z } from "zod";
 import type {
+	budgetCancelInviteInputSchema,
 	budgetCreatePayloadSchema,
 	budgetCreateResponseDataSchema,
 	budgetCreateResponseSchema,
 	budgetDeleteResponseDataSchema,
 	budgetDeleteResponseSchema,
 	budgetIdParamsSchema,
+	budgetInviteAcceptedResponseSchema,
+	budgetInviteCancelledResponseSchema,
 	budgetInviteMembersInputSchema,
 	budgetInviteMembersPayloadSchema,
 	budgetInviteMembersResponseDataSchema,
 	budgetInviteMembersResponseSchema,
+	budgetInviteRejectedResponseSchema,
 	budgetInviteSchema,
 	budgetInvitesResponseSchema,
 	budgetLeaveResponseDataSchema,
@@ -64,3 +68,15 @@ export type BudgetLeaveResponseData = z.infer<
 	typeof budgetLeaveResponseDataSchema
 >;
 export type BudgetLeaveResponse = z.infer<typeof budgetLeaveResponseSchema>;
+export type BudgetCancelInviteInput = z.infer<
+	typeof budgetCancelInviteInputSchema
+>;
+export type BudgetInviteAcceptedResponse = z.infer<
+	typeof budgetInviteAcceptedResponseSchema
+>;
+export type BudgetInviteRejectedResponse = z.infer<
+	typeof budgetInviteRejectedResponseSchema
+>;
+export type BudgetInviteCancelledResponse = z.infer<
+	typeof budgetInviteCancelledResponseSchema
+>;
