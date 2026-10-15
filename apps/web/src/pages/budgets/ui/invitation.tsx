@@ -1,30 +1,38 @@
-import type { BudgetMember } from "@repo/api/types";
+import type { BudgetListItem } from "@repo/api/types";
+import { hasPermission } from "@repo/common/permissions";
 import { useTranslation } from "react-i18next";
 import { Badge, Button, Icon, Text, Tooltip } from "@/shared/components";
 import { AvatarGroup } from "@/shared/widgets/avatar-group";
 import { useBudgetInvitation } from "../hooks/use-budget-invitation";
 
 type InvitationProps = {
-	budgetId: string;
-	title: string;
-	members: BudgetMember[];
+	budget: BudgetListItem;
 	userId: string;
 	inviteeId: string;
 };
 
-export const Invitation = ({
-	budgetId,
-	title,
-	members,
-	userId,
-	inviteeId,
-}: InvitationProps) => {
+export const Invitation = ({ budget, userId, inviteeId }: InvitationProps) => {
 	const { t } = useTranslation();
 	const { acceptInvite, rejectInvite, cancelInvite, isPending } =
-		useBudgetInvitation({ budgetId, inviteeId });
+		useBudgetInvitation({
+			budgetId: budget.id,
+			inviteeId,
+		});
 
-	const inviteeEmail = members.find((member) => member.id === inviteeId)?.email;
-	const isInvitee = inviteeId === userId;
+	const inviteeEmail = budget.members.find(
+		(member) => member.id === inviteeId,
+	)?.email;
+	const membership =
+		budget.members.find((member) => member.id === userId)?.status ?? null;
+
+	const canRespond = hasPermission(userId, "budgets", "acceptInvite", {
+		ownerId: budget.owner.id,
+		membership,
+	});
+	const canCancel = hasPermission(userId, "budgets", "cancelInvite", {
+		ownerId: budget.owner.id,
+		membership,
+	});
 
 	const subtitle = inviteeEmail
 		? t("invitations.waiting-for-acceptance", {
@@ -37,16 +45,16 @@ export const Invitation = ({
 		<div className="flex items-center justify-between pb-4">
 			<div className="space-y-2">
 				<div className="flex items-center gap-2">
-					<Text weight="medium">{title}</Text>
-					<Badge variant={isInvitee ? "secondary" : "default"}>
-						{isInvitee
+					<Text weight="medium">{budget.title}</Text>
+					<Badge variant={canRespond ? "secondary" : "default"}>
+						{canRespond
 							? t("common.invited", { ns: "common" })
 							: t("common.waiting", { ns: "common" })}
 					</Badge>
 				</div>
 				<div className="flex items-center gap-2">
-					<AvatarGroup users={members} />
-					{!isInvitee && subtitle && (
+					<AvatarGroup users={budget.members} />
+					{!canRespond && subtitle && (
 						<Text size="xs" color="muted">
 							{subtitle}
 						</Text>
@@ -54,7 +62,7 @@ export const Invitation = ({
 				</div>
 			</div>
 			<div className="flex flex-row gap-2">
-				{isInvitee ? (
+				{canRespond && (
 					<>
 						<Tooltip
 							trigger={
@@ -84,7 +92,8 @@ export const Invitation = ({
 							text={t("action.accept", { ns: "common" })}
 						/>
 					</>
-				) : (
+				)}
+				{canCancel && (
 					<Tooltip
 						trigger={
 							<Button

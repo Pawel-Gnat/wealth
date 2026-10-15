@@ -29,6 +29,7 @@ import type {
 	BudgetUpdateResponse,
 	User,
 } from "@repo/api/types";
+import { hasPermission, type Permissions } from "@repo/common/permissions";
 import { and, asc, desc, eq, inArray, or } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants";
@@ -253,7 +254,7 @@ export class BudgetService {
 		userId: string,
 		input: BudgetUpdateInput,
 	): Promise<BudgetUpdateResponse> {
-		await this.requireOwner(userId, input.id);
+		await this.requireBudgetPermission(userId, input.id, "edit");
 
 		await this.db
 			.update(budgetTable)
@@ -271,7 +272,7 @@ export class BudgetService {
 		userId: string,
 		input: BudgetInviteMembersInput,
 	): Promise<BudgetInviteMembersResponse> {
-		await this.requireOwner(userId, input.id);
+		await this.requireBudgetPermission(userId, input.id, "invite");
 
 		const existingMembers = await this.db
 			.select({ userId: budgetMemberTable.userId })
@@ -316,7 +317,7 @@ export class BudgetService {
 		userId: string,
 		budgetId: string,
 	): Promise<BudgetDeleteResponse> {
-		await this.requireOwner(userId, budgetId);
+		await this.requireBudgetPermission(userId, budgetId, "delete");
 
 		await this.db.delete(budgetTable).where(eq(budgetTable.id, budgetId));
 
@@ -331,13 +332,7 @@ export class BudgetService {
 		userId: string,
 		budgetId: string,
 	): Promise<BudgetLeaveResponse> {
-		const budget = await this.findBudget(budgetId);
-
-		if (!budget || budget.ownerId === userId) {
-			throw new ORPCError("NOT_FOUND", {
-				message: "Budget not found",
-			});
-		}
+		await this.requireBudgetPermission(userId, budgetId, "leave");
 
 		const deleted = await this.db
 			.delete(budgetMemberTable)
@@ -367,6 +362,8 @@ export class BudgetService {
 		userId: string,
 		budgetId: string,
 	): Promise<BudgetInviteAcceptedResponse> {
+		await this.requireBudgetPermission(userId, budgetId, "acceptInvite");
+
 		const updated = await this.db
 			.update(budgetMemberTable)
 			.set({ status: "active" })
@@ -396,6 +393,7 @@ export class BudgetService {
 		userId: string,
 		budgetId: string,
 	): Promise<BudgetInviteRejectedResponse> {
+		await this.requireBudgetPermission(userId, budgetId, "rejectInvite");
 		await this.deletePendingMembership(budgetId, userId);
 
 		return {
@@ -409,7 +407,7 @@ export class BudgetService {
 		userId: string,
 		input: BudgetCancelInviteInput,
 	): Promise<BudgetInviteCancelledResponse> {
-		await this.requireOwner(userId, input.id);
+		await this.requireBudgetPermission(userId, input.id, "cancelInvite");
 		await this.deletePendingMembership(input.id, input.userId);
 
 		return {
@@ -438,27 +436,45 @@ export class BudgetService {
 		}
 	}
 
-	private async findBudget(budgetId: string) {
+	private async findBudgetAccess(userId: string, budgetId: string) {
 		const [budget] = await this.db
 			.select({
-				id: budgetTable.id,
 				ownerId: budgetTable.ownerId,
+				membership: budgetMemberTable.status,
 			})
 			.from(budgetTable)
+			.leftJoin(
+				budgetMemberTable,
+				and(
+					eq(budgetMemberTable.budgetId, budgetTable.id),
+					eq(budgetMemberTable.userId, userId),
+				),
+			)
 			.where(eq(budgetTable.id, budgetId));
 
-		return budget;
+		if (!budget) {
+			return null;
+		}
+
+		return {
+			ownerId: budget.ownerId,
+			membership: budget.membership,
+		};
 	}
 
-	private async requireOwner(userId: string, budgetId: string) {
-		const budget = await this.findBudget(budgetId);
+	private async requireBudgetPermission(
+		userId: string,
+		budgetId: string,
+		action: Permissions["budgets"]["action"],
+	) {
+		const budget = await this.findBudgetAccess(userId, budgetId);
+		const allowed =
+			budget !== null && hasPermission(userId, "budgets", action, budget);
 
-		if (!budget || budget.ownerId !== userId) {
+		if (!allowed) {
 			throw new ORPCError("NOT_FOUND", {
 				message: "Budget not found",
 			});
 		}
-
-		return budget;
 	}
 }

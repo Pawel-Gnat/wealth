@@ -35,7 +35,7 @@ catalogs:
       version: 0.22.14
     typescript:
       specifier: 5.9.2
-      version: 6.0.2
+      version: 5.9.2
     vitest:
       specifier: ^3.2.4
       version: 3.2.4
@@ -415,6 +415,9 @@ importers:
 
   packages/common:
     dependencies:
+      '@repo/api':
+        specifier: workspace:*
+        version: link:../api
       i18next:
         specifier: ^26.0.5
         version: 26.0.5(typescript@5.9.2)

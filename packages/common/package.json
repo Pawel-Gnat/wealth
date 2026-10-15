@@ -18,6 +18,11 @@
 			"types": "./dist/constants/index.d.ts",
 			"import": "./dist/constants/index.js",
 			"default": "./dist/constants/index.js"
+		},
+		"./permissions": {
+			"types": "./dist/permissions/index.d.ts",
+			"import": "./dist/permissions/index.js",
+			"default": "./dist/permissions/index.js"
 		}
 	},
 	"scripts": {
@@ -29,6 +34,7 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
+		"@repo/api": "workspace:*",
 		"i18next": "^26.0.5"
 	},
 	"devDependencies": {
