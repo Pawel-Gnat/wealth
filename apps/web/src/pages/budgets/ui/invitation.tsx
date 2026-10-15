@@ -88,7 +88,6 @@ export const Invitation = ({
 					<Tooltip
 						trigger={
 							<Button
-								type="button"
 								variant="destructive"
 								size="icon"
 								disabled={isPending}
