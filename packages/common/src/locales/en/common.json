@@ -39,6 +39,7 @@
 		"signup": "Sign up",
 		"logout": "Logout",
 		"retry": "Retry",
+		"try-again": "Try again",
 		"add": "Add",
 		"edit": "Edit",
 		"preview": "Preview",
@@ -52,6 +53,10 @@
 		"download": "Download",
 		"change-avatar": "Change avatar",
 		"remove": "Remove {{fileName}}"
+	},
+	"route-chunk-error": {
+		"title": "Couldn't load this page.",
+		"description": "Check your connection and try again."
 	},
 	"toast": {
 		"success": {
