@@ -214,6 +214,19 @@
 	--leading-lg: 1.6;
 }
 
+@theme {
+	--animate-route-loading: route-loading 1s ease-in-out infinite;
+
+	@keyframes route-loading {
+		from {
+			transform: translateX(-100%);
+		}
+		to {
+			transform: translateX(300%);
+		}
+	}
+}
+
 @layer base {
 	* {
 		@apply border-border outline-ring/50;

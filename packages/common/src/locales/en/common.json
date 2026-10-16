@@ -39,6 +39,7 @@
 		"signup": "Sign up",
 		"logout": "Logout",
 		"retry": "Retry",
+		"try-again": "Try again",
 		"add": "Add",
 		"edit": "Edit",
 		"preview": "Preview",
@@ -52,6 +53,15 @@
 		"download": "Download",
 		"change-avatar": "Change avatar",
 		"remove": "Remove {{fileName}}"
+	},
+	"route-chunk-error": {
+		"title": "Couldn't load this page.",
+		"description": "Check your connection and try again."
+	},
+	"not-found": {
+		"title": "Page not found.",
+		"description": "This page doesn't exist or was moved.",
+		"back-home": "Back to home"
 	},
 	"toast": {
 		"success": {

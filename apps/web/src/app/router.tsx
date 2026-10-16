@@ -1,58 +1,122 @@
-import { Route, Routes } from "react-router";
-import { AuthPage } from "@/pages/auth";
+import { createBrowserRouter, Outlet, type RouteObject } from "react-router";
+import { AuthLayout } from "@/pages/auth/layouts";
+import { ErrorPage } from "@/pages/error";
 import {
 	AuthenticatedLayout,
 	DashboardLayout,
+	RootLayout,
 	UnauthenticatedLayout,
 } from "@/shared/layouts";
+import { PageLoader } from "@/shared/widgets/page-loader";
+import { lazyPage } from "@/shared/widgets/route-chunk";
+import { APP_ROUTES, EDIT_RECORD_SEGMENT, NEW_RECORD_SEGMENT } from "./routes";
 
 export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";
 
-import { AuthLayout } from "@/pages/auth/layouts";
-import { BudgetsPage } from "@/pages/budgets";
-import { DashboardPage } from "@/pages/dashboard";
-import { RecordsListPage } from "@/pages/records";
-import { RecordPage } from "@/pages/records/[id]";
-import { RecordFormPage } from "@/pages/records/form";
-import { SettingsPage } from "@/pages/settings";
-import { APP_ROUTES, EDIT_RECORD_SEGMENT, NEW_RECORD_SEGMENT } from "./routes";
+const loadAuthPage = lazyPage(() =>
+	import("@/pages/auth").then(({ AuthPage }) => AuthPage),
+).lazy;
 
-export function AppRouter() {
-	return (
-		<Routes>
-			<Route element={<UnauthenticatedLayout />}>
-				<Route element={<AuthLayout />}>
-					<Route path={APP_ROUTES.auth} element={<AuthPage />} />
-				</Route>
-			</Route>
-			<Route element={<AuthenticatedLayout />}>
-				<Route element={<DashboardLayout />}>
-					<Route path={APP_ROUTES.dashboard} element={<DashboardPage />} />
-					<Route path={APP_ROUTES.records.list}>
-						<Route index element={<RecordsListPage />} />
-						<Route path={NEW_RECORD_SEGMENT} element={<RecordFormPage />} />
-						<Route path=":id">
-							<Route index element={<RecordPage />} />
-							<Route path={EDIT_RECORD_SEGMENT} element={<RecordFormPage />} />
-						</Route>
-					</Route>
-					<Route path={APP_ROUTES.budgets.list}>
-						<Route index element={<BudgetsPage />} />
-						<Route path=":budgetId">
-							<Route index element={<RecordsListPage />} />
-							<Route path={NEW_RECORD_SEGMENT} element={<RecordFormPage />} />
-							<Route path=":id">
-								<Route index element={<RecordPage />} />
-								<Route
-									path={EDIT_RECORD_SEGMENT}
-									element={<RecordFormPage />}
-								/>
-							</Route>
-						</Route>
-					</Route>
-					<Route path={APP_ROUTES.settings} element={<SettingsPage />} />
-				</Route>
-			</Route>
-		</Routes>
-	);
-}
+const loadDashboardPage = lazyPage(() =>
+	import("@/pages/dashboard").then(({ DashboardPage }) => DashboardPage),
+).lazy;
+
+const loadRecordsListPage = lazyPage(() =>
+	import("@/pages/records").then(({ RecordsListPage }) => RecordsListPage),
+).lazy;
+
+const loadRecordFormPage = lazyPage(() =>
+	import("@/pages/records/form").then(({ RecordFormPage }) => RecordFormPage),
+).lazy;
+
+const loadRecordPage = lazyPage(() =>
+	import("@/pages/records/[id]").then(({ RecordPage }) => RecordPage),
+).lazy;
+
+const loadBudgetsPage = lazyPage(() =>
+	import("@/pages/budgets").then(({ BudgetsPage }) => BudgetsPage),
+).lazy;
+
+const loadSettingsPage = lazyPage(() =>
+	import("@/pages/settings").then(({ SettingsPage }) => SettingsPage),
+).lazy;
+
+const loadNotFoundPage = lazyPage(() =>
+	import("@/pages/not-found").then(({ NotFoundPage }) => NotFoundPage),
+).lazy;
+
+const routes: RouteObject[] = [
+	{
+		element: <UnauthenticatedLayout />,
+		children: [
+			{
+				element: <AuthLayout />,
+				children: [{ path: APP_ROUTES.auth, lazy: loadAuthPage }],
+			},
+		],
+	},
+	{
+		element: <AuthenticatedLayout />,
+		children: [
+			{
+				element: <DashboardLayout />,
+				children: [
+					{
+						element: <Outlet />,
+						errorElement: <ErrorPage />,
+						children: [
+							{ path: APP_ROUTES.dashboard, lazy: loadDashboardPage },
+							{
+								path: APP_ROUTES.records.list,
+								children: [
+									{ index: true, lazy: loadRecordsListPage },
+									{ path: NEW_RECORD_SEGMENT, lazy: loadRecordFormPage },
+									{
+										path: ":id",
+										children: [
+											{ index: true, lazy: loadRecordPage },
+											{ path: EDIT_RECORD_SEGMENT, lazy: loadRecordFormPage },
+										],
+									},
+								],
+							},
+							{
+								path: APP_ROUTES.budgets.list,
+								children: [
+									{ index: true, lazy: loadBudgetsPage },
+									{
+										path: ":budgetId",
+										children: [
+											{ index: true, lazy: loadRecordsListPage },
+											{ path: NEW_RECORD_SEGMENT, lazy: loadRecordFormPage },
+											{
+												path: ":id",
+												children: [
+													{ index: true, lazy: loadRecordPage },
+													{
+														path: EDIT_RECORD_SEGMENT,
+														lazy: loadRecordFormPage,
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+							{ path: APP_ROUTES.settings, lazy: loadSettingsPage },
+							{ path: "*", lazy: loadNotFoundPage },
+						],
+					},
+				],
+			},
+		],
+	},
+];
+
+export const router = createBrowserRouter([
+	{
+		element: <RootLayout />,
+		HydrateFallback: PageLoader,
+		children: routes,
+	},
+]);
