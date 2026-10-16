@@ -7,7 +7,7 @@ import {
 } from "./access";
 import type { RolesWithPermissions } from "./types";
 
-export const ROLES = {
+export const ROLES: RolesWithPermissions = {
 	default: {
 		budgets: {
 			view: (userId, budget) => hasBudgetAccess(userId, budget),
@@ -29,4 +29,4 @@ export const ROLES = {
 			delete: (userId, record) => isAuthor(userId, record),
 		},
 	},
-} as const satisfies RolesWithPermissions;
+};

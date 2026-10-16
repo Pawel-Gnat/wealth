@@ -33,6 +33,13 @@ export type Permissions = {
 	};
 };
 
+export type HasPermission = <Resource extends keyof Permissions>(
+	userId: string | null,
+	resource: Resource,
+	action: Permissions[Resource]["action"],
+	data: Permissions[Resource]["dataType"],
+) => boolean;
+
 export type PermissionCheck<Resource extends keyof Permissions> =
 	| boolean
 	| ((

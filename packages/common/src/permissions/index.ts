@@ -9,6 +9,7 @@ export { hasPermission } from "./has-permission";
 export { ROLES } from "./roles";
 export type {
 	BudgetAccess,
+	HasPermission,
 	PermissionRole,
 	Permissions,
 	RecordAccess,
