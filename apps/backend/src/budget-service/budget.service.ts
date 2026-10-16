@@ -37,6 +37,7 @@ import {
 	budgetMemberTable,
 	budgetTable,
 } from "../database-service/tables/index";
+import { findBudgetAccess } from "../shared/budget/find-budget-access";
 import { UsersService } from "../users-service/users.service";
 
 @Injectable()
@@ -436,38 +437,12 @@ export class BudgetService {
 		}
 	}
 
-	private async findBudgetAccess(userId: string, budgetId: string) {
-		const [budget] = await this.db
-			.select({
-				ownerId: budgetTable.ownerId,
-				membership: budgetMemberTable.status,
-			})
-			.from(budgetTable)
-			.leftJoin(
-				budgetMemberTable,
-				and(
-					eq(budgetMemberTable.budgetId, budgetTable.id),
-					eq(budgetMemberTable.userId, userId),
-				),
-			)
-			.where(eq(budgetTable.id, budgetId));
-
-		if (!budget) {
-			return null;
-		}
-
-		return {
-			ownerId: budget.ownerId,
-			membership: budget.membership,
-		};
-	}
-
 	private async requireBudgetPermission(
 		userId: string,
 		budgetId: string,
 		action: Permissions["budgets"]["action"],
 	) {
-		const budget = await this.findBudgetAccess(userId, budgetId);
+		const budget = await findBudgetAccess(this.db, userId, budgetId);
 		const allowed =
 			budget !== null && hasPermission(userId, "budgets", action, budget);
 

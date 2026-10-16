@@ -24,11 +24,10 @@ import { and, desc, eq, isNull } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants";
 import {
-	budgetMemberTable,
-	budgetTable,
 	recordLineItemsTable,
 	recordsTable,
 } from "../database-service/tables/index";
+import { findBudgetAccess } from "../shared/budget/find-budget-access";
 import { logDocumentSucceeded } from "../shared/observability/log-event";
 import {
 	calculateRecordTotalAmount,
@@ -293,7 +292,7 @@ export class RecordsService {
 		action: "edit" | "delete",
 	) {
 		const budget = record.budgetId
-			? await this.findBudgetAccess(userId, record.budgetId)
+			? await findBudgetAccess(this.db, userId, record.budgetId)
 			: null;
 
 		if (record.budgetId && !budget) {
@@ -315,7 +314,7 @@ export class RecordsService {
 		budgetId: string,
 		notFoundMessage = "Budget not found",
 	) {
-		const budget = await this.findBudgetAccess(userId, budgetId);
+		const budget = await findBudgetAccess(this.db, userId, budgetId);
 		const allowed =
 			budget !== null && hasPermission(userId, "budgets", "view", budget);
 
@@ -327,7 +326,7 @@ export class RecordsService {
 	}
 
 	private async assertCanCreateBudgetRecord(userId: string, budgetId: string) {
-		const budget = await this.findBudgetAccess(userId, budgetId);
+		const budget = await findBudgetAccess(this.db, userId, budgetId);
 		const allowed =
 			budget !== null &&
 			hasPermission(userId, "records", "create", {
@@ -340,32 +339,6 @@ export class RecordsService {
 				message: "Budget not found",
 			});
 		}
-	}
-
-	private async findBudgetAccess(userId: string, budgetId: string) {
-		const [budget] = await this.db
-			.select({
-				ownerId: budgetTable.ownerId,
-				membership: budgetMemberTable.status,
-			})
-			.from(budgetTable)
-			.leftJoin(
-				budgetMemberTable,
-				and(
-					eq(budgetMemberTable.budgetId, budgetTable.id),
-					eq(budgetMemberTable.userId, userId),
-				),
-			)
-			.where(eq(budgetTable.id, budgetId));
-
-		if (!budget) {
-			return null;
-		}
-
-		return {
-			ownerId: budget.ownerId,
-			membership: budget.membership,
-		};
 	}
 
 	private throwNotFound(): never {
