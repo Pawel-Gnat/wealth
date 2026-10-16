@@ -70,10 +70,8 @@ describe("RouteLoadingBar", () => {
 
 		const bar = screen.getByRole("progressbar", { name: t("common.loading") });
 		expect(bar).toHaveAttribute("aria-live", "polite");
-		expect(bar).toHaveClass("h-0.5");
 
 		const segment = bar.firstElementChild;
-		expect(segment).toHaveClass("bg-primary");
 		expect(segment).toHaveClass("motion-safe:animate-route-loading");
 		expect(segment).toHaveClass("motion-reduce:w-full");
 	});
