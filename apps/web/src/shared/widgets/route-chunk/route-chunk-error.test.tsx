@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { TFunction } from "i18next";
 import type { ComponentType } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { RouteChunkLoadProvider } from "@/context/route-chunk-load";
@@ -24,19 +25,21 @@ const deferred = () => {
 };
 
 describe("RouteChunkError", () => {
+	let t: TFunction;
+
 	beforeAll(async () => {
-		await init18nWeb({ lng: "en" });
+		t = (await init18nWeb({ lng: "en" })) as TFunction;
 	});
 
 	it("shows the chunk error and try again button", () => {
 		renderError(() => Promise.resolve(LoadedPage));
 
-		expect(screen.getByText("Couldn't load this page.")).toBeInTheDocument();
+		expect(screen.getByText(t("route-chunk-error.title"))).toBeInTheDocument();
 		expect(
-			screen.getByText("Check your connection and try again."),
+			screen.getByText(t("route-chunk-error.description")),
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole("button", { name: "Try again" }),
+			screen.getByRole("button", { name: t("action.try-again") }),
 		).toBeInTheDocument();
 	});
 
@@ -45,7 +48,9 @@ describe("RouteChunkError", () => {
 		const load = vi.fn(async () => LoadedPage);
 		renderError(load);
 
-		await user.click(screen.getByRole("button", { name: "Try again" }));
+		await user.click(
+			screen.getByRole("button", { name: t("action.try-again") }),
+		);
 
 		expect(await screen.findByText("page ready")).toBeInTheDocument();
 		expect(load).toHaveBeenCalledOnce();
@@ -55,12 +60,14 @@ describe("RouteChunkError", () => {
 		const user = userEvent.setup();
 		renderError(() => Promise.reject(new Error("chunk failed")));
 
-		await user.click(screen.getByRole("button", { name: "Try again" }));
+		await user.click(
+			screen.getByRole("button", { name: t("action.try-again") }),
+		);
 
 		expect(
-			await screen.findByRole("button", { name: "Try again" }),
+			await screen.findByRole("button", { name: t("action.try-again") }),
 		).toBeEnabled();
-		expect(screen.getByText("Couldn't load this page.")).toBeInTheDocument();
+		expect(screen.getByText(t("route-chunk-error.title"))).toBeInTheDocument();
 		expect(screen.queryByText("page ready")).not.toBeInTheDocument();
 	});
 
@@ -70,7 +77,9 @@ describe("RouteChunkError", () => {
 		const load = vi.fn(() => pending.promise);
 		renderError(load);
 
-		await user.click(screen.getByRole("button", { name: "Try again" }));
+		await user.click(
+			screen.getByRole("button", { name: t("action.try-again") }),
+		);
 		expect(screen.getByRole("button")).toBeDisabled();
 
 		await user.click(screen.getByRole("button"));
@@ -85,7 +94,9 @@ describe("RouteChunkError", () => {
 		const load = vi.fn(async () => LoadedPage);
 		const first = renderError(load);
 
-		await user.click(screen.getByRole("button", { name: "Try again" }));
+		await user.click(
+			screen.getByRole("button", { name: t("action.try-again") }),
+		);
 		expect(await screen.findByText("page ready")).toBeInTheDocument();
 		first.unmount();
 

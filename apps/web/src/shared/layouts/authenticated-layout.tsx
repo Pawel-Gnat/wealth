@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router";
+import { APP_ROUTES } from "@/app/routes";
 import { useAuth } from "@/context/auth";
-import { APP_ROUTES } from "../../app/router";
 import { AuthSessionStatus } from "./auth-session-status";
 
 export const AuthenticatedLayout = () => {

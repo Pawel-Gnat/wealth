@@ -1,12 +1,15 @@
 import { act, render, screen } from "@testing-library/react";
+import type { TFunction } from "i18next";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { LOADER_DELAY, LOADER_MIN_DURATION } from "@/shared/hooks/use-loader";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { RouteLoadingBar } from "./route-loading-bar";
 
 describe("RouteLoadingBar", () => {
+	let t: TFunction;
+
 	beforeAll(async () => {
-		await init18nWeb({ lng: "en" });
+		t = (await init18nWeb({ lng: "en" })) as TFunction;
 	});
 
 	afterEach(() => {
@@ -25,7 +28,7 @@ describe("RouteLoadingBar", () => {
 
 		await act(() => vi.advanceTimersByTimeAsync(1));
 		expect(
-			screen.getByRole("progressbar", { name: "Loading" }),
+			screen.getByRole("progressbar", { name: t("common.loading") }),
 		).toBeInTheDocument();
 	});
 
@@ -65,7 +68,7 @@ describe("RouteLoadingBar", () => {
 
 		await act(() => vi.advanceTimersByTimeAsync(LOADER_DELAY));
 
-		const bar = screen.getByRole("progressbar", { name: "Loading" });
+		const bar = screen.getByRole("progressbar", { name: t("common.loading") });
 		expect(bar).toHaveAttribute("aria-live", "polite");
 		expect(bar).toHaveClass("h-0.5");
 
