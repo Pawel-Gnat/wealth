@@ -15,11 +15,9 @@ export const InvitationsList = ({
 			{invitations.map(({ budget, invitee }) => (
 				<Invitation
 					key={`${budget.id}-${invitee.id}`}
-					budgetId={budget.id}
-					title={budget.title}
+					budget={budget}
 					userId={userId}
 					inviteeId={invitee.id}
-					members={budget.members}
 				/>
 			))}
 		</div>

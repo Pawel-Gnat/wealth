@@ -19,15 +19,15 @@ import {
 	encodeDocumentDateForStorage,
 	isStoredDocumentDateEqual,
 } from "@repo/common/helpers";
-import { and, desc, eq, isNotNull, isNull, or } from "drizzle-orm";
+import { hasPermission } from "@repo/common/permissions";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants";
 import {
-	budgetMemberTable,
-	budgetTable,
 	recordLineItemsTable,
 	recordsTable,
 } from "../database-service/tables/index";
+import { findBudgetAccess } from "../shared/budget/find-budget-access";
 import { logDocumentSucceeded } from "../shared/observability/log-event";
 import {
 	calculateRecordTotalAmount,
@@ -59,7 +59,7 @@ export class RecordsService {
 		budgetId?: string,
 	): Promise<RecordListResponse> {
 		if (budgetId) {
-			await this.assertBudgetAccess(userId, budgetId);
+			await this.assertCanViewBudget(userId, budgetId);
 		}
 
 		const rows = await this.db
@@ -116,7 +116,7 @@ export class RecordsService {
 		}
 
 		if (record.budgetId) {
-			await this.assertBudgetAccess(userId, record.budgetId, RECORD_NOT_FOUND);
+			await this.assertCanViewBudget(userId, record.budgetId, RECORD_NOT_FOUND);
 		} else if (record.userId !== userId) {
 			throw new ORPCError("NOT_FOUND", { message: RECORD_NOT_FOUND });
 		}
@@ -154,7 +154,7 @@ export class RecordsService {
 		budgetId?: string,
 	): Promise<RecordCreateResponse> {
 		if (budgetId) {
-			await this.assertBudgetAccess(userId, budgetId);
+			await this.assertCanCreateBudgetRecord(userId, budgetId);
 		}
 
 		const totalAmount = calculateRecordTotalAmount(payload);
@@ -213,7 +213,7 @@ export class RecordsService {
 				this.throwNotFound();
 			}
 
-			await this.assertRecordWritable(userId, existing);
+			await this.assertRecordWritable(userId, existing, "edit");
 
 			const dateChanged = !isStoredDocumentDateEqual(
 				existing.documentDate,
@@ -269,7 +269,7 @@ export class RecordsService {
 				this.throwNotFound();
 			}
 
-			await this.assertRecordWritable(userId, existing);
+			await this.assertRecordWritable(userId, existing, "delete");
 
 			const [deletedRecord] = await tx
 				.delete(recordsTable)
@@ -289,45 +289,54 @@ export class RecordsService {
 	private async assertRecordWritable(
 		userId: string,
 		record: { userId: string; budgetId: string | null },
+		action: "edit" | "delete",
 	) {
-		if (record.userId !== userId) {
+		const budget = record.budgetId
+			? await findBudgetAccess(this.db, userId, record.budgetId)
+			: null;
+
+		if (record.budgetId && !budget) {
 			this.throwNotFound();
 		}
 
-		if (record.budgetId) {
-			await this.assertBudgetAccess(userId, record.budgetId, RECORD_NOT_FOUND);
+		const allowed = hasPermission(userId, "records", action, {
+			authorId: record.userId,
+			budget,
+		});
+
+		if (!allowed) {
+			this.throwNotFound();
 		}
 	}
 
-	private async assertBudgetAccess(
+	private async assertCanViewBudget(
 		userId: string,
 		budgetId: string,
 		notFoundMessage = "Budget not found",
 	) {
-		const [accessibleBudget] = await this.db
-			.select({ id: budgetTable.id })
-			.from(budgetTable)
-			.leftJoin(
-				budgetMemberTable,
-				and(
-					eq(budgetMemberTable.budgetId, budgetTable.id),
-					eq(budgetMemberTable.userId, userId),
-					eq(budgetMemberTable.status, "active"),
-				),
-			)
-			.where(
-				and(
-					eq(budgetTable.id, budgetId),
-					or(
-						eq(budgetTable.ownerId, userId),
-						isNotNull(budgetMemberTable.userId),
-					),
-				),
-			);
+		const budget = await findBudgetAccess(this.db, userId, budgetId);
+		const allowed =
+			budget !== null && hasPermission(userId, "budgets", "view", budget);
 
-		if (!accessibleBudget) {
+		if (!allowed) {
 			throw new ORPCError("NOT_FOUND", {
 				message: notFoundMessage,
+			});
+		}
+	}
+
+	private async assertCanCreateBudgetRecord(userId: string, budgetId: string) {
+		const budget = await findBudgetAccess(this.db, userId, budgetId);
+		const allowed =
+			budget !== null &&
+			hasPermission(userId, "records", "create", {
+				authorId: userId,
+				budget,
+			});
+
+		if (!allowed) {
+			throw new ORPCError("NOT_FOUND", {
+				message: "Budget not found",
 			});
 		}
 	}

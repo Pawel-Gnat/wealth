@@ -1,3 +1,4 @@
+import { hasPermission } from "@repo/common/permissions";
 import { useUser } from "@/context/auth";
 import { useBudgets } from "@/pages/budgets/hooks/use-budgets";
 import { DeleteBudgetDialog } from "./delete-budget-dialog";
@@ -18,11 +19,33 @@ export const BudgetActions = ({ budgetId }: BudgetActionsProps) => {
 		return null;
 	}
 
-	const isOwner = budget.owner.id === user.id;
+	const membership =
+		budget.members.find((member) => member.id === user.id)?.status ?? null;
 
-	if (isOwner) {
-		return (
-			<>
+	const canInvite = hasPermission(user.id, "budgets", "invite", {
+		ownerId: budget.owner.id,
+		membership,
+	});
+	const canEdit = hasPermission(user.id, "budgets", "edit", {
+		ownerId: budget.owner.id,
+		membership,
+	});
+	const canDelete = hasPermission(user.id, "budgets", "delete", {
+		ownerId: budget.owner.id,
+		membership,
+	});
+	const canLeave = hasPermission(user.id, "budgets", "leave", {
+		ownerId: budget.owner.id,
+		membership,
+	});
+
+	if (!canInvite && !canEdit && !canDelete && !canLeave) {
+		return null;
+	}
+
+	return (
+		<>
+			{canInvite && (
 				<InviteMembersModal
 					budgetId={budgetId}
 					excludedUserIds={[
@@ -31,19 +54,10 @@ export const BudgetActions = ({ budgetId }: BudgetActionsProps) => {
 					]}
 					memberCount={budget.members.length}
 				/>
-				<EditBudgetModal budgetId={budgetId} title={budget.title} />
-				<DeleteBudgetDialog budgetId={budgetId} />
-			</>
-		);
-	}
-
-	const isActiveMember = budget.members.some(
-		(member) => member.id === user.id && member.status === "active",
+			)}
+			{canEdit && <EditBudgetModal budgetId={budgetId} title={budget.title} />}
+			{canDelete && <DeleteBudgetDialog budgetId={budgetId} />}
+			{canLeave && <LeaveBudgetDialog budgetId={budgetId} />}
+		</>
 	);
-
-	if (!isActiveMember) {
-		return null;
-	}
-
-	return <LeaveBudgetDialog budgetId={budgetId} />;
 };

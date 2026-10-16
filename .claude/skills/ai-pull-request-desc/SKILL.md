@@ -85,15 +85,38 @@ Rules for **What has been changed**:
 
 ### 4. Deliver
 
-Output only:
+**Always return the full result in markdown** — both title and description, ready to copy-paste. Do not wrap the output in a prose reply or plain text outside markdown.
 
-1. **Title** (plain line)
-2. **Description** (the markdown block above)
+Use this shape:
+
+```markdown
+# Title
+
+feat: add dashboard page components
+
+# Description
+
+## What's new
+
+...
+
+## What has been changed
+
+### Added
+- `path/to/file`
+
+### Edited
+- `path/to/file`
+
+### Deleted
+- `path/to/file`
+```
 
 Ready to paste into GitHub/GitLab. Do not open a PR unless the user asks.
 
 ## Rules
 
+- **Always** return the result in markdown (title + description)
 - Base the text on the actual diff — do not invent features that are not in the changes
 - Prefer accurate, skim-friendly wording over marketing language
 - If the diff is empty, say so and do not invent a PR description
