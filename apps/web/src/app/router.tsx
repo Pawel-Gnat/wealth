@@ -1,4 +1,4 @@
-import { createBrowserRouter, type RouteObject } from "react-router";
+import { createBrowserRouter, Outlet, type RouteObject } from "react-router";
 import { AuthLayout } from "@/pages/auth/layouts";
 import { ErrorPage } from "@/pages/error";
 import {
@@ -41,6 +41,10 @@ const loadSettingsPage = lazyPage(() =>
 	import("@/pages/settings").then(({ SettingsPage }) => SettingsPage),
 ).lazy;
 
+const loadNotFoundPage = lazyPage(() =>
+	import("@/pages/not-found").then(({ NotFoundPage }) => NotFoundPage),
+).lazy;
+
 const routes: RouteObject[] = [
 	{
 		element: <UnauthenticatedLayout />,
@@ -57,27 +61,13 @@ const routes: RouteObject[] = [
 			{
 				element: <DashboardLayout />,
 				children: [
-					{ path: APP_ROUTES.dashboard, lazy: loadDashboardPage },
 					{
-						path: APP_ROUTES.records.list,
+						element: <Outlet />,
+						errorElement: <ErrorPage />,
 						children: [
-							{ index: true, lazy: loadRecordsListPage },
-							{ path: NEW_RECORD_SEGMENT, lazy: loadRecordFormPage },
+							{ path: APP_ROUTES.dashboard, lazy: loadDashboardPage },
 							{
-								path: ":id",
-								children: [
-									{ index: true, lazy: loadRecordPage },
-									{ path: EDIT_RECORD_SEGMENT, lazy: loadRecordFormPage },
-								],
-							},
-						],
-					},
-					{
-						path: APP_ROUTES.budgets.list,
-						children: [
-							{ index: true, lazy: loadBudgetsPage },
-							{
-								path: ":budgetId",
+								path: APP_ROUTES.records.list,
 								children: [
 									{ index: true, lazy: loadRecordsListPage },
 									{ path: NEW_RECORD_SEGMENT, lazy: loadRecordFormPage },
@@ -85,17 +75,38 @@ const routes: RouteObject[] = [
 										path: ":id",
 										children: [
 											{ index: true, lazy: loadRecordPage },
+											{ path: EDIT_RECORD_SEGMENT, lazy: loadRecordFormPage },
+										],
+									},
+								],
+							},
+							{
+								path: APP_ROUTES.budgets.list,
+								children: [
+									{ index: true, lazy: loadBudgetsPage },
+									{
+										path: ":budgetId",
+										children: [
+											{ index: true, lazy: loadRecordsListPage },
+											{ path: NEW_RECORD_SEGMENT, lazy: loadRecordFormPage },
 											{
-												path: EDIT_RECORD_SEGMENT,
-												lazy: loadRecordFormPage,
+												path: ":id",
+												children: [
+													{ index: true, lazy: loadRecordPage },
+													{
+														path: EDIT_RECORD_SEGMENT,
+														lazy: loadRecordFormPage,
+													},
+												],
 											},
 										],
 									},
 								],
 							},
+							{ path: APP_ROUTES.settings, lazy: loadSettingsPage },
+							{ path: "*", lazy: loadNotFoundPage },
 						],
 					},
-					{ path: APP_ROUTES.settings, lazy: loadSettingsPage },
 				],
 			},
 		],
@@ -105,7 +116,6 @@ const routes: RouteObject[] = [
 export const router = createBrowserRouter([
 	{
 		element: <RootLayout />,
-		errorElement: <ErrorPage />,
 		HydrateFallback: PageLoader,
 		children: routes,
 	},

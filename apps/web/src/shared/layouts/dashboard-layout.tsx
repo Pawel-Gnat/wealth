@@ -38,7 +38,7 @@ export function DashboardLayout() {
 					<UserAvatar user={user} asLink />
 				</div>
 			</div>
-			<div className="px-2 flex flex-col gap-4 mb-4">
+			<div className="px-2 flex flex-col gap-4 mb-4 flex-1">
 				<Outlet />
 			</div>
 		</Sidebar>

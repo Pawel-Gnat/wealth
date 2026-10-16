@@ -58,6 +58,11 @@
 		"title": "Couldn't load this page.",
 		"description": "Check your connection and try again."
 	},
+	"not-found": {
+		"title": "Page not found.",
+		"description": "This page doesn't exist or was moved.",
+		"back-home": "Back to home"
+	},
 	"toast": {
 		"success": {
 			"account-created": "Account created successfully",
