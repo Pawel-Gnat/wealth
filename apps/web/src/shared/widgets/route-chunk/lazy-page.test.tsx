@@ -1,8 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import type { TFunction } from "i18next";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { RouteChunkLoadProvider } from "@/context/route-chunk-load";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { lazyPage } from "./lazy-page";
 
@@ -17,41 +15,25 @@ describe("lazyPage", () => {
 
 	it("returns the page component when the import succeeds", async () => {
 		const route = lazyPage(async () => Page);
-		const resolved = await route.lazy();
+		const resolved = await route();
 
 		expect(resolved.Component).toBe(Page);
 	});
 
-	it("returns the chunk error and retries the same import", async () => {
-		const user = userEvent.setup();
-		let shouldFail = true;
+	it("returns the chunk error when the import fails", async () => {
 		const load = vi.fn(async () => {
-			if (shouldFail) {
-				throw new Error("chunk failed");
-			}
-			return Page;
+			throw new Error("chunk failed");
 		});
 		const route = lazyPage(load);
-		const resolved = await route.lazy();
+		const resolved = await route();
 		const Fallback = resolved.Component;
 
-		render(
-			<RouteChunkLoadProvider>
-				<Fallback />
-			</RouteChunkLoadProvider>,
-		);
+		render(<Fallback />);
 
+		expect(screen.getByText(t("route-chunk-error.title"))).toBeInTheDocument();
 		expect(
-			screen.getByRole("button", { name: t("action.try-again") }),
+			screen.getByText(t("route-chunk-error.description")),
 		).toBeInTheDocument();
-
-		shouldFail = false;
-
-		await user.click(
-			screen.getByRole("button", { name: t("action.try-again") }),
-		);
-
-		expect(await screen.findByText("page ready")).toBeInTheDocument();
-		expect(load).toHaveBeenCalledTimes(2);
+		expect(load).toHaveBeenCalledOnce();
 	});
 });

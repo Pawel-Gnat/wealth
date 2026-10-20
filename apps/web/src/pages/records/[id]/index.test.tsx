@@ -77,7 +77,7 @@ describe("RecordPage", () => {
 			}),
 		);
 
-		expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+		expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
 		expect(
 			screen.getByText(t("delete.expense.title", { ns: "records" })),
 		).toBeInTheDocument();

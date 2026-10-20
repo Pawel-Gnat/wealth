@@ -56,7 +56,7 @@
 	},
 	"route-chunk-error": {
 		"title": "Couldn't load this page.",
-		"description": "Check your connection and try again."
+		"description": "Refresh the browser and try again."
 	},
 	"not-found": {
 		"title": "Page not found.",

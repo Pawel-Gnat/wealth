@@ -15,35 +15,35 @@ export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";
 
 const loadAuthPage = lazyPage(() =>
 	import("@/pages/auth").then(({ AuthPage }) => AuthPage),
-).lazy;
+);
 
 const loadDashboardPage = lazyPage(() =>
 	import("@/pages/dashboard").then(({ DashboardPage }) => DashboardPage),
-).lazy;
+);
 
 const loadRecordsListPage = lazyPage(() =>
 	import("@/pages/records").then(({ RecordsListPage }) => RecordsListPage),
-).lazy;
+);
 
 const loadRecordFormPage = lazyPage(() =>
 	import("@/pages/records/form").then(({ RecordFormPage }) => RecordFormPage),
-).lazy;
+);
 
 const loadRecordPage = lazyPage(() =>
 	import("@/pages/records/[id]").then(({ RecordPage }) => RecordPage),
-).lazy;
+);
 
 const loadBudgetsPage = lazyPage(() =>
 	import("@/pages/budgets").then(({ BudgetsPage }) => BudgetsPage),
-).lazy;
+);
 
 const loadSettingsPage = lazyPage(() =>
 	import("@/pages/settings").then(({ SettingsPage }) => SettingsPage),
-).lazy;
+);
 
 const loadNotFoundPage = lazyPage(() =>
 	import("@/pages/not-found").then(({ NotFoundPage }) => NotFoundPage),
-).lazy;
+);
 
 const routes: RouteObject[] = [
 	{
