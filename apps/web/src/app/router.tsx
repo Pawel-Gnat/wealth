@@ -8,7 +8,7 @@ import {
 	UnauthenticatedLayout,
 } from "@/shared/layouts";
 import { PageLoader } from "@/shared/widgets/page-loader";
-import { lazyPage } from "@/shared/widgets/route-chunk";
+import { lazyPage } from "@/shared/widgets/route-loading";
 import { APP_ROUTES, EDIT_RECORD_SEGMENT, NEW_RECORD_SEGMENT } from "./routes";
 
 export { APP_ROUTES, type AppRoutePath, type AppRoutes } from "./routes";

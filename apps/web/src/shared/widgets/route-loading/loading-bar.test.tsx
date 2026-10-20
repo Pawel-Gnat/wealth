@@ -3,9 +3,9 @@ import type { TFunction } from "i18next";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { LOADER_DELAY, LOADER_MIN_DURATION } from "@/shared/hooks/use-loader";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
-import { RouteLoadingBar } from "./route-loading-bar";
+import { LoadingBar } from "./loading-bar";
 
-describe("RouteLoadingBar", () => {
+describe("LoadingBar", () => {
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -18,8 +18,8 @@ describe("RouteLoadingBar", () => {
 
 	it("stays hidden until the loader delay elapses", async () => {
 		vi.useFakeTimers();
-		const view = render(<RouteLoadingBar isLoading={false} />);
-		view.rerender(<RouteLoadingBar isLoading />);
+		const view = render(<LoadingBar isLoading={false} />);
+		view.rerender(<LoadingBar isLoading />);
 
 		expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
 
@@ -34,11 +34,11 @@ describe("RouteLoadingBar", () => {
 
 	it("keeps the bar for the minimum duration after loading ends", async () => {
 		vi.useFakeTimers();
-		const view = render(<RouteLoadingBar isLoading={false} />);
-		view.rerender(<RouteLoadingBar isLoading />);
+		const view = render(<LoadingBar isLoading={false} />);
+		view.rerender(<LoadingBar isLoading />);
 
 		await act(() => vi.advanceTimersByTimeAsync(LOADER_DELAY));
-		view.rerender(<RouteLoadingBar isLoading={false} />);
+		view.rerender(<LoadingBar isLoading={false} />);
 
 		await act(() => vi.advanceTimersByTimeAsync(LOADER_MIN_DURATION - 1));
 		expect(screen.getByRole("progressbar")).toBeInTheDocument();
@@ -49,11 +49,11 @@ describe("RouteLoadingBar", () => {
 
 	it("does not show the bar when loading ends before the delay", async () => {
 		vi.useFakeTimers();
-		const view = render(<RouteLoadingBar isLoading={false} />);
-		view.rerender(<RouteLoadingBar isLoading />);
+		const view = render(<LoadingBar isLoading={false} />);
+		view.rerender(<LoadingBar isLoading />);
 
 		await act(() => vi.advanceTimersByTimeAsync(LOADER_DELAY - 1));
-		view.rerender(<RouteLoadingBar isLoading={false} />);
+		view.rerender(<LoadingBar isLoading={false} />);
 		await act(() =>
 			vi.advanceTimersByTimeAsync(LOADER_DELAY + LOADER_MIN_DURATION),
 		);
@@ -63,8 +63,8 @@ describe("RouteLoadingBar", () => {
 
 	it("announces loading politely and keeps a static full-width bar when motion is reduced", async () => {
 		vi.useFakeTimers();
-		const view = render(<RouteLoadingBar isLoading={false} />);
-		view.rerender(<RouteLoadingBar isLoading />);
+		const view = render(<LoadingBar isLoading={false} />);
+		view.rerender(<LoadingBar isLoading />);
 
 		await act(() => vi.advanceTimersByTimeAsync(LOADER_DELAY));
 

@@ -1,10 +1,10 @@
 import { Outlet } from "react-router";
-import { ChunkLoadingBar } from "@/shared/widgets/route-chunk";
+import { NavigationLoadingBar } from "@/shared/widgets/route-loading";
 
 export const RootLayout = () => {
 	return (
 		<>
-			<ChunkLoadingBar />
+			<NavigationLoadingBar />
 			<Outlet />
 		</>
 	);

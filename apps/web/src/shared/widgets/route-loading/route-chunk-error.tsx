@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { ErrorState } from "@/shared/components";
+import { Button, ErrorState } from "@/shared/components";
 
 export const RouteChunkError = () => {
 	const { t } = useTranslation();
@@ -10,6 +10,9 @@ export const RouteChunkError = () => {
 				title={t("route-chunk-error.title")}
 				description={t("route-chunk-error.description")}
 			/>
+			<Button onClick={() => window.location.reload()}>
+				{t("action.refresh")}
+			</Button>
 		</div>
 	);
 };
