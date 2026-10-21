@@ -62,7 +62,11 @@ export const RecordPage = () => {
 			</CardState>
 
 			{isDeleteOpen && data ? (
-				<Suspense fallback={<AlertModalSkeleton />}>
+				<Suspense
+					fallback={
+						<AlertModalSkeleton onClose={() => setIsDeleteOpen(false)} />
+					}
+				>
 					<RecordDeleteDialog
 						id={id}
 						kind={data.kind}

@@ -4,6 +4,18 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { lazyPage } from "./lazy-page";
 
+const captureException = vi.hoisted(() => vi.fn());
+
+vi.mock("@repo/observability/browser", async (importOriginal) => {
+	const actual =
+		await importOriginal<typeof import("@repo/observability/browser")>();
+
+	return {
+		...actual,
+		captureException,
+	};
+});
+
 const Page = () => <div>page ready</div>;
 
 describe("lazyPage", () => {
@@ -21,8 +33,9 @@ describe("lazyPage", () => {
 	});
 
 	it("returns the chunk error when the import fails", async () => {
+		const error = new Error("chunk failed");
 		const load = vi.fn(async () => {
-			throw new Error("chunk failed");
+			throw error;
 		});
 		const route = lazyPage(load);
 		const resolved = await route();
@@ -35,5 +48,6 @@ describe("lazyPage", () => {
 			screen.getByText(t("route-chunk-error.description")),
 		).toBeInTheDocument();
 		expect(load).toHaveBeenCalledOnce();
+		expect(captureException).toHaveBeenCalledWith(error);
 	});
 });
