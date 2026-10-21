@@ -32,6 +32,7 @@
 		"@nestjs/config": "^4.0.4",
 		"@nestjs/core": "^11.0.1",
 		"@nestjs/platform-express": "^11.0.1",
+		"@nestjs/throttler": "^6.7.1",
 		"@orpc/nest": "^1.14.0",
 		"@orpc/openapi": "^1.14.0",
 		"@orpc/server": "^1.14.0",
