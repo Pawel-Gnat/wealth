@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { useLoader } from "@/shared/hooks/use-loader";
 
-type RouteLoadingBarProps = {
+type LoadingBarProps = {
 	isLoading: boolean;
 };
 
-export const RouteLoadingBar = ({ isLoading }: RouteLoadingBarProps) => {
+export const LoadingBar = ({ isLoading }: LoadingBarProps) => {
 	const { t } = useTranslation();
 	const visible = useLoader({ isLoading });
 

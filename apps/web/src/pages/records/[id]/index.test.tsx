@@ -77,10 +77,10 @@ describe("RecordPage", () => {
 			}),
 		);
 
-		expect(screen.getByRole("alertdialog")).toBeInTheDocument();
 		expect(
-			screen.getByText(t("delete.expense.title", { ns: "records" })),
+			await screen.findByText(t("delete.expense.title", { ns: "records" })),
 		).toBeInTheDocument();
+		expect(screen.getByRole("alertdialog")).toBeInTheDocument();
 	});
 
 	it("shows an error when the record cannot be loaded", async () => {

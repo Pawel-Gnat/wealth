@@ -1,14 +1,20 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 import { APP_ROUTES } from "@/app/routes";
+import { AlertModalSkeleton } from "@/shared/components";
 import { PageLayout } from "@/shared/layouts";
 import { CardState } from "@/shared/widgets/card-state";
 import { getRecordConfig } from "../config/record-config";
 import { useRecord } from "../form/hooks/use-record";
 import { RecordActions } from "./ui/record-actions";
-import { RecordDeleteDialog } from "./ui/record-delete-dialog";
 import { RecordView } from "./ui/record-view";
+
+const RecordDeleteDialog = lazy(() =>
+	import("./ui/record-delete-dialog").then((module) => ({
+		default: module.RecordDeleteDialog,
+	})),
+);
 
 export const RecordPage = () => {
 	const { t } = useTranslation();
@@ -56,11 +62,17 @@ export const RecordPage = () => {
 			</CardState>
 
 			{isDeleteOpen && data ? (
-				<RecordDeleteDialog
-					id={id}
-					kind={data.kind}
-					onClose={() => setIsDeleteOpen(false)}
-				/>
+				<Suspense
+					fallback={
+						<AlertModalSkeleton onClose={() => setIsDeleteOpen(false)} />
+					}
+				>
+					<RecordDeleteDialog
+						id={id}
+						kind={data.kind}
+						onClose={() => setIsDeleteOpen(false)}
+					/>
+				</Suspense>
 			) : null}
 		</PageLayout>
 	);

@@ -40,6 +40,7 @@
 		"logout": "Logout",
 		"retry": "Retry",
 		"try-again": "Try again",
+		"refresh": "Refresh",
 		"add": "Add",
 		"edit": "Edit",
 		"preview": "Preview",
@@ -56,7 +57,7 @@
 	},
 	"route-chunk-error": {
 		"title": "Couldn't load this page.",
-		"description": "Check your connection and try again."
+		"description": "Refresh the browser and try again."
 	},
 	"not-found": {
 		"title": "Page not found.",

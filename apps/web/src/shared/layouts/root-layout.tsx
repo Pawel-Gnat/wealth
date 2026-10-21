@@ -1,12 +1,11 @@
 import { Outlet } from "react-router";
-import { RouteChunkLoadProvider } from "@/context/route-chunk-load";
-import { ChunkLoadingBar } from "@/shared/widgets/route-chunk";
+import { NavigationLoadingBar } from "@/shared/widgets/route-loading";
 
 export const RootLayout = () => {
 	return (
-		<RouteChunkLoadProvider>
-			<ChunkLoadingBar />
+		<>
+			<NavigationLoadingBar />
 			<Outlet />
-		</RouteChunkLoadProvider>
+		</>
 	);
 };
