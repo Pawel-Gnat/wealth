@@ -5,6 +5,7 @@ import {
 	setRequestId,
 } from "@repo/observability/browser";
 import { reportClientError } from "@/shared/helpers/controlled-fetch";
+import { notifyTooManyRequests } from "@/shared/lib/orpc/notify-too-many-requests";
 
 const PUBLIC_AUTH_PATHS = new Set([
 	"/auth/signin",
@@ -107,6 +108,10 @@ export const orpcTransportFetch = async (
 			if (snapshot) {
 				response = await fetch(...toFetchArgs(retryInput, init, requestId));
 			}
+		}
+
+		if (response.status === 429) {
+			notifyTooManyRequests(response);
 		}
 
 		return response;

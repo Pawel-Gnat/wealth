@@ -37,6 +37,10 @@ async function bootstrap() {
 		bodyParser: false,
 	});
 
+	if (isProduction()) {
+		app.getHttpAdapter().getInstance().set("trust proxy", 1);
+	}
+
 	app.use(cookieParser());
 
 	app.enableCors({

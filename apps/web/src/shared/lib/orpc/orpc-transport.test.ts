@@ -1,15 +1,25 @@
 import { REQUEST_ID_HEADER_NAME } from "@repo/common/constants";
+import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { toast } from "sonner";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	applySessionSnapshot,
 	clearAuthSession,
 	configureAuth,
 	resetRefreshMutex,
 } from "@/shared/lib/auth/auth-api";
+import { init18nWeb } from "@/shared/lib/i18n/i18n";
+import { TOO_MANY_REQUESTS_TOAST_ID } from "@/shared/lib/orpc/notify-too-many-requests";
 import { orpcTransportFetch } from "@/shared/lib/orpc/orpc-transport";
 import { MOCK_USER } from "@/test/mocks/user";
 import { server } from "@/test/servers";
+
+vi.mock("sonner", () => ({
+	toast: {
+		error: vi.fn(),
+	},
+}));
 
 const snapshot = {
 	user: MOCK_USER,
@@ -17,10 +27,17 @@ const snapshot = {
 };
 
 describe("orpcTransportFetch", () => {
+	let t: TFunction;
+
+	beforeAll(async () => {
+		t = (await init18nWeb({ lng: "en" })) as TFunction;
+	});
+
 	beforeEach(() => {
 		configureAuth({});
 		resetRefreshMutex();
 		clearAuthSession();
+		vi.mocked(toast.error).mockClear();
 	});
 
 	it("sends credentials and a request id", async () => {
@@ -134,5 +151,53 @@ describe("orpcTransportFetch", () => {
 
 		expect(response.status).toBe(401);
 		expect(onCleared).toHaveBeenCalledOnce();
+	});
+
+	it("shows one toast with the retry delay", async () => {
+		server.use(
+			http.get(
+				"http://backend.test/expenses",
+				() =>
+					new HttpResponse(null, {
+						status: 429,
+						headers: { "Retry-After": "12" },
+					}),
+			),
+		);
+
+		const response = await orpcTransportFetch("http://backend.test/expenses");
+
+		expect(response.status).toBe(429);
+		expect(toast.error).toHaveBeenCalledWith(
+			t("toast.error.too-many-requests", { count: 12 }),
+			{ id: TOO_MANY_REQUESTS_TOAST_ID },
+		);
+	});
+
+	it("keeps the same toast id for another 429", async () => {
+		server.use(
+			http.get(
+				"http://backend.test/expenses",
+				() =>
+					new HttpResponse(null, {
+						status: 429,
+						headers: { "Retry-After": "1" },
+					}),
+			),
+		);
+
+		await orpcTransportFetch("http://backend.test/expenses");
+		await orpcTransportFetch("http://backend.test/expenses");
+
+		expect(toast.error).toHaveBeenNthCalledWith(
+			1,
+			t("toast.error.too-many-requests", { count: 1 }),
+			{ id: TOO_MANY_REQUESTS_TOAST_ID },
+		);
+		expect(toast.error).toHaveBeenNthCalledWith(
+			2,
+			t("toast.error.too-many-requests", { count: 1 }),
+			{ id: TOO_MANY_REQUESTS_TOAST_ID },
+		);
 	});
 });
