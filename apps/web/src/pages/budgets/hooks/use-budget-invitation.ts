@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { invalidateBudgetQueries } from "@/features/budgets/helpers/invalidate-budget-queries";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useAppMutation } from "@/shared/hooks/use-app-mutation";
-import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
 type UseBudgetInvitationProps = {
@@ -69,12 +68,12 @@ export const useBudgetInvitation = ({
 		},
 	});
 
+	const isPending = accept.isPending || reject.isPending || cancel.isPending;
+
 	return {
 		acceptInvite: () => accept.mutate(),
 		rejectInvite: () => reject.mutate(),
 		cancelInvite: () => cancel.mutate(),
-		isPending: useLoader({
-			isLoading: accept.isPending || reject.isPending || cancel.isPending,
-		}),
+		isPending,
 	};
 };
