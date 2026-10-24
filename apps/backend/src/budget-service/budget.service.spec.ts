@@ -415,7 +415,7 @@ describe("Budget service", () => {
 
 			await usersService.updateImage(owner.id, stored.id);
 			const image = `http://localhost:9000/wealth-storage/avatars/${owner.id}/avatar.jpg`;
-			vi.mocked(storageService.resolvePublicUrl).mockResolvedValueOnce(
+			vi.mocked(storageService.resolvePublicUrl).mockResolvedValue(
 				new Map([[stored.id, image]]),
 			);
 

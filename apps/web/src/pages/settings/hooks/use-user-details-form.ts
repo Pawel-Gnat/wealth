@@ -10,11 +10,12 @@ import {
 	logger,
 	runWithRequestId,
 } from "@repo/observability/browser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
+import { useAppMutation } from "@/shared/hooks/use-app-mutation";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
@@ -29,7 +30,7 @@ export const useUserDetailsForm = (user: User) => {
 		},
 	});
 
-	const mutation = useMutation<
+	const mutation = useAppMutation<
 		UserEditDetailsResponse,
 		Error,
 		UserEditDetailsPayload

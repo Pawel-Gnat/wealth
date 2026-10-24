@@ -2,6 +2,7 @@ import { Controller, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Implement, implement, ORPCError } from "@orpc/nest";
 import { rpcContract } from "@repo/api/contracts";
 import { SessionGuard } from "../guards/session.guard";
+import { AuthThrottle } from "../shared/throttler/auth-throttle";
 import { AuthService } from "./auth.service";
 
 @Controller()
@@ -23,6 +24,7 @@ export class AuthController {
 		});
 	}
 
+	@AuthThrottle()
 	@Implement(rpcContract.user.signIn)
 	signInRpc() {
 		return implement(rpcContract.user.signIn).handler(
@@ -67,6 +69,7 @@ export class AuthController {
 		});
 	}
 
+	@AuthThrottle()
 	@Implement(rpcContract.user.signUp)
 	signUpRpc() {
 		return implement(rpcContract.user.signUp).handler(async ({ input }) => {

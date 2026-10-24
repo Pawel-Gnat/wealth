@@ -104,7 +104,8 @@
 			"income-updated": "Failed to update income",
 			"password-updated": "Failed to update password",
 			"details-updated": "Failed to update personal details",
-			"avatar-updated": "Failed to update avatar"
+			"avatar-updated": "Failed to update avatar",
+			"too-many-requests": "Too many requests. Try again in {{count}} seconds."
 		}
 	}
 }

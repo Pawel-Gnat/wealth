@@ -6,11 +6,11 @@ import {
 	logger,
 	runWithRequestId,
 } from "@repo/observability/browser";
-import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
+import { useAppMutation } from "@/shared/hooks/use-app-mutation";
 import { applySessionSnapshot } from "@/shared/lib/auth/auth-api";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
@@ -24,7 +24,11 @@ export const useSignInForm = () => {
 		},
 	});
 
-	const mutation = useMutation<SessionSnapshotResponse, Error, SignInPayload>({
+	const mutation = useAppMutation<
+		SessionSnapshotResponse,
+		Error,
+		SignInPayload
+	>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
 				const data = await controlledAsync(() =>

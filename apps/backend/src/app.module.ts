@@ -20,6 +20,7 @@ import { HealthModule } from "./health-service/health.module";
 import { RequestIdMiddleware } from "./middleware/request-id.middleware";
 import { RecordsModule } from "./records-service/records.module";
 import { RedisModule } from "./redis-service/redis.module";
+import { AppThrottlerModule } from "./shared/throttler/throttler.module";
 import { SseHttpModule } from "./sse-service/sse-http.module";
 import { SseRealtimeModule } from "./sse-service/sse-realtime.module";
 import { StorageModule } from "./storage-service/storage.module";
@@ -37,6 +38,7 @@ declare module "@orpc/nest" {
 		ConfigModule.forRoot({
 			isGlobal: true,
 		}),
+		AppThrottlerModule,
 		ORPCModule.forRootAsync({
 			useFactory: (request: Request) => {
 				if (!request.res) {

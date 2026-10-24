@@ -1,10 +1,11 @@
 import type { BudgetLeaveResponse } from "@repo/api/types";
 import { runWithRequestId } from "@repo/observability/browser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { invalidateBudgetQueries } from "@/features/budgets/helpers/invalidate-budget-queries";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
+import { useAppMutation } from "@/shared/hooks/use-app-mutation";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
 type UseLeaveBudgetProps = {
@@ -16,7 +17,7 @@ export const useLeaveBudget = ({ budgetId, onLeft }: UseLeaveBudgetProps) => {
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
 
-	const mutation = useMutation<BudgetLeaveResponse, Error, void>({
+	const mutation = useAppMutation<BudgetLeaveResponse, Error, void>({
 		mutationFn: () =>
 			runWithRequestId(() =>
 				controlledAsync(() => orpcClient.budget.leave({ id: budgetId })),

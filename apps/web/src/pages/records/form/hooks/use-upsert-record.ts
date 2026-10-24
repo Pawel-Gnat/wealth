@@ -8,7 +8,7 @@ import type {
 } from "@repo/api/types";
 import { normalizeDocumentDateForApi } from "@repo/common/helpers";
 import { logger, runWithRequestId } from "@repo/observability/browser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -16,6 +16,7 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { APP_ROUTES } from "@/app/routes";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
+import { useAppMutation } from "@/shared/hooks/use-app-mutation";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { getRecordConfig } from "../../config/record-config";
 
@@ -65,7 +66,11 @@ export const useUpsertRecord = ({
 		}
 	}, [form, initialValues]);
 
-	const mutation = useMutation<RecordUpsertResponse, Error, RecordFormValues>({
+	const mutation = useAppMutation<
+		RecordUpsertResponse,
+		Error,
+		RecordFormValues
+	>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
 				const config = getRecordConfig(payload.kind);

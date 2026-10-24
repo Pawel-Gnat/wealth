@@ -37,12 +37,17 @@ async function bootstrap() {
 		bodyParser: false,
 	});
 
+	if (isProduction()) {
+		app.getHttpAdapter().getInstance().set("trust proxy", 1);
+	}
+
 	app.use(cookieParser());
 
 	app.enableCors({
 		origin: resolveCorsOrigin(),
 		credentials: true,
 		allowedHeaders: ["Content-Type", "X-Timezone", REQUEST_ID_HEADER_NAME],
+		exposedHeaders: ["Retry-After"],
 	});
 
 	if (!isProduction()) {
