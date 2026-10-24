@@ -10,7 +10,6 @@ import {
 	resetRefreshMutex,
 } from "@/shared/lib/auth/auth-api";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
-import { TOO_MANY_REQUESTS_TOAST_ID } from "@/shared/lib/orpc/notify-too-many-requests";
 import { orpcTransportFetch } from "@/shared/lib/orpc/orpc-transport";
 import { MOCK_USER } from "@/test/mocks/user";
 import { server } from "@/test/servers";
@@ -170,11 +169,10 @@ describe("orpcTransportFetch", () => {
 		expect(response.status).toBe(429);
 		expect(toast.error).toHaveBeenCalledWith(
 			t("toast.error.too-many-requests", { count: 12 }),
-			{ id: TOO_MANY_REQUESTS_TOAST_ID },
 		);
 	});
 
-	it("keeps the same toast id for another 429", async () => {
+	it("shows a separate toast for each 429", async () => {
 		server.use(
 			http.get(
 				"http://backend.test/expenses",
@@ -192,12 +190,10 @@ describe("orpcTransportFetch", () => {
 		expect(toast.error).toHaveBeenNthCalledWith(
 			1,
 			t("toast.error.too-many-requests", { count: 1 }),
-			{ id: TOO_MANY_REQUESTS_TOAST_ID },
 		);
 		expect(toast.error).toHaveBeenNthCalledWith(
 			2,
 			t("toast.error.too-many-requests", { count: 1 }),
-			{ id: TOO_MANY_REQUESTS_TOAST_ID },
 		);
 	});
 });

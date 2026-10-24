@@ -47,6 +47,7 @@ async function bootstrap() {
 		origin: resolveCorsOrigin(),
 		credentials: true,
 		allowedHeaders: ["Content-Type", "X-Timezone", REQUEST_ID_HEADER_NAME],
+		exposedHeaders: ["Retry-After"],
 	});
 
 	if (!isProduction()) {

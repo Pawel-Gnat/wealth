@@ -6,11 +6,11 @@ import {
 	logger,
 	runWithRequestId,
 } from "@repo/observability/browser";
-import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
+import { useAppMutation } from "@/shared/hooks/use-app-mutation";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
 type UseSignUpFormProps = {
@@ -30,24 +30,26 @@ export const useSignUpForm = ({ onSignedUp }: UseSignUpFormProps) => {
 		},
 	});
 
-	const mutation = useMutation<CreateUserResponse, Error, CreateUserPayload>({
-		mutationFn: (payload) =>
-			runWithRequestId(async () => {
-				const data = await controlledAsync(() =>
-					orpcClient.user.signUp(payload),
-				);
-				logger.info(AUTH_OBSERVABILITY_EVENTS.signUpSucceeded);
-				return data;
-			}),
-		onSuccess: () => {
-			form.reset();
-			toast.success(t("toast.success.account-created", { ns: "common" }));
-			onSignedUp();
+	const mutation = useAppMutation<CreateUserResponse, Error, CreateUserPayload>(
+		{
+			mutationFn: (payload) =>
+				runWithRequestId(async () => {
+					const data = await controlledAsync(() =>
+						orpcClient.user.signUp(payload),
+					);
+					logger.info(AUTH_OBSERVABILITY_EVENTS.signUpSucceeded);
+					return data;
+				}),
+			onSuccess: () => {
+				form.reset();
+				toast.success(t("toast.success.account-created", { ns: "common" }));
+				onSignedUp();
+			},
+			onError: () => {
+				toast.error(t("toast.error.account-created", { ns: "common" }));
+			},
 		},
-		onError: () => {
-			toast.error(t("toast.error.account-created", { ns: "common" }));
-		},
-	});
+	);
 
 	return {
 		control: form.control,

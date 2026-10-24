@@ -4,11 +4,13 @@ import type {
 	BudgetInviteRejectedResponse,
 } from "@repo/api/types";
 import { runWithRequestId } from "@repo/observability/browser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { invalidateBudgetQueries } from "@/features/budgets/helpers/invalidate-budget-queries";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
+import { useAppMutation } from "@/shared/hooks/use-app-mutation";
+import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 
 type UseBudgetInvitationProps = {
@@ -23,7 +25,7 @@ export const useBudgetInvitation = ({
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
 
-	const accept = useMutation<BudgetInviteAcceptedResponse, Error, void>({
+	const accept = useAppMutation<BudgetInviteAcceptedResponse, Error, void>({
 		mutationFn: () =>
 			runWithRequestId(() =>
 				controlledAsync(() => orpcClient.budget.acceptInvite({ id: budgetId })),
@@ -37,7 +39,7 @@ export const useBudgetInvitation = ({
 		},
 	});
 
-	const reject = useMutation<BudgetInviteRejectedResponse, Error, void>({
+	const reject = useAppMutation<BudgetInviteRejectedResponse, Error, void>({
 		mutationFn: () =>
 			runWithRequestId(() =>
 				controlledAsync(() => orpcClient.budget.rejectInvite({ id: budgetId })),
@@ -51,7 +53,7 @@ export const useBudgetInvitation = ({
 		},
 	});
 
-	const cancel = useMutation<BudgetInviteCancelledResponse, Error, void>({
+	const cancel = useAppMutation<BudgetInviteCancelledResponse, Error, void>({
 		mutationFn: () =>
 			runWithRequestId(() =>
 				controlledAsync(() =>
@@ -67,12 +69,12 @@ export const useBudgetInvitation = ({
 		},
 	});
 
-	const isPending = accept.isPending || reject.isPending || cancel.isPending;
-
 	return {
 		acceptInvite: () => accept.mutate(),
 		rejectInvite: () => reject.mutate(),
 		cancelInvite: () => cancel.mutate(),
-		isPending,
+		isPending: useLoader({
+			isLoading: accept.isPending || reject.isPending || cancel.isPending,
+		}),
 	};
 };

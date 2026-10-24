@@ -1,7 +1,8 @@
 import type { RecordDeleteResponse, RecordKind } from "@repo/api/types";
 import { logger, runWithRequestId } from "@repo/observability/browser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
+import { useAppMutation } from "@/shared/hooks/use-app-mutation";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { getRecordConfig } from "../../config/record-config";
 
@@ -19,7 +20,7 @@ export const useDeleteRecord = ({
 	const config = getRecordConfig(kind);
 	const queryClient = useQueryClient();
 
-	const mutation = useMutation<RecordDeleteResponse, Error, string>({
+	const mutation = useAppMutation<RecordDeleteResponse, Error, string>({
 		mutationFn: (recordId) =>
 			runWithRequestId(async () => {
 				const data = await controlledAsync<RecordDeleteResponse>(async () =>
