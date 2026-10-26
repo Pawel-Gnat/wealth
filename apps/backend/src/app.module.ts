@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import {
 	type MiddlewareConsumer,
 	Module,
@@ -37,6 +38,7 @@ declare module "@orpc/nest" {
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true,
+			envFilePath: join(__dirname, "../../../.env"),
 		}),
 		AppThrottlerModule,
 		ORPCModule.forRootAsync({

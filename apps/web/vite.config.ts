@@ -8,6 +8,7 @@ import { analyzer } from "vite-bundle-analyzer";
 import { defineConfig as defineVitestConfig } from "vitest/config";
 
 const viteConfig = defineViteConfig({
+	envDir: path.resolve(import.meta.dirname, "../.."),
 	plugins: [
 		react(),
 		tailwindcss(),
