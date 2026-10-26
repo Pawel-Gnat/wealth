@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig, devices } from "@playwright/test";
 
 const e2ePackageDir = dirname(fileURLToPath(import.meta.url));
-const envPath = join(e2ePackageDir, ".env");
+const envPath = join(e2ePackageDir, "../..", ".env");
 
 if (existsSync(envPath)) {
 	loadEnvFile(envPath);

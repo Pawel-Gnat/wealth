@@ -74,11 +74,10 @@ pnpm install
 Copy the env examples and leave the Better Stack variables empty if you do not need logs or error reporting locally:
 
 ```bash
-cp apps/backend/.env.example apps/backend/.env
-cp apps/web/.env.example apps/web/.env
+cp .env.example .env
 ```
 
-Local MinIO (object storage in `docker-compose.dev.yaml`) requires a personal MinIO license file at `apps/backend/minio/minio.license` (gitignored). Without a valid license the container can start, but all S3 operations are denied.
+Local MinIO (object storage in `docker/docker-compose.dev.yaml`) requires a personal MinIO license file at `docker/minio/minio.license` (gitignored). Without a valid license the container can start, but all S3 operations are denied.
 
 Start the local services in the background, stop them without deleting data, or remove the containers and their volumes:
 
@@ -148,7 +147,7 @@ Domain types stay in `@repo/api`. Income and expense use the same records screen
 pnpm exec playwright install chromium
 ```
 
-Daily activity bots are a separate Playwright project. They sign in to a deployed app and add records. Copy `apps/e2e/.env.example` to `apps/e2e/.env` and set `FRONTEND_URL` and `BOT_PASSWORD`, then run:
+Daily activity bots are a separate Playwright project. They sign in to a deployed app and add records. Set `FRONTEND_URL` and `BOT_PASSWORD` in the root `.env`, then run:
 
 ```bash
 pnpm --filter e2e test:bots
