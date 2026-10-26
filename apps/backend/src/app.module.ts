@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import {
 	type MiddlewareConsumer,
@@ -27,6 +28,8 @@ import { SseRealtimeModule } from "./sse-service/sse-realtime.module";
 import { StorageModule } from "./storage-service/storage.module";
 import { UsersModule } from "./users-service/users.module";
 
+const envFilePath = join(__dirname, "../../../.env");
+
 declare module "@orpc/nest" {
 	interface ORPCGlobalContext {
 		request: Request;
@@ -38,7 +41,7 @@ declare module "@orpc/nest" {
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true,
-			envFilePath: join(__dirname, "../../../.env"),
+			envFilePath: existsSync(envFilePath) ? envFilePath : [],
 		}),
 		AppThrottlerModule,
 		ORPCModule.forRootAsync({

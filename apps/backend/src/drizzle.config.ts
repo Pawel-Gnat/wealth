@@ -1,9 +1,9 @@
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { join } from "node:path";
 import { loadEnvFile } from "node:process";
 import { defineConfig } from "drizzle-kit";
 
-const envPath = resolve(process.cwd(), "../../.env");
+const envPath = join(__dirname, "../../../.env");
 
 if (existsSync(envPath)) {
 	loadEnvFile(envPath);
