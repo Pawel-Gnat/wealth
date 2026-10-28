@@ -282,6 +282,13 @@ describe("Audits service", () => {
 			},
 		);
 		await expect(
+			auditsService.list(pending.id, {
+				actions: [RECORD_EVENTS.expense.created],
+				entityId: "record-1",
+				budgetId: budget.id,
+			}),
+		).rejects.toMatchObject({ code: "NOT_FOUND" });
+		await expect(
 			auditsService.list(owner.id, {
 				actions: [BUDGET_EVENTS.created],
 				entityId: "missing-budget",
