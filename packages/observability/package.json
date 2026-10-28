@@ -13,6 +13,11 @@
 			"types": "./dist/node/index.d.ts",
 			"import": "./dist/node/index.js",
 			"default": "./dist/node/index.js"
+		},
+		"./shared": {
+			"types": "./dist/shared/index.d.ts",
+			"import": "./dist/shared/index.js",
+			"default": "./dist/shared/index.js"
 		}
 	},
 	"scripts": {
@@ -20,7 +25,8 @@
 		"build": "tsdown",
 		"lint": "biome check .",
 		"format": "biome check --write .",
-		"check-types": "tsc --noEmit"
+		"check-types": "tsc --noEmit",
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"@logtail/browser": "^0.5.8",
@@ -35,6 +41,7 @@
 		"@repo/typescript-config": "workspace:*",
 		"@types/node": "catalog:",
 		"tsdown": "catalog:",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }

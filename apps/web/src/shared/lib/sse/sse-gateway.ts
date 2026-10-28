@@ -1,6 +1,7 @@
 import { sseEventSchema } from "@repo/api/schemas";
 import type { SseEvent } from "@repo/api/types";
-import { logger, SSE_OBSERVABILITY_EVENTS } from "@repo/observability/browser";
+import { logger } from "@repo/observability/browser";
+import { OBSERVABILITY_EVENTS } from "@repo/observability/shared";
 import { clearAuthSession } from "@/shared/lib/auth/auth-api";
 
 const RECONNECT_INITIAL_MS = 1_000;
@@ -11,13 +12,13 @@ export const dispatchSseMessage = (raw: string): SseEvent | null => {
 	try {
 		parsed = JSON.parse(raw);
 	} catch {
-		logger.warn(SSE_OBSERVABILITY_EVENTS.frameMalformed);
+		logger.warn(OBSERVABILITY_EVENTS.sseFrame);
 		return null;
 	}
 
 	const result = sseEventSchema.safeParse(parsed);
 	if (!result.success) {
-		logger.warn(SSE_OBSERVABILITY_EVENTS.envelopeInvalid);
+		logger.warn(OBSERVABILITY_EVENTS.sseEnvelope);
 		return null;
 	}
 

@@ -1,7 +1,5 @@
-import { RECORD_UPDATED_MESSAGE } from "@repo/api/schemas";
 import type { RecordKind } from "@repo/api/types";
 import type { ParseKeys, ParseNsKeys } from "@repo/common/i18n";
-import { getDocumentObservabilityEvents } from "@repo/observability/browser";
 import { APP_ROUTES } from "@/app/routes";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
@@ -33,7 +31,6 @@ const sharedRecordConfig = {
 	editRoute: APP_ROUTES.records.edit,
 	queryKeys: queryKeys.records,
 	client: orpcClient.records,
-	updatedMessage: RECORD_UPDATED_MESSAGE,
 } as const;
 
 export const RECORD_CONFIG = {
@@ -41,7 +38,6 @@ export const RECORD_CONFIG = {
 		...sharedRecordConfig,
 		lineItemLabelKey: "line-item.expense-label" satisfies LineItemTitleLabelKey,
 		sectionTitleKey: "line-items.expense",
-		events: getDocumentObservabilityEvents("expense"),
 		toast: recordToast({
 			created: "toast.success.expense-created",
 			updated: "toast.success.expense-updated",
@@ -55,7 +51,6 @@ export const RECORD_CONFIG = {
 		...sharedRecordConfig,
 		lineItemLabelKey: "line-item.income-label" satisfies LineItemTitleLabelKey,
 		sectionTitleKey: "line-items.income",
-		events: getDocumentObservabilityEvents("income"),
 		toast: recordToast({
 			created: "toast.success.income-created",
 			updated: "toast.success.income-updated",

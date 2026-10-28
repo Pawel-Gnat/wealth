@@ -4,11 +4,7 @@ import type {
 	UserEditPasswordPayload,
 	UserEditPasswordResponse,
 } from "@repo/api/types";
-import {
-	AUTH_OBSERVABILITY_EVENTS,
-	logger,
-	runWithRequestId,
-} from "@repo/observability/browser";
+import { runWithRequestId } from "@repo/observability/browser";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -34,11 +30,9 @@ export const usePasswordForm = () => {
 	>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
-				const data = await controlledAsync(() =>
+				return await controlledAsync(() =>
 					orpcClient.settings.password(payload),
 				);
-				logger.info(AUTH_OBSERVABILITY_EVENTS.passwordUpdateSucceeded);
-				return data;
 			}),
 		onSuccess: () => {
 			form.reset();

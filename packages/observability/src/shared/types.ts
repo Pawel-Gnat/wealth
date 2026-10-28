@@ -7,6 +7,18 @@ export type ObservabilityContext = {
 	userId?: string;
 };
 
+export type DomainLogOwnerType = "user" | "budget";
+
+export type DomainLogSubjectType = "user" | "budget" | "record";
+
+export type DomainLogContext = {
+	actorId: string;
+	ownerType: DomainLogOwnerType;
+	ownerId: string;
+	subjectType: DomainLogSubjectType;
+	subjectId: string;
+};
+
 export type LogRecord = {
 	service: ObservabilityService;
 	environment: string;
@@ -14,6 +26,11 @@ export type LogRecord = {
 	event: string;
 	requestId?: string;
 	userId?: string;
+	actorId?: string;
+	ownerType?: DomainLogOwnerType;
+	ownerId?: string;
+	subjectType?: DomainLogSubjectType;
+	subjectId?: string;
 };
 
 export type LogSink = {
@@ -53,9 +70,9 @@ export type ContextStore = {
 };
 
 export type Logger = {
-	info: (event: string) => void;
-	warn: (event: string) => void;
-	error: (event: string) => void;
+	info: (event: string, domain?: DomainLogContext) => void;
+	warn: (event: string, domain?: DomainLogContext) => void;
+	error: (event: string, domain?: DomainLogContext) => void;
 };
 
 export type Observability = {

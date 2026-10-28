@@ -183,7 +183,7 @@ export class RecordsService {
 			);
 		});
 
-		logDocumentSucceeded(kind, "create");
+		logDocumentSucceeded(kind, "created");
 
 		return { data: { message: RECORD_CREATED_MESSAGE } };
 	}
@@ -244,7 +244,7 @@ export class RecordsService {
 			);
 		});
 
-		logDocumentSucceeded(kind, "update");
+		logDocumentSucceeded(kind, "updated");
 
 		return { data: { message: RECORD_UPDATED_MESSAGE } };
 	}
@@ -281,7 +281,7 @@ export class RecordsService {
 			}
 		});
 
-		logDocumentSucceeded(kind, "delete");
+		logDocumentSucceeded(kind, "deleted");
 
 		return { data: { message: RECORD_DELETED_MESSAGE } };
 	}

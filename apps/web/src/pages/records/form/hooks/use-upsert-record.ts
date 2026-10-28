@@ -7,7 +7,7 @@ import type {
 	RecordUpdateResponse,
 } from "@repo/api/types";
 import { normalizeDocumentDateForApi } from "@repo/common/helpers";
-import { logger, runWithRequestId } from "@repo/observability/browser";
+import { runWithRequestId } from "@repo/observability/browser";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { type Resolver, useForm } from "react-hook-form";
@@ -79,7 +79,7 @@ export const useUpsertRecord = ({
 					date: normalizeDocumentDateForApi(payload.date),
 				};
 
-				const data = recordId
+				return recordId
 					? await controlledAsync<RecordUpsertResponse>(async () => {
 							const { kind: recordKind, ...updatePayload } = normalizedPayload;
 							return config.client.update({
@@ -94,10 +94,6 @@ export const useUpsertRecord = ({
 								...(budgetId ? { budgetId } : {}),
 							}),
 						);
-
-				const isUpdated = data.data.message === config.updatedMessage;
-				logger.info(isUpdated ? config.events.update : config.events.create);
-				return data;
 			}),
 		onSuccess: (_data, payload) => {
 			const config = getRecordConfig(payload.kind);

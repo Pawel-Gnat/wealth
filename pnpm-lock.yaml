@@ -486,6 +486,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/node@24.12.2)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.32.0)(msw@2.13.6(@types/node@24.12.2)(typescript@5.9.2))(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
 
   packages/tsdown-config:
     dependencies:

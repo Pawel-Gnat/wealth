@@ -32,7 +32,8 @@ import {
 	SESSION_COOKIE_NAME,
 	SESSION_TTL,
 } from "@repo/common/constants";
-import { AUTH_OBSERVABILITY_EVENTS } from "@repo/observability/node";
+import { AUTH_EVENTS } from "@repo/common/events";
+import { OBSERVABILITY_EVENTS } from "@repo/observability/shared";
 import * as bcrypt from "bcrypt";
 import { addDays } from "date-fns";
 import { and, eq, gt, ne } from "drizzle-orm";
@@ -90,7 +91,7 @@ export class AuthService {
 		await this.replaceSessionFromRefreshCookie(request);
 		const tokens = await this.insertSession(user.id);
 		setAuthCookies(response, tokens, isProduction());
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.signInSucceeded);
+		logAuthEvent(AUTH_EVENTS.signedIn);
 		return this.toSnapshot(user, tokens.sessionExpiresAt);
 	}
 
@@ -140,7 +141,7 @@ export class AuthService {
 				},
 				isProduction(),
 			);
-			logAuthEvent(AUTH_OBSERVABILITY_EVENTS.refreshSucceeded);
+			logAuthEvent(AUTH_EVENTS.sessionRefreshed);
 			return this.toSnapshot(user, sessionExpiresAt);
 		}
 
@@ -157,7 +158,7 @@ export class AuthService {
 
 		if (graceRow) {
 			const user = await this.requireUser(graceRow.userId);
-			logAuthEvent(AUTH_OBSERVABILITY_EVENTS.refreshSucceeded);
+			logAuthEvent(AUTH_EVENTS.sessionRefreshed);
 			return this.toSnapshot(user, graceRow.sessionExpiresAt);
 		}
 
@@ -196,7 +197,7 @@ export class AuthService {
 		}
 
 		clearAuthCookies(response, isProduction());
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.logoutSucceeded);
+		logAuthEvent(AUTH_EVENTS.loggedOut);
 	}
 
 	async me(request: Request): Promise<SessionSnapshotResponse> {
@@ -276,7 +277,7 @@ export class AuthService {
 		const passwordHash = await bcrypt.hash(input.newPassword, BCRYPT_ROUNDS);
 		await this.usersService.updatePassword(user.id, passwordHash);
 		await this.endOtherSessions(user.id, session.sessionId);
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.passwordUpdateSucceeded);
+		logAuthEvent(AUTH_EVENTS.passwordUpdated);
 
 		return { data: { message: USER_PASSWORD_UPDATED_MESSAGE } };
 	}
@@ -299,7 +300,7 @@ export class AuthService {
 			firstName: input.firstName,
 			lastName: input.lastName,
 		});
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.detailsUpdateSucceeded);
+		logAuthEvent(AUTH_EVENTS.detailsUpdated);
 
 		return { data: { message: USER_DETAILS_UPDATED_MESSAGE } };
 	}
@@ -335,10 +336,7 @@ export class AuthService {
 			try {
 				await this.storageService.delete(id);
 			} catch {
-				logAuthEvent(
-					AUTH_OBSERVABILITY_EVENTS.avatarPreviousDeleteFailed,
-					"warn",
-				);
+				logAuthEvent(OBSERVABILITY_EVENTS.avatarPreviousDelete, "warn");
 			}
 			throw error;
 		}
@@ -347,10 +345,7 @@ export class AuthService {
 			try {
 				await this.storageService.delete(id);
 			} catch {
-				logAuthEvent(
-					AUTH_OBSERVABILITY_EVENTS.avatarPreviousDeleteFailed,
-					"warn",
-				);
+				logAuthEvent(OBSERVABILITY_EVENTS.avatarPreviousDelete, "warn");
 			}
 			throw new ORPCError("CONFLICT", {
 				message: "Avatar was updated concurrently",
@@ -361,14 +356,11 @@ export class AuthService {
 			try {
 				await this.storageService.delete(previousImageId);
 			} catch {
-				logAuthEvent(
-					AUTH_OBSERVABILITY_EVENTS.avatarPreviousDeleteFailed,
-					"warn",
-				);
+				logAuthEvent(OBSERVABILITY_EVENTS.avatarPreviousDelete, "warn");
 			}
 		}
 
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.avatarUpdateSucceeded);
+		logAuthEvent(AUTH_EVENTS.avatarUpdated);
 
 		return { data: { message: USER_AVATAR_UPDATED_MESSAGE } };
 	}
@@ -385,7 +377,7 @@ export class AuthService {
 			firstName: input.firstName ?? undefined,
 			lastName: input.lastName ?? undefined,
 		});
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.signUpSucceeded);
+		logAuthEvent(AUTH_EVENTS.signedUp);
 		return { data: { message: USER_CREATED_MESSAGE } };
 	}
 
@@ -551,7 +543,7 @@ export class AuthService {
 		try {
 			await this.ssePublisher.publishSessionEnded(input);
 		} catch {
-			logAuthEvent(AUTH_OBSERVABILITY_EVENTS.sessionEndedPublishFailed, "warn");
+			logAuthEvent(OBSERVABILITY_EVENTS.sessionEndedPublish, "warn");
 		}
 	}
 }

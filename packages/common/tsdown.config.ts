@@ -6,5 +6,6 @@ export default createTsdownConfig({
 		"src/helpers/index.ts",
 		"src/constants/index.ts",
 		"src/permissions/index.ts",
+		"src/events/index.ts",
 	],
 });

@@ -1,11 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInPayloadSchema } from "@repo/api/schemas";
 import type { SessionSnapshotResponse, SignInPayload } from "@repo/api/types";
-import {
-	AUTH_OBSERVABILITY_EVENTS,
-	logger,
-	runWithRequestId,
-} from "@repo/observability/browser";
+import { runWithRequestId } from "@repo/observability/browser";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -31,11 +27,7 @@ export const useSignInForm = () => {
 	>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
-				const data = await controlledAsync(() =>
-					orpcClient.user.signIn(payload),
-				);
-				logger.info(AUTH_OBSERVABILITY_EVENTS.signInSucceeded);
-				return data;
+				return await controlledAsync(() => orpcClient.user.signIn(payload));
 			}),
 		onSuccess: (data) => {
 			applySessionSnapshot(data.data);

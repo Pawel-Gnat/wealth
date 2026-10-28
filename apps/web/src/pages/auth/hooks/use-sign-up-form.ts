@@ -1,11 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createUserPayloadSchema } from "@repo/api/schemas";
 import type { CreateUserPayload, CreateUserResponse } from "@repo/api/types";
-import {
-	AUTH_OBSERVABILITY_EVENTS,
-	logger,
-	runWithRequestId,
-} from "@repo/observability/browser";
+import { runWithRequestId } from "@repo/observability/browser";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -34,11 +30,7 @@ export const useSignUpForm = ({ onSignedUp }: UseSignUpFormProps) => {
 		{
 			mutationFn: (payload) =>
 				runWithRequestId(async () => {
-					const data = await controlledAsync(() =>
-						orpcClient.user.signUp(payload),
-					);
-					logger.info(AUTH_OBSERVABILITY_EVENTS.signUpSucceeded);
-					return data;
+					return await controlledAsync(() => orpcClient.user.signUp(payload));
 				}),
 			onSuccess: () => {
 				form.reset();

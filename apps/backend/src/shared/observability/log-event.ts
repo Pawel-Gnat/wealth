@@ -1,28 +1,27 @@
-import {
-	type AuthObservabilityEvent,
-	DOCUMENT_OBSERVABILITY_EVENTS,
-	type DocumentMutationEvent,
-	type DocumentRecordKind,
-	logger,
-	type SseObservabilityEvent,
-} from "@repo/observability/node";
+import { type AUTH_EVENTS, RECORD_EVENTS } from "@repo/common/events";
+import { logger } from "@repo/observability/node";
+import type { ObservabilityEvent } from "@repo/observability/shared";
+
+type AuthEvent = (typeof AUTH_EVENTS)[keyof typeof AUTH_EVENTS];
+type RecordEventKind = keyof typeof RECORD_EVENTS;
+type RecordEventMutation = keyof (typeof RECORD_EVENTS)["expense"];
 
 export const logAuthEvent = (
-	event: AuthObservabilityEvent,
+	event: AuthEvent | ObservabilityEvent,
 	level: "info" | "warn" = "info",
 ) => {
 	logger[level](event);
 };
 
 export const logDocumentSucceeded = (
-	kind: DocumentRecordKind,
-	mutation: DocumentMutationEvent,
+	kind: RecordEventKind,
+	mutation: RecordEventMutation,
 ) => {
-	logger.info(DOCUMENT_OBSERVABILITY_EVENTS[kind][mutation]);
+	logger.info(RECORD_EVENTS[kind][mutation]);
 };
 
 export const logSseEvent = (
-	event: SseObservabilityEvent,
+	event: ObservabilityEvent,
 	level: "info" | "warn" = "warn",
 ) => {
 	logger[level](event);

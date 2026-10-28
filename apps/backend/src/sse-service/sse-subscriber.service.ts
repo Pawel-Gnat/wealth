@@ -4,7 +4,7 @@ import {
 	type OnModuleInit,
 } from "@nestjs/common";
 import { sseEventSchema } from "@repo/api/schemas";
-import { SSE_OBSERVABILITY_EVENTS } from "@repo/observability/node";
+import { OBSERVABILITY_EVENTS } from "@repo/observability/shared";
 import { RedisService } from "../redis-service/redis.service";
 import { logSseEvent } from "../shared/observability/log-event";
 import { userIdFromSseChannel } from "./helpers/sse-channels";
@@ -42,13 +42,13 @@ export class SseSubscriber implements OnModuleInit, OnModuleDestroy {
 		try {
 			parsed = JSON.parse(message);
 		} catch {
-			logSseEvent(SSE_OBSERVABILITY_EVENTS.frameMalformed);
+			logSseEvent(OBSERVABILITY_EVENTS.sseFrame);
 			return;
 		}
 
 		const result = sseEventSchema.safeParse(parsed);
 		if (!result.success) {
-			logSseEvent(SSE_OBSERVABILITY_EVENTS.envelopeInvalid);
+			logSseEvent(OBSERVABILITY_EVENTS.sseEnvelope);
 			return;
 		}
 
