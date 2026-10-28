@@ -1,5 +1,6 @@
 import type { TestingModule } from "@nestjs/testing";
 import { ORPCError } from "@orpc/nest";
+import { BUDGET_EVENTS } from "@repo/api/events";
 import {
 	BUDGET_CREATED_MESSAGE,
 	BUDGET_DELETED_MESSAGE,
@@ -11,10 +12,13 @@ import {
 	BUDGET_MEMBERS_INVITED_MESSAGE,
 	BUDGET_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
+import { logger } from "@repo/observability/node";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { AuditsService } from "../audits-service/audits.service";
 import { DBS } from "../database-service/constants";
 import {
+	budgetAuditsTable,
 	budgetMemberTable,
 	budgetTable,
 	recordLineItemsTable,
@@ -34,7 +38,7 @@ describe("Budget service", () => {
 	let storageService: StorageService;
 
 	beforeAll(async () => {
-		moduleRef = await createTestApp([BudgetService]).compile();
+		moduleRef = await createTestApp([BudgetService, AuditsService]).compile();
 		budgetService = moduleRef.get(BudgetService);
 		usersService = moduleRef.get(UsersService);
 		storageService = moduleRef.get(StorageService);
@@ -346,6 +350,20 @@ describe("Budget service", () => {
 				.where(eq(budgetMemberTable.budgetId, createdBudget.id));
 
 			expect(members).toHaveLength(0);
+
+			const audits = await db
+				.select()
+				.from(budgetAuditsTable)
+				.where(eq(budgetAuditsTable.budgetId, createdBudget.id));
+
+			expect(audits).toEqual([
+				expect.objectContaining({
+					actorUserId: owner.id,
+					entityId: createdBudget.id,
+					event: BUDGET_EVENTS.created,
+					metadata: { title: "Solo budget" },
+				}),
+			]);
 		});
 
 		it("stores invitees as pending and skips the owner id", async () => {
@@ -386,6 +404,28 @@ describe("Budget service", () => {
 					status: "pending",
 				}),
 			]);
+
+			const audits = await db
+				.select({
+					event: budgetAuditsTable.event,
+					metadata: budgetAuditsTable.metadata,
+				})
+				.from(budgetAuditsTable)
+				.where(eq(budgetAuditsTable.budgetId, createdBudget.id));
+
+			expect(audits).toHaveLength(2);
+			expect(audits).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						event: BUDGET_EVENTS.created,
+						metadata: { title: "Household" },
+					}),
+					expect.objectContaining({
+						event: BUDGET_EVENTS.memberInvited,
+						metadata: { userId: invitee.id },
+					}),
+				]),
+			);
 		});
 
 		it("exposes the newly created budget in the user list", async () => {
@@ -546,6 +586,48 @@ describe("Budget service", () => {
 				.where(eq(budgetTable.id, budget.id));
 
 			expect(stored?.title).toBe("New title");
+
+			const audits = await db
+				.select()
+				.from(budgetAuditsTable)
+				.where(eq(budgetAuditsTable.budgetId, budget.id));
+			expect(audits).toEqual([
+				expect.objectContaining({
+					event: BUDGET_EVENTS.updated,
+					metadata: {
+						oldValues: { title: "Old title" },
+						newValues: { title: "New title" },
+					},
+				}),
+			]);
+		});
+
+		it("does not write an audit when the title stays the same", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-update-same",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Same title", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await budgetService.updateBudgetByUserId(owner.id, {
+				id: budget.id,
+				title: "Same title",
+			});
+
+			const audits = await db
+				.select()
+				.from(budgetAuditsTable)
+				.where(eq(budgetAuditsTable.budgetId, budget.id));
+
+			expect(audits).toEqual([]);
 		});
 
 		it("rejects a member and a missing budget", async () => {
@@ -839,11 +921,24 @@ describe("Budget service", () => {
 				singleAmount: "12.00",
 			});
 
+			const info = vi.spyOn(logger, "info");
+
 			await expect(
 				budgetService.deleteBudgetByUserId(owner.id, budget.id),
 			).resolves.toEqual({
 				data: { message: BUDGET_DELETED_MESSAGE },
 			});
+			expect(info).toHaveBeenCalledWith(
+				BUDGET_EVENTS.deleted,
+				expect.objectContaining({
+					actorId: owner.id,
+					ownerType: "budget",
+					ownerId: budget.id,
+					subjectType: "budget",
+					subjectId: budget.id,
+				}),
+			);
+			info.mockRestore();
 
 			const [budgets, members, records, lineItems] = await Promise.all([
 				db.select().from(budgetTable).where(eq(budgetTable.id, budget.id)),
@@ -998,6 +1093,19 @@ describe("Budget service", () => {
 
 			expect(members).toHaveLength(0);
 			expect(budgets).toHaveLength(1);
+
+			const audits = await db
+				.select()
+				.from(budgetAuditsTable)
+				.where(eq(budgetAuditsTable.budgetId, budget.id));
+
+			expect(audits).toEqual([
+				expect.objectContaining({
+					actorUserId: member.id,
+					event: BUDGET_EVENTS.left,
+					metadata: { userId: member.id },
+				}),
+			]);
 		});
 
 		it("rejects the owner, a pending member, and a stranger", async () => {

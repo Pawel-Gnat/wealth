@@ -1,5 +1,6 @@
 import type { TestingModule } from "@nestjs/testing";
 import { ORPCError } from "@orpc/nest";
+import { RECORD_EVENTS } from "@repo/api/events";
 import {
 	RECORD_CREATED_MESSAGE,
 	RECORD_DELETED_MESSAGE,
@@ -7,14 +8,19 @@ import {
 } from "@repo/api/schemas";
 import type { RecordKind } from "@repo/api/types";
 import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
+import { logger } from "@repo/observability/node";
 import { eq } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { AuditsService } from "../audits-service/audits.service";
 import { DBS } from "../database-service/constants";
 import {
+	budgetAuditsTable,
 	budgetMemberTable,
 	budgetTable,
 	recordLineItemsTable,
 	recordsTable,
+	userAuditsTable,
 } from "../database-service/tables/index";
 import { createTestApp } from "../test/helpers/modules";
 import { createTestUser } from "../test/mocks/users";
@@ -45,7 +51,7 @@ describe("Records service", () => {
 	let usersService: UsersService;
 
 	beforeAll(async () => {
-		moduleRef = await createTestApp([RecordsService]).compile();
+		moduleRef = await createTestApp([RecordsService, AuditsService]).compile();
 		recordsService = moduleRef.get(RecordsService);
 		usersService = moduleRef.get(UsersService);
 	});
@@ -204,6 +210,26 @@ describe("Records service", () => {
 					}),
 				]),
 			);
+
+			const audits = await db
+				.select()
+				.from(userAuditsTable)
+				.where(eq(userAuditsTable.entityId, createdDocument.id));
+
+			expect(audits).toEqual([
+				expect.objectContaining({
+					userId: user.id,
+					event: RECORD_EVENTS[kind].created,
+					metadata: {
+						recordId: createdDocument.id,
+						date: "2026-05-01",
+						lineItems: [
+							{ title: "Taxi", quantity: 2, singleAmount: 12.5 },
+							{ title: "Lunch", quantity: 1, singleAmount: 30 },
+						],
+					},
+				}),
+			]);
 		});
 
 		it("returns the created document from the personal list", async () => {
@@ -350,6 +376,50 @@ describe("Records service", () => {
 			expect(ownerAfterDelete).toHaveLength(0);
 			expect(lineItemsAfterDelete).toHaveLength(0);
 			expect(otherAfterDelete).toHaveLength(1);
+		});
+
+		it("drops the record audits on delete and logs the deletion", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const user = await createTestUser(usersService, {
+				passwordHash: "hashed-password",
+				emailTag: `${kind}-delete-audit`,
+			});
+
+			const payload = {
+				date: decodeDocumentDateFromStorage("2026-08-01"),
+				lineItems: [{ title: "Ticket", quantity: 1, singleAmount: 18 }],
+			};
+
+			await recordsService.createByUserId(user.id, kind, payload);
+
+			const [created] = await db
+				.select({ id: recordsTable.id })
+				.from(recordsTable)
+				.where(eq(recordsTable.userId, user.id));
+			if (!created) {
+				throw new Error("Expected created document");
+			}
+
+			const info = vi.spyOn(logger, "info");
+			await recordsService.deleteByUserId(user.id, created.id, kind);
+
+			const audits = await db
+				.select()
+				.from(userAuditsTable)
+				.where(eq(userAuditsTable.entityId, created.id));
+
+			expect(audits).toEqual([]);
+			expect(info).toHaveBeenCalledWith(
+				RECORD_EVENTS[kind].deleted,
+				expect.objectContaining({
+					actorId: user.id,
+					ownerType: "user",
+					ownerId: user.id,
+					subjectType: "record",
+					subjectId: created.id,
+				}),
+			);
+			info.mockRestore();
 		});
 
 		it("throws when the document belongs to another user", async () => {
@@ -506,6 +576,37 @@ describe("Records service", () => {
 					quantity: 11,
 					singleAmount: "5.00",
 				}),
+			]);
+		});
+
+		it("does not write an audit when the date and line items stay the same", async () => {
+			const db: NodePgDatabase = moduleRef.get(DBS.APP);
+			const user = await createTestUser(usersService, {
+				passwordHash: "hashed-password",
+				emailTag: `${kind}-update-noop`,
+			});
+			const payload = {
+				date: decodeDocumentDateFromStorage("2026-05-10"),
+				lineItems: [{ title: "Taxi", quantity: 2, singleAmount: 12.5 }],
+			};
+
+			await recordsService.createByUserId(user.id, kind, payload);
+			const [created] = await db
+				.select({ id: recordsTable.id })
+				.from(recordsTable)
+				.where(eq(recordsTable.userId, user.id));
+			if (!created) {
+				throw new Error("Expected created document");
+			}
+
+			await recordsService.updateByUserId(user.id, created.id, kind, payload);
+
+			const audits = await db
+				.select({ event: userAuditsTable.event })
+				.from(userAuditsTable)
+				.where(eq(userAuditsTable.entityId, created.id));
+			expect(audits.map((audit) => audit.event)).toEqual([
+				RECORD_EVENTS[kind].created,
 			]);
 		});
 
@@ -812,6 +913,20 @@ describe("Records service", () => {
 
 			expect(personal.data).toHaveLength(0);
 			expect(shared.data).toHaveLength(1);
+
+			const recordId = shared.data[0]?.id;
+			const audits = await db
+				.select()
+				.from(budgetAuditsTable)
+				.where(eq(budgetAuditsTable.budgetId, budget.id));
+
+			expect(audits).toEqual([
+				expect.objectContaining({
+					actorUserId: owner.id,
+					entityId: recordId,
+					event: RECORD_EVENTS.expense.created,
+				}),
+			]);
 			expect(shared.data[0]).toMatchObject({
 				kind: "expense",
 				totalAmount: 18,
