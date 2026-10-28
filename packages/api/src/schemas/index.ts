@@ -1,3 +1,4 @@
+export * from "./audit.schema";
 export * from "./budget.schema";
 export * from "./common.schema";
 export * from "./dashboard.schema";

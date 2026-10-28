@@ -5,5 +5,6 @@ export default createTsdownConfig({
 		"src/schemas/index.ts",
 		"src/contracts/index.ts",
 		"src/types/index.ts",
+		"src/events/index.ts",
 	],
 });

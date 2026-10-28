@@ -14,9 +14,8 @@ export const budgetAuditsTable = pgTable(
 			onDelete: "set null",
 		}),
 		event: text("event").notNull(),
-		subjectType: text("subject_type").notNull(),
-		subjectId: text("subject_id").notNull(),
-		changes: jsonb("changes").notNull().default([]),
+		entityId: text("entity_id").notNull(),
+		metadata: jsonb("metadata").notNull().default({}),
 		createdAt: timestamp("created_at"),
 	},
 	(table) => [

@@ -10,6 +10,7 @@ import { APP_FILTER, REQUEST } from "@nestjs/core";
 import { ORPCModule, onError } from "@orpc/nest";
 import { captureException } from "@repo/observability/node";
 import type { Request, Response } from "express";
+import { AuditsModule } from "./audits-service/audits.module";
 import { AuthModule } from "./auth-service/auth.module";
 import { BudgetModule } from "./budget-service/budget.module";
 import { DashboardModule } from "./dashboard-service/dashboard.module";
@@ -70,6 +71,7 @@ declare module "@orpc/nest" {
 		BudgetModule,
 		DashboardModule,
 		AuthModule,
+		AuditsModule,
 		DatabaseModule,
 		RedisModule,
 		HealthModule,

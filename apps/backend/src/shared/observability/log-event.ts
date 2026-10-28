@@ -1,4 +1,4 @@
-import { type AUTH_EVENTS, RECORD_EVENTS } from "@repo/common/events";
+import { type AUTH_EVENTS, RECORD_EVENTS } from "@repo/api/events";
 import { logger } from "@repo/observability/node";
 import type { ObservabilityEvent } from "@repo/observability/shared";
 

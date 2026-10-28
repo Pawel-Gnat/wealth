@@ -6,6 +6,7 @@ import {
 	UnauthorizedException,
 } from "@nestjs/common";
 import { ORPCError } from "@orpc/server";
+import { AUTH_EVENTS } from "@repo/api/events";
 import {
 	USER_AVATAR_UPDATED_MESSAGE,
 	USER_CREATED_MESSAGE,
@@ -32,7 +33,6 @@ import {
 	SESSION_COOKIE_NAME,
 	SESSION_TTL,
 } from "@repo/common/constants";
-import { AUTH_EVENTS } from "@repo/common/events";
 import { OBSERVABILITY_EVENTS } from "@repo/observability/shared";
 import * as bcrypt from "bcrypt";
 import { addDays } from "date-fns";

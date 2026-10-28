@@ -3,9 +3,8 @@ CREATE TABLE "budget_audits" (
 	"budget_id" text NOT NULL,
 	"actor_user_id" text,
 	"event" text NOT NULL,
-	"subject_type" text NOT NULL,
-	"subject_id" text NOT NULL,
-	"changes" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"entity_id" text NOT NULL,
+	"metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
@@ -13,9 +12,8 @@ CREATE TABLE "user_audits" (
 	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
 	"event" text NOT NULL,
-	"subject_type" text NOT NULL,
-	"subject_id" text NOT NULL,
-	"changes" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"entity_id" text NOT NULL,
+	"metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint

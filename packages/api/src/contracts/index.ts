@@ -1,4 +1,5 @@
 import { populateContractRouterPaths } from "@orpc/contract";
+import { listAuditsContract } from "./audit.contract";
 import {
 	acceptBudgetInviteContract,
 	cancelBudgetInviteContract,
@@ -65,6 +66,9 @@ export const rpcContract = populateContractRouterPaths({
 		acceptInvite: acceptBudgetInviteContract,
 		rejectInvite: rejectBudgetInviteContract,
 		cancelInvite: cancelBudgetInviteContract,
+	},
+	audits: {
+		list: listAuditsContract,
 	},
 	dashboard: {
 		getSummary: getDashboardSummaryContract,
