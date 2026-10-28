@@ -5,7 +5,10 @@ import { and, asc, eq, ilike, inArray, isNull, ne, or } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DBS } from "../database-service/constants";
 import { usersTable } from "../database-service/tables/index";
-import type { UserRow } from "../database-service/types/types";
+import type {
+	DatabaseTransaction,
+	UserRow,
+} from "../database-service/types/types";
 import { StorageService } from "../storage-service/storage.service";
 import { escapeLikePattern } from "./helpers/escape-like-pattern";
 import { CreateUserInput, UpdateUserDetailsInput } from "./types/users";
@@ -26,18 +29,25 @@ export class UsersService {
 		return user ?? null;
 	}
 
-	async createUser({
-		email,
-		passwordHash,
-		firstName,
-		lastName,
-	}: CreateUserInput): Promise<void> {
-		await this.db.insert(usersTable).values({
-			email,
-			password: passwordHash,
-			firstName,
-			lastName,
-		});
+	async createUser(
+		{ email, passwordHash, firstName, lastName }: CreateUserInput,
+		tx?: DatabaseTransaction,
+	): Promise<string> {
+		const [created] = await (tx ?? this.db)
+			.insert(usersTable)
+			.values({
+				email,
+				password: passwordHash,
+				firstName,
+				lastName,
+			})
+			.returning({ id: usersTable.id });
+
+		if (!created) {
+			throw new Error("Failed to create user");
+		}
+
+		return created.id;
 	}
 
 	async findUserById(id: string): Promise<UserRow | null> {
@@ -49,8 +59,12 @@ export class UsersService {
 		return user ?? null;
 	}
 
-	async updatePassword(id: string, passwordHash: string): Promise<void> {
-		await this.db
+	async updatePassword(
+		id: string,
+		passwordHash: string,
+		tx: DatabaseTransaction,
+	): Promise<void> {
+		await tx
 			.update(usersTable)
 			.set({ password: passwordHash })
 			.where(eq(usersTable.id, id));
@@ -59,8 +73,9 @@ export class UsersService {
 	async updateDetails(
 		id: string,
 		{ firstName, lastName }: UpdateUserDetailsInput,
+		tx?: DatabaseTransaction,
 	): Promise<void> {
-		await this.db
+		await (tx ?? this.db)
 			.update(usersTable)
 			.set({
 				firstName: firstName || null,
@@ -80,13 +95,14 @@ export class UsersService {
 		id: string,
 		nextImage: string,
 		expectedCurrent: string | null,
+		tx?: DatabaseTransaction,
 	): Promise<boolean> {
 		const currentImageCondition =
 			expectedCurrent === null
 				? isNull(usersTable.image)
 				: eq(usersTable.image, expectedCurrent);
 
-		const updated = await this.db
+		const updated = await (tx ?? this.db)
 			.update(usersTable)
 			.set({ image: nextImage })
 			.where(and(eq(usersTable.id, id), currentImageCondition))

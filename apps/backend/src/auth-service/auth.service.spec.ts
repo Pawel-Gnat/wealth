@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { UnauthorizedException } from "@nestjs/common";
+import { AUTH_EVENTS } from "@repo/api/events";
 import {
 	AUTH_COOKIE_PATH,
 	REFRESH_COOKIE_NAME,
@@ -21,7 +22,11 @@ import {
 } from "vitest";
 
 import { DBS } from "../database-service/constants";
-import { sessionsTable, storageTable } from "../database-service/tables/index";
+import {
+	sessionsTable,
+	storageTable,
+	userAuditsTable,
+} from "../database-service/tables/index";
 import { SsePublisher } from "../sse-service/sse-publisher.service";
 import { StorageService } from "../storage-service/storage.service";
 import { createAuthTestingModule } from "../test/helpers/modules";
@@ -72,6 +77,16 @@ describe("Auth service", () => {
 	let storageService: StorageService;
 	let db: NodePgDatabase;
 	let publishSessionEnded: ReturnType<typeof vi.fn>;
+
+	const accountAudits = (userId: string) =>
+		db
+			.select({
+				event: userAuditsTable.event,
+				entityId: userAuditsTable.entityId,
+				metadata: userAuditsTable.metadata,
+			})
+			.from(userAuditsTable)
+			.where(eq(userAuditsTable.userId, userId));
 
 	beforeAll(async () => {
 		moduleRef = await createAuthTestingModule();
@@ -217,6 +232,13 @@ describe("Auth service", () => {
 			expect(row?.refreshHash).toBe(
 				hashToken(jar.cookies[REFRESH_COOKIE_NAME]),
 			);
+			expect(await accountAudits(user.id)).toEqual([
+				expect.objectContaining({
+					event: AUTH_EVENTS.signedIn,
+					entityId: user.id,
+					metadata: {},
+				}),
+			]);
 			expect(row?.previousRefreshHash).toBe(previousHash);
 			expect(jar.cookies[REFRESH_COOKIE_NAME]).not.toBe(previousRefresh);
 		});
@@ -303,6 +325,15 @@ describe("Auth service", () => {
 				[REFRESH_COOKIE_NAME, laxCookieOptions],
 			]);
 			expect(await sessionByRefreshToken(refreshToken)).toBeNull();
+			expect(await accountAudits(user.id)).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						event: AUTH_EVENTS.loggedOut,
+						entityId: user.id,
+						metadata: {},
+					}),
+				]),
+			);
 		});
 
 		it("is idempotent when there is no session", async () => {
@@ -470,6 +501,28 @@ describe("Auth service", () => {
 				firstName: "Ada",
 				lastName: "Lovelace",
 			});
+			expect(await accountAudits(user.id)).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						event: AUTH_EVENTS.detailsUpdated,
+						entityId: user.id,
+						metadata: {
+							oldValues: { firstName: null, lastName: null },
+							newValues: { firstName: "Ada", lastName: "Lovelace" },
+						},
+					}),
+				]),
+			);
+
+			await authService.updateDetails(
+				{ firstName: "Ada", lastName: "Lovelace" },
+				asRequest({}, currentSession ?? undefined),
+			);
+			expect(
+				(await accountAudits(user.id)).filter(
+					(audit) => audit.event === AUTH_EVENTS.detailsUpdated,
+				),
+			).toHaveLength(1);
 		});
 
 		it("rejects when the session is missing", async () => {
@@ -603,6 +656,13 @@ describe("Auth service", () => {
 			expect(row?.firstName).toBe("Ada");
 			expect(row?.lastName).toBe("Lovelace");
 			expect(await sessionsForUser(String(row?.id))).toEqual([]);
+			expect(await accountAudits(String(row?.id))).toEqual([
+				expect.objectContaining({
+					event: AUTH_EVENTS.signedUp,
+					entityId: row?.id,
+					metadata: {},
+				}),
+			]);
 		});
 	});
 });

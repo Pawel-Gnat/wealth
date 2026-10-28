@@ -3,6 +3,7 @@ import type { TestingModule } from "@nestjs/testing";
 import { Test } from "@nestjs/testing";
 import { vi } from "vitest";
 
+import { AuditsService } from "../../audits-service/audits.service";
 import { AuthService } from "../../auth-service/auth.service";
 import { SsePublisher } from "../../sse-service/sse-publisher.service";
 import { StorageModule } from "../../storage-service/storage.module";
@@ -46,6 +47,7 @@ export async function createAuthTestingModule(overrides?: {
 		imports: [TestModule],
 		providers: [
 			AuthService,
+			AuditsService,
 			{
 				provide: SsePublisher,
 				useValue: {
