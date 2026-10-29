@@ -19,21 +19,21 @@ export const auditColumns = ({
 }: AuditColumnsProps): ColumnDef<Audit>[] => [
 	{
 		accessorKey: "createdAt",
-		meta: { className: "w-[1%] whitespace-nowrap" },
+		meta: { className: "w-0 min-w-max whitespace-nowrap" },
 		header: () => (
 			<Text size="sm" weight="medium">
 				{t("common.date", { ns: "common" })}
 			</Text>
 		),
 		cell: ({ row }) => (
-			<Text size="sm">
+			<Text size="sm" className="whitespace-nowrap">
 				{formatAuditDateTime(row.original.createdAt, language)}
 			</Text>
 		),
 	},
 	{
 		accessorKey: "actorId",
-		meta: { className: "w-[1%] whitespace-nowrap" },
+		meta: { className: "w-0 min-w-max whitespace-nowrap" },
 		header: () => (
 			<Text size="sm" weight="medium">
 				{t("actor", { ns: "audits" })}
@@ -45,14 +45,14 @@ export const auditColumns = ({
 	},
 	{
 		accessorKey: "metadata",
-		meta: { className: "w-full" },
+		meta: { className: "w-full whitespace-normal" },
 		header: () => (
 			<Text size="sm" weight="medium">
 				{t("details", { ns: "audits" })}
 			</Text>
 		),
 		cell: ({ row }) => (
-			<Text size="sm">
+			<Text size="sm" className="whitespace-normal">
 				{formatAuditDetails(row.original, language, users, t)}
 			</Text>
 		),
