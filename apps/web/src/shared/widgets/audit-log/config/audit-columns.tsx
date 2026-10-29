@@ -44,17 +44,6 @@ export const auditColumns = ({
 		),
 	},
 	{
-		accessorKey: "event",
-		header: () => (
-			<Text size="sm" weight="medium">
-				{t("event", { ns: "audits" })}
-			</Text>
-		),
-		cell: ({ row }) => (
-			<Text size="sm">{t(row.original.event, { ns: "events" })}</Text>
-		),
-	},
-	{
 		accessorKey: "metadata",
 		meta: { className: "w-full" },
 		header: () => (
@@ -63,7 +52,9 @@ export const auditColumns = ({
 			</Text>
 		),
 		cell: ({ row }) => (
-			<Text size="sm">{formatAuditDetails(row.original, language)}</Text>
+			<Text size="sm">
+				{formatAuditDetails(row.original, language, users, t)}
+			</Text>
 		),
 	},
 ];

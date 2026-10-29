@@ -18,7 +18,7 @@ describe("AuditLog", () => {
 		t = (await init18nWeb({ lng: "en" })) as TFunction;
 	});
 
-	it("shows the signed-in row, the actor avatar, and empty details", async () => {
+	it("shows the signed-in sentence, the actor avatar", async () => {
 		renderWithProviders(<AuditLog params={params} users={[MOCK_USER]} />);
 
 		expect(
@@ -34,7 +34,7 @@ describe("AuditLog", () => {
 		}
 		const cells = within(dataRow).getAllByRole("cell");
 
-		expect(cells[3]).toHaveTextContent("");
+		expect(cells[2]).toHaveTextContent(t("auth.signed-in", { ns: "events" }));
 		expect(
 			screen.getByText(t("pagination.rows-per-page", { ns: "common" })),
 		).toBeInTheDocument();

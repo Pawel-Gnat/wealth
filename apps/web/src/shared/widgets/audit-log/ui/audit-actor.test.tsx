@@ -1,6 +1,7 @@
 import type { User } from "@repo/api/types";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { TFunction } from "i18next";
 import { beforeAll, describe, expect, it } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
@@ -14,8 +15,10 @@ const actor: User = {
 };
 
 describe("AuditActor", () => {
+	let t: TFunction;
+
 	beforeAll(async () => {
-		await init18nWeb({ lng: "en" });
+		t = (await init18nWeb({ lng: "en" })) as TFunction;
 	});
 
 	it("shows the avatar and the full name in the tooltip", async () => {
@@ -53,13 +56,17 @@ describe("AuditActor", () => {
 	it("shows an unknown user when the actor is missing", () => {
 		renderWithProviders(<AuditActor actorId={null} users={[actor]} />);
 
-		expect(screen.getByText("Unknown user")).toBeInTheDocument();
+		expect(
+			screen.getByText(t("unknown-user", { ns: "audits" })),
+		).toBeInTheDocument();
 		expect(screen.queryByText("JD")).not.toBeInTheDocument();
 	});
 
 	it("shows an unknown user when the actor is not in the list", () => {
 		renderWithProviders(<AuditActor actorId="someone-else" users={[actor]} />);
 
-		expect(screen.getByText("Unknown user")).toBeInTheDocument();
+		expect(
+			screen.getByText(t("unknown-user", { ns: "audits" })),
+		).toBeInTheDocument();
 	});
 });

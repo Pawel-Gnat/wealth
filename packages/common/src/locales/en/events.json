@@ -4,36 +4,37 @@
 		"signed-up": "Signed up",
 		"logged-out": "Logged out",
 		"password": {
-			"updated": "Updated password"
+			"updated": "Updated the password"
 		},
 		"details": {
-			"updated": "Updated details"
+			"updated": "Updated the name from {{previous}} to {{next}}",
+			"set": "Updated the name to {{name}}"
 		},
 		"avatar": {
-			"updated": "Updated avatar"
+			"updated": "Updated the avatar"
 		}
 	},
 	"budget": {
-		"created": "Created budget",
-		"updated": "Updated budget",
+		"created": "Created a budget titled {{title}}",
+		"updated": "Updated the budget, changes: title {{previous}} → {{next}}",
 		"member": {
-			"invited": "Invited member"
+			"invited": "Invited {{person}}"
 		},
 		"invite": {
-			"cancelled": "Cancelled invite",
-			"accepted": "Accepted invite",
-			"rejected": "Rejected invite"
+			"cancelled": "Cancelled the invite for {{person}}",
+			"accepted": "{{person}} accepted the invite",
+			"rejected": "{{person}} rejected the invite"
 		},
-		"left": "Left budget"
+		"left": "{{person}} left the budget"
 	},
 	"expense": {
-		"created": "Created expense",
-		"updated": "Updated expense",
-		"deleted": "Deleted expense"
+		"created": "Created a new expense dated {{date}}",
+		"updated": "Updated the expense from {{date}}, changes: {{changes}}",
+		"deleted": "Deleted the expense dated {{date}}"
 	},
 	"income": {
-		"created": "Created income",
-		"updated": "Updated income",
-		"deleted": "Deleted income"
+		"created": "Created a new income dated {{date}}",
+		"updated": "Updated the income from {{date}}, changes: {{changes}}",
+		"deleted": "Deleted the income dated {{date}}"
 	}
 }

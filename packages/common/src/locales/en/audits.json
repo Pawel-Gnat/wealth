@@ -1,9 +1,11 @@
 {
 	"title": "Audit log",
 	"actor": "Actor",
-	"event": "Event",
 	"details": "Details",
 	"unknown-user": "Unknown user",
+	"date-change": "date {{previous}} → {{next}}",
+	"item-added": "{{item}} → added",
+	"item-removed": "{{item}} → removed",
 	"empty": {
 		"title": "No audit logs",
 		"description": "Actions you take will appear here."
