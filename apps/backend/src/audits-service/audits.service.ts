@@ -50,6 +50,20 @@ export class AuditsService {
 		await tx.insert(budgetAuditsTable).values(entry);
 	}
 
+	async createBudgetAudits(
+		tx: DatabaseTransaction,
+		entries: (NewAudit<BudgetAudit> & {
+			budgetId: string;
+			actorUserId: string;
+		})[],
+	) {
+		if (entries.length === 0) {
+			return;
+		}
+
+		await tx.insert(budgetAuditsTable).values(entries);
+	}
+
 	async list(userId: string, params: AuditsParams) {
 		const entityId = "entityId" in params ? params.entityId : undefined;
 		const actions = [...params.actions];

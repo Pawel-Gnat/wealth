@@ -239,14 +239,6 @@ export class BudgetService {
 				throw new Error("Budget insert failed");
 			}
 
-			await this.auditsService.createBudgetAudit(tx, {
-				budgetId: createdBudget.id,
-				actorUserId: ownerId,
-				entityId: createdBudget.id,
-				event: BUDGET_EVENTS.created,
-				metadata: { title: payload.title },
-			});
-
 			if (inviteeIds.length > 0) {
 				await tx.insert(budgetMemberTable).values(
 					inviteeIds.map((userId) => ({
@@ -254,17 +246,24 @@ export class BudgetService {
 						userId,
 					})),
 				);
-
-				for (const inviteeId of inviteeIds) {
-					await this.auditsService.createBudgetAudit(tx, {
-						budgetId: createdBudget.id,
-						actorUserId: ownerId,
-						entityId: createdBudget.id,
-						event: BUDGET_EVENTS.memberInvited,
-						metadata: { userId: inviteeId },
-					});
-				}
 			}
+
+			await this.auditsService.createBudgetAudits(tx, [
+				{
+					budgetId: createdBudget.id,
+					actorUserId: ownerId,
+					entityId: createdBudget.id,
+					event: BUDGET_EVENTS.created,
+					metadata: { title: payload.title },
+				},
+				...inviteeIds.map((inviteeId) => ({
+					budgetId: createdBudget.id,
+					actorUserId: ownerId,
+					entityId: createdBudget.id,
+					event: BUDGET_EVENTS.memberInvited,
+					metadata: { userId: inviteeId },
+				})),
+			]);
 
 			return createdBudget.id;
 		});
@@ -375,15 +374,16 @@ export class BudgetService {
 					})),
 				);
 
-				for (const inviteeId of inviteeIds) {
-					await this.auditsService.createBudgetAudit(tx, {
+				await this.auditsService.createBudgetAudits(
+					tx,
+					inviteeIds.map((inviteeId) => ({
 						budgetId: input.id,
 						actorUserId: userId,
 						entityId: input.id,
 						event: BUDGET_EVENTS.memberInvited,
 						metadata: { userId: inviteeId },
-					});
-				}
+					})),
+				);
 			});
 
 			inviteeIds.forEach(() => {
