@@ -6,10 +6,12 @@ import i18n, {
 
 export type { Namespace, ParseKeys, TOptionsBase } from "i18next";
 
+import enAudits from "./locales/en/audits.json" with { type: "json" };
 import enAuth from "./locales/en/auth.json" with { type: "json" };
 import enBudgets from "./locales/en/budgets.json" with { type: "json" };
 import enCommon from "./locales/en/common.json" with { type: "json" };
 import enDashboard from "./locales/en/dashboard.json" with { type: "json" };
+import enEvents from "./locales/en/events.json" with { type: "json" };
 import enForm from "./locales/en/form.json" with { type: "json" };
 import enRecords from "./locales/en/records.json" with { type: "json" };
 import enSettings from "./locales/en/settings.json" with { type: "json" };
@@ -27,6 +29,8 @@ export const I18N_RESOURCES = {
 		form: enForm,
 		auth: enAuth,
 		settings: enSettings,
+		audits: enAudits,
+		events: enEvents,
 	},
 } as const;
 

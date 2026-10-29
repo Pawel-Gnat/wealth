@@ -4,11 +4,7 @@ import type {
 	UserEditAvatarPayload,
 	UserEditAvatarResponse,
 } from "@repo/api/types";
-import {
-	AUTH_OBSERVABILITY_EVENTS,
-	logger,
-	runWithRequestId,
-} from "@repo/observability/browser";
+import { runWithRequestId } from "@repo/observability/browser";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -57,15 +53,14 @@ export const useAvatarForm = ({ onSuccess }: UseAvatarFormProps = {}) => {
 	>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
-				const data = await controlledAsync(() =>
-					orpcClient.settings.avatar(payload),
-				);
-				logger.info(AUTH_OBSERVABILITY_EVENTS.avatarUpdateSucceeded);
-				return data;
+				return await controlledAsync(() => orpcClient.settings.avatar(payload));
 			}),
 		onSuccess: () => {
 			form.reset();
 			void queryClient.invalidateQueries({ queryKey: queryKeys.me() });
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.audits.all(),
+			});
 			toast.success(t("toast.success.avatar-updated", { ns: "common" }));
 			onSuccess?.();
 		},

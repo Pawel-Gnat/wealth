@@ -1,5 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ORPCError } from "@orpc/nest";
+import { RECORD_EVENTS } from "@repo/api/events";
 import {
 	RECORD_CREATED_MESSAGE,
 	RECORD_DELETED_MESSAGE,
@@ -20,15 +21,18 @@ import {
 	isStoredDocumentDateEqual,
 } from "@repo/common/helpers";
 import { hasPermission } from "@repo/common/permissions";
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import { AuditsService } from "../audits-service/audits.service";
 import { DBS } from "../database-service/constants";
 import {
+	budgetAuditsTable,
 	recordLineItemsTable,
 	recordsTable,
+	userAuditsTable,
 } from "../database-service/tables/index";
 import { findBudgetAccess } from "../shared/budget/find-budget-access";
-import { logDocumentSucceeded } from "../shared/observability/log-event";
+import { logDomainEvent } from "../shared/observability/log-event";
 import {
 	calculateRecordTotalAmount,
 	mapPayloadLineItemsToInsertRows,
@@ -51,6 +55,7 @@ export class RecordsService {
 	constructor(
 		@Inject(DBS.APP) private readonly db: NodePgDatabase,
 		private readonly usersService: UsersService,
+		private readonly auditsService: AuditsService,
 	) {}
 
 	async listByUserId(
@@ -158,15 +163,17 @@ export class RecordsService {
 		}
 
 		const totalAmount = calculateRecordTotalAmount(payload);
+		const date = encodeDocumentDateForStorage(payload.date);
+		const lineItems = this.auditLineItems(payload);
 
-		await this.db.transaction(async (tx) => {
+		const recordId = await this.db.transaction(async (tx) => {
 			const [createdRecord] = await tx
 				.insert(recordsTable)
 				.values({
 					userId,
 					budgetId: budgetId ?? null,
 					kind,
-					documentDate: encodeDocumentDateForStorage(payload.date),
+					documentDate: date,
 					totalAmount: totalAmount.toFixed(2),
 				})
 				.returning({ id: recordsTable.id });
@@ -181,9 +188,39 @@ export class RecordsService {
 					...row,
 				})),
 			);
+
+			const metadata = {
+				recordId: createdRecord.id,
+				date,
+				lineItems,
+			};
+
+			if (budgetId) {
+				await this.auditsService.createBudgetAudit(tx, {
+					budgetId,
+					actorUserId: userId,
+					entityId: createdRecord.id,
+					event: RECORD_EVENTS[kind].created,
+					metadata,
+				});
+			} else {
+				await this.auditsService.createUserAudit(tx, {
+					userId,
+					entityId: createdRecord.id,
+					event: RECORD_EVENTS[kind].created,
+					metadata,
+				});
+			}
+
+			return createdRecord.id;
 		});
 
-		logDocumentSucceeded(kind, "create");
+		this.logRecordEvent(
+			RECORD_EVENTS[kind].created,
+			userId,
+			budgetId ?? null,
+			recordId,
+		);
 
 		return { data: { message: RECORD_CREATED_MESSAGE } };
 	}
@@ -196,8 +233,10 @@ export class RecordsService {
 	): Promise<RecordUpdateResponse> {
 		const newTotalAmount = calculateRecordTotalAmount(payload);
 		const newTotalAmountStr = newTotalAmount.toFixed(2);
+		const nextDate = encodeDocumentDateForStorage(payload.date);
+		const nextLineItems = this.auditLineItems(payload);
 
-		await this.db.transaction(async (tx) => {
+		const result = await this.db.transaction(async (tx) => {
 			const [existing] = await tx
 				.select({
 					id: recordsTable.id,
@@ -207,7 +246,8 @@ export class RecordsService {
 					totalAmount: recordsTable.totalAmount,
 				})
 				.from(recordsTable)
-				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)));
+				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)))
+				.for("update");
 
 			if (!existing) {
 				this.throwNotFound();
@@ -215,17 +255,38 @@ export class RecordsService {
 
 			await this.assertRecordWritable(userId, existing, "edit");
 
+			const storedLineItems = await tx
+				.select({
+					title: recordLineItemsTable.title,
+					quantity: recordLineItemsTable.quantity,
+					singleAmount: recordLineItemsTable.singleAmount,
+				})
+				.from(recordLineItemsTable)
+				.where(eq(recordLineItemsTable.documentId, recordId))
+				.orderBy(asc(recordLineItemsTable.id));
+
+			const previousLineItems = storedLineItems.map((item) => ({
+				title: item.title,
+				quantity: item.quantity,
+				singleAmount: Number(item.singleAmount),
+			}));
 			const dateChanged = !isStoredDocumentDateEqual(
 				existing.documentDate,
 				payload.date,
 			);
-			const totalChanged = existing.totalAmount !== newTotalAmountStr;
+			const lineItemsChanged =
+				JSON.stringify(previousLineItems) !== JSON.stringify(nextLineItems);
 
+			if (!dateChanged && !lineItemsChanged) {
+				return { changed: false as const };
+			}
+
+			const totalChanged = existing.totalAmount !== newTotalAmountStr;
 			if (dateChanged || totalChanged) {
 				await tx
 					.update(recordsTable)
 					.set({
-						documentDate: encodeDocumentDateForStorage(payload.date),
+						documentDate: nextDate,
 						totalAmount: newTotalAmountStr,
 						updatedAt: new Date(),
 					})
@@ -242,9 +303,47 @@ export class RecordsService {
 					...row,
 				})),
 			);
+
+			const metadata = {
+				recordId,
+				oldValues: {
+					date: existing.documentDate,
+					lineItems: previousLineItems,
+				},
+				newValues: {
+					date: nextDate,
+					lineItems: nextLineItems,
+				},
+			};
+
+			if (existing.budgetId) {
+				await this.auditsService.createBudgetAudit(tx, {
+					budgetId: existing.budgetId,
+					actorUserId: userId,
+					entityId: recordId,
+					event: RECORD_EVENTS[kind].updated,
+					metadata,
+				});
+			} else {
+				await this.auditsService.createUserAudit(tx, {
+					userId,
+					entityId: recordId,
+					event: RECORD_EVENTS[kind].updated,
+					metadata,
+				});
+			}
+
+			return { changed: true as const, budgetId: existing.budgetId };
 		});
 
-		logDocumentSucceeded(kind, "update");
+		if (result.changed) {
+			this.logRecordEvent(
+				RECORD_EVENTS[kind].updated,
+				userId,
+				result.budgetId,
+				recordId,
+			);
+		}
 
 		return { data: { message: RECORD_UPDATED_MESSAGE } };
 	}
@@ -254,7 +353,7 @@ export class RecordsService {
 		recordId: string,
 		kind: RecordKind,
 	): Promise<RecordDeleteResponse> {
-		await this.db.transaction(async (tx) => {
+		const deleted = await this.db.transaction(async (tx) => {
 			const [existing] = await tx
 				.select({
 					id: recordsTable.id,
@@ -271,6 +370,26 @@ export class RecordsService {
 
 			await this.assertRecordWritable(userId, existing, "delete");
 
+			if (existing.budgetId) {
+				await tx
+					.delete(budgetAuditsTable)
+					.where(
+						and(
+							eq(budgetAuditsTable.budgetId, existing.budgetId),
+							eq(budgetAuditsTable.entityId, recordId),
+						),
+					);
+			} else {
+				await tx
+					.delete(userAuditsTable)
+					.where(
+						and(
+							eq(userAuditsTable.userId, userId),
+							eq(userAuditsTable.entityId, recordId),
+						),
+					);
+			}
+
 			const [deletedRecord] = await tx
 				.delete(recordsTable)
 				.where(eq(recordsTable.id, recordId))
@@ -279,9 +398,16 @@ export class RecordsService {
 			if (!deletedRecord) {
 				this.throwNotFound();
 			}
+
+			return { budgetId: existing.budgetId };
 		});
 
-		logDocumentSucceeded(kind, "delete");
+		this.logRecordEvent(
+			RECORD_EVENTS[kind].deleted,
+			userId,
+			deleted.budgetId,
+			recordId,
+		);
 
 		return { data: { message: RECORD_DELETED_MESSAGE } };
 	}
@@ -339,6 +465,29 @@ export class RecordsService {
 				message: "Budget not found",
 			});
 		}
+	}
+
+	private auditLineItems(payload: RecordCreatePayload) {
+		return payload.lineItems.map((item) => ({
+			title: item.title,
+			quantity: item.quantity,
+			singleAmount: item.singleAmount,
+		}));
+	}
+
+	private logRecordEvent(
+		event: string,
+		actorId: string,
+		budgetId: string | null,
+		recordId: string,
+	) {
+		logDomainEvent(event, {
+			actorId,
+			ownerType: budgetId ? "budget" : "user",
+			ownerId: budgetId ?? actorId,
+			subjectType: "record",
+			subjectId: recordId,
+		});
 	}
 
 	private throwNotFound(): never {

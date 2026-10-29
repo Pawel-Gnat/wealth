@@ -6,6 +6,7 @@ import {
 	UnauthorizedException,
 } from "@nestjs/common";
 import { ORPCError } from "@orpc/server";
+import { AUTH_EVENTS } from "@repo/api/events";
 import {
 	USER_AVATAR_UPDATED_MESSAGE,
 	USER_CREATED_MESSAGE,
@@ -32,17 +33,24 @@ import {
 	SESSION_COOKIE_NAME,
 	SESSION_TTL,
 } from "@repo/common/constants";
-import { AUTH_OBSERVABILITY_EVENTS } from "@repo/observability/node";
+import { OBSERVABILITY_EVENTS } from "@repo/observability/shared";
 import * as bcrypt from "bcrypt";
 import { addDays } from "date-fns";
 import { and, eq, gt, ne } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Request, Response } from "express";
+import { AuditsService } from "../audits-service/audits.service";
 import { DBS } from "../database-service/constants";
 import { sessionsTable } from "../database-service/tables/index";
-import type { UserRow } from "../database-service/types/types";
+import type {
+	DatabaseTransaction,
+	UserRow,
+} from "../database-service/types/types";
 import { isProduction } from "../shared/http/is-production";
-import { logAuthEvent } from "../shared/observability/log-event";
+import {
+	logAuthEvent,
+	logDomainEvent,
+} from "../shared/observability/log-event";
 import { SsePublisher } from "../sse-service/sse-publisher.service";
 import { StorageService } from "../storage-service/storage.service";
 import { UsersService } from "../users-service/users.service";
@@ -67,6 +75,7 @@ export class AuthService {
 		@Inject(DBS.APP) private readonly db: NodePgDatabase,
 		private readonly ssePublisher: SsePublisher,
 		private readonly storageService: StorageService,
+		private readonly auditsService: AuditsService,
 	) {}
 
 	async validateUser(payload: SignInPayload): Promise<User> {
@@ -88,9 +97,20 @@ export class AuthService {
 	): Promise<SessionSnapshotResponse> {
 		const user = await this.validateUser(payload);
 		await this.replaceSessionFromRefreshCookie(request);
-		const tokens = await this.insertSession(user.id);
+		const tokens = await this.db.transaction(async (tx) => {
+			const created = await this.insertSession(user.id, tx);
+
+			await this.auditsService.createUserAudit(tx, {
+				userId: user.id,
+				entityId: user.id,
+				event: AUTH_EVENTS.signedIn,
+				metadata: {},
+			});
+
+			return created;
+		});
 		setAuthCookies(response, tokens, isProduction());
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.signInSucceeded);
+		this.logAccountEvent(AUTH_EVENTS.signedIn, user.id);
 		return this.toSnapshot(user, tokens.sessionExpiresAt);
 	}
 
@@ -140,7 +160,7 @@ export class AuthService {
 				},
 				isProduction(),
 			);
-			logAuthEvent(AUTH_OBSERVABILITY_EVENTS.refreshSucceeded);
+			this.logAccountEvent(AUTH_EVENTS.sessionRefreshed, rotated.userId);
 			return this.toSnapshot(user, sessionExpiresAt);
 		}
 
@@ -157,7 +177,7 @@ export class AuthService {
 
 		if (graceRow) {
 			const user = await this.requireUser(graceRow.userId);
-			logAuthEvent(AUTH_OBSERVABILITY_EVENTS.refreshSucceeded);
+			this.logAccountEvent(AUTH_EVENTS.sessionRefreshed, graceRow.userId);
 			return this.toSnapshot(user, graceRow.sessionExpiresAt);
 		}
 
@@ -191,12 +211,22 @@ export class AuthService {
 				.limit(1);
 
 			if (row) {
-				await this.endSession(row.userId, row.id);
+				await this.db.transaction(async (tx) => {
+					await this.endSession(row.userId, row.id, tx);
+
+					await this.auditsService.createUserAudit(tx, {
+						userId: row.userId,
+						entityId: row.userId,
+						event: AUTH_EVENTS.loggedOut,
+						metadata: {},
+					});
+				});
+
+				this.logAccountEvent(AUTH_EVENTS.loggedOut, row.userId);
 			}
 		}
 
 		clearAuthCookies(response, isProduction());
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.logoutSucceeded);
 	}
 
 	async me(request: Request): Promise<SessionSnapshotResponse> {
@@ -274,9 +304,18 @@ export class AuthService {
 		}
 
 		const passwordHash = await bcrypt.hash(input.newPassword, BCRYPT_ROUNDS);
-		await this.usersService.updatePassword(user.id, passwordHash);
+		await this.db.transaction(async (tx) => {
+			await this.usersService.updatePassword(user.id, passwordHash, tx);
+
+			await this.auditsService.createUserAudit(tx, {
+				userId: user.id,
+				entityId: user.id,
+				event: AUTH_EVENTS.passwordUpdated,
+				metadata: {},
+			});
+		});
 		await this.endOtherSessions(user.id, session.sessionId);
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.passwordUpdateSucceeded);
+		this.logAccountEvent(AUTH_EVENTS.passwordUpdated, user.id);
 
 		return { data: { message: USER_PASSWORD_UPDATED_MESSAGE } };
 	}
@@ -295,11 +334,31 @@ export class AuthService {
 			throw new UnauthorizedException("Unauthorized");
 		}
 
-		await this.usersService.updateDetails(user.id, {
-			firstName: input.firstName,
-			lastName: input.lastName,
+		const next = {
+			firstName: input.firstName || null,
+			lastName: input.lastName || null,
+		};
+		if (user.firstName === next.firstName && user.lastName === next.lastName) {
+			return { data: { message: USER_DETAILS_UPDATED_MESSAGE } };
+		}
+
+		await this.db.transaction(async (tx) => {
+			await this.usersService.updateDetails(user.id, input, tx);
+
+			await this.auditsService.createUserAudit(tx, {
+				userId: user.id,
+				entityId: user.id,
+				event: AUTH_EVENTS.detailsUpdated,
+				metadata: {
+					oldValues: {
+						firstName: user.firstName,
+						lastName: user.lastName,
+					},
+					newValues: next,
+				},
+			});
 		});
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.detailsUpdateSucceeded);
+		this.logAccountEvent(AUTH_EVENTS.detailsUpdated, user.id);
 
 		return { data: { message: USER_DETAILS_UPDATED_MESSAGE } };
 	}
@@ -324,21 +383,29 @@ export class AuthService {
 			file: input.avatar,
 		});
 
-		let swapped: boolean;
+		let swapped = false;
 		try {
-			swapped = await this.usersService.updateImageIfCurrent(
-				user.id,
-				id,
-				previousImageId,
-			);
+			await this.db.transaction(async (tx) => {
+				swapped = await this.usersService.updateImageIfCurrent(
+					user.id,
+					id,
+					previousImageId,
+					tx,
+				);
+				if (!swapped) return;
+
+				await this.auditsService.createUserAudit(tx, {
+					userId: user.id,
+					entityId: user.id,
+					event: AUTH_EVENTS.avatarUpdated,
+					metadata: {},
+				});
+			});
 		} catch (error) {
 			try {
 				await this.storageService.delete(id);
 			} catch {
-				logAuthEvent(
-					AUTH_OBSERVABILITY_EVENTS.avatarPreviousDeleteFailed,
-					"warn",
-				);
+				logAuthEvent(OBSERVABILITY_EVENTS.avatarPreviousDelete, "warn");
 			}
 			throw error;
 		}
@@ -347,10 +414,7 @@ export class AuthService {
 			try {
 				await this.storageService.delete(id);
 			} catch {
-				logAuthEvent(
-					AUTH_OBSERVABILITY_EVENTS.avatarPreviousDeleteFailed,
-					"warn",
-				);
+				logAuthEvent(OBSERVABILITY_EVENTS.avatarPreviousDelete, "warn");
 			}
 			throw new ORPCError("CONFLICT", {
 				message: "Avatar was updated concurrently",
@@ -361,14 +425,11 @@ export class AuthService {
 			try {
 				await this.storageService.delete(previousImageId);
 			} catch {
-				logAuthEvent(
-					AUTH_OBSERVABILITY_EVENTS.avatarPreviousDeleteFailed,
-					"warn",
-				);
+				logAuthEvent(OBSERVABILITY_EVENTS.avatarPreviousDelete, "warn");
 			}
 		}
 
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.avatarUpdateSucceeded);
+		this.logAccountEvent(AUTH_EVENTS.avatarUpdated, user.id);
 
 		return { data: { message: USER_AVATAR_UPDATED_MESSAGE } };
 	}
@@ -379,13 +440,26 @@ export class AuthService {
 			throw new ORPCError("CONFLICT", { message: "Email already registered" });
 		}
 		const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
-		await this.usersService.createUser({
-			email: input.email,
-			passwordHash,
-			firstName: input.firstName ?? undefined,
-			lastName: input.lastName ?? undefined,
+		const userId = await this.db.transaction(async (tx) => {
+			const id = await this.usersService.createUser(
+				{
+					email: input.email,
+					passwordHash,
+					firstName: input.firstName ?? undefined,
+					lastName: input.lastName ?? undefined,
+				},
+				tx,
+			);
+
+			await this.auditsService.createUserAudit(tx, {
+				userId: id,
+				entityId: id,
+				event: AUTH_EVENTS.signedUp,
+				metadata: {},
+			});
+			return id;
 		});
-		logAuthEvent(AUTH_OBSERVABILITY_EVENTS.signUpSucceeded);
+		this.logAccountEvent(AUTH_EVENTS.signedUp, userId);
 		return { data: { message: USER_CREATED_MESSAGE } };
 	}
 
@@ -414,7 +488,10 @@ export class AuthService {
 		await this.endSession(row.userId, row.id);
 	}
 
-	private async insertSession(userId: string): Promise<{
+	private async insertSession(
+		userId: string,
+		tx: DatabaseTransaction,
+	): Promise<{
 		sessionToken: string;
 		refreshToken: string;
 		sessionExpiresAt: Date;
@@ -427,7 +504,7 @@ export class AuthService {
 		const sessionExpiresAt = new Date(now.getTime() + SESSION_TTL);
 		const refreshExpiresAt = addDays(now, REFRESH_TTL_DAYS);
 
-		const [row] = await this.db
+		const [row] = await tx
 			.insert(sessionsTable)
 			.values({
 				userId,
@@ -519,9 +596,28 @@ export class AuthService {
 		await Promise.all(rows.map((row) => this.endSession(userId, row.id)));
 	}
 
-	private async endSession(userId: string, sessionId: string): Promise<void> {
+	private async endSession(
+		userId: string,
+		sessionId: string,
+		tx?: DatabaseTransaction,
+	): Promise<void> {
 		await this.publishSessionEndedBestEffort({ userId, targetId: sessionId });
-		await this.db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
+		await (tx ?? this.db)
+			.delete(sessionsTable)
+			.where(eq(sessionsTable.id, sessionId));
+	}
+
+	private logAccountEvent(
+		event: (typeof AUTH_EVENTS)[keyof typeof AUTH_EVENTS],
+		userId: string,
+	) {
+		logDomainEvent(event, {
+			actorId: userId,
+			ownerType: "user",
+			ownerId: userId,
+			subjectType: "user",
+			subjectId: userId,
+		});
 	}
 
 	private toSnapshot(
@@ -551,7 +647,7 @@ export class AuthService {
 		try {
 			await this.ssePublisher.publishSessionEnded(input);
 		} catch {
-			logAuthEvent(AUTH_OBSERVABILITY_EVENTS.sessionEndedPublishFailed, "warn");
+			logAuthEvent(OBSERVABILITY_EVENTS.sessionEndedPublish, "warn");
 		}
 	}
 }

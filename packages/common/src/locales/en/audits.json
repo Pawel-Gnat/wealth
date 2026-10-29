@@ -1,0 +1,17 @@
+{
+	"title": "Audit log",
+	"actor": "Actor",
+	"details": "Details",
+	"unknown-user": "Unknown user",
+	"date-change": "date {{previous}} → {{next}}",
+	"item-added": "{{item}} → added",
+	"item-removed": "{{item}} → removed",
+	"empty": {
+		"title": "No audit logs",
+		"description": "Actions you take will appear here."
+	},
+	"error": {
+		"title": "Could not load audit logs",
+		"description": "Audit logs could not be loaded. Please try again later."
+	}
+}

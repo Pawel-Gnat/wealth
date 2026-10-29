@@ -1,0 +1,40 @@
+{
+	"auth": {
+		"signed-in": "Signed in",
+		"signed-up": "Signed up",
+		"logged-out": "Logged out",
+		"password": {
+			"updated": "Updated the password"
+		},
+		"details": {
+			"updated": "Updated the name from {{previous}} to {{next}}",
+			"set": "Updated the name to {{name}}"
+		},
+		"avatar": {
+			"updated": "Updated the avatar"
+		}
+	},
+	"budget": {
+		"created": "Created a budget titled {{title}}",
+		"updated": "Updated the budget, changes: title {{previous}} → {{next}}",
+		"member": {
+			"invited": "Invited {{person}}"
+		},
+		"invite": {
+			"cancelled": "Cancelled the invite for {{person}}",
+			"accepted": "{{person}} accepted the invite",
+			"rejected": "{{person}} rejected the invite"
+		},
+		"left": "{{person}} left the budget"
+	},
+	"expense": {
+		"created": "Created a new expense dated {{date}}",
+		"updated": "Updated the expense from {{date}}, changes: {{changes}}",
+		"deleted": "Deleted the expense dated {{date}}"
+	},
+	"income": {
+		"created": "Created a new income dated {{date}}",
+		"updated": "Updated the income from {{date}}, changes: {{changes}}",
+		"deleted": "Deleted the income dated {{date}}"
+	}
+}

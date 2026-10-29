@@ -1,4 +1,5 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
+import { AuditsModule } from "../audits-service/audits.module";
 import { SessionGuard } from "../guards/session.guard";
 import { SseRealtimeModule } from "../sse-service/sse-realtime.module";
 import { UsersController } from "../users-service/users.controller";
@@ -7,7 +8,7 @@ import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 
 @Module({
-	imports: [UsersModule, SseRealtimeModule],
+	imports: [UsersModule, SseRealtimeModule, forwardRef(() => AuditsModule)],
 	controllers: [AuthController, UsersController],
 	providers: [AuthService, SessionGuard],
 	exports: [AuthService, SessionGuard],

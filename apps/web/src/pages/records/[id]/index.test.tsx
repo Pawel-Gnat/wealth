@@ -62,6 +62,7 @@ describe("RecordPage", () => {
 		).toBeInTheDocument();
 
 		expect(await screen.findByText("Taxi")).toBeInTheDocument();
+		expect(screen.getByText(t("title", { ns: "audits" }))).toBeInTheDocument();
 		expect(
 			screen.getByText(t("common.total", { ns: "common" })),
 		).toBeInTheDocument();

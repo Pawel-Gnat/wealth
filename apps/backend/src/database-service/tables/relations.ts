@@ -1,9 +1,11 @@
 import { relations } from "drizzle-orm";
+import { budgetAuditsTable } from "./budget-audits.table";
 import { budgetMemberTable } from "./budget-members.table";
 import { budgetTable } from "./budgets.table";
 import { recordLineItemsTable } from "./record-line-items.table";
 import { recordsTable } from "./records.table";
 import { sessionsTable } from "./sessions.table";
+import { userAuditsTable } from "./user-audits.table";
 import { usersTable } from "./users.table";
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
@@ -11,6 +13,8 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
 	sessions: many(sessionsTable),
 	budgets: many(budgetTable),
 	budgetMembers: many(budgetMemberTable),
+	audits: many(userAuditsTable),
+	budgetAuditActions: many(budgetAuditsTable),
 }));
 
 export const recordsRelations = relations(recordsTable, ({ one, many }) => ({
@@ -42,6 +46,7 @@ export const budgetRelations = relations(budgetTable, ({ one, many }) => ({
 	}),
 	members: many(budgetMemberTable),
 	records: many(recordsTable),
+	audits: many(budgetAuditsTable),
 }));
 
 export const budgetMemberRelations = relations(
@@ -64,3 +69,24 @@ export const sessionsRelations = relations(sessionsTable, ({ one }) => ({
 		references: [usersTable.id],
 	}),
 }));
+
+export const userAuditsRelations = relations(userAuditsTable, ({ one }) => ({
+	user: one(usersTable, {
+		fields: [userAuditsTable.userId],
+		references: [usersTable.id],
+	}),
+}));
+
+export const budgetAuditsRelations = relations(
+	budgetAuditsTable,
+	({ one }) => ({
+		budget: one(budgetTable, {
+			fields: [budgetAuditsTable.budgetId],
+			references: [budgetTable.id],
+		}),
+		actor: one(usersTable, {
+			fields: [budgetAuditsTable.actorUserId],
+			references: [usersTable.id],
+		}),
+	}),
+);

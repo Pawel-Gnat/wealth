@@ -1,4 +1,4 @@
-import type { Period } from "@repo/api/types";
+import type { AuditsParams, Period } from "@repo/api/types";
 
 export const queryKeys = {
 	me: () => ["me"] as const,
@@ -14,6 +14,10 @@ export const queryKeys = {
 	},
 	users: {
 		search: (query: string) => ["users", "search", query] as const,
+	},
+	audits: {
+		all: () => ["audits"] as const,
+		list: (params: AuditsParams) => ["audits", "list", params] as const,
 	},
 	dashboard: {
 		all: () => ["dashboard"] as const,

@@ -33,22 +33,3 @@ export const {
 	setUserId,
 	clearUserId,
 } = observability;
-
-export type {
-	AuthObservabilityEvent,
-	DocumentMutationEvent,
-	DocumentRecordKind,
-	SseObservabilityEvent,
-} from "../shared/observability-events";
-
-export {
-	AUTH_OBSERVABILITY_EVENTS,
-	DOCUMENT_OBSERVABILITY_EVENTS,
-	getDocumentObservabilityEvents,
-	SSE_OBSERVABILITY_EVENTS,
-} from "../shared/observability-events";
-export type {
-	BetterStackConfig,
-	ObservabilityInitConfig,
-	ObservabilityService,
-} from "../shared/types";

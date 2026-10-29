@@ -1,5 +1,5 @@
 {
-  "version": "2.19",
+  "version": "2.21",
   "children": [
     {
       "type": "frame",
@@ -1615,6 +1615,739 @@
               }
             }
           ]
+        },
+        {
+          "type": "frame",
+          "id": "tDgOA",
+          "name": "Audit log",
+          "reusable": true,
+          "width": 720,
+          "fill": "$card",
+          "stroke": "$border",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "frame",
+              "id": "u5Rli",
+              "name": "Filters",
+              "width": "fill_container",
+              "gap": 8,
+              "alignItems": "end",
+              "children": [
+                {
+                  "id": "fuxZP",
+                  "type": "ref",
+                  "ref": "gIJ2L",
+                  "name": "Date filter",
+                  "width": "fill_container",
+                  "descendants": {
+                    "ZWsLX": {
+                      "content": "Date"
+                    },
+                    "Eyb4X": {
+                      "icon": "calendar"
+                    },
+                    "xV4Tl": {
+                      "content": "28 Oct 2026",
+                      "fill": "$foreground"
+                    }
+                  }
+                },
+                {
+                  "id": "TGtpa",
+                  "type": "ref",
+                  "ref": "gIJ2L",
+                  "name": "Actor filter",
+                  "width": "fill_container",
+                  "descendants": {
+                    "ZWsLX": {
+                      "content": "Actor"
+                    },
+                    "Eyb4X": {
+                      "icon": "user"
+                    },
+                    "xV4Tl": {
+                      "content": "All actors",
+                      "fill": "$foreground"
+                    }
+                  }
+                },
+                {
+                  "id": "GtKP1",
+                  "type": "ref",
+                  "ref": "gIJ2L",
+                  "name": "Event filter",
+                  "width": "fill_container",
+                  "descendants": {
+                    "ZWsLX": {
+                      "content": "Event"
+                    },
+                    "Eyb4X": {
+                      "icon": "list-filter"
+                    },
+                    "xV4Tl": {
+                      "content": "All events",
+                      "fill": "$foreground"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Nh0OO",
+              "name": "Table",
+              "width": "fill_container",
+              "cornerRadius": 12,
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "X6P98",
+                  "name": "Header",
+                  "width": "fill_container",
+                  "fill": "$muted",
+                  "gap": 16,
+                  "padding": [
+                    12,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "a8RK1",
+                      "name": "Col Date",
+                      "fill": "$foreground",
+                      "textGrowth": "fixed-width",
+                      "width": 132,
+                      "content": "Date",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "eiTim",
+                      "name": "Col Actor",
+                      "fill": "$foreground",
+                      "textGrowth": "fixed-width",
+                      "width": 148,
+                      "content": "Actor",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "hZ9xF",
+                      "name": "Col Event",
+                      "fill": "$foreground",
+                      "textGrowth": "fixed-width",
+                      "width": 148,
+                      "content": "Event",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Ahvwm",
+                      "name": "Col Details",
+                      "fill": "$foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Details",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "bstzM",
+                  "name": "Row 1",
+                  "width": "fill_container",
+                  "stroke": "$border",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "gap": 16,
+                  "padding": [
+                    12,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "N6hCD",
+                      "name": "When 1",
+                      "width": 132,
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "T0AP5V",
+                          "name": "Date 1",
+                          "fill": "$foreground",
+                          "content": "28 Oct 2026",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "G1Kcy8",
+                          "name": "Time 1",
+                          "fill": "$muted-foreground",
+                          "content": "16:04",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "OVCQD",
+                      "name": "Actor 1",
+                      "width": 148,
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "id": "RuByx",
+                          "type": "ref",
+                          "ref": "yNC4s",
+                          "name": "Avatar 1",
+                          "descendants": {
+                            "G197PP": {
+                              "content": "Y"
+                            }
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "id": "lPcfS",
+                          "name": "Actor name 1",
+                          "fill": "$foreground",
+                          "content": "You",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "F6UST",
+                      "type": "ref",
+                      "ref": "X4el9",
+                      "name": "Event 1",
+                      "fill": "$muted",
+                      "width": 148,
+                      "descendants": {
+                        "IJ5hx": {
+                          "content": "Signed in",
+                          "fill": "$muted-foreground"
+                        }
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "bEHpt",
+                      "name": "Details 1",
+                      "fill": "$muted-foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Session started",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "nX04W",
+                  "name": "Row 2",
+                  "width": "fill_container",
+                  "stroke": "$border",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "gap": 16,
+                  "padding": [
+                    12,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "HyMPH",
+                      "name": "When 2",
+                      "width": 132,
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "K7iT6z",
+                          "name": "Date 2",
+                          "fill": "$foreground",
+                          "content": "28 Oct 2026",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "g4wm3S",
+                          "name": "Time 2",
+                          "fill": "$muted-foreground",
+                          "content": "15:12",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "N2YXmx",
+                      "name": "Actor 2",
+                      "width": 148,
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "id": "RWBQ3",
+                          "type": "ref",
+                          "ref": "yNC4s",
+                          "name": "Avatar 2",
+                          "descendants": {
+                            "G197PP": {
+                              "content": "Y"
+                            }
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "id": "r2RG1",
+                          "name": "Actor name 2",
+                          "fill": "$foreground",
+                          "content": "You",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "WJs0y",
+                      "type": "ref",
+                      "ref": "X4el9",
+                      "name": "Event 2",
+                      "fill": "$muted",
+                      "width": 148,
+                      "descendants": {
+                        "IJ5hx": {
+                          "content": "Updated details",
+                          "fill": "$muted-foreground"
+                        }
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "VxcF9",
+                      "name": "Details 2",
+                      "fill": "$muted-foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Ada Lovelace",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "TpF0A",
+                  "name": "Row 3",
+                  "width": "fill_container",
+                  "stroke": "$border",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "gap": 16,
+                  "padding": [
+                    12,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "nmcRF",
+                      "name": "When 3",
+                      "width": 132,
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "BaBtV",
+                          "name": "Date 3",
+                          "fill": "$foreground",
+                          "content": "27 Oct 2026",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "LtbVA",
+                          "name": "Time 3",
+                          "fill": "$muted-foreground",
+                          "content": "11:20",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "d94ha",
+                      "name": "Actor 3",
+                      "width": 148,
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "id": "mScNT",
+                          "type": "ref",
+                          "ref": "yNC4s",
+                          "name": "Avatar 3",
+                          "descendants": {
+                            "G197PP": {
+                              "content": "Y"
+                            }
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "id": "w3B5n",
+                          "name": "Actor name 3",
+                          "fill": "$foreground",
+                          "content": "You",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "PHZG4",
+                      "type": "ref",
+                      "ref": "X4el9",
+                      "name": "Event 3",
+                      "fill": "$muted",
+                      "width": 148,
+                      "descendants": {
+                        "IJ5hx": {
+                          "content": "Created expense",
+                          "fill": "$muted-foreground"
+                        }
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "WyBnz",
+                      "name": "Details 3",
+                      "fill": "$muted-foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "18 Aug · $84.20",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "PPHtz",
+                  "name": "Row 4",
+                  "width": "fill_container",
+                  "stroke": "$border",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "gap": 16,
+                  "padding": [
+                    12,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "BAfJP",
+                      "name": "When 4",
+                      "width": 132,
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "aHvZK",
+                          "name": "Date 4",
+                          "fill": "$foreground",
+                          "content": "26 Oct 2026",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "V9BDdg",
+                          "name": "Time 4",
+                          "fill": "$muted-foreground",
+                          "content": "09:03",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "LKBIK",
+                      "name": "Actor 4",
+                      "width": 148,
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "id": "kR1yb",
+                          "type": "ref",
+                          "ref": "yNC4s",
+                          "name": "Avatar 4",
+                          "fill": "#854D0E",
+                          "descendants": {
+                            "G197PP": {
+                              "content": "M"
+                            }
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "id": "V9nu9",
+                          "name": "Actor name 4",
+                          "fill": "$foreground",
+                          "content": "Maya Chen",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "PTpBs",
+                      "type": "ref",
+                      "ref": "X4el9",
+                      "name": "Event 4",
+                      "fill": "$muted",
+                      "width": 148,
+                      "descendants": {
+                        "IJ5hx": {
+                          "content": "Invited member",
+                          "fill": "$muted-foreground"
+                        }
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "p7jwSx",
+                      "name": "Details 4",
+                      "fill": "$muted-foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Pending",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "prA6C",
+              "name": "Pagination",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "aKCnX",
+                  "name": "Rows per page",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "g5w2fM",
+                      "name": "Rows label",
+                      "fill": "$muted-foreground",
+                      "content": "Rows per page",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bTopi",
+                      "name": "Page size",
+                      "height": 32,
+                      "fill": "$muted",
+                      "cornerRadius": "$radius-pill",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "p3nCJ",
+                          "name": "Page size value",
+                          "fill": "$foreground",
+                          "content": "10",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "icon",
+                          "id": "eiEWC",
+                          "name": "Page size chevron",
+                          "width": 14,
+                          "height": 14,
+                          "icon": "chevron-down",
+                          "library": "lucide",
+                          "fill": "$muted-foreground"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "V3mD89",
+                  "name": "Page nav",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "D2IpZW",
+                      "name": "Page status",
+                      "fill": "$muted-foreground",
+                      "content": "Page 1 of 3",
+                      "fontFamily": "$font-sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "anQd3",
+                      "name": "Previous",
+                      "opacity": 0.5,
+                      "height": 32,
+                      "fill": "$secondary",
+                      "cornerRadius": "$radius-pill",
+                      "gap": 4,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "ZtlLb",
+                          "name": "Previous icon",
+                          "width": 14,
+                          "height": 14,
+                          "icon": "chevron-left",
+                          "library": "lucide",
+                          "fill": "$secondary-foreground"
+                        },
+                        {
+                          "type": "text",
+                          "id": "C7BTe",
+                          "name": "Previous label",
+                          "fill": "$secondary-foreground",
+                          "content": "Previous",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "S4FP31",
+                      "name": "Next",
+                      "height": 32,
+                      "fill": "$secondary",
+                      "cornerRadius": "$radius-pill",
+                      "gap": 4,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "NDYms",
+                          "name": "Next label",
+                          "fill": "$secondary-foreground",
+                          "content": "Next",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "icon",
+                          "id": "LvB27",
+                          "name": "Next icon",
+                          "width": 14,
+                          "height": 14,
+                          "icon": "chevron-right",
+                          "library": "lucide",
+                          "fill": "$secondary-foreground"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -1622,7 +2355,7 @@
       "type": "frame",
       "id": "P6QvKO",
       "x": 0,
-      "y": 3372,
+      "y": 3912,
       "name": "Group budgets",
       "clip": true,
       "width": 1440,
@@ -3049,7 +3782,7 @@
       "type": "frame",
       "id": "j7mUZ",
       "x": 1720,
-      "y": 3372,
+      "y": 3912,
       "name": "Create group budget",
       "clip": true,
       "width": 1440,
@@ -4239,7 +4972,7 @@
       "type": "frame",
       "id": "Zr8vQ",
       "x": 3440,
-      "y": 3372,
+      "y": 3912,
       "name": "Edit group budget",
       "clip": true,
       "width": 1440,
@@ -5398,11 +6131,11 @@
       "type": "frame",
       "id": "IQMvV",
       "x": 5160,
-      "y": 3372,
+      "y": 3912,
       "name": "Group budget detail",
       "clip": true,
       "width": 1440,
-      "height": 1200,
+      "height": 1560,
       "fill": "$background",
       "children": [
         {
@@ -7166,6 +7899,46 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": "frame",
+              "id": "mhHIQ",
+              "name": "Audit log card",
+              "width": "fill_container",
+              "fill": "$card",
+              "cornerRadius": 32,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#0000000D",
+                "offset": {
+                  "x": 0,
+                  "y": 8
+                },
+                "blur": 20
+              },
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "etdq8",
+                  "name": "Audit log heading",
+                  "fill": "$foreground",
+                  "content": "Audit log",
+                  "fontFamily": "$font-sans",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "id": "X4yyN",
+                  "type": "ref",
+                  "ref": "tDgOA",
+                  "name": "Audit log",
+                  "width": "fill_container"
+                }
+              ]
             }
           ]
         }
@@ -7179,7 +7952,7 @@
       "name": "Personal records",
       "clip": true,
       "width": 1440,
-      "height": 900,
+      "height": 1420,
       "fill": "$background",
       "children": [
         {
@@ -8411,6 +9184,46 @@
                       ]
                     }
                   ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "YTkGh",
+              "name": "Audit log card",
+              "width": "fill_container",
+              "fill": "$card",
+              "cornerRadius": 32,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#0000000D",
+                "offset": {
+                  "x": 0,
+                  "y": 8
+                },
+                "blur": 20
+              },
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "S4X8S",
+                  "name": "Audit log heading",
+                  "fill": "$foreground",
+                  "content": "Audit log",
+                  "fontFamily": "$font-sans",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "id": "p4t7cG",
+                  "type": "ref",
+                  "ref": "tDgOA",
+                  "name": "Audit log",
+                  "width": "fill_container"
                 }
               ]
             }
@@ -12158,7 +12971,7 @@
       "name": "Settings",
       "clip": true,
       "width": 1440,
-      "height": 1100,
+      "height": 1640,
       "fill": "$background",
       "children": [
         {
@@ -13076,6 +13889,46 @@
                       ]
                     }
                   ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "FiXXK",
+              "name": "Audit log card",
+              "width": "fill_container",
+              "fill": "$card",
+              "cornerRadius": 32,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#0000000D",
+                "offset": {
+                  "x": 0,
+                  "y": 8
+                },
+                "blur": 20
+              },
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "lMTBj",
+                  "name": "Audit log heading",
+                  "fill": "$foreground",
+                  "content": "Audit log",
+                  "fontFamily": "$font-sans",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "id": "Ew5cr",
+                  "type": "ref",
+                  "ref": "tDgOA",
+                  "name": "Audit log",
+                  "width": "fill_container"
                 }
               ]
             }
@@ -14106,7 +14959,7 @@
                         "type": "image",
                         "enabled": true,
                         "url": "https://images.unsplash.com/photo-1521146764736-56c929d59c83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODg1MTk1ODJ8&ixlib=rb-4.1.0&q=80&w=1080",
-                        "mode": "fill"
+                        "mode": "cover"
                       },
                       "cornerRadius": 80
                     },
@@ -14245,7 +15098,7 @@
       "type": "frame",
       "id": "cWxtL",
       "x": 0,
-      "y": 4852,
+      "y": 5752,
       "name": "Sign in Mobile",
       "clip": true,
       "width": 375,
@@ -14743,7 +15596,7 @@
       "type": "frame",
       "id": "xahnA",
       "x": 655,
-      "y": 4852,
+      "y": 5752,
       "name": "Create account Mobile",
       "clip": true,
       "width": 375,
@@ -15437,7 +16290,7 @@
       "type": "frame",
       "id": "JoETY",
       "x": 1310,
-      "y": 4852,
+      "y": 5752,
       "name": "Reset password Mobile",
       "clip": true,
       "width": 375,
@@ -15804,7 +16657,7 @@
       "type": "frame",
       "id": "KQgBX",
       "x": 1965,
-      "y": 4852,
+      "y": 5752,
       "name": "Set new password Mobile",
       "clip": true,
       "width": 375,
@@ -16263,7 +17116,7 @@
       "type": "frame",
       "id": "p1wQW",
       "x": 0,
-      "y": 5798,
+      "y": 6738,
       "name": "Dashboard Mobile",
       "clip": true,
       "width": 375,
@@ -18025,7 +18878,7 @@
       "type": "frame",
       "id": "Ykdn6",
       "x": 655,
-      "y": 5798,
+      "y": 6738,
       "name": "Personal records Mobile",
       "clip": true,
       "width": 375,
@@ -19373,7 +20226,7 @@
       "type": "frame",
       "id": "v8XFH",
       "x": 1310,
-      "y": 5798,
+      "y": 6738,
       "name": "Settings Mobile",
       "clip": true,
       "width": 375,
@@ -20336,7 +21189,7 @@
       "type": "frame",
       "id": "mMOfW",
       "x": 1965,
-      "y": 5798,
+      "y": 6738,
       "name": "Change photo Mobile",
       "clip": true,
       "width": 375,
@@ -21385,7 +22238,7 @@
                         "type": "image",
                         "enabled": true,
                         "url": "https://images.unsplash.com/photo-1521146764736-56c929d59c83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODg1MTk1ODJ8&ixlib=rb-4.1.0&q=80&w=1080",
-                        "mode": "fill"
+                        "mode": "cover"
                       },
                       "cornerRadius": 80
                     },
@@ -21550,7 +22403,7 @@
       "type": "frame",
       "id": "mFtyi",
       "x": 0,
-      "y": 7409,
+      "y": 8650,
       "name": "Group budgets Mobile",
       "clip": true,
       "width": 375,
@@ -23027,7 +23880,7 @@
       "type": "frame",
       "id": "deDdo",
       "x": 655,
-      "y": 7409,
+      "y": 8650,
       "name": "Create group budget Mobile",
       "clip": true,
       "width": 375,
@@ -24248,7 +25101,7 @@
       "type": "frame",
       "id": "Ho9ex",
       "x": 1310,
-      "y": 7409,
+      "y": 8650,
       "name": "Edit group budget Mobile",
       "clip": true,
       "width": 375,
@@ -25438,7 +26291,7 @@
       "type": "frame",
       "id": "QM1B4",
       "x": 1965,
-      "y": 7409,
+      "y": 8650,
       "name": "Group budget detail Mobile",
       "clip": true,
       "width": 375,
@@ -27244,7 +28097,7 @@
       "type": "frame",
       "id": "ijNpP",
       "x": 0,
-      "y": 9841,
+      "y": 11107,
       "name": "Dashboard Empty",
       "clip": true,
       "width": 1440,
@@ -28373,7 +29226,7 @@
       "type": "frame",
       "id": "PGN6w",
       "x": 1720,
-      "y": 9841,
+      "y": 11107,
       "name": "Personal records Empty",
       "clip": true,
       "width": 1440,
@@ -29017,7 +29870,7 @@
       "type": "frame",
       "id": "Wyx8p",
       "x": 3440,
-      "y": 9841,
+      "y": 11107,
       "name": "Group budgets Empty",
       "clip": true,
       "width": 1440,
@@ -29488,7 +30341,7 @@
       "type": "frame",
       "id": "m86bk",
       "x": 5160,
-      "y": 9841,
+      "y": 11107,
       "name": "Group budget detail Empty",
       "clip": true,
       "width": 1440,
@@ -30402,7 +31255,7 @@
       "type": "frame",
       "id": "t1ALMP",
       "x": 0,
-      "y": 11321,
+      "y": 12587,
       "name": "Dashboard Mobile Empty",
       "clip": true,
       "width": 375,
@@ -31569,7 +32422,7 @@
       "type": "frame",
       "id": "y4kli",
       "x": 655,
-      "y": 11321,
+      "y": 12587,
       "name": "Personal records Mobile Empty",
       "clip": true,
       "width": 375,
@@ -32221,7 +33074,7 @@
       "type": "frame",
       "id": "Fs0jl",
       "x": 1310,
-      "y": 11321,
+      "y": 12587,
       "name": "Group budgets Mobile Empty",
       "clip": true,
       "width": 375,
@@ -32720,7 +33573,7 @@
       "type": "frame",
       "id": "hHia7",
       "x": 1965,
-      "y": 11321,
+      "y": 12587,
       "name": "Group budget detail Mobile Empty",
       "clip": true,
       "width": 375,
@@ -33663,7 +34516,7 @@
       "type": "frame",
       "id": "Y0kRD",
       "x": 0,
-      "y": 12996,
+      "y": 14475,
       "name": "Dashboard Error",
       "clip": true,
       "width": 1440,
@@ -34469,7 +35322,7 @@
       "type": "frame",
       "id": "gCFU3",
       "x": 1720,
-      "y": 12996,
+      "y": 14475,
       "name": "Personal records Error",
       "clip": true,
       "width": 1440,
@@ -35110,7 +35963,7 @@
       "type": "frame",
       "id": "fZEHW",
       "x": 3440,
-      "y": 12996,
+      "y": 14475,
       "name": "Group budgets Error",
       "clip": true,
       "width": 1440,
@@ -35575,7 +36428,7 @@
       "type": "frame",
       "id": "Zc7GN",
       "x": 5160,
-      "y": 12996,
+      "y": 14475,
       "name": "Group budget detail Error",
       "clip": true,
       "width": 1440,
@@ -36486,7 +37339,7 @@
       "type": "frame",
       "id": "n2RqhD",
       "x": 0,
-      "y": 14476,
+      "y": 15955,
       "name": "Dashboard Mobile Error",
       "clip": true,
       "width": 375,
@@ -37330,7 +38183,7 @@
       "type": "frame",
       "id": "nAQIK",
       "x": 655,
-      "y": 14476,
+      "y": 15955,
       "name": "Personal records Mobile Error",
       "clip": true,
       "width": 375,
@@ -37979,7 +38832,7 @@
       "type": "frame",
       "id": "N48YC6",
       "x": 1310,
-      "y": 14476,
+      "y": 15955,
       "name": "Group budgets Mobile Error",
       "clip": true,
       "width": 375,
@@ -38472,7 +39325,7 @@
       "type": "frame",
       "id": "wHBdT",
       "x": 1965,
-      "y": 14476,
+      "y": 15955,
       "name": "Group budget detail Mobile Error",
       "clip": true,
       "width": 375,
@@ -42311,7 +43164,7 @@
       "type": "frame",
       "id": "inYLc",
       "x": 2620,
-      "y": 5798,
+      "y": 6738,
       "name": "Delete expense Mobile",
       "clip": true,
       "width": 375,
@@ -43848,7 +44701,7 @@
       "type": "frame",
       "id": "a4kJK9",
       "x": 3275,
-      "y": 5798,
+      "y": 6738,
       "name": "Create expense Mobile",
       "clip": true,
       "width": 375,
@@ -44600,7 +45453,7 @@
       "type": "frame",
       "id": "K6H0BY",
       "x": 3930,
-      "y": 5798,
+      "y": 6738,
       "name": "Create income Mobile",
       "clip": true,
       "width": 375,
@@ -45356,7 +46209,7 @@
       "type": "frame",
       "id": "d90hB",
       "x": 6880,
-      "y": 12996,
+      "y": 14475,
       "name": "Edit expense Error",
       "clip": true,
       "width": 1440,
@@ -45714,7 +46567,7 @@
       "type": "frame",
       "id": "CS8wG",
       "x": 2620,
-      "y": 14476,
+      "y": 15955,
       "name": "Edit expense Error Mobile",
       "clip": true,
       "width": 375,
@@ -47464,7 +48317,7 @@
       "type": "frame",
       "id": "u5yne",
       "x": 4385,
-      "y": 5798,
+      "y": 6738,
       "name": "Expense detail Mobile",
       "clip": true,
       "width": 375,
@@ -48257,7 +49110,7 @@
       "type": "frame",
       "id": "Bjr64",
       "x": 4840,
-      "y": 5798,
+      "y": 6738,
       "name": "Income detail Mobile",
       "clip": true,
       "width": 375,

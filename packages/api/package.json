@@ -18,6 +18,11 @@
 			"types": "./dist/types/index.d.ts",
 			"import": "./dist/types/index.js",
 			"default": "./dist/types/index.js"
+		},
+		"./events": {
+			"types": "./dist/events/index.d.ts",
+			"import": "./dist/events/index.js",
+			"default": "./dist/events/index.js"
 		}
 	},
 	"scripts": {

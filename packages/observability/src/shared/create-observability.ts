@@ -1,6 +1,7 @@
 import { createConsoleErrorSink, createConsoleLogSink } from "./console-sink";
 import type {
 	ContextStore,
+	DomainLogContext,
 	ErrorSink,
 	LogLevel,
 	LogSink,
@@ -61,13 +62,14 @@ export const createObservability = (store: ContextStore): Observability => {
 		};
 	};
 
-	const emit = (level: LogLevel, event: string) => {
+	const emit = (level: LogLevel, event: string, domain?: DomainLogContext) => {
 		withRequestId(() => {
 			const runtime = ensureInitialized();
 			runtime.logSink.write({
 				...buildMeta(runtime),
 				level,
 				event,
+				...(domain ?? {}),
 			});
 		});
 	};
@@ -82,9 +84,9 @@ export const createObservability = (store: ContextStore): Observability => {
 			};
 		},
 		logger: {
-			info: (event) => emit("info", event),
-			warn: (event) => emit("warn", event),
-			error: (event) => emit("error", event),
+			info: (event, domain) => emit("info", event, domain),
+			warn: (event, domain) => emit("warn", event, domain),
+			error: (event, domain) => emit("error", event, domain),
 		},
 		captureException: (error) => {
 			withRequestId(() => {

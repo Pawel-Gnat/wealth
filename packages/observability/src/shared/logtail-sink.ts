@@ -29,6 +29,17 @@ export const createLogtailLogSink = (
 					? { requestId: record.requestId }
 					: {}),
 				...(record.userId !== undefined ? { userId: record.userId } : {}),
+				...(record.actorId !== undefined ? { actorId: record.actorId } : {}),
+				...(record.ownerType !== undefined
+					? { ownerType: record.ownerType }
+					: {}),
+				...(record.ownerId !== undefined ? { ownerId: record.ownerId } : {}),
+				...(record.subjectType !== undefined
+					? { subjectType: record.subjectType }
+					: {}),
+				...(record.subjectId !== undefined
+					? { subjectId: record.subjectId }
+					: {}),
 			};
 
 			switch (record.level) {

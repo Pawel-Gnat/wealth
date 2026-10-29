@@ -5,11 +5,7 @@ import type {
 	UserEditDetailsPayload,
 	UserEditDetailsResponse,
 } from "@repo/api/types";
-import {
-	AUTH_OBSERVABILITY_EVENTS,
-	logger,
-	runWithRequestId,
-} from "@repo/observability/browser";
+import { runWithRequestId } from "@repo/observability/browser";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -37,11 +33,9 @@ export const useUserDetailsForm = (user: User) => {
 	>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
-				const data = await controlledAsync(() =>
+				return await controlledAsync(() =>
 					orpcClient.settings.details(payload),
 				);
-				logger.info(AUTH_OBSERVABILITY_EVENTS.detailsUpdateSucceeded);
-				return data;
 			}),
 		onSuccess: (_data, payload) => {
 			form.reset(payload);
@@ -54,6 +48,9 @@ export const useUserDetailsForm = (user: User) => {
 						}
 					: current,
 			);
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.audits.all(),
+			});
 			toast.success(t("toast.success.details-updated", { ns: "common" }));
 		},
 		onError: () => {
