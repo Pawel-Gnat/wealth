@@ -6,6 +6,7 @@ import { HttpResponse, http } from "msw";
 import { toast } from "sonner";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 import { RECORD_CONFIG } from "../../config/record-config";
@@ -73,9 +74,10 @@ describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
 		const user = userEvent.setup();
 		const onClose = vi.fn();
 
-		renderWithProviders(
+		const { queryClient } = renderWithProviders(
 			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
 		);
+		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
 		const dialog = screen.getByRole("alertdialog");
 		await user.click(
@@ -89,6 +91,9 @@ describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
 				t(config.toast.deleted, { ns: "common" }),
 			);
 			expect(onClose).toHaveBeenCalled();
+		});
+		expect(invalidateSpy).toHaveBeenCalledWith({
+			queryKey: queryKeys.audits.all(),
 		});
 	});
 

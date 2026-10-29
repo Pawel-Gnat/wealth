@@ -58,6 +58,9 @@ export const useAvatarForm = ({ onSuccess }: UseAvatarFormProps = {}) => {
 		onSuccess: () => {
 			form.reset();
 			void queryClient.invalidateQueries({ queryKey: queryKeys.me() });
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.audits.all(),
+			});
 			toast.success(t("toast.success.avatar-updated", { ns: "common" }));
 			onSuccess?.();
 		},

@@ -1,0 +1,15 @@
+{
+	"title": "Audit log",
+	"actor": "Actor",
+	"event": "Event",
+	"details": "Details",
+	"unknown-user": "Unknown user",
+	"empty": {
+		"title": "No audit logs",
+		"description": "Actions you take will appear here."
+	},
+	"error": {
+		"title": "Could not load audit logs",
+		"description": "Audit logs could not be loaded. Please try again later."
+	}
+}

@@ -11,4 +11,7 @@ export const invalidateBudgetQueries = (
 	void queryClient.invalidateQueries({
 		queryKey: queryKeys.records.list(budgetId),
 	});
+	void queryClient.invalidateQueries({
+		queryKey: queryKeys.audits.all(),
+	});
 };

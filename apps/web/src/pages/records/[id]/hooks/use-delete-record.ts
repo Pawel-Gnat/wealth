@@ -34,6 +34,9 @@ export const useDeleteRecord = ({
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.dashboard.all(),
 			});
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.audits.all(),
+			});
 			onSuccess?.(data);
 		},
 		onError: (error) => {

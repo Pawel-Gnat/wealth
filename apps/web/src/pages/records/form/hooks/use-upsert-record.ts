@@ -103,6 +103,9 @@ export const useUpsertRecord = ({
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.records.all(),
 			});
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.audits.all(),
+			});
 			toast.success(
 				t(isEditMode ? config.toast.updated : config.toast.created, {
 					ns: "common",

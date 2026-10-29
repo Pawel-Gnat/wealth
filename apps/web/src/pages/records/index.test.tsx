@@ -35,6 +35,7 @@ describe("RecordsListPage", () => {
 		});
 
 		expect(addLink).toHaveAttribute("href", APP_ROUTES.records.add);
+		expect(screen.getByText(t("title", { ns: "audits" }))).toBeInTheDocument();
 
 		await waitFor(() => {
 			expect(

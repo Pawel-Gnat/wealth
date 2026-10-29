@@ -5,6 +5,7 @@ import { HttpResponse, http } from "msw";
 import { toast } from "sonner";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 import { MOCK_JPEG_FILE } from "@/test/mocks/jpeg-file";
 import { MOCK_USER } from "@/test/mocks/user";
 import { renderWithProviders } from "@/test/render-with-providers";
@@ -39,7 +40,9 @@ describe("AvatarFormModal", () => {
 
 	const openModal = async () => {
 		const userActions = userEvent.setup();
-		renderWithProviders(<AvatarFormModal user={MOCK_USER} />);
+		const { queryClient } = renderWithProviders(
+			<AvatarFormModal user={MOCK_USER} />,
+		);
 
 		await userActions.click(
 			screen.getByRole("button", {
@@ -53,11 +56,12 @@ describe("AvatarFormModal", () => {
 		);
 		await userActions.upload(fileInput, MOCK_JPEG_FILE);
 
-		return { userActions, dialog };
+		return { userActions, dialog, queryClient };
 	};
 
 	it("closes the modal and shows a success toast after a successful upload", async () => {
-		const { userActions, dialog } = await openModal();
+		const { userActions, dialog, queryClient } = await openModal();
+		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
 		await userActions.click(
 			within(dialog).getByRole("button", {
@@ -72,6 +76,9 @@ describe("AvatarFormModal", () => {
 		});
 		await waitFor(() => {
 			expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+		});
+		expect(invalidateSpy).toHaveBeenCalledWith({
+			queryKey: queryKeys.audits.all(),
 		});
 	});
 

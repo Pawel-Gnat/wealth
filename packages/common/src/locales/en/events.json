@@ -1,0 +1,39 @@
+{
+	"auth": {
+		"signed-in": "Signed in",
+		"signed-up": "Signed up",
+		"logged-out": "Logged out",
+		"password": {
+			"updated": "Updated password"
+		},
+		"details": {
+			"updated": "Updated details"
+		},
+		"avatar": {
+			"updated": "Updated avatar"
+		}
+	},
+	"budget": {
+		"created": "Created budget",
+		"updated": "Updated budget",
+		"member": {
+			"invited": "Invited member"
+		},
+		"invite": {
+			"cancelled": "Cancelled invite",
+			"accepted": "Accepted invite",
+			"rejected": "Rejected invite"
+		},
+		"left": "Left budget"
+	},
+	"expense": {
+		"created": "Created expense",
+		"updated": "Updated expense",
+		"deleted": "Deleted expense"
+	},
+	"income": {
+		"created": "Created income",
+		"updated": "Updated income",
+		"deleted": "Deleted income"
+	}
+}

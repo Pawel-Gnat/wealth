@@ -179,6 +179,9 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 			expect(invalidateSpy).toHaveBeenCalledWith({
 				queryKey: queryKeys.dashboard.all(),
 			});
+			expect(invalidateSpy).toHaveBeenCalledWith({
+				queryKey: queryKeys.audits.all(),
+			});
 		});
 
 		it("navigates to the budget after create when budgetId is set", async () => {

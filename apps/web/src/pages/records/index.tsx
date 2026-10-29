@@ -4,6 +4,7 @@ import { APP_ROUTES } from "@/app/routes";
 import { Button, Card, Icon } from "@/shared/components";
 import { PageLayout } from "@/shared/layouts";
 import { BudgetActions } from "./ui/budget-actions";
+import { RecordsAuditLog } from "./ui/records-audit-log";
 import { RecordsTable } from "./ui/records-table";
 
 export const RecordsListPage = () => {
@@ -40,6 +41,7 @@ export const RecordsListPage = () => {
 			>
 				<RecordsTable {...(budgetId ? { budgetId } : {})} />
 			</Card>
+			<RecordsAuditLog {...(budgetId ? { budgetId } : {})} />
 		</PageLayout>
 	);
 };

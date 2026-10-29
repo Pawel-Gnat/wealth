@@ -1,3 +1,4 @@
+import { AUTH_EVENTS } from "@repo/api/events";
 import {
 	BUDGET_DELETED_MESSAGE,
 	BUDGET_LEFT_MESSAGE,
@@ -218,6 +219,21 @@ const deleteBudgetMembershipHandler = () => {
 	});
 };
 
+const getAuditsHandler = () => {
+	return HttpResponse.json({
+		data: [
+			{
+				id: "01JTZKQX2GT6PHGQER0M8FS6KA",
+				actorId: MOCK_USER.id,
+				entityId: MOCK_USER.id,
+				event: AUTH_EVENTS.signedIn,
+				metadata: {},
+				createdAt: "2026-10-29T07:14:00.000Z",
+			},
+		],
+	});
+};
+
 const postAuthRefreshHandler = () => {
 	return HttpResponse.json(
 		{ error: { message: "Unauthorized" } },
@@ -246,6 +262,7 @@ export const HANDLERS = [
 	http.post("*/budgets/:id/members", postBudgetMembersHandler),
 	http.delete("*/budgets/:id/membership", deleteBudgetMembershipHandler),
 	http.delete("*/budgets/:id", deleteBudgetHandler),
+	http.get("*/audits", getAuditsHandler),
 	http.get("*/auth/me", getAuthMeHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),

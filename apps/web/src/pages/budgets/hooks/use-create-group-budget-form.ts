@@ -47,6 +47,9 @@ export const useCreateGroupBudgetForm = ({
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.budgets.all(),
 			});
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.audits.all(),
+			});
 			form.reset(DEFAULT_CREATE_GROUP_BUDGET_VALUES);
 			toast.success(t("toast.success.group-budget-created", { ns: "common" }));
 			onCreated();

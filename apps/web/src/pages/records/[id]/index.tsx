@@ -7,6 +7,7 @@ import { PageLayout } from "@/shared/layouts";
 import { CardState } from "@/shared/widgets/card-state";
 import { getRecordConfig } from "../config/record-config";
 import { useRecord } from "../form/hooks/use-record";
+import { RecordsAuditLog } from "../ui/records-audit-log";
 import { RecordActions } from "./ui/record-actions";
 import { RecordView } from "./ui/record-view";
 
@@ -60,6 +61,7 @@ export const RecordPage = () => {
 			>
 				{(record) => <RecordView record={record} />}
 			</CardState>
+			<RecordsAuditLog recordId={id} {...(budgetId ? { budgetId } : {})} />
 
 			{isDeleteOpen && data ? (
 				<Suspense

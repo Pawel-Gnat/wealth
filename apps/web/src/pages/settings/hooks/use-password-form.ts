@@ -5,15 +5,19 @@ import type {
 	UserEditPasswordResponse,
 } from "@repo/api/types";
 import { runWithRequestId } from "@repo/observability/browser";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useAppMutation } from "@/shared/hooks/use-app-mutation";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
+import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
 export const usePasswordForm = () => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
+
 	const form = useForm<UserEditPasswordPayload>({
 		resolver: zodResolver(userEditPasswordSchema),
 		defaultValues: {
@@ -36,6 +40,9 @@ export const usePasswordForm = () => {
 			}),
 		onSuccess: () => {
 			form.reset();
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.audits.all(),
+			});
 			toast.success(t("toast.success.password-updated", { ns: "common" }));
 		},
 		onError: () => {

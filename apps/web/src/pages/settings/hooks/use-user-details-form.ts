@@ -48,6 +48,9 @@ export const useUserDetailsForm = (user: User) => {
 						}
 					: current,
 			);
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.audits.all(),
+			});
 			toast.success(t("toast.success.details-updated", { ns: "common" }));
 		},
 		onError: () => {
