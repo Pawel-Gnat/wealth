@@ -1,6 +1,6 @@
 import { index, jsonb, pgTable, text } from "drizzle-orm/pg-core";
 import { budgetTable } from "./budgets.table";
-import { timestamp, ulidPrimaryKey } from "./helpers";
+import { timestamptz, ulidPrimaryKey } from "./helpers";
 import { usersTable } from "./users.table";
 
 export const budgetAuditsTable = pgTable(
@@ -16,7 +16,7 @@ export const budgetAuditsTable = pgTable(
 		event: text("event").notNull(),
 		entityId: text("entity_id").notNull(),
 		metadata: jsonb("metadata").notNull().default({}),
-		createdAt: timestamp("created_at"),
+		createdAt: timestamptz("created_at"),
 	},
 	(table) => [
 		index("budget_audits_budget_id_created_at_id_idx").on(

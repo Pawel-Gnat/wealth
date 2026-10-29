@@ -246,7 +246,8 @@ export class RecordsService {
 					totalAmount: recordsTable.totalAmount,
 				})
 				.from(recordsTable)
-				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)));
+				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)))
+				.for("update");
 
 			if (!existing) {
 				this.throwNotFound();
@@ -381,7 +382,12 @@ export class RecordsService {
 			} else {
 				await tx
 					.delete(userAuditsTable)
-					.where(eq(userAuditsTable.entityId, recordId));
+					.where(
+						and(
+							eq(userAuditsTable.userId, userId),
+							eq(userAuditsTable.entityId, recordId),
+						),
+					);
 			}
 
 			const [deletedRecord] = await tx

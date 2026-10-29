@@ -292,7 +292,8 @@ export class BudgetService {
 			const [budget] = await tx
 				.select({ title: budgetTable.title })
 				.from(budgetTable)
-				.where(eq(budgetTable.id, input.id));
+				.where(eq(budgetTable.id, input.id))
+				.for("update");
 
 			if (!budget) {
 				throw new ORPCError("NOT_FOUND", { message: "Budget not found" });

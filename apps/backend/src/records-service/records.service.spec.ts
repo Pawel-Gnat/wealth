@@ -9,7 +9,7 @@ import {
 import type { RecordKind } from "@repo/api/types";
 import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { logger } from "@repo/observability/node";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { AuditsService } from "../audits-service/audits.service";
@@ -400,15 +400,42 @@ describe("Records service", () => {
 				throw new Error("Expected created document");
 			}
 
+			const other = await createTestUser(usersService, {
+				passwordHash: "hashed-password",
+				emailTag: `${kind}-delete-audit-other`,
+			});
+
+			await db.insert(userAuditsTable).values({
+				userId: other.id,
+				entityId: created.id,
+				event: RECORD_EVENTS[kind].created,
+				metadata: {
+					recordId: created.id,
+					date: "2026-08-01",
+					lineItems: [{ title: "Ticket", quantity: 1, singleAmount: 18 }],
+				},
+			});
+
 			const info = vi.spyOn(logger, "info");
 			await recordsService.deleteByUserId(user.id, created.id, kind);
 
 			const audits = await db
 				.select()
 				.from(userAuditsTable)
-				.where(eq(userAuditsTable.entityId, created.id));
+				.where(eq(userAuditsTable.userId, user.id));
+
+			const otherAudits = await db
+				.select()
+				.from(userAuditsTable)
+				.where(
+					and(
+						eq(userAuditsTable.userId, other.id),
+						eq(userAuditsTable.entityId, created.id),
+					),
+				);
 
 			expect(audits).toEqual([]);
+			expect(otherAudits).toHaveLength(1);
 			expect(info).toHaveBeenCalledWith(
 				RECORD_EVENTS[kind].deleted,
 				expect.objectContaining({
