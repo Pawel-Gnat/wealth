@@ -98,6 +98,35 @@ describe("SseSubscriber", () => {
 		expect(unregister).toHaveBeenCalledTimes(1);
 	});
 
+	it("writes notification events to every connection of the user", async () => {
+		const event = {
+			type: "notification-created",
+			id: "evt-3",
+			occurredAt: "2026-07-21T10:00:00.000Z",
+			notification: {
+				id: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+				event: "budget.member.invited",
+				metadata: {
+					budgetId: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+					budgetName: "Summer house",
+				},
+				readAt: null,
+				createdAt: "2026-07-21T10:00:00.000Z",
+			},
+		};
+
+		await subscriber.handleMessage(
+			sseUserChannel("user-1"),
+			JSON.stringify(event),
+		);
+
+		expect(nextA).toHaveBeenCalledWith(event);
+		expect(nextB).toHaveBeenCalledWith(event);
+		expect(completeA).not.toHaveBeenCalled();
+		expect(completeB).not.toHaveBeenCalled();
+		expect(unregister).not.toHaveBeenCalled();
+	});
+
 	it("ignores malformed and invalid envelopes", async () => {
 		await subscriber.handleMessage(sseUserChannel("user-1"), "{not-json");
 		await subscriber.handleMessage(

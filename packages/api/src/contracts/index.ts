@@ -23,6 +23,11 @@ import { userEditPasswordContract } from "./edit-password.contract";
 import { logoutContract } from "./logout.contract";
 import { meContract } from "./me.contract";
 import {
+	listNotificationsContract,
+	markAllNotificationsReadContract,
+	markNotificationReadContract,
+} from "./notification.contract";
+import {
 	createRecordContract,
 	deleteRecordContract,
 	getRecordContract,
@@ -69,6 +74,11 @@ export const rpcContract = populateContractRouterPaths({
 	},
 	audits: {
 		list: listAuditsContract,
+	},
+	notifications: {
+		list: listNotificationsContract,
+		markRead: markNotificationReadContract,
+		markAllRead: markAllNotificationsReadContract,
 	},
 	dashboard: {
 		getSummary: getDashboardSummaryContract,

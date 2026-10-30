@@ -23,7 +23,7 @@ import {
 import { hasPermission } from "@repo/common/permissions";
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { AuditsService } from "../audits-service/audits.service";
+import { AuditsService } from "../audit-service/audits.service";
 import { DBS } from "../database-service/constants";
 import {
 	budgetAuditsTable,

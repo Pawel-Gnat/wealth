@@ -247,6 +247,36 @@ describe("dispatchSseMessage", () => {
 		expect(onUnauthorized).not.toHaveBeenCalled();
 	});
 
+	it("accepts a notification event without clearing the session", () => {
+		const onUnauthorized = vi.fn();
+		configureAuth({ onCleared: onUnauthorized });
+		applySessionSnapshot({
+			user: MOCK_USER,
+			sessionExpiresAt: "2026-09-15T08:15:00.000Z",
+		});
+
+		const event = dispatchSseMessage(
+			JSON.stringify({
+				type: "notification-created",
+				id: "evt-2",
+				occurredAt: "2026-07-21T12:00:00.000Z",
+				notification: {
+					id: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+					event: "budget.member.invited",
+					metadata: {
+						budgetId: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+						budgetName: "Summer house",
+					},
+					readAt: null,
+					createdAt: "2026-07-21T12:00:00.000Z",
+				},
+			}),
+		);
+
+		expect(event?.type).toBe("notification-created");
+		expect(onUnauthorized).not.toHaveBeenCalled();
+	});
+
 	it("ignores envelopes that fail schema validation", () => {
 		const onUnauthorized = vi.fn();
 		configureAuth({ onCleared: onUnauthorized });

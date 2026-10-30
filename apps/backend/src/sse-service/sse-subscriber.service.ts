@@ -53,9 +53,14 @@ export class SseSubscriber implements OnModuleInit, OnModuleDestroy {
 		}
 
 		const event = result.data;
-		const matching = this.connectionRegistry
-			.getConnections(userId)
-			.filter((connection) => connection.sessionId === event.targetId);
+		const connections = this.connectionRegistry.getConnections(userId);
+
+		const matching =
+			event.type === "session-ended"
+				? connections.filter(
+						(connection) => connection.sessionId === event.targetId,
+					)
+				: connections;
 
 		for (const connection of matching) {
 			connection.sink.next(event);

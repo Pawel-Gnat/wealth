@@ -463,29 +463,6 @@
                       "fontFamily": "$font-sans",
                       "fontSize": 12,
                       "fontWeight": "normal"
-                    },
-                    {
-                      "type": "frame",
-                      "id": "VgS2B",
-                      "name": "Mark as read",
-                      "width": 24,
-                      "height": 24,
-                      "fill": "$secondary",
-                      "cornerRadius": 12,
-                      "justifyContent": "center",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "dC3kP",
-                          "name": "Mark icon",
-                          "width": 12,
-                          "height": 12,
-                          "icon": "check",
-                          "library": "lucide",
-                          "fill": "$secondary-foreground"
-                        }
-                      ]
                     }
                   ]
                 }

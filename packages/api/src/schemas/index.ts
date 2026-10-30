@@ -2,6 +2,7 @@ export * from "./audit.schema";
 export * from "./budget.schema";
 export * from "./common.schema";
 export * from "./dashboard.schema";
+export * from "./notification.schema";
 export * from "./record.schema";
 export * from "./session.schema";
 export * from "./signin.schema";
