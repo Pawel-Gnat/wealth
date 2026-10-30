@@ -39,8 +39,19 @@ import {
 	budgetMemberTable,
 	budgetTable,
 } from "../database-service/tables/index";
-import type { DatabaseTransaction } from "../database-service/types/types";
+import type {
+	DatabaseTransaction,
+	NotificationRow,
+} from "../database-service/types/types";
+import {
+	type NewNotification,
+	NotificationsService,
+} from "../notification-service/notifications.service";
 import { findBudgetAccess } from "../shared/budget/find-budget-access";
+import {
+	listActiveParticipantIds,
+	otherParticipantIds,
+} from "../shared/budget/list-active-participant-ids";
 import { logDomainEvent } from "../shared/observability/log-event";
 import { UsersService } from "../users-service/users.service";
 
@@ -50,6 +61,7 @@ export class BudgetService {
 		@Inject(DBS.APP) private readonly db: NodePgDatabase,
 		private readonly usersService: UsersService,
 		private readonly auditsService: AuditsService,
+		private readonly notificationsService: NotificationsService,
 	) {}
 
 	async listBudgetsByUserId(userId: string): Promise<BudgetListResponse> {
@@ -226,49 +238,64 @@ export class BudgetService {
 			}
 		}
 
-		const budgetId = await this.db.transaction(async (tx) => {
-			const [createdBudget] = await tx
-				.insert(budgetTable)
-				.values({
-					title: payload.title,
-					ownerId,
-				})
-				.returning({ id: budgetTable.id });
+		const { budgetId, notifications } = await this.db.transaction(
+			async (tx) => {
+				const [createdBudget] = await tx
+					.insert(budgetTable)
+					.values({
+						title: payload.title,
+						ownerId,
+					})
+					.returning({ id: budgetTable.id });
 
-			if (!createdBudget) {
-				throw new Error("Budget insert failed");
-			}
+				if (!createdBudget) {
+					throw new Error("Budget insert failed");
+				}
 
-			if (inviteeIds.length > 0) {
-				await tx.insert(budgetMemberTable).values(
-					inviteeIds.map((userId) => ({
+				if (inviteeIds.length > 0) {
+					await tx.insert(budgetMemberTable).values(
+						inviteeIds.map((userId) => ({
+							budgetId: createdBudget.id,
+							userId,
+						})),
+					);
+				}
+
+				await this.auditsService.createBudgetAudits(tx, [
+					{
 						budgetId: createdBudget.id,
+						actorUserId: ownerId,
+						entityId: createdBudget.id,
+						event: BUDGET_EVENTS.created,
+						metadata: { title: payload.title },
+					},
+					...inviteeIds.map((inviteeId) => ({
+						budgetId: createdBudget.id,
+						actorUserId: ownerId,
+						entityId: createdBudget.id,
+						event: BUDGET_EVENTS.memberInvited,
+						metadata: { userId: inviteeId },
+					})),
+				]);
+
+				const notifications = await this.notificationsService.create(
+					tx,
+					inviteeIds.map((userId) => ({
 						userId,
+						event: BUDGET_EVENTS.memberInvited,
+						metadata: {
+							budgetId: createdBudget.id,
+							budgetName: payload.title,
+						},
 					})),
 				);
-			}
 
-			await this.auditsService.createBudgetAudits(tx, [
-				{
-					budgetId: createdBudget.id,
-					actorUserId: ownerId,
-					entityId: createdBudget.id,
-					event: BUDGET_EVENTS.created,
-					metadata: { title: payload.title },
-				},
-				...inviteeIds.map((inviteeId) => ({
-					budgetId: createdBudget.id,
-					actorUserId: ownerId,
-					entityId: createdBudget.id,
-					event: BUDGET_EVENTS.memberInvited,
-					metadata: { userId: inviteeId },
-				})),
-			]);
-
-			return createdBudget.id;
-		});
+				return { budgetId: createdBudget.id, notifications };
+			},
+		);
 
 		this.logBudgetEvent(BUDGET_EVENTS.created, ownerId, budgetId);
+		await this.publishNotifications(notifications);
 
 		inviteeIds.forEach(() => {
 			this.logBudgetEvent(BUDGET_EVENTS.memberInvited, ownerId, budgetId);
@@ -287,19 +314,11 @@ export class BudgetService {
 	): Promise<BudgetUpdateResponse> {
 		await this.requireBudgetPermission(userId, input.id, "edit");
 
-		const changed = await this.db.transaction(async (tx) => {
-			const [budget] = await tx
-				.select({ title: budgetTable.title })
-				.from(budgetTable)
-				.where(eq(budgetTable.id, input.id))
-				.for("update");
-
-			if (!budget) {
-				throw new ORPCError("NOT_FOUND", { message: "Budget not found" });
-			}
+		const { changed, notifications } = await this.db.transaction(async (tx) => {
+			const budget = await this.lockBudget(tx, input.id);
 
 			if (budget.title === input.title) {
-				return false;
+				return { changed: false, notifications: [] };
 			}
 
 			await tx
@@ -318,12 +337,29 @@ export class BudgetService {
 				},
 			});
 
-			return true;
+			const participantIds = await listActiveParticipantIds(
+				tx,
+				input.id,
+				budget.ownerId,
+			);
+			const notifications = await this.notificationsService.create(
+				tx,
+				this.budgetNotifications(
+					otherParticipantIds(participantIds, userId),
+					BUDGET_EVENTS.updated,
+					input.id,
+					input.title,
+				),
+			);
+
+			return { changed: true, notifications };
 		});
 
 		if (changed) {
 			this.logBudgetEvent(BUDGET_EVENTS.updated, userId, input.id);
 		}
+
+		await this.publishNotifications(notifications);
 
 		return {
 			data: {
@@ -366,7 +402,9 @@ export class BudgetService {
 				});
 			}
 
-			await this.db.transaction(async (tx) => {
+			const notifications = await this.db.transaction(async (tx) => {
+				const budget = await this.lockBudget(tx, input.id);
+
 				await tx.insert(budgetMemberTable).values(
 					inviteeIds.map((memberId) => ({
 						budgetId: input.id,
@@ -384,11 +422,24 @@ export class BudgetService {
 						metadata: { userId: inviteeId },
 					})),
 				);
+
+				return this.notificationsService.create(
+					tx,
+					inviteeIds.map((inviteeId) => ({
+						userId: inviteeId,
+						event: BUDGET_EVENTS.memberInvited,
+						metadata: {
+							budgetId: input.id,
+							budgetName: budget.title,
+						},
+					})),
+				);
 			});
 
 			inviteeIds.forEach(() => {
 				this.logBudgetEvent(BUDGET_EVENTS.memberInvited, userId, input.id);
 			});
+			await this.publishNotifications(notifications);
 		}
 
 		return {
@@ -404,8 +455,29 @@ export class BudgetService {
 	): Promise<BudgetDeleteResponse> {
 		await this.requireBudgetPermission(userId, budgetId, "delete");
 
-		await this.db.delete(budgetTable).where(eq(budgetTable.id, budgetId));
+		const notifications = await this.db.transaction(async (tx) => {
+			const budget = await this.lockBudget(tx, budgetId);
+			const participantIds = await listActiveParticipantIds(
+				tx,
+				budgetId,
+				budget.ownerId,
+			);
+			const rows = await this.notificationsService.create(
+				tx,
+				this.budgetNotifications(
+					otherParticipantIds(participantIds, userId),
+					BUDGET_EVENTS.deleted,
+					budgetId,
+					budget.title,
+				),
+			);
+
+			await tx.delete(budgetTable).where(eq(budgetTable.id, budgetId));
+
+			return rows;
+		});
 		this.logBudgetEvent(BUDGET_EVENTS.deleted, userId, budgetId);
+		await this.publishNotifications(notifications);
 
 		return {
 			data: {
@@ -420,7 +492,14 @@ export class BudgetService {
 	): Promise<BudgetLeaveResponse> {
 		await this.requireBudgetPermission(userId, budgetId, "leave");
 
-		await this.db.transaction(async (tx) => {
+		const notifications = await this.db.transaction(async (tx) => {
+			const budget = await this.lockBudget(tx, budgetId);
+			const participantIds = await listActiveParticipantIds(
+				tx,
+				budgetId,
+				budget.ownerId,
+			);
+			const recipientIds = otherParticipantIds(participantIds, userId);
 			const deleted = await tx
 				.delete(budgetMemberTable)
 				.where(
@@ -445,8 +524,19 @@ export class BudgetService {
 				event: BUDGET_EVENTS.left,
 				metadata: { userId },
 			});
+
+			return this.notificationsService.create(
+				tx,
+				this.budgetNotifications(
+					recipientIds,
+					BUDGET_EVENTS.left,
+					budgetId,
+					budget.title,
+				),
+			);
 		});
 		this.logBudgetEvent(BUDGET_EVENTS.left, userId, budgetId);
+		await this.publishNotifications(notifications);
 
 		return {
 			data: {
@@ -502,7 +592,13 @@ export class BudgetService {
 		budgetId: string,
 	): Promise<BudgetInviteRejectedResponse> {
 		await this.requireBudgetPermission(userId, budgetId, "rejectInvite");
-		await this.db.transaction(async (tx) => {
+		const notifications = await this.db.transaction(async (tx) => {
+			const budget = await this.lockBudget(tx, budgetId);
+			const participantIds = await listActiveParticipantIds(
+				tx,
+				budgetId,
+				budget.ownerId,
+			);
 			await this.deletePendingMembership(tx, budgetId, userId);
 			await this.auditsService.createBudgetAudit(tx, {
 				budgetId,
@@ -511,8 +607,24 @@ export class BudgetService {
 				event: BUDGET_EVENTS.inviteRejected,
 				metadata: { userId },
 			});
+
+			const recipientIds =
+				participantIds.length > 1
+					? [budget.ownerId].filter((ownerId) => ownerId !== userId)
+					: [];
+
+			return this.notificationsService.create(
+				tx,
+				this.budgetNotifications(
+					recipientIds,
+					BUDGET_EVENTS.inviteRejected,
+					budgetId,
+					budget.title,
+				),
+			);
 		});
 		this.logBudgetEvent(BUDGET_EVENTS.inviteRejected, userId, budgetId);
+		await this.publishNotifications(notifications);
 
 		return {
 			data: {
@@ -526,7 +638,8 @@ export class BudgetService {
 		input: BudgetCancelInviteInput,
 	): Promise<BudgetInviteCancelledResponse> {
 		await this.requireBudgetPermission(userId, input.id, "cancelInvite");
-		await this.db.transaction(async (tx) => {
+		const notifications = await this.db.transaction(async (tx) => {
+			const budget = await this.lockBudget(tx, input.id);
 			await this.deletePendingMembership(tx, input.id, input.userId);
 			await this.auditsService.createBudgetAudit(tx, {
 				budgetId: input.id,
@@ -535,8 +648,20 @@ export class BudgetService {
 				event: BUDGET_EVENTS.inviteCancelled,
 				metadata: { userId: input.userId },
 			});
+
+			return this.notificationsService.create(tx, [
+				{
+					userId: input.userId,
+					event: BUDGET_EVENTS.inviteCancelled,
+					metadata: {
+						budgetId: input.id,
+						budgetName: budget.title,
+					},
+				},
+			]);
 		});
 		this.logBudgetEvent(BUDGET_EVENTS.inviteCancelled, userId, input.id);
+		await this.publishNotifications(notifications);
 
 		return {
 			data: {
@@ -584,6 +709,44 @@ export class BudgetService {
 		}
 
 		return budget;
+	}
+
+	private async lockBudget(tx: DatabaseTransaction, budgetId: string) {
+		const [budget] = await tx
+			.select({
+				title: budgetTable.title,
+				ownerId: budgetTable.ownerId,
+			})
+			.from(budgetTable)
+			.where(eq(budgetTable.id, budgetId))
+			.for("update");
+
+		if (!budget) {
+			throw new ORPCError("NOT_FOUND", { message: "Budget not found" });
+		}
+
+		return budget;
+	}
+
+	private budgetNotifications(
+		recipientIds: string[],
+		event: NewNotification["event"],
+		budgetId: string,
+		budgetName: string,
+	): NewNotification[] {
+		return recipientIds.map((userId) => ({
+			userId,
+			event,
+			metadata: { budgetId, budgetName },
+		}));
+	}
+
+	private async publishNotifications(rows: NotificationRow[]) {
+		if (rows.length === 0) {
+			return;
+		}
+
+		await this.notificationsService.publish(rows);
 	}
 
 	private logBudgetEvent(event: string, actorId: string, budgetId: string) {

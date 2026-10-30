@@ -1,0 +1,13 @@
+import { Module } from "@nestjs/common";
+import { AuthModule } from "../auth-service/auth.module";
+import { SseRealtimeModule } from "../sse-service/sse-realtime.module";
+import { NotificationsController } from "./notifications.controller";
+import { NotificationsService } from "./notifications.service";
+
+@Module({
+	imports: [AuthModule, SseRealtimeModule],
+	controllers: [NotificationsController],
+	providers: [NotificationsService],
+	exports: [NotificationsService],
+})
+export class NotificationsModule {}

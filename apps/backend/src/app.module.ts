@@ -21,6 +21,7 @@ import {
 } from "./filters/observability-exception.filter";
 import { HealthModule } from "./health-service/health.module";
 import { RequestIdMiddleware } from "./middleware/request-id.middleware";
+import { NotificationsModule } from "./notification-service/notifications.module";
 import { RecordsModule } from "./records-service/records.module";
 import { RedisModule } from "./redis-service/redis.module";
 import { AppThrottlerModule } from "./shared/throttler/throttler.module";
@@ -72,6 +73,7 @@ declare module "@orpc/nest" {
 		DashboardModule,
 		AuthModule,
 		AuditsModule,
+		NotificationsModule,
 		DatabaseModule,
 		RedisModule,
 		HealthModule,

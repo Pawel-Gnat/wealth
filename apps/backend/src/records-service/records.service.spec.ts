@@ -12,7 +12,7 @@ import { logger } from "@repo/observability/node";
 import { and, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { AuditsService } from "../audits-service/audits.service";
+import { AuditsService } from "../audit-service/audits.service";
 import { DBS } from "../database-service/constants";
 import {
 	budgetAuditsTable,
