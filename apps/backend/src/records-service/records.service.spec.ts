@@ -11,7 +11,15 @@ import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { logger } from "@repo/observability/node";
 import { and, eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from "vitest";
 import { AuditsService } from "../audit-service/audits.service";
 import { DBS } from "../database-service/constants";
 import {
@@ -22,7 +30,10 @@ import {
 	recordsTable,
 	userAuditsTable,
 } from "../database-service/tables/index";
+import { NotificationsService } from "../notification-service/notifications.service";
+import { SsePublisher } from "../sse-service/sse-publisher.service";
 import { createTestApp } from "../test/helpers/modules";
+import { seedBudget } from "../test/mocks/budgets";
 import { createTestUser } from "../test/mocks/users";
 import { UsersService } from "../users-service/users.service";
 import { RECORD_NOT_FOUND, RecordsService } from "./records.service";
@@ -49,11 +60,24 @@ describe("Records service", () => {
 	let moduleRef: TestingModule;
 	let recordsService: RecordsService;
 	let usersService: UsersService;
+	let notificationsService: NotificationsService;
+	const publish = vi.fn().mockResolvedValue(true);
 
 	beforeAll(async () => {
-		moduleRef = await createTestApp([RecordsService, AuditsService]).compile();
+		moduleRef = await createTestApp([
+			RecordsService,
+			AuditsService,
+			NotificationsService,
+			{ provide: SsePublisher, useValue: { publish } },
+		]).compile();
 		recordsService = moduleRef.get(RecordsService);
 		usersService = moduleRef.get(UsersService);
+		notificationsService = moduleRef.get(NotificationsService);
+	});
+
+	beforeEach(() => {
+		publish.mockClear();
+		publish.mockResolvedValue(true);
 	});
 
 	afterAll(async () => {
@@ -1179,6 +1203,235 @@ describe("Records service", () => {
 					"01K1MISSINGBUDGET00000000000",
 				),
 			).rejects.toBeInstanceOf(ORPCError);
+		});
+	});
+
+	describe.each(["expense", "income"] as const)("%s notifications", (kind) => {
+		const payload = {
+			date: decodeDocumentDateFromStorage("2026-05-01"),
+			lineItems: [{ title: "Taxi", quantity: 1, singleAmount: 10 }],
+		};
+		const changedPayload = {
+			date: decodeDocumentDateFromStorage("2026-05-02"),
+			lineItems: [{ title: "Taxi", quantity: 1, singleAmount: 12 }],
+		};
+
+		const sharedBudget = async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: `${kind}-notify-owner`,
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: `${kind}-notify-member`,
+			});
+			const other = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: `${kind}-notify-other`,
+			});
+			const pending = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: `${kind}-notify-pending`,
+			});
+			const budget = await seedBudget(db, owner.id, "House", [
+				{ userId: member.id, status: "active" },
+				{ userId: other.id, status: "active" },
+				{ userId: pending.id, status: "pending" },
+			]);
+
+			return { db, owner, member, other, pending, budget };
+		};
+
+		it("does not notify for a personal record", async () => {
+			const user = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: `${kind}-notify-personal`,
+			});
+
+			await recordsService.createByUserId(user.id, kind, payload);
+			const [record] = await moduleRef
+				.get(DBS.APP)
+				.select({ id: recordsTable.id })
+				.from(recordsTable)
+				.where(eq(recordsTable.userId, user.id));
+
+			if (!record) {
+				throw new Error("Expected created record");
+			}
+
+			await recordsService.updateByUserId(
+				user.id,
+				record.id,
+				kind,
+				changedPayload,
+			);
+			await recordsService.deleteByUserId(user.id, record.id, kind);
+
+			await expect(notificationsService.list(user.id)).resolves.toEqual({
+				data: [],
+			});
+			expect(publish).not.toHaveBeenCalled();
+		});
+
+		it("does not notify when the budget is solo", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: `${kind}-notify-solo`,
+			});
+			const budget = await seedBudget(db, owner.id, "Solo");
+
+			await recordsService.createByUserId(owner.id, kind, payload, budget.id);
+			const [record] = await db
+				.select({ id: recordsTable.id })
+				.from(recordsTable)
+				.where(eq(recordsTable.budgetId, budget.id));
+
+			if (!record) {
+				throw new Error("Expected created record");
+			}
+
+			await recordsService.updateByUserId(
+				owner.id,
+				record.id,
+				kind,
+				changedPayload,
+			);
+			await recordsService.deleteByUserId(owner.id, record.id, kind);
+
+			await expect(notificationsService.list(owner.id)).resolves.toEqual({
+				data: [],
+			});
+			expect(publish).not.toHaveBeenCalled();
+		});
+
+		it("notifies other participants when a budget record is created or edited", async () => {
+			const { db, owner, member, other, pending, budget } =
+				await sharedBudget();
+
+			await recordsService.createByUserId(member.id, kind, payload, budget.id);
+			const [record] = await db
+				.select({ id: recordsTable.id })
+				.from(recordsTable)
+				.where(eq(recordsTable.budgetId, budget.id));
+
+			if (!record) {
+				throw new Error("Expected created record");
+			}
+
+			const created = {
+				event: RECORD_EVENTS[kind].created,
+				metadata: {
+					budgetId: budget.id,
+					budgetName: "House",
+					recordId: record.id,
+				},
+				readAt: null,
+			};
+			await expect(notificationsService.list(owner.id)).resolves.toEqual({
+				data: [expect.objectContaining(created)],
+			});
+			await expect(notificationsService.list(other.id)).resolves.toEqual({
+				data: [expect.objectContaining(created)],
+			});
+			await expect(notificationsService.list(member.id)).resolves.toEqual({
+				data: [],
+			});
+			await expect(notificationsService.list(pending.id)).resolves.toEqual({
+				data: [],
+			});
+
+			publish.mockClear();
+			await recordsService.updateByUserId(
+				member.id,
+				record.id,
+				kind,
+				changedPayload,
+			);
+
+			const edited = {
+				event: RECORD_EVENTS[kind].updated,
+				metadata: {
+					budgetId: budget.id,
+					budgetName: "House",
+					recordId: record.id,
+				},
+				readAt: null,
+			};
+			await expect(notificationsService.list(owner.id)).resolves.toEqual({
+				data: [
+					expect.objectContaining(edited),
+					expect.objectContaining(created),
+				],
+			});
+			expect(publish).toHaveBeenCalledTimes(2);
+		});
+
+		it("does not notify when the record stays the same", async () => {
+			const { db, owner, member, budget } = await sharedBudget();
+
+			await recordsService.createByUserId(member.id, kind, payload, budget.id);
+			const [record] = await db
+				.select({ id: recordsTable.id })
+				.from(recordsTable)
+				.where(eq(recordsTable.budgetId, budget.id));
+
+			if (!record) {
+				throw new Error("Expected created record");
+			}
+
+			publish.mockClear();
+			await recordsService.updateByUserId(member.id, record.id, kind, payload);
+
+			const listed = await notificationsService.list(owner.id);
+			expect(listed.data).toHaveLength(1);
+			expect(listed.data[0]?.event).toBe(RECORD_EVENTS[kind].created);
+			expect(publish).not.toHaveBeenCalled();
+		});
+
+		it("notifies other participants when a budget record is deleted", async () => {
+			const { db, owner, member, other, budget } = await sharedBudget();
+
+			await recordsService.createByUserId(member.id, kind, payload, budget.id);
+			const [record] = await db
+				.select({ id: recordsTable.id })
+				.from(recordsTable)
+				.where(eq(recordsTable.budgetId, budget.id));
+
+			if (!record) {
+				throw new Error("Expected created record");
+			}
+
+			publish.mockClear();
+			await recordsService.deleteByUserId(member.id, record.id, kind);
+
+			const deleted = {
+				event: RECORD_EVENTS[kind].deleted,
+				metadata: { budgetId: budget.id, budgetName: "House" },
+				readAt: null,
+			};
+			const listed = await notificationsService.list(owner.id);
+			expect(listed.data[0]).toMatchObject(deleted);
+			expect(listed.data[0]).not.toHaveProperty("metadata.recordId");
+			await expect(notificationsService.list(other.id)).resolves.toEqual({
+				data: [
+					expect.objectContaining(deleted),
+					expect.objectContaining({
+						event: RECORD_EVENTS[kind].created,
+					}),
+				],
+			});
+			await expect(notificationsService.list(member.id)).resolves.toEqual({
+				data: [],
+			});
+			expect(publish).toHaveBeenCalledTimes(2);
+
+			const stored = await db
+				.select()
+				.from(recordsTable)
+				.where(eq(recordsTable.id, record.id));
+			expect(stored).toHaveLength(0);
 		});
 	});
 });

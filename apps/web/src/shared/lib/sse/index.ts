@@ -1,6 +1,7 @@
 export type {
 	EventSourceFactory,
 	EventSourceLike,
+	NotificationSseEvent,
 } from "@/shared/lib/sse/sse-gateway";
 export {
 	configureSseGateway,
@@ -8,4 +9,6 @@ export {
 	resetSseGatewayForTests,
 	startSseGateway,
 	stopSseGateway,
+	subscribeSseConnectionDrop,
+	subscribeSseNotifications,
 } from "@/shared/lib/sse/sse-gateway";

@@ -10,6 +10,8 @@ import {
 	resetSseGatewayForTests,
 	startSseGateway,
 	stopSseGateway,
+	subscribeSseConnectionDrop,
+	subscribeSseNotifications,
 } from "@/shared/lib/sse/sse-gateway";
 import { createMockEventSourceFactory } from "@/test/mocks/event-source";
 import { MOCK_USER } from "@/test/mocks/user";
@@ -191,6 +193,106 @@ describe("sse-gateway", () => {
 
 		expect(onUnauthorized).not.toHaveBeenCalled();
 		expect(instances).toHaveLength(3);
+	});
+
+	it("delivers notification events and ignores session-ended", () => {
+		const onNotification = vi.fn();
+		const onDrop = vi.fn();
+		const unsubscribe = subscribeSseNotifications(onNotification);
+		subscribeSseConnectionDrop(onDrop);
+		const { createEventSource, instances } = createMockEventSourceFactory();
+		configureSseGateway({
+			getUrl: () => "http://backend.test/sse",
+			createEventSource,
+		});
+
+		startSseGateway();
+		instances[0]?.emitMessage(
+			JSON.stringify({
+				type: "notification-read",
+				id: "evt-2",
+				occurredAt: "2026-07-21T12:00:00.000Z",
+				notificationId: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+				readAt: "2026-07-21T12:05:00.000Z",
+			}),
+		);
+		instances[0]?.emitMessage(
+			JSON.stringify({
+				type: "notifications-read",
+				id: "evt-3",
+				occurredAt: "2026-07-21T12:06:00.000Z",
+				readAt: "2026-07-21T12:06:00.000Z",
+			}),
+		);
+		instances[0]?.emitMessage(sessionEndedPayload);
+
+		expect(onNotification).toHaveBeenCalledTimes(2);
+		expect(onNotification.mock.calls[0]?.[0]).toMatchObject({
+			type: "notification-read",
+			notificationId: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+		});
+		expect(onNotification.mock.calls[1]?.[0]).toMatchObject({
+			type: "notifications-read",
+		});
+		expect(onDrop).not.toHaveBeenCalled();
+
+		unsubscribe();
+		startSseGateway();
+		instances.at(-1)?.emitMessage(
+			JSON.stringify({
+				type: "notification-created",
+				id: "evt-4",
+				occurredAt: "2026-07-21T12:07:00.000Z",
+				notification: {
+					id: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+					event: "budget.updated",
+					metadata: {
+						budgetId: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+						budgetName: "Summer house",
+					},
+					readAt: null,
+					createdAt: "2026-07-21T12:07:00.000Z",
+				},
+			}),
+		);
+		expect(onNotification).toHaveBeenCalledTimes(2);
+	});
+
+	it("signals each connection drop and keeps reconnecting", async () => {
+		const onDrop = vi.fn();
+		subscribeSseConnectionDrop(onDrop);
+		const { createEventSource, instances } = createMockEventSourceFactory();
+		configureSseGateway({
+			getUrl: () => "http://backend.test/sse",
+			createEventSource,
+		});
+
+		startSseGateway();
+		instances[0]?.emitError();
+		await vi.advanceTimersByTimeAsync(1_000);
+		instances[1]?.emitError();
+
+		expect(onDrop).toHaveBeenCalledTimes(2);
+		expect(instances).toHaveLength(2);
+	});
+
+	it("does not signal a drop when the connection is closed on purpose", async () => {
+		const onDrop = vi.fn();
+		subscribeSseConnectionDrop(onDrop);
+		const { createEventSource, instances } = createMockEventSourceFactory();
+		configureSseGateway({
+			getUrl: () => "http://backend.test/sse",
+			createEventSource,
+		});
+
+		startSseGateway();
+		stopSseGateway();
+		instances[0]?.emitError();
+		instances[0]?.emitMessage(sessionEndedPayload);
+		await vi.advanceTimersByTimeAsync(60_000);
+
+		expect(onDrop).not.toHaveBeenCalled();
+		expect(instances).toHaveLength(1);
 	});
 });
 
