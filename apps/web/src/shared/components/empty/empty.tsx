@@ -9,7 +9,7 @@ type EmptyProps = {
 
 export const Empty = ({ icon, title, description }: EmptyProps) => {
 	return (
-		<div className="flex flex-col items-center justify-center gap-2 my-2">
+		<div className="flex flex-col items-center justify-center gap-2 my-2 text-center">
 			<Icon name={icon} className="bg-muted size-12 p-3 rounded-full" />
 			<Text weight="medium">{title}</Text>
 			<Text size="sm" color="muted">

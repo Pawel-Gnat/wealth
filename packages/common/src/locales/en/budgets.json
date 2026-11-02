@@ -44,6 +44,7 @@
 	"invitations": {
 		"title": "Invitations",
 		"waiting-for-acceptance": "Waiting for acceptance by {{email}}",
+		"invited-by": "You were invited to this budget by {{email}}",
 		"empty": {
 			"title": "No invitations",
 			"description": "Invites you send or receive will appear here."

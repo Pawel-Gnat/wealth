@@ -17,7 +17,7 @@ export const InvitationsList = ({
 					key={`${budget.id}-${invitee.id}`}
 					budget={budget}
 					userId={userId}
-					inviteeId={invitee.id}
+					invitee={invitee}
 				/>
 			))}
 		</div>

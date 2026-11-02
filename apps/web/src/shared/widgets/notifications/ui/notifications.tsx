@@ -40,13 +40,13 @@ export const Notifications = () => {
 					<div className="relative">
 						<Icon name="bell" />
 						{isSuccess && !isError && hasUnread && (
-							<span className="absolute top-0 right-0 size-2 rounded-full bg-primary animate-pulse" />
+							<span className="absolute top-0 right-0 size-2 rounded-full bg-destructive" />
 						)}
 					</div>
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent align="end" className="w-95">
-				<div className="flex items-center justify-between gap-2">
+				<div className="flex items-center justify-between gap-2 border-b border-border pb-2">
 					<Text weight="medium">{t("title", { ns: "notifications" })}</Text>
 					{showMarkAll && (
 						<Button
