@@ -1,6 +1,7 @@
 import {
 	AlertCircle,
 	Banknote,
+	Bell,
 	CalendarIcon,
 	Camera,
 	ChartArea,
@@ -58,6 +59,7 @@ export const icons = {
 	accept: Check,
 	error: AlertCircle,
 	balance: Scale,
+	bell: Bell,
 	email: Mail,
 	password: Lock,
 	settings: Cog,

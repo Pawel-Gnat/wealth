@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router";
 import { useUser } from "@/context/auth";
 import { Heading } from "@/shared/components";
 import { CardState } from "@/shared/widgets/card-state";
@@ -8,8 +10,11 @@ import { BudgetModalForm } from "./ui/budget-modal-form";
 import { BudgetsList } from "./ui/budgets-list";
 import { InvitationsList } from "./ui/invitations-list";
 
+const INVITATIONS_ID = "invitations";
+
 export const BudgetsPage = () => {
 	const { t } = useTranslation();
+	const { hash } = useLocation();
 	const { data: user } = useUser();
 	const { data: budgets, isLoading, isError } = useBudgets();
 	const {
@@ -17,6 +22,14 @@ export const BudgetsPage = () => {
 		isLoading: isInvitesLoading,
 		isError: isInvitesError,
 	} = useBudgetInvites();
+
+	useEffect(() => {
+		if (!user || hash !== `#${INVITATIONS_ID}`) {
+			return;
+		}
+
+		document.getElementById(INVITATIONS_ID)?.scrollIntoView();
+	}, [hash, user]);
 
 	if (!user) {
 		return null;
@@ -43,6 +56,7 @@ export const BudgetsPage = () => {
 			</CardState>
 
 			<CardState
+				id={INVITATIONS_ID}
 				title={t("invitations.title", { ns: "budgets" })}
 				data={invitations}
 				isLoading={isInvitesLoading}
