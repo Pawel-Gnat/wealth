@@ -16,29 +16,29 @@ export const Notification = ({ notification, onSelect }: NotificationProps) => {
 		<li>
 			<button
 				type="button"
-				className="flex w-full gap-3 rounded-2xl px-2 py-2 text-left hover:bg-muted"
+				className="w-full gap-1 rounded-2xl p-3 flex flex-col hover:bg-muted text-left"
 				onClick={onSelect}
 			>
-				<Icon name={notificationIcon(notification.event)} />
-				<div className="flex min-w-0 flex-1 flex-col gap-1">
+				<div className="flex items-center gap-2 justify-between mb-1">
 					<div className="flex items-center gap-2">
-						<Text weight="medium" className="truncate">
+						<Icon name={notificationIcon(notification.event)} />
+						<Text size="sm" weight="medium" className="truncate">
 							{t(`${notification.event}.title`, { ns: "notifications" })}
 						</Text>
-						{notification.readAt === null ? (
-							<Badge>{t("new", { ns: "notifications" })}</Badge>
-						) : null}
 					</div>
-					<Text size="sm" color="muted">
-						{t(`${notification.event}.body`, {
-							ns: "notifications",
-							budget: notification.metadata.budgetName,
-						})}
-					</Text>
-					<Text size="sm" color="muted">
-						{formatNotificationTime(notification.createdAt)}
-					</Text>
+					{notification.readAt === null && (
+						<Badge>{t("new", { ns: "notifications" })}</Badge>
+					)}
 				</div>
+				<Text size="sm" color="muted">
+					{t(`${notification.event}.body`, {
+						ns: "notifications",
+						budget: notification.metadata.budgetName,
+					})}
+				</Text>
+				<Text size="xs" color="muted">
+					{formatNotificationTime(notification.createdAt)}
+				</Text>
 			</button>
 		</li>
 	);
