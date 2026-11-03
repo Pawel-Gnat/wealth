@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { toast } from "@/shared/components";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import type { NotificationSseEvent } from "@/shared/lib/sse";

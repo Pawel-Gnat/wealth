@@ -1506,30 +1506,17 @@
                       "fill": "$foreground",
                       "textGrowth": "fixed-width",
                       "width": "fill_container",
-                      "content": "Expense created",
+                      "content": "Account created successfully",
                       "fontFamily": "$font-sans",
                       "fontSize": 14,
                       "fontWeight": "600"
-                    },
-                    {
-                      "type": "text",
-                      "id": "g9xcr",
-                      "name": "Body",
-                      "fill": "$muted-foreground",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "The expense was saved to this month.",
-                      "lineHeight": 1.35,
-                      "fontFamily": "$font-sans",
-                      "fontSize": 13,
-                      "fontWeight": "normal"
                     }
                   ]
                 }
               ]
             },
             {
-              "id": "ywEvR",
+              "id": "OiCoi",
               "type": "ref",
               "ref": "D6w3Hv",
               "name": "Toast Error",
@@ -1542,52 +1529,7 @@
                   "fill": "$destructive"
                 },
                 "h6KSQ": {
-                  "content": "Could not save expense"
-                },
-                "g9xcr": {
-                  "content": "Something went wrong. Try again."
-                }
-              }
-            },
-            {
-              "id": "LeIky",
-              "type": "ref",
-              "ref": "D6w3Hv",
-              "name": "Toast Warning",
-              "descendants": {
-                "JyqUM": {
-                  "fill": "$warning-soft"
-                },
-                "U6aFCH": {
-                  "icon": "triangle-alert",
-                  "fill": "$warning"
-                },
-                "h6KSQ": {
-                  "content": "Check the amount"
-                },
-                "g9xcr": {
-                  "content": "This looks higher than usual."
-                }
-              }
-            },
-            {
-              "id": "kOx3u",
-              "type": "ref",
-              "ref": "D6w3Hv",
-              "name": "Toast Info",
-              "descendants": {
-                "JyqUM": {
-                  "fill": "$muted"
-                },
-                "U6aFCH": {
-                  "icon": "info",
-                  "fill": "$foreground"
-                },
-                "h6KSQ": {
-                  "content": "Invitation sent"
-                },
-                "g9xcr": {
-                  "content": "Anna Kowalska will see it in notifications."
+                  "content": "Failed to sign in"
                 }
               }
             }

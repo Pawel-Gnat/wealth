@@ -9,7 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { toast } from "@/shared/components";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useAppMutation } from "@/shared/hooks/use-app-mutation";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
