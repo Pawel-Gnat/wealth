@@ -266,12 +266,14 @@ describe("Notifications service", () => {
 		);
 
 		expect(marked.data.readAt).toEqual(expect.any(String));
+		expect(marked.data.ids).toEqual([unread.id]);
 		expect(kept?.readAt).toBe(firstMark.data.readAt);
 		expect(changed?.readAt).toBe(marked.data.readAt);
 		expect(publish).toHaveBeenCalledOnce();
 		expect(publish.mock.calls[0]?.[1]).toMatchObject({
 			type: "notifications-read",
 			readAt: marked.data.readAt,
+			ids: [unread.id],
 		});
 	});
 
@@ -282,7 +284,7 @@ describe("Notifications service", () => {
 		});
 
 		await expect(notificationsService.markAllRead(user.id)).resolves.toEqual({
-			data: { readAt: null },
+			data: { readAt: null, ids: [] },
 		});
 		expect(publish).not.toHaveBeenCalled();
 	});

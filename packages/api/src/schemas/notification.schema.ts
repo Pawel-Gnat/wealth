@@ -68,5 +68,6 @@ export const notificationMarkReadResponseSchema = apiPayload(
 export const notificationMarkAllReadResponseSchema = apiPayload(
 	z.object({
 		readAt: z.iso.datetime().nullable(),
+		ids: z.array(z.string().min(1)),
 	}),
 );

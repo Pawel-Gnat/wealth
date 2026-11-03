@@ -28,6 +28,7 @@ export const notificationReadEventSchema = z.object({
 export const notificationsReadEventSchema = z.object({
 	type: z.literal("notifications-read"),
 	readAt: z.iso.datetime(),
+	ids: z.array(z.string().min(1)),
 	...sseEnvelope,
 });
 

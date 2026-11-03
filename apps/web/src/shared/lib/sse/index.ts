@@ -10,5 +10,6 @@ export {
 	startSseGateway,
 	stopSseGateway,
 	subscribeSseConnectionDrop,
+	subscribeSseConnectionOpen,
 	subscribeSseNotifications,
 } from "@/shared/lib/sse/sse-gateway";

@@ -42,13 +42,14 @@ describe("applyNotificationEvent", () => {
 		).toBe("2026-07-21T12:06:00.000Z");
 	});
 
-	it("marks one row and then every unread row", () => {
+	it("marks one row and only the ids included in mark all", () => {
 		const unread = notification("a", "2026-07-21T12:02:00.000Z");
 		const alreadyRead = notification(
 			"b",
 			"2026-07-21T12:01:00.000Z",
 			"2026-07-21T12:03:00.000Z",
 		);
+		const arrivedDuringMark = notification("c", "2026-07-21T12:06:00.000Z");
 		const items = [unread, alreadyRead];
 		const readOne = applyNotificationEvent(items, {
 			type: "notification-read",
@@ -58,12 +59,17 @@ describe("applyNotificationEvent", () => {
 			readAt: "2026-07-21T12:04:00.000Z",
 		});
 		const readAll = applyNotificationEvent(
-			[notification("a", "2026-07-21T12:02:00.000Z"), alreadyRead],
+			[
+				notification("a", "2026-07-21T12:02:00.000Z"),
+				alreadyRead,
+				arrivedDuringMark,
+			],
 			{
 				type: "notifications-read",
 				id: "event-2",
 				occurredAt: "2026-07-21T12:05:00.000Z",
 				readAt: "2026-07-21T12:05:00.000Z",
+				ids: ["a"],
 			},
 		);
 
@@ -76,5 +82,6 @@ describe("applyNotificationEvent", () => {
 		expect(readAll.find((item) => item.id === "a")?.readAt).toBe(
 			"2026-07-21T12:05:00.000Z",
 		);
+		expect(readAll.find((item) => item.id === "c")?.readAt).toBeNull();
 	});
 });

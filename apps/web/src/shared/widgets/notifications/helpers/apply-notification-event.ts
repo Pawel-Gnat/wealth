@@ -18,8 +18,9 @@ export const applyNotificationEvent = (
 		);
 	}
 
+	const ids = new Set(event.ids);
 	return items.map((item) =>
-		item.readAt ? item : { ...item, readAt: event.readAt },
+		ids.has(item.id) ? { ...item, readAt: event.readAt } : item,
 	);
 };
 

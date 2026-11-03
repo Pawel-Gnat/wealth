@@ -13,7 +13,7 @@ import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
 import type { NotificationSseEvent } from "@/shared/lib/sse";
 import {
-	subscribeSseConnectionDrop,
+	subscribeSseConnectionOpen,
 	subscribeSseNotifications,
 } from "@/shared/lib/sse";
 import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
@@ -47,7 +47,6 @@ const updateNotifications = (
 export const useNotifications = () => {
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
-	const dropRefetchUsed = useRef(false);
 	const pendingEvents = useRef<NotificationSseEvent[]>([]);
 
 	const query = useQuery({
@@ -76,13 +75,12 @@ export const useNotifications = () => {
 			);
 		});
 
-		const unsubscribeDrop = subscribeSseConnectionDrop(() => {
+		const unsubscribeOpen = subscribeSseConnectionOpen(() => {
 			const state = notificationQueryState(queryClient);
-			if (state?.status === "error" || dropRefetchUsed.current) {
+			if (state?.status === "error") {
 				return;
 			}
 
-			dropRefetchUsed.current = true;
 			void queryClient.refetchQueries({ queryKey: notificationsKey });
 		});
 
@@ -99,7 +97,6 @@ export const useNotifications = () => {
 				return;
 			}
 
-			dropRefetchUsed.current = false;
 			const pending = pendingEvents.current.splice(0);
 			if (pending.length === 0) {
 				return;
@@ -112,7 +109,7 @@ export const useNotifications = () => {
 
 		return () => {
 			unsubscribeNotifications();
-			unsubscribeDrop();
+			unsubscribeOpen();
 			unsubscribeCache();
 		};
 	}, [queryClient]);
@@ -138,10 +135,13 @@ export const useNotifications = () => {
 		mutationFn: () =>
 			controlledAsync(() => orpcClient.notifications.markAllRead()),
 		onSuccess: (response) => {
-			const readAt = response.data.readAt;
+			const { readAt, ids } = response.data;
 			if (readAt) {
+				const markedIds = new Set(ids);
 				updateNotifications(queryClient, (items) =>
-					items.map((item) => (item.readAt ? item : { ...item, readAt })),
+					items.map((item) =>
+						markedIds.has(item.id) ? { ...item, readAt } : item,
+					),
 				);
 			}
 

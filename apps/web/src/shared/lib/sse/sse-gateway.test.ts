@@ -11,6 +11,7 @@ import {
 	startSseGateway,
 	stopSseGateway,
 	subscribeSseConnectionDrop,
+	subscribeSseConnectionOpen,
 	subscribeSseNotifications,
 } from "@/shared/lib/sse/sse-gateway";
 import { createMockEventSourceFactory } from "@/test/mocks/event-source";
@@ -222,6 +223,7 @@ describe("sse-gateway", () => {
 				id: "evt-3",
 				occurredAt: "2026-07-21T12:06:00.000Z",
 				readAt: "2026-07-21T12:06:00.000Z",
+				ids: ["01ARZ3NDEKTSV4RRFFQ69G5FAV"],
 			}),
 		);
 		instances[0]?.emitMessage(sessionEndedPayload);
@@ -256,6 +258,24 @@ describe("sse-gateway", () => {
 			}),
 		);
 		expect(onNotification).toHaveBeenCalledTimes(2);
+	});
+
+	it("signals a reopened connection and skips the first open", async () => {
+		const onOpen = vi.fn();
+		subscribeSseConnectionOpen(onOpen);
+		const { createEventSource, instances } = createMockEventSourceFactory();
+		configureSseGateway({
+			getUrl: () => "http://backend.test/sse",
+			createEventSource,
+		});
+
+		startSseGateway();
+		instances[0]?.emitOpen();
+		instances[0]?.emitError();
+		await vi.advanceTimersByTimeAsync(1_000);
+		instances[1]?.emitOpen();
+
+		expect(onOpen).toHaveBeenCalledOnce();
 	});
 
 	it("signals each connection drop and keeps reconnecting", async () => {

@@ -127,20 +127,22 @@ export class NotificationsService {
 			.returning({ id: notificationsTable.id });
 
 		if (updated.length === 0) {
-			return { data: { readAt: null } };
+			return { data: { readAt: null, ids: [] } };
 		}
 
 		const readAtIso = toIso(readAt);
+		const ids = updated.map((row) => row.id);
 		const event: NotificationsReadEvent = {
 			type: "notifications-read",
 			id: ulid(),
 			occurredAt: new Date().toISOString(),
 			readAt: readAtIso,
+			ids,
 		};
 
 		await this.publishBestEffort(userId, event);
 
-		return { data: { readAt: readAtIso } };
+		return { data: { readAt: readAtIso, ids } };
 	}
 
 	private async findOwn(userId: string, id: string) {

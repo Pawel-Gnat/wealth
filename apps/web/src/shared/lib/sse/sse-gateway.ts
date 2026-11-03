@@ -78,9 +78,11 @@ export type NotificationSseEvent = Exclude<SseEvent, { type: "session-ended" }>;
 
 type NotificationListener = (event: NotificationSseEvent) => void;
 type ConnectionDropListener = () => void;
+type ConnectionOpenListener = () => void;
 
 const notificationListeners = new Set<NotificationListener>();
 const connectionDropListeners = new Set<ConnectionDropListener>();
+const connectionOpenListeners = new Set<ConnectionOpenListener>();
 
 const notifyNotificationListeners = (event: NotificationSseEvent) => {
 	for (const listener of [...notificationListeners]) {
@@ -90,6 +92,12 @@ const notifyNotificationListeners = (event: NotificationSseEvent) => {
 
 const notifyConnectionDrop = () => {
 	for (const listener of [...connectionDropListeners]) {
+		listener();
+	}
+};
+
+const notifyConnectionOpen = () => {
+	for (const listener of [...connectionOpenListeners]) {
 		listener();
 	}
 };
@@ -128,7 +136,11 @@ const openConnection = (): void => {
 	});
 
 	nextSource.onopen = () => {
+		const isReconnect = reconnectAttempt > 0;
 		reconnectAttempt = 0;
+		if (isReconnect) {
+			notifyConnectionOpen();
+		}
 	};
 
 	nextSource.onmessage = (event) => {
@@ -219,9 +231,19 @@ export const subscribeSseConnectionDrop = (
 	};
 };
 
+export const subscribeSseConnectionOpen = (
+	listener: ConnectionOpenListener,
+): (() => void) => {
+	connectionOpenListeners.add(listener);
+	return () => {
+		connectionOpenListeners.delete(listener);
+	};
+};
+
 export const resetSseGatewayForTests = (): void => {
 	stopSseGateway();
 	config = { ...defaultConfig };
 	notificationListeners.clear();
 	connectionDropListeners.clear();
+	connectionOpenListeners.clear();
 };
