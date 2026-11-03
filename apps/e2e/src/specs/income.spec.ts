@@ -24,6 +24,7 @@ test('income document lifecycle', async ({ page, loginAsUser }) => {
 	const editButton = getI18nText('common', 'action.edit')
 	const deleteButton = getI18nText('common', 'action.delete')
 	const typeLabel = getI18nText('records', 'single.type')
+	const incomeKindLabel = getI18nText('records', 'single.kind.income')
 	const createRecordText = getI18nText('records', 'single.title-create')
 	const editRecordText = getI18nText('records', 'single.title-edit')
 	const deleteIncomeTitle = getI18nText('records', 'delete.income.title')
@@ -33,7 +34,7 @@ test('income document lifecycle', async ({ page, loginAsUser }) => {
 	await expect(page.getByRole('heading', { name: createRecordText })).toBeVisible()
 
 	await page.getByLabel(typeLabel).click()
-	await page.getByRole('option', { name: 'income', exact: true }).click()
+	await page.getByRole('option', { name: incomeKindLabel, exact: true }).click()
 
 	await page.getByLabel(incomeLabel).nth(0).fill('Salary')
 	await page.getByLabel(priceLabel).nth(0).fill('10')

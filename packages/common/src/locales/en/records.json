@@ -7,6 +7,10 @@
 		"title-edit": "Edit record",
 		"description-edit": "Update the date and line items for this record.",
 		"type": "Type",
+		"kind": {
+			"expense": "Expense",
+			"income": "Income"
+		},
 		"error": {
 			"title": "Could not load record",
 			"description": "The record could not be loaded."
