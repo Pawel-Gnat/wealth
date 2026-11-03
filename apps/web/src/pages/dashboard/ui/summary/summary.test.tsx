@@ -65,7 +65,7 @@ describe("Summary", () => {
 		expect(screen.getByText(formatPrice(150, "en"))).toBeInTheDocument();
 		expect(screen.getByText("+12.5%")).toBeInTheDocument();
 		expect(screen.getByText("-3.2%")).toBeInTheDocument();
-		expect(screen.queryByText("0.0%")).not.toBeInTheDocument();
+		expect(screen.getByText("0.0%")).toBeInTheDocument();
 		expect(
 			screen.getByText(t("common.expenses", { ns: "common" })),
 		).toBeInTheDocument();
@@ -77,10 +77,10 @@ describe("Summary", () => {
 		).toBeInTheDocument();
 		expect(
 			screen.getAllByText(t("summary.vs-previous-period", { ns: "dashboard" })),
-		).toHaveLength(2);
+		).toHaveLength(3);
 	});
 
-	it("shows empty copy and no percent badge when amount is 0", async () => {
+	it("shows a percent badge when the amount is 0", async () => {
 		server.use(
 			http.get("*/dashboard/summary", () =>
 				HttpResponse.json({
@@ -95,14 +95,15 @@ describe("Summary", () => {
 
 		renderWithProviders(<Summary days={DEFAULT_PERIOD} />);
 
+		expect(await screen.findByText("+12.5%")).toBeInTheDocument();
+		expect(screen.getByText("-3.2%")).toBeInTheDocument();
+		expect(screen.getByText("0.0%")).toBeInTheDocument();
 		expect(
-			await screen.findAllByText(t("summary.empty", { ns: "dashboard" })),
-		).toHaveLength(3);
-		expect(screen.queryByText("+12.5%")).not.toBeInTheDocument();
-		expect(screen.queryByText("-3.2%")).not.toBeInTheDocument();
-		expect(
-			screen.queryByText(t("summary.vs-previous-period", { ns: "dashboard" })),
+			screen.queryByText(t("summary.empty", { ns: "dashboard" })),
 		).not.toBeInTheDocument();
+		expect(
+			screen.getAllByText(t("summary.vs-previous-period", { ns: "dashboard" })),
+		).toHaveLength(3);
 	});
 
 	it("shows skeleton while summary is loading", async () => {

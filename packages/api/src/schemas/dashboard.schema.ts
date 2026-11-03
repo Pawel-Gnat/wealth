@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { apiPayload } from "./common.schema";
 
-export const DEFAULT_PERIOD = 30;
-export const periodValues = [7, DEFAULT_PERIOD] as const;
+export const DEFAULT_PERIOD = 7;
+export const periodValues = [DEFAULT_PERIOD, 30] as const;
 
 export const periodEnumSchema = z.coerce.number().pipe(z.literal(periodValues));
 export const periodSchema = periodEnumSchema.default(DEFAULT_PERIOD);
