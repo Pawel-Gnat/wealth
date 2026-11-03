@@ -1,6 +1,7 @@
 export * from "./budget-audits.table";
 export * from "./budget-members.table";
 export * from "./budgets.table";
+export * from "./notifications.table";
 export * from "./record-line-items.table";
 export * from "./records.table";
 export * from "./relations";

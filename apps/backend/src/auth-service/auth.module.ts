@@ -1,5 +1,5 @@
 import { forwardRef, Module } from "@nestjs/common";
-import { AuditsModule } from "../audits-service/audits.module";
+import { AuditsModule } from "../audit-service/audits.module";
 import { SessionGuard } from "../guards/session.guard";
 import { SseRealtimeModule } from "../sse-service/sse-realtime.module";
 import { UsersController } from "../users-service/users.controller";

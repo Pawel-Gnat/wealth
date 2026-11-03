@@ -1,4 +1,4 @@
-import type { BudgetListItem } from "@repo/api/types";
+import type { BudgetListItem, BudgetMember } from "@repo/api/types";
 import { hasPermission } from "@repo/common/permissions";
 import { useTranslation } from "react-i18next";
 import { Badge, Button, Icon, Text, Tooltip } from "@/shared/components";
@@ -8,22 +8,22 @@ import { useBudgetInvitation } from "../hooks/use-budget-invitation";
 type InvitationProps = {
 	budget: BudgetListItem;
 	userId: string;
-	inviteeId: string;
+	invitee: BudgetMember;
 };
 
-export const Invitation = ({ budget, userId, inviteeId }: InvitationProps) => {
+export const Invitation = ({ budget, userId, invitee }: InvitationProps) => {
 	const { t } = useTranslation();
 	const { acceptInvite, rejectInvite, cancelInvite, isPending } =
 		useBudgetInvitation({
 			budgetId: budget.id,
-			inviteeId,
+			inviteeId: invitee.id,
 		});
 
-	const inviteeEmail = budget.members.find(
-		(member) => member.id === inviteeId,
-	)?.email;
+	const ownMembership = budget.members.find(
+		(member) => member.id === userId,
+	)?.status;
 	const membership =
-		budget.members.find((member) => member.id === userId)?.status ?? null;
+		userId === invitee.id ? invitee.status : (ownMembership ?? null);
 
 	const canRespond = hasPermission(userId, "budgets", "acceptInvite", {
 		ownerId: budget.owner.id,
@@ -34,12 +34,15 @@ export const Invitation = ({ budget, userId, inviteeId }: InvitationProps) => {
 		membership,
 	});
 
-	const subtitle = inviteeEmail
-		? t("invitations.waiting-for-acceptance", {
+	const subtitle = canRespond
+		? t("invitations.invited-by", {
 				ns: "budgets",
-				email: inviteeEmail,
+				email: budget.owner.email,
 			})
-		: null;
+		: t("invitations.waiting-for-acceptance", {
+				ns: "budgets",
+				email: invitee.email,
+			});
 
 	return (
 		<div className="flex items-center justify-between pb-4">
@@ -53,8 +56,8 @@ export const Invitation = ({ budget, userId, inviteeId }: InvitationProps) => {
 					</Badge>
 				</div>
 				<div className="flex items-center gap-2">
-					<AvatarGroup users={budget.members} />
-					{!canRespond && subtitle && (
+					<AvatarGroup users={[budget.owner, ...budget.members]} />
+					{subtitle && (
 						<Text size="xs" color="muted">
 							{subtitle}
 						</Text>

@@ -10,6 +10,7 @@ import {
 	Text,
 } from "@/shared/components";
 import { Navigation } from "../widgets/navigation";
+import { Notifications } from "../widgets/notifications";
 import { UserAvatar } from "../widgets/user-avatar";
 
 export function DashboardLayout() {
@@ -35,6 +36,7 @@ export function DashboardLayout() {
 				<Breadcrumbs />
 
 				<div className="flex items-center gap-2 ml-auto">
+					<Notifications />
 					<UserAvatar user={user} asLink />
 				</div>
 			</div>

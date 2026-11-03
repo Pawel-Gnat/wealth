@@ -1,0 +1,71 @@
+{
+	"title": "Notifications",
+	"new": "New",
+	"mark-all": "Mark all as read",
+	"empty": {
+		"title": "You're all caught up",
+		"description": "New invitations and document updates will appear here."
+	},
+	"error": {
+		"title": "Could not load notifications",
+		"description": "Check your connection and try again."
+	},
+	"budget": {
+		"member": {
+			"invited": {
+				"title": "Invitation to a group budget",
+				"body": "You have been invited to {{budget}}."
+			}
+		},
+		"invite": {
+			"cancelled": {
+				"title": "Invitation cancelled",
+				"body": "The invitation to {{budget}} was cancelled."
+			},
+			"rejected": {
+				"title": "Invitation declined",
+				"body": "The invitation to {{budget}} was declined."
+			}
+		},
+		"left": {
+			"title": "Left a group budget",
+			"body": "A member left {{budget}}."
+		},
+		"updated": {
+			"title": "Budget renamed",
+			"body": "The budget was renamed to {{budget}}."
+		},
+		"deleted": {
+			"title": "Budget deleted",
+			"body": "{{budget}} was deleted."
+		}
+	},
+	"expense": {
+		"created": {
+			"title": "Expense added",
+			"body": "An expense was added in {{budget}}."
+		},
+		"updated": {
+			"title": "Expense edited",
+			"body": "An expense was edited in {{budget}}."
+		},
+		"deleted": {
+			"title": "Expense deleted",
+			"body": "An expense was deleted in {{budget}}."
+		}
+	},
+	"income": {
+		"created": {
+			"title": "Income added",
+			"body": "An income was added in {{budget}}."
+		},
+		"updated": {
+			"title": "Income edited",
+			"body": "An income was edited in {{budget}}."
+		},
+		"deleted": {
+			"title": "Income deleted",
+			"body": "An income was deleted in {{budget}}."
+		}
+	}
+}

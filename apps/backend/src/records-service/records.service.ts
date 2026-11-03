@@ -23,15 +23,28 @@ import {
 import { hasPermission } from "@repo/common/permissions";
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { AuditsService } from "../audits-service/audits.service";
+import { AuditsService } from "../audit-service/audits.service";
 import { DBS } from "../database-service/constants";
 import {
 	budgetAuditsTable,
+	budgetTable,
 	recordLineItemsTable,
 	recordsTable,
 	userAuditsTable,
 } from "../database-service/tables/index";
+import type {
+	DatabaseTransaction,
+	NotificationRow,
+} from "../database-service/types/types";
+import {
+	type NewNotification,
+	NotificationsService,
+} from "../notification-service/notifications.service";
 import { findBudgetAccess } from "../shared/budget/find-budget-access";
+import {
+	listActiveParticipantIds,
+	otherParticipantIds,
+} from "../shared/budget/list-active-participant-ids";
 import { logDomainEvent } from "../shared/observability/log-event";
 import {
 	calculateRecordTotalAmount,
@@ -56,6 +69,7 @@ export class RecordsService {
 		@Inject(DBS.APP) private readonly db: NodePgDatabase,
 		private readonly usersService: UsersService,
 		private readonly auditsService: AuditsService,
+		private readonly notificationsService: NotificationsService,
 	) {}
 
 	async listByUserId(
@@ -166,54 +180,63 @@ export class RecordsService {
 		const date = encodeDocumentDateForStorage(payload.date);
 		const lineItems = this.auditLineItems(payload);
 
-		const recordId = await this.db.transaction(async (tx) => {
-			const [createdRecord] = await tx
-				.insert(recordsTable)
-				.values({
-					userId,
+		const { recordId, notifications } = await this.db.transaction(
+			async (tx) => {
+				const [createdRecord] = await tx
+					.insert(recordsTable)
+					.values({
+						userId,
+						budgetId: budgetId ?? null,
+						kind,
+						documentDate: date,
+						totalAmount: totalAmount.toFixed(2),
+					})
+					.returning({ id: recordsTable.id });
+
+				if (!createdRecord) {
+					throw new Error(recordCopy[kind].insertFailed);
+				}
+
+				await tx.insert(recordLineItemsTable).values(
+					mapPayloadLineItemsToInsertRows(payload).map((row) => ({
+						documentId: createdRecord.id,
+						...row,
+					})),
+				);
+
+				const metadata = {
+					recordId: createdRecord.id,
+					date,
+					lineItems,
+				};
+
+				if (budgetId) {
+					await this.auditsService.createBudgetAudit(tx, {
+						budgetId,
+						actorUserId: userId,
+						entityId: createdRecord.id,
+						event: RECORD_EVENTS[kind].created,
+						metadata,
+					});
+				} else {
+					await this.auditsService.createUserAudit(tx, {
+						userId,
+						entityId: createdRecord.id,
+						event: RECORD_EVENTS[kind].created,
+						metadata,
+					});
+				}
+
+				const notifications = await this.recordNotifications(tx, {
+					actorId: userId,
 					budgetId: budgetId ?? null,
-					kind,
-					documentDate: date,
-					totalAmount: totalAmount.toFixed(2),
-				})
-				.returning({ id: recordsTable.id });
-
-			if (!createdRecord) {
-				throw new Error(recordCopy[kind].insertFailed);
-			}
-
-			await tx.insert(recordLineItemsTable).values(
-				mapPayloadLineItemsToInsertRows(payload).map((row) => ({
-					documentId: createdRecord.id,
-					...row,
-				})),
-			);
-
-			const metadata = {
-				recordId: createdRecord.id,
-				date,
-				lineItems,
-			};
-
-			if (budgetId) {
-				await this.auditsService.createBudgetAudit(tx, {
-					budgetId,
-					actorUserId: userId,
-					entityId: createdRecord.id,
 					event: RECORD_EVENTS[kind].created,
-					metadata,
+					recordId: createdRecord.id,
 				});
-			} else {
-				await this.auditsService.createUserAudit(tx, {
-					userId,
-					entityId: createdRecord.id,
-					event: RECORD_EVENTS[kind].created,
-					metadata,
-				});
-			}
 
-			return createdRecord.id;
-		});
+				return { recordId: createdRecord.id, notifications };
+			},
+		);
 
 		this.logRecordEvent(
 			RECORD_EVENTS[kind].created,
@@ -221,6 +244,7 @@ export class RecordsService {
 			budgetId ?? null,
 			recordId,
 		);
+		await this.publishNotifications(notifications);
 
 		return { data: { message: RECORD_CREATED_MESSAGE } };
 	}
@@ -278,7 +302,7 @@ export class RecordsService {
 				JSON.stringify(previousLineItems) !== JSON.stringify(nextLineItems);
 
 			if (!dateChanged && !lineItemsChanged) {
-				return { changed: false as const };
+				return { changed: false as const, notifications: [] };
 			}
 
 			const totalChanged = existing.totalAmount !== newTotalAmountStr;
@@ -333,7 +357,18 @@ export class RecordsService {
 				});
 			}
 
-			return { changed: true as const, budgetId: existing.budgetId };
+			const notifications = await this.recordNotifications(tx, {
+				actorId: userId,
+				budgetId: existing.budgetId,
+				event: RECORD_EVENTS[kind].updated,
+				recordId,
+			});
+
+			return {
+				changed: true as const,
+				budgetId: existing.budgetId,
+				notifications,
+			};
 		});
 
 		if (result.changed) {
@@ -344,6 +379,8 @@ export class RecordsService {
 				recordId,
 			);
 		}
+
+		await this.publishNotifications(result.notifications);
 
 		return { data: { message: RECORD_UPDATED_MESSAGE } };
 	}
@@ -390,6 +427,12 @@ export class RecordsService {
 					);
 			}
 
+			const notifications = await this.recordNotifications(tx, {
+				actorId: userId,
+				budgetId: existing.budgetId,
+				event: RECORD_EVENTS[kind].deleted,
+			});
+
 			const [deletedRecord] = await tx
 				.delete(recordsTable)
 				.where(eq(recordsTable.id, recordId))
@@ -399,7 +442,7 @@ export class RecordsService {
 				this.throwNotFound();
 			}
 
-			return { budgetId: existing.budgetId };
+			return { budgetId: existing.budgetId, notifications };
 		});
 
 		this.logRecordEvent(
@@ -408,6 +451,7 @@ export class RecordsService {
 			deleted.budgetId,
 			recordId,
 		);
+		await this.publishNotifications(deleted.notifications);
 
 		return { data: { message: RECORD_DELETED_MESSAGE } };
 	}
@@ -473,6 +517,66 @@ export class RecordsService {
 			quantity: item.quantity,
 			singleAmount: item.singleAmount,
 		}));
+	}
+
+	private async recordNotifications(
+		tx: DatabaseTransaction,
+		input: {
+			actorId: string;
+			budgetId: string | null;
+			event: NewNotification["event"];
+			recordId?: string;
+		},
+	) {
+		if (!input.budgetId) {
+			return [];
+		}
+
+		const [budget] = await tx
+			.select({
+				title: budgetTable.title,
+				ownerId: budgetTable.ownerId,
+			})
+			.from(budgetTable)
+			.where(eq(budgetTable.id, input.budgetId))
+			.for("update");
+
+		if (!budget) {
+			this.throwNotFound();
+		}
+
+		const participantIds = await listActiveParticipantIds(
+			tx,
+			input.budgetId,
+			budget.ownerId,
+		);
+		const metadata = input.recordId
+			? {
+					budgetId: input.budgetId,
+					budgetName: budget.title,
+					recordId: input.recordId,
+				}
+			: {
+					budgetId: input.budgetId,
+					budgetName: budget.title,
+				};
+
+		return this.notificationsService.create(
+			tx,
+			otherParticipantIds(participantIds, input.actorId).map((userId) => ({
+				userId,
+				event: input.event,
+				metadata,
+			})),
+		);
+	}
+
+	private async publishNotifications(rows: NotificationRow[]) {
+		if (rows.length === 0) {
+			return;
+		}
+
+		await this.notificationsService.publish(rows);
 	}
 
 	private logRecordEvent(

@@ -13,6 +13,9 @@ import enCommon from "./locales/en/common.json" with { type: "json" };
 import enDashboard from "./locales/en/dashboard.json" with { type: "json" };
 import enEvents from "./locales/en/events.json" with { type: "json" };
 import enForm from "./locales/en/form.json" with { type: "json" };
+import enNotifications from "./locales/en/notifications.json" with {
+	type: "json",
+};
 import enRecords from "./locales/en/records.json" with { type: "json" };
 import enSettings from "./locales/en/settings.json" with { type: "json" };
 
@@ -30,6 +33,7 @@ export const I18N_RESOURCES = {
 		auth: enAuth,
 		settings: enSettings,
 		audits: enAudits,
+		notifications: enNotifications,
 		events: enEvents,
 	},
 } as const;

@@ -15,6 +15,7 @@ export const queryKeys = {
 	users: {
 		search: (query: string) => ["users", "search", query] as const,
 	},
+	notifications: () => ["notifications"] as const,
 	audits: {
 		all: () => ["audits"] as const,
 		list: (params: AuditsParams) => ["audits", "list", params] as const,

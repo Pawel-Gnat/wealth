@@ -10,6 +10,7 @@ export type CardProps = {
 	children: ReactNode;
 	className?: string | undefined;
 	contentClassName?: string | undefined;
+	id?: string | undefined;
 };
 
 export const Card = ({
@@ -19,9 +20,10 @@ export const Card = ({
 	children,
 	className,
 	contentClassName,
+	id,
 }: CardProps) => {
 	return (
-		<CardUI className={cn("shadow-xl/10", className)}>
+		<CardUI id={id} className={cn("shadow-xl/10", className)}>
 			{(title || subtitle || actions) && (
 				<CardHeader className="flex items-center gap-2 justify-between">
 					{(title || subtitle) && (

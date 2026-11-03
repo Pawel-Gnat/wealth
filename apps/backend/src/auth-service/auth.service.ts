@@ -39,7 +39,7 @@ import { addDays } from "date-fns";
 import { and, eq, gt, ne } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Request, Response } from "express";
-import { AuditsService } from "../audits-service/audits.service";
+import { AuditsService } from "../audit-service/audits.service";
 import { DBS } from "../database-service/constants";
 import { sessionsTable } from "../database-service/tables/index";
 import type {

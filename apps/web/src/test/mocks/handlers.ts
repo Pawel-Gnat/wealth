@@ -1,4 +1,4 @@
-import { AUTH_EVENTS } from "@repo/api/events";
+import { AUTH_EVENTS, BUDGET_EVENTS } from "@repo/api/events";
 import {
 	BUDGET_DELETED_MESSAGE,
 	BUDGET_LEFT_MESSAGE,
@@ -155,6 +155,27 @@ const getUsersSearchHandler = () => {
 export const MOCK_BUDGET_ID = "01JTZKQX2GT6PHGQER0M8FS6KA";
 export const MOCK_MEMBER_BUDGET_ID = "01JTZKQX2GT6PHGQER0M8FS6KB";
 
+const getNotificationsHandler = () => {
+	return HttpResponse.json({
+		data: [
+			{
+				id: "01JTZKQX2GT6PHGQER0M8FS6KD",
+				event: BUDGET_EVENTS.memberInvited,
+				metadata: {
+					budgetId: MOCK_BUDGET_ID,
+					budgetName: "Household",
+				},
+				readAt: null,
+				createdAt: "2026-10-29T07:14:00.000Z",
+			},
+		],
+	});
+};
+
+const getBudgetInvitesHandler = () => {
+	return HttpResponse.json({ data: [] });
+};
+
 const getBudgetsHandler = () => {
 	return HttpResponse.json({
 		data: [
@@ -257,12 +278,14 @@ export const HANDLERS = [
 	http.put("*/settings/details", putSettingsDetailsHandler),
 	http.put("*/settings/avatar", putSettingsAvatarHandler),
 	http.get("*/users/search", getUsersSearchHandler),
+	http.get("*/budgets/invites", getBudgetInvitesHandler),
 	http.get("*/budgets", getBudgetsHandler),
 	http.put("*/budgets/:id", putBudgetHandler),
 	http.post("*/budgets/:id/members", postBudgetMembersHandler),
 	http.delete("*/budgets/:id/membership", deleteBudgetMembershipHandler),
 	http.delete("*/budgets/:id", deleteBudgetHandler),
 	http.get("*/audits", getAuditsHandler),
+	http.get("*/notifications", getNotificationsHandler),
 	http.get("*/auth/me", getAuthMeHandler),
 	http.post("*/auth/signin", postAuthSignInHandler),
 	http.post("*/auth/signup", postAuthSignUpHandler),

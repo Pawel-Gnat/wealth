@@ -14,8 +14,16 @@ import {
 } from "@repo/api/schemas";
 import { logger } from "@repo/observability/node";
 import { eq } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { AuditsService } from "../audits-service/audits.service";
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from "vitest";
+import { AuditsService } from "../audit-service/audits.service";
 import { DBS } from "../database-service/constants";
 import {
 	budgetAuditsTable,
@@ -25,8 +33,11 @@ import {
 	recordsTable,
 	storageTable,
 } from "../database-service/tables/index";
+import { NotificationsService } from "../notification-service/notifications.service";
+import { SsePublisher } from "../sse-service/sse-publisher.service";
 import { StorageService } from "../storage-service/storage.service";
 import { createTestApp } from "../test/helpers/modules";
+import { seedBudget } from "../test/mocks/budgets";
 import { createTestUser } from "../test/mocks/users";
 import { UsersService } from "../users-service/users.service";
 import { BudgetService } from "./budget.service";
@@ -36,12 +47,25 @@ describe("Budget service", () => {
 	let budgetService: BudgetService;
 	let usersService: UsersService;
 	let storageService: StorageService;
+	let notificationsService: NotificationsService;
+	const publish = vi.fn().mockResolvedValue(true);
 
 	beforeAll(async () => {
-		moduleRef = await createTestApp([BudgetService, AuditsService]).compile();
+		moduleRef = await createTestApp([
+			BudgetService,
+			AuditsService,
+			NotificationsService,
+			{ provide: SsePublisher, useValue: { publish } },
+		]).compile();
 		budgetService = moduleRef.get(BudgetService);
 		usersService = moduleRef.get(UsersService);
 		storageService = moduleRef.get(StorageService);
+		notificationsService = moduleRef.get(NotificationsService);
+	});
+
+	beforeEach(() => {
+		publish.mockClear();
+		publish.mockResolvedValue(true);
 	});
 
 	afterAll(async () => {
@@ -1435,6 +1459,285 @@ describe("Budget service", () => {
 				.where(eq(budgetMemberTable.budgetId, budget.id));
 
 			expect(members).toHaveLength(2);
+		});
+	});
+
+	describe("budget notifications", () => {
+		it("notifies active members when the title changes and skips a solo budget", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-rename-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-rename-member",
+			});
+			const pending = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-rename-pending",
+			});
+			const soloOwner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-rename-solo",
+			});
+			const shared = await seedBudget(db, owner.id, "Old house", [
+				{ userId: member.id, status: "active" },
+				{ userId: pending.id, status: "pending" },
+			]);
+			const solo = await seedBudget(db, soloOwner.id, "Solo");
+
+			await budgetService.updateBudgetByUserId(owner.id, {
+				id: shared.id,
+				title: "New house",
+			});
+			await budgetService.updateBudgetByUserId(soloOwner.id, {
+				id: solo.id,
+				title: "Still solo",
+			});
+
+			await expect(notificationsService.list(member.id)).resolves.toEqual({
+				data: [
+					expect.objectContaining({
+						event: BUDGET_EVENTS.updated,
+						metadata: { budgetId: shared.id, budgetName: "New house" },
+						readAt: null,
+					}),
+				],
+			});
+			await expect(notificationsService.list(owner.id)).resolves.toEqual({
+				data: [],
+			});
+			await expect(notificationsService.list(pending.id)).resolves.toEqual({
+				data: [],
+			});
+			await expect(notificationsService.list(soloOwner.id)).resolves.toEqual({
+				data: [],
+			});
+			expect(publish).toHaveBeenCalledOnce();
+		});
+
+		it("does not notify when the title stays the same", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-same-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-same-member",
+			});
+			const budget = await seedBudget(db, owner.id, "House", [
+				{ userId: member.id, status: "active" },
+			]);
+
+			await budgetService.updateBudgetByUserId(owner.id, {
+				id: budget.id,
+				title: "House",
+			});
+
+			await expect(notificationsService.list(member.id)).resolves.toEqual({
+				data: [],
+			});
+			expect(publish).not.toHaveBeenCalled();
+		});
+
+		it("notifies active members that a budget was deleted and keeps the row after the budget is gone", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-delete-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-delete-member",
+			});
+			const pending = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-delete-pending",
+			});
+			const soloOwner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-delete-solo",
+			});
+			const shared = await seedBudget(db, owner.id, "House", [
+				{ userId: member.id, status: "active" },
+				{ userId: pending.id, status: "pending" },
+			]);
+			const solo = await seedBudget(db, soloOwner.id, "Solo", [
+				{ userId: pending.id, status: "pending" },
+			]);
+
+			await budgetService.deleteBudgetByUserId(owner.id, shared.id);
+			await budgetService.deleteBudgetByUserId(soloOwner.id, solo.id);
+
+			await expect(notificationsService.list(member.id)).resolves.toEqual({
+				data: [
+					expect.objectContaining({
+						event: BUDGET_EVENTS.deleted,
+						metadata: { budgetId: shared.id, budgetName: "House" },
+						readAt: null,
+					}),
+				],
+			});
+			await expect(notificationsService.list(owner.id)).resolves.toEqual({
+				data: [],
+			});
+			await expect(notificationsService.list(pending.id)).resolves.toEqual({
+				data: [],
+			});
+			await expect(notificationsService.list(soloOwner.id)).resolves.toEqual({
+				data: [],
+			});
+			expect(publish).toHaveBeenCalledOnce();
+		});
+
+		it("notifies the people who stayed when a member leaves", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-leave-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-leave-member",
+			});
+			const other = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-leave-other",
+			});
+			const budget = await seedBudget(db, owner.id, "House", [
+				{ userId: member.id, status: "active" },
+				{ userId: other.id, status: "active" },
+			]);
+
+			await budgetService.leaveBudgetByUserId(member.id, budget.id);
+
+			const expected = {
+				event: BUDGET_EVENTS.left,
+				metadata: { budgetId: budget.id, budgetName: "House" },
+				readAt: null,
+			};
+			await expect(notificationsService.list(owner.id)).resolves.toEqual({
+				data: [expect.objectContaining(expected)],
+			});
+			await expect(notificationsService.list(other.id)).resolves.toEqual({
+				data: [expect.objectContaining(expected)],
+			});
+			await expect(notificationsService.list(member.id)).resolves.toEqual({
+				data: [],
+			});
+			expect(publish).toHaveBeenCalledTimes(2);
+		});
+
+		it("notifies the owner about a declined invite only when the budget is not solo", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-reject-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-reject-member",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-reject-invitee",
+			});
+			const soloInvitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-reject-solo-invitee",
+			});
+			const shared = await seedBudget(db, owner.id, "House", [
+				{ userId: member.id, status: "active" },
+				{ userId: invitee.id, status: "pending" },
+			]);
+			const solo = await seedBudget(db, owner.id, "Solo", [
+				{ userId: soloInvitee.id, status: "pending" },
+			]);
+
+			await budgetService.rejectInviteByUserId(invitee.id, shared.id);
+			await budgetService.rejectInviteByUserId(soloInvitee.id, solo.id);
+
+			await expect(notificationsService.list(owner.id)).resolves.toEqual({
+				data: [
+					expect.objectContaining({
+						event: BUDGET_EVENTS.inviteRejected,
+						metadata: { budgetId: shared.id, budgetName: "House" },
+						readAt: null,
+					}),
+				],
+			});
+			await expect(notificationsService.list(member.id)).resolves.toEqual({
+				data: [],
+			});
+			await expect(notificationsService.list(invitee.id)).resolves.toEqual({
+				data: [],
+			});
+			expect(publish).toHaveBeenCalledOnce();
+		});
+
+		it("notifies the invitee when they are invited or the invitation is cancelled", async () => {
+			const db = moduleRef.get(DBS.APP);
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-invite-owner",
+			});
+			const invitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-invite-user",
+			});
+			const createdInvitee = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-notify-create-invitee",
+			});
+
+			await budgetService.createBudgetByUserId(owner.id, {
+				title: "New house",
+				memberIds: [createdInvitee.id],
+			});
+
+			const budget = await seedBudget(db, owner.id, "House");
+			await budgetService.inviteMembersByUserId(owner.id, {
+				id: budget.id,
+				memberIds: [invitee.id],
+			});
+			await budgetService.cancelInviteByUserId(owner.id, {
+				id: budget.id,
+				userId: invitee.id,
+			});
+
+			const created = await notificationsService.list(createdInvitee.id);
+			const invited = await notificationsService.list(invitee.id);
+			const audits = await db
+				.select()
+				.from(budgetAuditsTable)
+				.where(eq(budgetAuditsTable.budgetId, budget.id));
+
+			expect(created.data).toEqual([
+				expect.objectContaining({
+					event: BUDGET_EVENTS.memberInvited,
+					metadata: expect.objectContaining({ budgetName: "New house" }),
+					readAt: null,
+				}),
+			]);
+			expect(invited.data.map((notification) => notification.event)).toEqual([
+				BUDGET_EVENTS.inviteCancelled,
+				BUDGET_EVENTS.memberInvited,
+			]);
+			expect(invited.data[0]).toMatchObject({
+				metadata: { budgetId: budget.id, budgetName: "House" },
+			});
+			expect(
+				audits.filter(
+					(audit: { event: string }) =>
+						audit.event === BUDGET_EVENTS.inviteCancelled,
+				),
+			).toHaveLength(1);
+			await expect(notificationsService.list(owner.id)).resolves.toEqual({
+				data: [],
+			});
+			expect(publish).toHaveBeenCalledTimes(3);
 		});
 	});
 });

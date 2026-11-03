@@ -83,7 +83,9 @@
 			"income-updated": "Income updated successfully",
 			"password-updated": "Password updated successfully",
 			"details-updated": "Personal details updated successfully",
-			"avatar-updated": "Avatar updated successfully"
+			"avatar-updated": "Avatar updated successfully",
+			"notifications-updated": "Notifications updated",
+			"notifications-marked-read": "All notifications marked as read."
 		},
 		"error": {
 			"signed-in": "Failed to sign in",
@@ -105,6 +107,8 @@
 			"password-updated": "Failed to update password",
 			"details-updated": "Failed to update personal details",
 			"avatar-updated": "Failed to update avatar",
+			"notification-marked-read": "Failed to mark the notification as read.",
+			"notifications-marked-read": "Failed to mark all notifications as read.",
 			"too-many-requests": "Too many requests. Try again in {{count}} seconds."
 		}
 	}
