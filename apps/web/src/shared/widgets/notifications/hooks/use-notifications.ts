@@ -145,14 +145,7 @@ export const useNotifications = () => {
 				);
 			}
 
-			toast.success(
-				t("toast.success.notifications-updated", { ns: "common" }),
-				{
-					description: t("toast.success.notifications-marked-read", {
-						ns: "common",
-					}),
-				},
-			);
+			toast.success(t("toast.success.notifications-updated", { ns: "common" }));
 		},
 		onError: () => {
 			toast.error(t("toast.error.notifications-marked-read", { ns: "common" }));

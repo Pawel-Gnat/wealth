@@ -33,7 +33,11 @@ const toasterStyle = {
 	"--width": "348px",
 } as CSSProperties;
 
-const toastClassName = cn("cn-toast", "p-3! gap-2! font-sans! shadow-sm!");
+const toastClassName = cn(
+	"cn-toast",
+	"p-3! gap-2! font-sans! shadow-sm!",
+	"focus-visible:shadow-[var(--shadow-sm),0_0_0_2px_var(--ring)]!",
+);
 
 type ToasterProps = ComponentProps<typeof SonnerToaster>;
 
