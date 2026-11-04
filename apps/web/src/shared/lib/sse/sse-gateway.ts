@@ -77,22 +77,14 @@ let isStarted = false;
 export type NotificationSseEvent = Exclude<SseEvent, { type: "session-ended" }>;
 
 type NotificationListener = (event: NotificationSseEvent) => void;
-type ConnectionDropListener = () => void;
 type ConnectionOpenListener = () => void;
 
 const notificationListeners = new Set<NotificationListener>();
-const connectionDropListeners = new Set<ConnectionDropListener>();
 const connectionOpenListeners = new Set<ConnectionOpenListener>();
 
 const notifyNotificationListeners = (event: NotificationSseEvent) => {
 	for (const listener of [...notificationListeners]) {
 		listener(event);
-	}
-};
-
-const notifyConnectionDrop = () => {
-	for (const listener of [...connectionDropListeners]) {
-		listener();
 	}
 };
 
@@ -163,7 +155,6 @@ const openConnection = (): void => {
 		}
 
 		detachSource();
-		notifyConnectionDrop();
 		scheduleReconnect();
 	};
 
@@ -222,15 +213,6 @@ export const subscribeSseNotifications = (
 	};
 };
 
-export const subscribeSseConnectionDrop = (
-	listener: ConnectionDropListener,
-): (() => void) => {
-	connectionDropListeners.add(listener);
-	return () => {
-		connectionDropListeners.delete(listener);
-	};
-};
-
 export const subscribeSseConnectionOpen = (
 	listener: ConnectionOpenListener,
 ): (() => void) => {
@@ -244,6 +226,5 @@ export const resetSseGatewayForTests = (): void => {
 	stopSseGateway();
 	config = { ...defaultConfig };
 	notificationListeners.clear();
-	connectionDropListeners.clear();
 	connectionOpenListeners.clear();
 };

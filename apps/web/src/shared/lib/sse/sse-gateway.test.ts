@@ -10,7 +10,6 @@ import {
 	resetSseGatewayForTests,
 	startSseGateway,
 	stopSseGateway,
-	subscribeSseConnectionDrop,
 	subscribeSseConnectionOpen,
 	subscribeSseNotifications,
 } from "@/shared/lib/sse/sse-gateway";
@@ -198,9 +197,7 @@ describe("sse-gateway", () => {
 
 	it("delivers notification events and ignores session-ended", () => {
 		const onNotification = vi.fn();
-		const onDrop = vi.fn();
 		const unsubscribe = subscribeSseNotifications(onNotification);
-		subscribeSseConnectionDrop(onDrop);
 		const { createEventSource, instances } = createMockEventSourceFactory();
 		configureSseGateway({
 			getUrl: () => "http://backend.test/sse",
@@ -236,7 +233,6 @@ describe("sse-gateway", () => {
 		expect(onNotification.mock.calls[1]?.[0]).toMatchObject({
 			type: "notifications-read",
 		});
-		expect(onDrop).not.toHaveBeenCalled();
 
 		unsubscribe();
 		startSseGateway();
@@ -278,9 +274,7 @@ describe("sse-gateway", () => {
 		expect(onOpen).toHaveBeenCalledOnce();
 	});
 
-	it("signals each connection drop and keeps reconnecting", async () => {
-		const onDrop = vi.fn();
-		subscribeSseConnectionDrop(onDrop);
+	it("reconnects after each connection error", async () => {
 		const { createEventSource, instances } = createMockEventSourceFactory();
 		configureSseGateway({
 			getUrl: () => "http://backend.test/sse",
@@ -292,13 +286,10 @@ describe("sse-gateway", () => {
 		await vi.advanceTimersByTimeAsync(1_000);
 		instances[1]?.emitError();
 
-		expect(onDrop).toHaveBeenCalledTimes(2);
 		expect(instances).toHaveLength(2);
 	});
 
-	it("does not signal a drop when the connection is closed on purpose", async () => {
-		const onDrop = vi.fn();
-		subscribeSseConnectionDrop(onDrop);
+	it("does not reconnect after an intentional close", async () => {
 		const { createEventSource, instances } = createMockEventSourceFactory();
 		configureSseGateway({
 			getUrl: () => "http://backend.test/sse",
@@ -311,7 +302,6 @@ describe("sse-gateway", () => {
 		instances[0]?.emitMessage(sessionEndedPayload);
 		await vi.advanceTimersByTimeAsync(60_000);
 
-		expect(onDrop).not.toHaveBeenCalled();
 		expect(instances).toHaveLength(1);
 	});
 });
