@@ -1,22 +1,46 @@
 import { Test, type TestingModule } from "@nestjs/testing";
+import type { SseEvent } from "@repo/api/types";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { RedisService } from "../redis-service/redis.service";
-import { sseUserChannel } from "./helpers/sse-channels";
+import { SseConnectionRegistry } from "./sse-connection-registry.service";
 import { SsePublisher } from "./sse-publisher.service";
 
 describe("SsePublisher", () => {
 	let moduleRef: TestingModule;
 	let publisher: SsePublisher;
-	let publish: ReturnType<typeof vi.fn>;
+	let getConnections: ReturnType<typeof vi.fn>;
+	let unregister: ReturnType<typeof vi.fn>;
+	let nextA: ReturnType<typeof vi.fn>;
+	let completeA: ReturnType<typeof vi.fn>;
+	let nextB: ReturnType<typeof vi.fn>;
+	let completeB: ReturnType<typeof vi.fn>;
 
 	beforeEach(async () => {
-		publish = vi.fn().mockResolvedValue(true);
+		nextA = vi.fn();
+		completeA = vi.fn();
+		nextB = vi.fn();
+		completeB = vi.fn();
+		getConnections = vi.fn().mockReturnValue([
+			{
+				connectionId: "conn-a",
+				userId: "user-1",
+				sessionId: "session-a",
+				sink: { next: nextA, complete: completeA },
+			},
+			{
+				connectionId: "conn-b",
+				userId: "user-1",
+				sessionId: "session-b",
+				sink: { next: nextB, complete: completeB },
+			},
+		]);
+		unregister = vi.fn();
+
 		moduleRef = await Test.createTestingModule({
 			providers: [
 				SsePublisher,
 				{
-					provide: RedisService,
-					useValue: { publish },
+					provide: SseConnectionRegistry,
+					useValue: { getConnections, unregister },
 				},
 			],
 		}).compile();
@@ -27,35 +51,51 @@ describe("SsePublisher", () => {
 		await moduleRef.close();
 	});
 
-	it("publishes session-ended envelopes on the user channel", async () => {
-		await expect(
-			publisher.publishSessionEnded({
-				userId: "user-1",
-				targetId: "session-a",
-			}),
-		).resolves.toBe(true);
+	it("sends session-ended only to the matching session and closes it", () => {
+		publisher.publishSessionEnded({
+			userId: "user-1",
+			targetId: "session-a",
+		});
 
-		expect(publish).toHaveBeenCalledOnce();
-		expect(publish.mock.calls[0]?.[0]).toBe(sseUserChannel("user-1"));
-
-		const envelope = JSON.parse(publish.mock.calls[0]?.[1] as string);
-		expect(envelope).toMatchObject({
+		expect(getConnections).toHaveBeenCalledWith("user-1");
+		expect(nextA).toHaveBeenCalledOnce();
+		const event = nextA.mock.calls[0]?.[0] as SseEvent;
+		expect(event).toMatchObject({
 			type: "session-ended",
 			targetId: "session-a",
 		});
-		expect(envelope.id).toBeTypeOf("string");
-		expect(envelope.occurredAt).toBeTypeOf("string");
-		expect(envelope).not.toHaveProperty("scope");
+		expect(event.id).toBeTypeOf("string");
+		expect(event.occurredAt).toBeTypeOf("string");
+		expect(event).not.toHaveProperty("scope");
+		expect(completeA).toHaveBeenCalledOnce();
+		expect(unregister).toHaveBeenCalledWith("user-1", "conn-a");
+		expect(nextB).not.toHaveBeenCalled();
+		expect(completeB).not.toHaveBeenCalled();
 	});
 
-	it("returns false when Redis publish is unavailable", async () => {
-		publish.mockResolvedValueOnce(false);
+	it("sends notification events to every connection of the user", () => {
+		const event: SseEvent = {
+			type: "notification-created",
+			id: "evt-3",
+			occurredAt: "2026-07-21T10:00:00.000Z",
+			notification: {
+				id: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+				event: "budget.member.invited",
+				metadata: {
+					budgetId: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+					budgetName: "Summer house",
+				},
+				readAt: null,
+				createdAt: "2026-07-21T10:00:00.000Z",
+			},
+		};
 
-		await expect(
-			publisher.publishSessionEnded({
-				userId: "user-1",
-				targetId: "session-a",
-			}),
-		).resolves.toBe(false);
+		publisher.publish("user-1", event);
+
+		expect(nextA).toHaveBeenCalledWith(event);
+		expect(nextB).toHaveBeenCalledWith(event);
+		expect(completeA).not.toHaveBeenCalled();
+		expect(completeB).not.toHaveBeenCalled();
+		expect(unregister).not.toHaveBeenCalled();
 	});
 });

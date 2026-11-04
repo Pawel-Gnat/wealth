@@ -3,7 +3,7 @@ declare namespace NodeJS {
 		NODE_ENV?: string;
 		PORT: string;
 		DATABASE_URL: string;
-		/** Redis connection URL for SSE pub/sub. Optional — API degrades without live fan-out. */
+		/** Redis connection URL for a later read cache. Optional — readiness fails when Redis does not answer. */
 		REDIS_URL?: string;
 		/** Comma-separated browser origins for CORS. Required in production. */
 		CORS_ORIGIN?: string;

@@ -5,7 +5,6 @@ import type {
 	NotificationCreatedEvent,
 	NotificationReadEvent,
 	NotificationsReadEvent,
-	SseEvent,
 } from "@repo/api/types";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { ulid } from "ulid";
@@ -163,7 +162,13 @@ export class NotificationsService {
 		return row;
 	}
 
-	private async publishBestEffort(userId: string, event: SseEvent) {
+	private async publishBestEffort(
+		userId: string,
+		event:
+			| NotificationCreatedEvent
+			| NotificationReadEvent
+			| NotificationsReadEvent,
+	) {
 		try {
 			await this.ssePublisher.publish(userId, event);
 		} catch (error) {
