@@ -51,15 +51,13 @@ describe("CumulativeChartSection", () => {
 			await screen.findByText(t("chart.running-title", { ns: "dashboard" })),
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole("radio", {
-				name: t("chart.switch.area", { ns: "dashboard" }),
-			}),
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole("radio", {
-				name: t("chart.switch.bar", { ns: "dashboard" }),
-			}),
-		).toBeInTheDocument();
+			screen
+				.getAllByRole("radio")
+				.map((radio) => radio.getAttribute("aria-label")),
+		).toEqual([
+			t("chart.switch.area", { ns: "dashboard" }),
+			t("chart.switch.bar", { ns: "dashboard" }),
+		]);
 	});
 
 	it("switches the chart type when bar is selected", async () => {

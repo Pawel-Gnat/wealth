@@ -33,6 +33,10 @@ const createDocument = async (
 	const createButton = getI18nText('common', 'action.create')
 	const heading = getI18nText('records', 'single.title-create')
 	const typeLabel = getI18nText('records', 'single.type')
+	const kindLabel = getI18nText(
+		'records',
+		input.kind === 'expense' ? 'single.kind.expense' : 'single.kind.income',
+	)
 	const lineItemLabel = getI18nText(
 		'form',
 		input.kind === 'expense' ? 'line-item.expense-label' : 'line-item.income-label',
@@ -42,7 +46,7 @@ const createDocument = async (
 	await expect(page.getByRole('heading', { name: heading })).toBeVisible()
 
 	await page.getByLabel(typeLabel).click()
-	await page.getByRole('option', { name: input.kind, exact: true }).click()
+	await page.getByRole('option', { name: kindLabel, exact: true }).click()
 
 	await page.getByLabel(lineItemLabel).nth(0).fill(input.payload.title)
 	await page.getByLabel(priceLabel).nth(0).fill(input.payload.singleAmount.toFixed(2))

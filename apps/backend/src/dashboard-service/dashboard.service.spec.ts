@@ -44,7 +44,7 @@ describe("Dashboard service", () => {
 	});
 
 	describe("getSummary", () => {
-		it("returns zero amounts and null percentChange when the user has no documents", async () => {
+		it("returns zero amounts and no percent change when the user has no documents", async () => {
 			const user = await createTestUser(usersService, {
 				passwordHash: "hashed-password",
 				emailTag: "dash-empty",
@@ -54,9 +54,9 @@ describe("Dashboard service", () => {
 				dashboardService.getSummary(user.id, 30, "UTC"),
 			).resolves.toEqual({
 				data: {
-					expenses: { amount: 0, percentChange: null },
-					incomes: { amount: 0, percentChange: null },
-					netBalance: { amount: 0, percentChange: null },
+					expenses: { amount: 0, percentChange: 0 },
+					incomes: { amount: 0, percentChange: 0 },
+					netBalance: { amount: 0, percentChange: 0 },
 				},
 			});
 		});
@@ -173,7 +173,7 @@ describe("Dashboard service", () => {
 			expect(result.data.expenses.amount).toBe(40);
 		});
 
-		it("returns percentChange null when the previous period average is zero", async () => {
+		it("reports a full swing when the previous period total is zero", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const user = await createTestUser(usersService, {
 				passwordHash: "hash",
@@ -190,7 +190,9 @@ describe("Dashboard service", () => {
 
 			const result = await dashboardService.getSummary(user.id, 30, "UTC");
 
-			expect(result.data.expenses.percentChange).toBeNull();
+			expect(result.data.expenses.percentChange).toBe(100);
+			expect(result.data.incomes.percentChange).toBe(0);
+			expect(result.data.netBalance.percentChange).toBe(-100);
 		});
 
 		it("calculates percentChange from daily averages across equal rolling windows", async () => {

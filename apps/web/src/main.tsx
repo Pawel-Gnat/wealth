@@ -4,8 +4,8 @@ import { StrictMode } from "react";
 import { createRoot, type RootOptions } from "react-dom/client";
 import "./index.css";
 import App from "@/app";
+import { Toaster } from "@/shared/components";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
-import { Toaster } from "@/shared/lib/ui/sonner";
 
 const initialLanguage = document.documentElement.lang || "en";
 
@@ -24,7 +24,7 @@ if (root) {
 	} as RootOptions).render(
 		<StrictMode>
 			<App />
-			<Toaster richColors />
+			<Toaster />
 		</StrictMode>,
 	);
 }

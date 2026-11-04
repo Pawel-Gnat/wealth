@@ -283,7 +283,11 @@ export class DashboardService {
 		const avgPrevious = previousSum / previousDays;
 
 		if (avgPrevious === 0) {
-			return null;
+			if (currentSum === 0) {
+				return 0;
+			}
+
+			return currentSum > 0 ? 100 : -100;
 		}
 
 		const avgCurrent = currentSum / currentDays;

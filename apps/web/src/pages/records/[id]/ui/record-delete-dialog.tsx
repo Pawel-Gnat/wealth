@@ -1,9 +1,8 @@
 import type { RecordKind } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { toast } from "sonner";
 import { APP_ROUTES } from "@/app/routes";
-import { AlertModal } from "@/shared/components";
+import { AlertModal, toast } from "@/shared/components";
 import { getRecordConfig } from "../../config/record-config";
 import { useDeleteRecord } from "../hooks/use-delete-record";
 

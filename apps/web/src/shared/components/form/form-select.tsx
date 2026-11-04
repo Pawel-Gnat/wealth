@@ -3,15 +3,21 @@ import type { ReactNode } from "react";
 import {
 	Select,
 	SelectContent,
+	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/lib/ui/select";
 import { FormBase, type FormControlFunction } from "./form-base";
 
+type FormSelectOption = {
+	value: string;
+	label: ReactNode;
+};
+
 export const FormSelect: FormControlFunction<{
-	children: ReactNode;
+	options: FormSelectOption[];
 	disabled?: boolean;
-}> = ({ children, disabled, ...props }) => {
+}> = ({ options, disabled, ...props }) => {
 	return (
 		<FormBase {...props}>
 			{({ onChange, onBlur, ...field }) => (
@@ -27,7 +33,13 @@ export const FormSelect: FormControlFunction<{
 					>
 						<SelectValue />
 					</SelectTrigger>
-					<SelectContent>{children}</SelectContent>
+					<SelectContent>
+						{options.map((option) => (
+							<SelectItem key={option.value} value={option.value}>
+								{option.label}
+							</SelectItem>
+						))}
+					</SelectContent>
 				</Select>
 			)}
 		</FormBase>

@@ -18,6 +18,7 @@ export * from "./separator";
 export * from "./sidebar";
 export * from "./skeleton";
 export * from "./table";
+export * from "./toast";
 export * from "./toggle-group";
 export * from "./tooltip";
 export * from "./typography";

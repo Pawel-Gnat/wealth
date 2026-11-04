@@ -2,6 +2,7 @@ import { recordKinds } from "@repo/api/schemas";
 import { type UseFormReturn, useFieldArray, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
+	Button,
 	FormDatePicker,
 	FormSelect,
 	Icon,
@@ -9,8 +10,6 @@ import {
 	Separator,
 	Text,
 } from "@/shared/components";
-import { Button } from "@/shared/lib/ui/button";
-import { SelectItem } from "@/shared/lib/ui/select";
 import { getRecordConfig } from "../../config/record-config";
 import {
 	calculateLineTotal,
@@ -58,13 +57,11 @@ export const RecordFields = ({ form, isKindLocked }: RecordFieldsProps) => {
 				label={t("single.type", { ns: "records" })}
 				control={form.control}
 				disabled={isKindLocked}
-			>
-				{recordKinds.map((recordKind) => (
-					<SelectItem key={recordKind} value={recordKind}>
-						{recordKind}
-					</SelectItem>
-				))}
-			</FormSelect>
+				options={recordKinds.map((recordKind) => ({
+					value: recordKind,
+					label: t(`single.kind.${recordKind}`, { ns: "records" }),
+				}))}
+			/>
 
 			<div className="flex items-center justify-between">
 				<Text weight="medium">
@@ -76,7 +73,7 @@ export const RecordFields = ({ form, isKindLocked }: RecordFieldsProps) => {
 					size="sm"
 					onClick={() => append(EMPTY_LINE_ITEM)}
 				>
-					<Icon name="add" className="mr-1" />
+					<Icon name="add" />
 					{t("action.add", { ns: "common" })}
 				</Button>
 			</div>

@@ -21,7 +21,11 @@ export const Notification = ({ notification, onSelect }: NotificationProps) => {
 			>
 				<div className="flex items-center gap-2 justify-between mb-1">
 					<div className="flex items-center gap-2">
-						<Icon name={notificationIcon(notification.event)} />
+						<Icon
+							name={notificationIcon(notification.event)}
+							variant="filled"
+							color="muted"
+						/>
 						<Text size="sm" weight="medium" className="truncate">
 							{t(`${notification.event}.title`, { ns: "notifications" })}
 						</Text>

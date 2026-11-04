@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon, ToggleGroup } from "@/shared/components";
 
-export const chartTypes = ["bar", "area"] as const;
+export const chartTypes = ["area", "bar"] as const;
 export type ChartType = (typeof chartTypes)[number];
 
 type ChartToggleProps = {

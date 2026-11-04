@@ -73,21 +73,17 @@ export const SummaryMetric = ({
 
 			{isLoading || summary == null ? (
 				<Skeleton className="h-4 w-40" />
-			) : summary.amount === 0 ? (
-				<Text size="xs" color="muted">
-					{t("summary.empty", { ns: "dashboard" })}
-				</Text>
 			) : (
-				summary.percentChange !== null && (
-					<div className="flex flex-wrap items-center gap-2">
-						<Badge variant={getTrendBadgeVariant(kind, summary.percentChange)}>
-							{formatPercentChange(summary.percentChange)}
-						</Badge>
-						<Text size="xs" color="muted">
-							{t("summary.vs-previous-period", { ns: "dashboard" })}
-						</Text>
-					</div>
-				)
+				<div className="flex flex-wrap items-center gap-2">
+					<Badge
+						variant={getTrendBadgeVariant(kind, summary.percentChange ?? 0)}
+					>
+						{formatPercentChange(summary.percentChange ?? 0)}
+					</Badge>
+					<Text size="xs" color="muted">
+						{t("summary.vs-previous-period", { ns: "dashboard" })}
+					</Text>
+				</div>
 			)}
 		</div>
 	);

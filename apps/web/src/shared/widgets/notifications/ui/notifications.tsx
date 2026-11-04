@@ -45,8 +45,8 @@ export const Notifications = () => {
 					</div>
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent align="end" className="w-fit max-w-95 min-w-72">
-				<div className="flex items-center justify-between gap-2 border-b border-border pb-2">
+			<PopoverContent align="end" className="w-fit max-w-95 min-w-72 p-2 gap-2">
+				<div className="flex items-center justify-between gap-2 border-b border-border p-2">
 					<Text weight="medium">{t("title", { ns: "notifications" })}</Text>
 					{showMarkAll && (
 						<Button

@@ -1,5 +1,5 @@
 import { i18n } from "@repo/common/i18n";
-import { toast } from "sonner";
+import { toast } from "@/shared/components";
 
 export const notifyTooManyRequests = (response: Response) => {
 	const seconds = Number(response.headers.get("retry-after"));
