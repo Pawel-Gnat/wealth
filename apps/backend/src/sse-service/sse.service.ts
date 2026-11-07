@@ -16,6 +16,9 @@ export class SseService {
 
 	async connect(request: Request, response: Response) {
 		const session = await this.authService.resolveActiveRefreshSession(request);
+		if (request.closed) {
+			return;
+		}
 		if (!session) {
 			throw new UnauthorizedException("Invalid refresh token");
 		}

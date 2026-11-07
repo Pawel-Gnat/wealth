@@ -64,6 +64,20 @@ describe("SseService", () => {
 		};
 	};
 
+	it("does not register when the client is already gone", async () => {
+		resolveActiveRefreshSession.mockResolvedValue({
+			userId: "user-1",
+			sessionId: "session-1",
+		});
+		const request = { closed: true } as Request;
+		const response = createResponse();
+
+		await sseService.connect(request, response);
+
+		expect(register).not.toHaveBeenCalled();
+		expect(response.flushHeaders).not.toHaveBeenCalled();
+	});
+
 	it("rejects when refresh cookie session is missing", async () => {
 		resolveActiveRefreshSession.mockResolvedValue(null);
 		const request = {} as Request;
