@@ -8,7 +8,7 @@
 
 - **Source of truth:** Two httpOnly cookies (`wealth.auth.session`, `wealth.auth.refresh`) and one database row. Tokens are opaque (`randomBytes` → base64url); the DB stores SHA-256 hashes only. No JWT, no access token in JS, no CSRF header. Mutations are JSON; CSRF defense is the CORS origin allowlist (required in production) plus preflight. Production cookies: `Secure` + `SameSite=None`. Local: `SameSite=Lax`, not secure.
 - **TTL:** Session cookie 15 minutes. Refresh cookie slides 3 days from each successful `/refresh`. Refresh rotation is CAS on `refreshHash` (update in place; `sessions.id` stays put so SSE need not reconnect). A 10s grace window accepts the previous refresh and returns the same snapshot without another `Set-Cookie` — same-browser tabs already share the winner’s cookies; plaintext tokens are not stored, so grace cannot re-issue them. Presenting the previous refresh **after** grace deletes **that** row only and publishes `session-ended`. Unknown/garbage refresh: 401, no publish.
-- **Logout and sign-in:** Logout ends only the current row (refresh cookie; session cookie may already be dead), returns 204, clears both cookies, best-effort SSE. Redis/SSE failure must not fail logout HTTP. Sign-in with an existing refresh cookie ends that row (`session-ended` then `DELETE`) and inserts a new one. Other devices are unchanged. Sign-up creates a user only — no cookies, no auto-login. “Logout everywhere” as a user action is out of scope. Existing `refresh_tokens` are not migrated (force re-login).
+- **Logout and sign-in:** Logout ends only the current row (refresh cookie; session cookie may already be dead), returns 204, clears both cookies, best-effort SSE. An SSE write failure must not fail logout HTTP. Sign-in with an existing refresh cookie ends that row (`session-ended` then `DELETE`) and inserts a new one. Other devices are unchanged. Sign-up creates a user only — no cookies, no auto-login. “Logout everywhere” as a user action is out of scope. Existing `refresh_tokens` are not migrated (force re-login).
 - **Password change:** A successful password update keeps the current `sessions` row and ends every other row for that user (`session-ended` then `DELETE`). Other devices must sign in again.
 - **RPC vs SSE:** API and `GET /me` authenticate with the session cookie (`SessionGuard`). `GET /sse` authenticates with the refresh cookie, targeting the same `sessions.id`. Event: `session-ended` (no `scope`). Publish before `DELETE` on logout, post-grace reuse, failed refresh that deletes a found row, sign-in that replaces the current refresh row, and password change that ends other sessions.
 - **Frontend:** Public context is `{ isAuthenticated, isAuthLoading, logout }`. Layouts treat `isAuthenticated` as signed in (`queryKeys.me()` has a `User`). Bootstrap is `GET /me` (401 → interceptor `/refresh` + retry `/me`, else logged out). Sign-in and `/refresh` seed that cache from `{ user, sessionExpiresAt }` — the client ignores expiry and does not schedule a refresh timer. A 401 interceptor shares one in-tab mutex `/refresh`. No Bearer, Web Lock, or auth BroadcastChannel. A second tab left on the login screen does not live-sync after sign-in (reload). Cache is cleared only from logout, `session-ended`, or `/refresh` 401. EventSource errors reconnect with backoff; they never log the user out.
@@ -19,4 +19,21 @@
 - Tabs with a live SSE stream clear UI when that session ends. Tabs without SSE (login screen) wait for reload or a later `/me` / failed refresh.
 - Reuse after grace is treated as theft of **this** session, not of every device.
 - Session lookup hits the database on each RPC (Redis cache later). Logout is immediate on the API because the row is gone, not because a JWT expired.
+- SSE fan-out is in-process on the single API machine (ADR-002). Redis is the later read cache, not the event bus.
 - Production `SameSite=None` makes a strict CORS allowlist mandatory.
+
+## ADR-002: In-process SSE, Redis as a cache client
+
+**Context:** SSE fan-out went through Redis pub/sub so a second API process could deliver events to connections it did not own. The API runs as one Fly machine. A second machine is a manual `fly scale count`, not something traffic creates. Pub/sub made every live event depend on Redis and kept a second connection plus per-user subscribe state that one process does not need. Redis stays in the stack for a later read cache.
+
+**Decision:**
+
+- The API process fans SSE out in memory. `SsePublisher` writes to connections registered for that user. `session-ended` still reaches only the matching `sessions.id`, then closes that stream.
+- One Redis client serves commands (`ping` today, cache later). No pub/sub and no second connection.
+- `REDIS_URL` stays optional for local runs. Readiness still fails when Redis does not answer.
+- Logout and notification publishes stay best-effort. A failed SSE write does not fail the HTTP request.
+
+**Consequences:**
+
+- Events reach only tabs connected to this process. A second machine would miss them until fan-out goes back through a bus.
+- `GET /sse` connects when Redis is down. Readiness does not.

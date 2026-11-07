@@ -6,6 +6,7 @@ export const iconVariants = cva("shrink-0", {
 			default: "",
 			filled: "size-6 rounded-full p-1.5",
 			badge: "size-5 rounded-full p-1",
+			status: "size-12 rounded-full p-3",
 		},
 		color: {
 			default: "",
@@ -34,6 +35,16 @@ export const iconVariants = cva("shrink-0", {
 			variant: "badge",
 			color: "muted",
 			class: "bg-muted text-foreground",
+		},
+		{
+			variant: "status",
+			color: "destructive",
+			class: "bg-destructive text-destructive-foreground",
+		},
+		{
+			variant: "status",
+			color: "muted",
+			class: "bg-muted",
 		},
 	],
 	defaultVariants: {

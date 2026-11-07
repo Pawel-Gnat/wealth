@@ -42,7 +42,7 @@ pnpm and Turborepo monorepo on Node 22.
 
 - **Web.** React, Vite, React Router, TanStack Query, Tailwind CSS, and shadcn/ui.
 - **API.** NestJS and oRPC. Request and response schemas live in `@repo/api` (Zod). Persistence is Drizzle ORM on PostgreSQL.
-- **Sessions.** Opaque tokens in httpOnly cookies. Redis publishes session-ended events over server-sent events.
+- **Sessions.** Opaque tokens in httpOnly cookies. The API process pushes `session-ended` to open tabs over server-sent events.
 - **Files.** S3-compatible storage for avatars. Locally that is MinIO.
 - **Observability.** Better Stack for logs and errors.
 - **Quality.** TypeScript, Biome, Vitest, and Playwright.
@@ -122,7 +122,7 @@ Database commands go through the backend package:
 
 The web app and the API share one contract in `@repo/api`. Zod schemas describe every input and output. Nest controllers implement that contract with oRPC. Outside production the same contract is published as Swagger at [http://localhost:4000/api-docs](http://localhost:4000/api-docs).
 
-A signed-in device has two httpOnly cookies and one database row. The tokens are opaque. Redis publishes `session-ended` over server-sent events when that session ends. The session, logout, and refresh rules are in [docs/ADR.md](docs/ADR.md).
+A signed-in device has two httpOnly cookies and one database row. The tokens are opaque. When that session ends, the API process pushes `session-ended` over server-sent events to tabs connected to it. The session, logout, and refresh rules are in [docs/ADR.md](docs/ADR.md).
 
 The web app keeps screen logic in the page that owns it. Higher layers may import lower ones.
 

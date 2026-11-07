@@ -35,18 +35,6 @@ export const resetRefreshMutex = (): void => {
 	refreshPromise = null;
 };
 
-export const withRefreshMutex = async <T>(
-	refresh: () => Promise<T>,
-): Promise<T> => {
-	if (!refreshPromise) {
-		refreshPromise = refresh().finally(() => {
-			refreshPromise = null;
-		});
-	}
-
-	return refreshPromise as Promise<T>;
-};
-
 export const bootstrapSession = async (): Promise<SessionSnapshot | null> => {
 	try {
 		const response = await orpcClient.user.me();
@@ -70,16 +58,22 @@ const isUnauthorizedStatus = (error: unknown): boolean => {
 };
 
 export const refreshSession = async (): Promise<SessionSnapshot | null> => {
-	return withRefreshMutex(async () => {
-		try {
-			const response = await orpcClient.user.refresh();
-			applySessionSnapshot(response.data);
-			return response.data;
-		} catch {
-			clearAuthSession();
-			return null;
-		}
-	});
+	if (!refreshPromise) {
+		refreshPromise = (async () => {
+			try {
+				const response = await orpcClient.user.refresh();
+				applySessionSnapshot(response.data);
+				return response.data;
+			} catch {
+				clearAuthSession();
+				return null;
+			}
+		})().finally(() => {
+			refreshPromise = null;
+		});
+	}
+
+	return refreshPromise as Promise<SessionSnapshot | null>;
 };
 
 export const logoutSession = async (): Promise<void> => {

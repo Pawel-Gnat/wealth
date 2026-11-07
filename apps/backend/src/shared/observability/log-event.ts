@@ -14,13 +14,6 @@ export const logAuthEvent = (
 	logger[level](event);
 };
 
-export const logSseEvent = (
-	event: ObservabilityEvent,
-	level: "info" | "warn" = "warn",
-) => {
-	logger[level](event);
-};
-
 export const logDomainEvent = (event: string, domain: DomainLogContext) => {
 	logger.info(event, domain);
 };

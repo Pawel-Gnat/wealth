@@ -1,16 +1,9 @@
-import {
-	Injectable,
-	Logger,
-	ServiceUnavailableException,
-	UnauthorizedException,
-} from "@nestjs/common";
+import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import type { SseEvent } from "@repo/api/types";
 import { SSE_HEARTBEAT_INTERVAL_MS } from "@repo/common/constants";
 import type { Request, Response } from "express";
 import { AuthService } from "../auth-service/auth.service";
-import {
-	SseConnectionRegistry,
-	SseFanOutUnavailableError,
-} from "./sse-connection-registry.service";
+import { SseConnectionRegistry } from "./sse-connection-registry.service";
 
 @Injectable()
 export class SseService {
@@ -23,13 +16,16 @@ export class SseService {
 
 	async connect(request: Request, response: Response) {
 		const session = await this.authService.resolveActiveRefreshSession(request);
+		if (request.closed) {
+			return;
+		}
 		if (!session) {
 			throw new UnauthorizedException("Invalid refresh token");
 		}
 
 		const sink = {
-			next: (data: unknown) => {
-				this.writeData(response, data);
+			next: (event: SseEvent) => {
+				this.writeData(response, event);
 			},
 			complete: () => {
 				if (!response.writableEnded) {
@@ -38,18 +34,11 @@ export class SseService {
 			},
 		};
 
-		const connection = await this.connectionRegistry
-			.register({
-				userId: session.userId,
-				sessionId: session.sessionId,
-				sink,
-			})
-			.catch((error: unknown) => {
-				if (error instanceof SseFanOutUnavailableError) {
-					throw new ServiceUnavailableException("SSE unavailable");
-				}
-				throw error;
-			});
+		const connection = this.connectionRegistry.register({
+			userId: session.userId,
+			sessionId: session.sessionId,
+			sink,
+		});
 
 		response.status(200);
 		response.setHeader("Content-Type", "text/event-stream; charset=utf-8");
@@ -63,20 +52,20 @@ export class SseService {
 		}, SSE_HEARTBEAT_INTERVAL_MS);
 
 		let cleanedUp = false;
-		const cleanup = async () => {
+		const cleanup = () => {
 			if (cleanedUp) {
 				return;
 			}
 			cleanedUp = true;
 			clearInterval(heartbeat);
-			await this.connectionRegistry.unregister(
+			this.connectionRegistry.unregister(
 				session.userId,
 				connection.connectionId,
 			);
 		};
 
 		request.on("close", () => {
-			void cleanup();
+			cleanup();
 		});
 	}
 
@@ -96,26 +85,13 @@ export class SseService {
 		}
 	}
 
-	private writeData(response: Response, data: unknown) {
+	private writeData(response: Response, event: SseEvent) {
 		if (response.writableEnded) {
 			return;
 		}
 
-		const payload = typeof data === "string" ? data : JSON.stringify(data);
-		const eventId =
-			typeof data === "object" &&
-			data !== null &&
-			"id" in data &&
-			typeof data.id === "string"
-				? data.id
-				: null;
-
 		try {
-			const frame =
-				eventId === null
-					? `data: ${payload}\n\n`
-					: `id: ${eventId}\ndata: ${payload}\n\n`;
-			response.write(frame);
+			response.write(`id: ${event.id}\ndata: ${JSON.stringify(event)}\n\n`);
 		} catch (error) {
 			this.logger.warn(
 				`Failed to write SSE data: ${
