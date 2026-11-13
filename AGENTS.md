@@ -85,3 +85,4 @@ Conventions:
 - Happy-path API responses for feature tests belong in `apps/web/src/test/mocks/handlers.ts` and are registered on the shared MSW server.
 - Success / default cases should rely on those handlers — do not duplicate the same payload with `server.use` in the test.
 - Use `server.use(...)` only to override the default for that case (e.g. error status, empty list, hanging/loading response).
+- After bumping the `msw` version, refresh the worker once: `cd apps/web && pnpm exec msw init .storybook/public --save`.

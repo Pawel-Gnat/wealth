@@ -7,6 +7,12 @@
 			"formatter": { "enabled": false },
 			"linter": { "enabled": false },
 			"assist": { "enabled": false }
+		},
+		{
+			"includes": ["**/.storybook/public/mockServiceWorker.js"],
+			"formatter": { "enabled": false },
+			"linter": { "enabled": false },
+			"assist": { "enabled": false }
 		}
 	],
 	"vcs": {
