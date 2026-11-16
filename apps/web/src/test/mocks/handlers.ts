@@ -10,7 +10,7 @@ import {
 	USER_AVATAR_UPDATED_MESSAGE,
 	USER_DETAILS_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
-import { HttpResponse, http } from "msw";
+import { delay, HttpResponse, http } from "msw";
 import { MOCK_USER } from "./user";
 
 const mockSessionSnapshot = {
@@ -254,6 +254,19 @@ const getAuditsHandler = () => {
 		],
 	});
 };
+
+export const getAuditsEmptyHandler = http.get("*/audits", () =>
+	HttpResponse.json({ data: [] }),
+);
+
+export const getAuditsErrorHandler = http.get("*/audits", () =>
+	HttpResponse.json({ message: "Server error" }, { status: 500 }),
+);
+
+export const getAuditsLoadingHandler = http.get("*/audits", async () => {
+	await delay("infinite");
+	return HttpResponse.json({ data: [] });
+});
 
 const postAuthRefreshHandler = () => {
 	return HttpResponse.json(

@@ -1,9 +1,12 @@
 import { AUTH_AUDIT_EVENTS } from "@repo/api/events";
 import { screen, within } from "@testing-library/react";
 import type { TFunction } from "i18next";
-import { HttpResponse, http } from "msw";
 import { beforeAll, describe, expect, it } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
+import {
+	getAuditsEmptyHandler,
+	getAuditsErrorHandler,
+} from "@/test/mocks/handlers";
 import { MOCK_USER } from "@/test/mocks/user";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
@@ -50,7 +53,7 @@ describe("AuditLog", () => {
 	});
 
 	it("keeps the header and hides pagination when the list is empty", async () => {
-		server.use(http.get("*/audits", () => HttpResponse.json({ data: [] })));
+		server.use(getAuditsEmptyHandler);
 
 		renderWithProviders(<AuditLog params={params} users={[MOCK_USER]} />);
 
@@ -67,11 +70,7 @@ describe("AuditLog", () => {
 	});
 
 	it("replaces the table with an error state", async () => {
-		server.use(
-			http.get("*/audits", () =>
-				HttpResponse.json({ message: "Server error" }, { status: 500 }),
-			),
-		);
+		server.use(getAuditsErrorHandler);
 
 		renderWithProviders(<AuditLog params={params} users={[MOCK_USER]} />);
 

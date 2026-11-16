@@ -55,6 +55,8 @@
 		"@biomejs/biome": "catalog:",
 		"@repo/biome-config": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
+		"@storybook/addon-docs": "^10.6.7",
+		"@storybook/react-vite": "^10.6.7",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
@@ -64,13 +66,12 @@
 		"@vitejs/plugin-react": "^6.0.1",
 		"jsdom": "^26.1.0",
 		"msw": "^2.13.6",
+		"msw-storybook-addon": "^3.0.3",
+		"storybook": "^10.6.7",
 		"typescript": "catalog:",
 		"vite": "^8.0.4",
 		"vite-bundle-analyzer": "^1.3.9",
-		"vitest": "catalog:",
-		"storybook": "^10.6.7",
-		"@storybook/react-vite": "^10.6.7",
-		"@storybook/addon-docs": "^10.6.7"
+		"vitest": "catalog:"
 	},
 	"msw": {
 		"workerDirectory": [
