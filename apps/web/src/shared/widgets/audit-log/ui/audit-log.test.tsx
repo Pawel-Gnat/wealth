@@ -3,10 +3,7 @@ import { screen, within } from "@testing-library/react";
 import type { TFunction } from "i18next";
 import { beforeAll, describe, expect, it } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
-import {
-	getAuditsEmptyHandler,
-	getAuditsErrorHandler,
-} from "@/test/mocks/handlers";
+import { getAuditsEmptyHandler, getAuditsErrorHandler } from "@/test/handlers";
 import { MOCK_USER } from "@/test/mocks/user";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";

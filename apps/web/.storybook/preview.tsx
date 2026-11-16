@@ -10,7 +10,7 @@ import { Toaster } from "@/shared/components";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { configureSseGateway } from "@/shared/lib/sse";
 import { TooltipProvider } from "@/shared/lib/ui/tooltip";
-import { HANDLERS } from "@/test/mocks/handlers";
+import { HANDLERS } from "@/test/handlers";
 import "../src/index.css";
 
 const isStorybookRequest = (url: string) =>
