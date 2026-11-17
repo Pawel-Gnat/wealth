@@ -3,7 +3,7 @@ import type { TFunction } from "i18next";
 import { beforeAll, describe, expect, it } from "vitest";
 import { APP_ROUTES } from "@/app/routes";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
-import { MOCK_BUDGET_ID, MOCK_MEMBER_BUDGET_ID } from "@/test/mocks/handlers";
+import { MOCK_BUDGET_ID, MOCK_MEMBER_BUDGET_ID } from "@/test/handlers";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { RecordsListPage } from "./index";
 

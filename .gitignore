@@ -76,3 +76,5 @@ playwright/.auth/
 
 # Local MinIO license
 docker/minio/minio.license
+*storybook.log
+storybook-static

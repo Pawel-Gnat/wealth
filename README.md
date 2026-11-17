@@ -137,7 +137,7 @@ Domain types stay in `@repo/api`. Income and expense use the same records screen
 
 `pnpm test` runs Vitest.
 
-- **Web.** Testing Library and MSW. Default API responses live in `apps/web/src/test/mocks/handlers.ts`. Override that server in a test only when the case differs, for example an error or an empty list.
+- **Web.** Testing Library and MSW. Default API responses live in `apps/web/src/test/handlers`. Override that server in a test only when the case differs, for example an error or an empty list.
 - **API.** A PostgreSQL Testcontainer starts for the suite and the Drizzle migrations are applied to it.
 - **`@repo/common`.** Its own Vitest suite.
 

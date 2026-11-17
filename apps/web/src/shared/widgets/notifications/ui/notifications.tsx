@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { Button, Empty, ErrorState, Icon, Text } from "@/shared/components";
+import { Button, Icon } from "@/shared/components";
 import {
 	Popover,
 	PopoverContent,
@@ -9,8 +9,7 @@ import {
 } from "@/shared/lib/ui/popover";
 import { notificationHref } from "../helpers/notification-href";
 import { useNotifications } from "../hooks/use-notifications";
-import { Notification } from "./notification";
-import { NotificationsSkeleton } from "./notifications-skeleton";
+import { NotificationsPanel } from "./notifications-panel";
 
 export const Notifications = () => {
 	const { t } = useTranslation();
@@ -27,7 +26,6 @@ export const Notifications = () => {
 		markAllRead,
 		isMarkingAll,
 	} = useNotifications();
-	const showMarkAll = hasUnread && !isLoading && !isError;
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -46,51 +44,21 @@ export const Notifications = () => {
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent align="end" className="w-fit max-w-95 min-w-72 p-2 gap-2">
-				<div className="flex items-center justify-between gap-2 border-b border-border p-2">
-					<Text weight="medium">{t("title", { ns: "notifications" })}</Text>
-					{showMarkAll && (
-						<Button
-							variant="ghost"
-							size="sm"
-							isLoading={isMarkingAll}
-							onClick={() => markAllRead()}
-						>
-							{t("mark-all", { ns: "notifications" })}
-						</Button>
-					)}
-				</div>
+				<NotificationsPanel
+					items={items}
+					isLoading={isLoading}
+					isError={isError}
+					isMarkingAll={isMarkingAll}
+					onMarkAllRead={() => markAllRead()}
+					onSelect={(item) => {
+						setOpen(false);
+						navigate(notificationHref(item));
 
-				{isLoading ? (
-					<NotificationsSkeleton />
-				) : isError ? (
-					<ErrorState
-						title={t("error.title", { ns: "notifications" })}
-						description={t("error.description", { ns: "notifications" })}
-					/>
-				) : items.length === 0 ? (
-					<Empty
-						icon="bell"
-						title={t("empty.title", { ns: "notifications" })}
-						description={t("empty.description", { ns: "notifications" })}
-					/>
-				) : (
-					<ul className="flex max-h-96 flex-col gap-1 overflow-y-auto">
-						{items.map((item) => (
-							<Notification
-								key={item.id}
-								notification={item}
-								onSelect={() => {
-									setOpen(false);
-									navigate(notificationHref(item));
-
-									if (item.readAt === null) {
-										markRead(item.id);
-									}
-								}}
-							/>
-						))}
-					</ul>
-				)}
+						if (item.readAt === null) {
+							markRead(item.id);
+						}
+					}}
+				/>
 			</PopoverContent>
 		</Popover>
 	);
