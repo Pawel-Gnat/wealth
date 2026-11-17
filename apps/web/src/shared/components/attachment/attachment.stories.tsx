@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useTranslation } from "react-i18next";
+import { MOCK_JPEG_FILE } from "@/test/mocks/jpeg-file";
 import { Attachment } from "./attachment";
 
 const AttachmentStory = () => {
@@ -7,7 +8,7 @@ const AttachmentStory = () => {
 
 	return (
 		<Attachment
-			title={t("file.label", { ns: "form" })}
+			title={MOCK_JPEG_FILE.name}
 			description={t("file.description", { ns: "form", size: 5 })}
 			onRemove={() => undefined}
 		/>

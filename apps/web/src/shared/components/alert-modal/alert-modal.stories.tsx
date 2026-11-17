@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useTranslation } from "react-i18next";
 import { AlertModal } from "./alert-modal";
+import { AlertModalSkeleton } from "./alert-modal-skeleton";
 
 const AlertModalStory = ({ isConfirming }: { isConfirming?: boolean }) => {
 	const { t } = useTranslation();
@@ -34,4 +35,8 @@ export const Open: Story = {
 
 export const Confirming: Story = {
 	render: () => <AlertModalStory isConfirming />,
+};
+
+export const Skeleton: Story = {
+	render: () => <AlertModalSkeleton onClose={() => undefined} />,
 };

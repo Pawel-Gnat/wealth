@@ -41,30 +41,32 @@ export const NotificationsPanel = ({
 				)}
 			</div>
 
-			{isLoading ? (
-				<NotificationsSkeleton />
-			) : isError ? (
-				<ErrorState
-					title={t("error.title", { ns: "notifications" })}
-					description={t("error.description", { ns: "notifications" })}
-				/>
-			) : items.length === 0 ? (
-				<Empty
-					icon="bell"
-					title={t("empty.title", { ns: "notifications" })}
-					description={t("empty.description", { ns: "notifications" })}
-				/>
-			) : (
-				<ul className="flex max-h-96 flex-col gap-1 overflow-y-auto">
-					{items.map((item) => (
-						<Notification
-							key={item.id}
-							notification={item}
-							onSelect={() => onSelect(item)}
-						/>
-					))}
-				</ul>
-			)}
+			<div className="my-2">
+				{isLoading ? (
+					<NotificationsSkeleton />
+				) : isError ? (
+					<ErrorState
+						title={t("error.title", { ns: "notifications" })}
+						description={t("error.description", { ns: "notifications" })}
+					/>
+				) : items.length === 0 ? (
+					<Empty
+						icon="bell"
+						title={t("empty.title", { ns: "notifications" })}
+						description={t("empty.description", { ns: "notifications" })}
+					/>
+				) : (
+					<ul className="flex max-h-96 flex-col gap-1 overflow-y-auto">
+						{items.map((item) => (
+							<Notification
+								key={item.id}
+								notification={item}
+								onSelect={() => onSelect(item)}
+							/>
+						))}
+					</ul>
+				)}
+			</div>
 		</>
 	);
 };

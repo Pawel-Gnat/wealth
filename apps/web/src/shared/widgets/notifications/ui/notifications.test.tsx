@@ -4,6 +4,7 @@ import type { TFunction } from "i18next";
 import { delay, HttpResponse, http } from "msw";
 import { beforeAll, describe, expect, it } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
+import { MOCK_NOTIFICATIONS } from "@/test/mocks/notifications";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 import { Notifications } from "./notifications";
@@ -125,14 +126,8 @@ describe("Notifications", () => {
 				HttpResponse.json({
 					data: [
 						{
-							id: "01JTZKQX2GT6PHGQER0M8FS6KD",
-							event: "budget.member.invited",
-							metadata: {
-								budgetId: "01JTZKQX2GT6PHGQER0M8FS6KA",
-								budgetName: "Household",
-							},
+							...MOCK_NOTIFICATIONS[0],
 							readAt: "2026-10-29T08:00:00.000Z",
-							createdAt: "2026-10-29T07:14:00.000Z",
 						},
 					],
 				}),

@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MOCK_BUDGET_ID } from "@/test/handlers";
+import { MOCK_USER } from "@/test/mocks/user";
 import { Breadcrumbs } from "./breadcrumbs";
-
-const RECORD_ID = "01JTZKQX2GT6PHGQER0M8FS6K8";
 
 const meta = {
 	title: "Shared/Breadcrumbs",
@@ -43,7 +42,7 @@ export const Budget: Story = {
 export const BudgetRecord: Story = {
 	parameters: {
 		router: {
-			initialEntries: [`/budgets/${MOCK_BUDGET_ID}/${RECORD_ID}`],
+			initialEntries: [`/budgets/${MOCK_BUDGET_ID}/${MOCK_USER.id}`],
 			routePath: "/budgets/:budgetId/:recordId",
 		},
 	},
@@ -52,7 +51,7 @@ export const BudgetRecord: Story = {
 export const Edit: Story = {
 	parameters: {
 		router: {
-			initialEntries: [`/budgets/${MOCK_BUDGET_ID}/${RECORD_ID}/edit`],
+			initialEntries: [`/budgets/${MOCK_BUDGET_ID}/${MOCK_USER.id}/edit`],
 			routePath: "/budgets/:budgetId/:recordId/edit",
 		},
 	},
