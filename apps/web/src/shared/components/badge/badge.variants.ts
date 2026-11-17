@@ -16,7 +16,7 @@ export const trendBadgeVariants = cva("", {
 	},
 });
 
-const trendBadgeVariantOptions = Object.keys(trendBadgeVariant) as Array<
+export const trendBadgeVariantOptions = Object.keys(trendBadgeVariant) as Array<
 	keyof typeof trendBadgeVariant
 >;
 
@@ -43,10 +43,4 @@ export type BadgeVariant = UiBadgeVariant | TrendBadgeVariant;
 export const badgeVariantOptions = [
 	...uiBadgeVariantOptions,
 	...trendBadgeVariantOptions,
-] as Array<BadgeVariant>;
-
-export const isTrendVariant = (
-	variant: BadgeVariant | undefined,
-): variant is TrendBadgeVariant =>
-	variant !== undefined &&
-	trendBadgeVariantOptions.includes(variant as TrendBadgeVariant);
+];

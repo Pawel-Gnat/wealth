@@ -1,11 +1,8 @@
 import { cn } from "cn";
 import type { ComponentProps } from "react";
 import { Badge as BadgeUI } from "@/shared/lib/ui/badge";
-import {
-	type BadgeVariant,
-	isTrendVariant,
-	trendBadgeVariants,
-} from "./badge.variants";
+import { isTrendVariant } from "./badge.helpers";
+import { type BadgeVariant, trendBadgeVariants } from "./badge.variants";
 
 type BadgeProps = Omit<ComponentProps<typeof BadgeUI>, "variant"> & {
 	variant?: BadgeVariant;
