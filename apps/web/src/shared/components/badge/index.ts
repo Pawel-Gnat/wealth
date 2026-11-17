@@ -1,1 +1,2 @@
-export { Badge, type TrendBadgeVariant } from "./badge";
+export { Badge } from "./badge";
+export type { TrendBadgeVariant } from "./badge.variants";

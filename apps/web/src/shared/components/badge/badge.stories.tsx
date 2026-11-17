@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
-import { Badge, badgeVariantOptions } from "./badge";
+import { Badge } from "./badge";
+import { badgeVariantOptions } from "./badge.variants";
 
 const BadgeStory = (args: Omit<ComponentProps<typeof Badge>, "children">) => {
 	const { t } = useTranslation();
