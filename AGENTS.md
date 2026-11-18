@@ -64,6 +64,11 @@ Conventions:
 
 - `// @ts-nocheck` on files in `shared/lib/ui` is applied automatically by `apps/web/scripts/patch-ui-ts-nocheck.mjs` (`pnpm ui:patch-ts-nocheck`) via the lefthook pre-commit hook — do not run it manually.
 
+## Storybook
+
+- When adding a new shared component (`src/shared/components`) or widget (`src/shared/widgets`), do not create a Storybook story on your own.
+- Stop and ask whether a `*.stories.tsx` story is needed. Add it only after the developer confirms.
+
 ## Database migrations (Drizzle)
 
 - Never create or edit SQL files in `apps/backend/drizzle/` by hand.
