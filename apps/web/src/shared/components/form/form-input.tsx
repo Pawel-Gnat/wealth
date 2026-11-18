@@ -20,6 +20,7 @@ type FormInputNativeProps = Omit<
 
 export const FormInput: FormControlFunction<FormInputNativeProps> = (props) => {
 	const { t } = useTranslation();
+
 	const {
 		name,
 		label,
@@ -31,8 +32,18 @@ export const FormInput: FormControlFunction<FormInputNativeProps> = (props) => {
 		disabled,
 		...inputProps
 	} = props;
+
 	const { isPassword, isRevealed, inputType, toggle } =
 		usePasswordVisibility(type);
+
+	const visibilityLabel = t(isRevealed ? "password.hide" : "password.show", {
+		ns: "form",
+	});
+
+	const passwordToggleLabel =
+		typeof label === "string"
+			? `${visibilityLabel}, ${label}`
+			: visibilityLabel;
 
 	return (
 		<FormBase
@@ -52,6 +63,7 @@ export const FormInput: FormControlFunction<FormInputNativeProps> = (props) => {
 						<InputGroupInput
 							{...inputProps}
 							type={inputType}
+							spellCheck={isPassword ? false : undefined}
 							disabled={disabled || field.disabled}
 							name={field.name}
 							ref={field.ref}
@@ -75,6 +87,7 @@ export const FormInput: FormControlFunction<FormInputNativeProps> = (props) => {
 							{...field}
 							{...inputProps}
 							type={inputType}
+							spellCheck={isPassword ? false : undefined}
 							disabled={disabled || field.disabled}
 						/>
 					)}
@@ -84,11 +97,12 @@ export const FormInput: FormControlFunction<FormInputNativeProps> = (props) => {
 							<InputGroupButton
 								size="icon-xs"
 								variant="ghost"
-								aria-label={t(isRevealed ? "password.hide" : "password.show", {
-									ns: "form",
-								})}
+								aria-label={passwordToggleLabel}
 								aria-pressed={isRevealed}
 								disabled={disabled || field.disabled}
+								onMouseDown={(event) => {
+									event.preventDefault();
+								}}
 								onClick={toggle}
 							>
 								<Icon name={isRevealed ? "eyeOff" : "eye"} />

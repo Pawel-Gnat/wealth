@@ -90,21 +90,25 @@ describe("FormFieldStory", () => {
 		);
 
 		const input = screen.getByLabelText(t("password.label", { ns: "form" }));
+		const passwordLabel = t("password.label", { ns: "form" });
 		await user.type(input, "Secret1!");
 		expect(input).toHaveAttribute("type", "password");
+		expect(input).toHaveAttribute("spellcheck", "false");
 
+		input.focus();
 		await user.click(
 			screen.getByRole("button", {
-				name: t("password.show", { ns: "form" }),
+				name: `${t("password.show", { ns: "form" })}, ${passwordLabel}`,
 			}),
 		);
 
 		expect(input).toHaveAttribute("type", "text");
 		expect(input).toHaveValue("Secret1!");
+		expect(input).toHaveFocus();
 
 		await user.click(
 			screen.getByRole("button", {
-				name: t("password.hide", { ns: "form" }),
+				name: `${t("password.hide", { ns: "form" })}, ${passwordLabel}`,
 			}),
 		);
 
