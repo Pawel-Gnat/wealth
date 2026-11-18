@@ -55,3 +55,26 @@ export const WithError: Story = {
 export const Disabled: Story = {
 	render: () => <EmailField disabled />,
 };
+
+const PasswordField = () => {
+	const { t } = useTranslation();
+
+	return (
+		<FormFieldStory<{ password: string }> defaultValues={{ password: "" }}>
+			{(control) => (
+				<FormInput
+					name="password"
+					label={t("password.label", { ns: "form" })}
+					placeholder={t("password.placeholder", { ns: "form" })}
+					type="password"
+					icon="password"
+					control={control}
+				/>
+			)}
+		</FormFieldStory>
+	);
+};
+
+export const Password: Story = {
+	render: () => <PasswordField />,
+};

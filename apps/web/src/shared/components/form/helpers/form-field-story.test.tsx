@@ -1,4 +1,5 @@
 import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type { TFunction } from "i18next";
 import { beforeAll, describe, expect, it } from "vitest";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
@@ -70,5 +71,43 @@ describe("FormFieldStory", () => {
 		);
 
 		expect(screen.getByRole("textbox")).toBeDisabled();
+	});
+
+	it("reveals a password and hides it again", async () => {
+		const user = userEvent.setup();
+
+		renderWithProviders(
+			<FormFieldStory<{ password: string }> defaultValues={{ password: "" }}>
+				{(control) => (
+					<FormInput
+						name="password"
+						label={t("password.label", { ns: "form" })}
+						type="password"
+						control={control}
+					/>
+				)}
+			</FormFieldStory>,
+		);
+
+		const input = screen.getByLabelText(t("password.label", { ns: "form" }));
+		await user.type(input, "Secret1!");
+		expect(input).toHaveAttribute("type", "password");
+
+		await user.click(
+			screen.getByRole("button", {
+				name: t("password.show", { ns: "form" }),
+			}),
+		);
+
+		expect(input).toHaveAttribute("type", "text");
+		expect(input).toHaveValue("Secret1!");
+
+		await user.click(
+			screen.getByRole("button", {
+				name: t("password.hide", { ns: "form" }),
+			}),
+		);
+
+		expect(input).toHaveAttribute("type", "password");
 	});
 });
