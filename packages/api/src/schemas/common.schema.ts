@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const pageSchema = z.coerce.number().int().positive();
+
 export function apiPayload<T extends z.ZodType>(zodSchema: T) {
 	return z.object({
 		data: zodSchema,

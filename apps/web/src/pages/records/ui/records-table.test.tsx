@@ -1,8 +1,10 @@
 import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type { TFunction } from "i18next";
 import { HttpResponse, http } from "msw";
 import { beforeAll, describe, expect, it } from "vitest";
 import { APP_ROUTES } from "@/app/routes";
+import { formatPrice } from "@/shared/components/price/helpers/price.helpers";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
@@ -64,10 +66,7 @@ describe("RecordTable", () => {
 			month: "long",
 			year: "numeric",
 		});
-		const formattedAmount = new Intl.NumberFormat("en", {
-			style: "currency",
-			currency: "USD",
-		}).format(123.45);
+		const formattedAmount = formatPrice(123.45, "en");
 		const previewActionLabel = t("action.preview", { ns: "common" });
 
 		renderWithProviders(<RecordsTable />);
@@ -86,5 +85,52 @@ describe("RecordTable", () => {
 			"href",
 			APP_ROUTES.records.view(recordId),
 		);
+	});
+
+	it("requests the page stored in the url and the next page after the pager", async () => {
+		const user = userEvent.setup();
+		const requestedPages: Array<string | null> = [];
+
+		server.use(
+			http.get("*/records", ({ request }) => {
+				const page = new URL(request.url).searchParams.get("page");
+				requestedPages.push(page);
+
+				return HttpResponse.json({
+					data: [
+						{
+							id: recordId,
+							date: "2024-03-01T12:00:00.000Z",
+							kind: "expense",
+							totalAmount: Number(page ?? "1"),
+						},
+					],
+					pagination: {
+						page: Number(page ?? "1"),
+						totalPages: 2,
+						hasNextPage: page !== "2",
+						hasPreviousPage: page === "2",
+					},
+				});
+			}),
+		);
+
+		renderWithProviders(<RecordsTable />, {
+			initialEntries: ["/records?page=2"],
+		});
+
+		await screen.findByText(formatPrice(2, "en"));
+		expect(requestedPages).toContain("2");
+
+		await user.click(
+			screen.getByRole("button", {
+				name: t("pagination.previous", { ns: "common" }),
+			}),
+		);
+
+		await screen.findByText(formatPrice(1, "en"));
+		expect(
+			requestedPages.some((value) => value === null || value === "1"),
+		).toBe(true);
 	});
 });

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { APP_ROUTES } from "@/app/routes";
 import { ErrorState, Table } from "@/shared/components";
+import { useUrlPage } from "@/shared/hooks/use-url-page";
 import { recordColumns } from "../config/record-columns";
 import { useRecordsList } from "../hooks/use-records-list";
 
@@ -11,9 +12,12 @@ type RecordsTableProps = {
 
 export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 	const { t, i18n } = useTranslation();
-	const { data, isLoading, isError } = useRecordsList(
-		budgetId ? { budgetId } : {},
-	);
+	const { page, setPage } = useUrlPage();
+	const { data, pagination, isLoading, isError } = useRecordsList({
+		page,
+		...(budgetId ? { budgetId } : {}),
+	});
+
 	const errorTitle = t("list.error.title", { ns: "records" });
 	const errorDescription = t("list.error.description", { ns: "records" });
 	const emptyTitle = t("list.empty.title", { ns: "records" });
@@ -45,6 +49,9 @@ export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 			noResultsDescription={emptyDescription}
 			noResultsIcon={budgetId ? "group" : "money"}
 			isLoading={isLoading}
+			page={page}
+			pageCount={pagination.totalPages}
+			onPageChange={setPage}
 		/>
 	);
 };

@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { DEFAULT_PAGE_SIZE } from "../constants/pagination.constant";
-import { apiOffsetPaginatedPayload, apiPayload } from "./common.schema";
+import {
+	apiOffsetPaginatedPayload,
+	apiPayload,
+	pageSchema,
+} from "./common.schema";
 import { userSchema } from "./user.schema";
 
 export const RECORD_CREATED_MESSAGE = "record_created" as const;
@@ -58,7 +62,7 @@ export const recordUpdatePayloadSchema = recordCreatePayloadSchema.extend({
 export const recordListParamsSchema = z.object({
 	kind: recordKindSchema.optional(),
 	budgetId: z.string().optional(),
-	page: z.coerce.number().int().positive().default(1),
+	page: pageSchema.default(1),
 	limit: z.coerce.number().int().positive().default(DEFAULT_PAGE_SIZE),
 });
 

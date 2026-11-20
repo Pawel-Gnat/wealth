@@ -1,5 +1,7 @@
+import { DEFAULT_PAGE_SIZE } from "@repo/api/constants";
+import { offsetPagination } from "@repo/api/schemas";
 import type { RecordListResponse } from "@repo/api/types";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useLoader } from "@/shared/hooks/use-loader";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
@@ -7,22 +9,31 @@ import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 
 type UseRecordsListProps = {
 	budgetId?: string;
+	page: number;
 };
 
-export const useRecordsList = ({ budgetId }: UseRecordsListProps = {}) => {
+export const useRecordsList = ({ budgetId, page }: UseRecordsListProps) => {
 	const query = useQuery({
-		queryKey: queryKeys.records.list(budgetId),
+		queryKey: [...queryKeys.records.list(budgetId), page],
+		placeholderData: keepPreviousData,
 		queryFn: async (): Promise<RecordListResponse> => {
 			return controlledAsync(() =>
-				orpcClient.records.list(budgetId ? { budgetId } : {}),
+				orpcClient.records.list({
+					page,
+					...(budgetId ? { budgetId } : {}),
+				}),
 			);
 		},
-		select: (response) => response.data,
 	});
 
 	return {
-		data: query.data ?? [],
-		isLoading: useLoader({ isLoading: query.isPending }),
+		data: query.data?.data ?? [],
+		pagination:
+			query.data?.pagination ??
+			offsetPagination({ page, total: 0, limit: DEFAULT_PAGE_SIZE }),
+		isLoading: useLoader({
+			isLoading: query.isPending && query.data === undefined,
+		}),
 		isError: query.isError,
 		error: query.error,
 	};
