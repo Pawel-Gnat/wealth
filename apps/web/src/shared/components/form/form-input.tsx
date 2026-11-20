@@ -1,11 +1,14 @@
 import type { ComponentProps } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	InputGroup,
 	InputGroupAddon,
+	InputGroupButton,
 	InputGroupInput,
 } from "@/shared/lib/ui/input-group";
 import { Icon, type IconName } from "../icons";
 import { FormBase, type FormControlFunction } from "./form-base";
+import { usePasswordVisibility } from "./hooks/use-password-visibility";
 
 type FormInputNativeProps = Omit<
 	ComponentProps<"input">,
@@ -16,6 +19,8 @@ type FormInputNativeProps = Omit<
 };
 
 export const FormInput: FormControlFunction<FormInputNativeProps> = (props) => {
+	const { t } = useTranslation();
+
 	const {
 		name,
 		label,
@@ -23,8 +28,22 @@ export const FormInput: FormControlFunction<FormInputNativeProps> = (props) => {
 		control,
 		valueAsNumber,
 		icon,
+		type,
+		disabled,
 		...inputProps
 	} = props;
+
+	const { isPassword, isRevealed, inputType, toggle } =
+		usePasswordVisibility(type);
+
+	const visibilityLabel = t(isRevealed ? "password.hide" : "password.show", {
+		ns: "form",
+	});
+
+	const passwordToggleLabel =
+		typeof label === "string"
+			? `${visibilityLabel}, ${label}`
+			: visibilityLabel;
 
 	return (
 		<FormBase
@@ -43,6 +62,9 @@ export const FormInput: FormControlFunction<FormInputNativeProps> = (props) => {
 					{valueAsNumber ? (
 						<InputGroupInput
 							{...inputProps}
+							type={inputType}
+							spellCheck={isPassword ? false : undefined}
+							disabled={disabled || field.disabled}
 							name={field.name}
 							ref={field.ref}
 							onBlur={field.onBlur}
@@ -61,7 +83,31 @@ export const FormInput: FormControlFunction<FormInputNativeProps> = (props) => {
 							}}
 						/>
 					) : (
-						<InputGroupInput {...field} {...inputProps} />
+						<InputGroupInput
+							{...field}
+							{...inputProps}
+							type={inputType}
+							spellCheck={isPassword ? false : undefined}
+							disabled={disabled || field.disabled}
+						/>
+					)}
+
+					{isPassword && (
+						<InputGroupAddon align="inline-end">
+							<InputGroupButton
+								size="icon-xs"
+								variant="ghost"
+								aria-label={passwordToggleLabel}
+								aria-pressed={isRevealed}
+								disabled={disabled || field.disabled}
+								onMouseDown={(event) => {
+									event.preventDefault();
+								}}
+								onClick={toggle}
+							>
+								<Icon name={isRevealed ? "eyeOff" : "eye"} />
+							</InputGroupButton>
+						</InputGroupAddon>
 					)}
 				</InputGroup>
 			)}
