@@ -36,7 +36,15 @@ describe("RecordTable", () => {
 	it("shows empty state when the list has no items", async () => {
 		server.use(
 			http.get("*/records", () =>
-				HttpResponse.json({ data: [], pagination: {} }),
+				HttpResponse.json({
+					data: [],
+					pagination: {
+						page: 1,
+						totalPages: 0,
+						hasNextPage: false,
+						hasPreviousPage: false,
+					},
+				}),
 			),
 		);
 

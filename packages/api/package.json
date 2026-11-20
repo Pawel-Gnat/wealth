@@ -4,6 +4,11 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./constants": {
+			"types": "./dist/constants/index.d.ts",
+			"import": "./dist/constants/index.js",
+			"default": "./dist/constants/index.js"
+		},
 		"./schemas": {
 			"types": "./dist/schemas/index.d.ts",
 			"import": "./dist/schemas/index.js",

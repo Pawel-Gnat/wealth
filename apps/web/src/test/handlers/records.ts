@@ -17,7 +17,12 @@ const getRecordsListHandler = () => {
 				totalAmount: 123.45,
 			},
 		],
-		pagination: {},
+		pagination: {
+			page: 1,
+			totalPages: 1,
+			hasNextPage: false,
+			hasPreviousPage: false,
+		},
 	});
 };
 
