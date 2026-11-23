@@ -4,16 +4,24 @@ import { useSearchParams } from "react-router";
 import {
 	type FilterSchemas,
 	type FilterValues,
+	filterToParam,
 	parseUrlParams,
+	schemaKeys,
 	serializeUrlParam,
 } from "./utils/url-pagination";
 
-export const useUrlPagination = <const T extends FilterSchemas>(
-	schemas: T & { page?: never },
+type WithoutPage<T> = "page" extends keyof T ? never : T;
+
+export const useUrlPagination = <const T extends FilterSchemas<T>>(
+	schemas: WithoutPage<T>,
 ) => {
+	const filterSchemas: T = schemas;
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	const { page, filters, normalized } = parseUrlParams(searchParams, schemas);
+	const { page, filters, normalized } = parseUrlParams(
+		searchParams,
+		filterSchemas,
+	);
 
 	const currentSearch = searchParams.toString();
 	const normalizedSearch = normalized.toString();
@@ -35,18 +43,14 @@ export const useUrlPagination = <const T extends FilterSchemas>(
 			updates.push(["page", result.data === 1 ? null : String(result.data)]);
 		}
 
-		for (const key of Object.keys(schemas) as Array<keyof T & string>) {
+		for (const key of schemaKeys(filterSchemas)) {
 			if (!Object.hasOwn(values, key)) continue;
 
-			const schema = schemas[key];
+			const serialized = filterToParam(filterSchemas, key, values[key]);
 
-			if (!schema) continue;
+			if (serialized === undefined) return;
 
-			const result = schema.safeParse(values[key]);
-
-			if (!result.success || result.data == null) return;
-
-			updates.push([key, String(result.data)]);
+			updates.push([key, serialized]);
 		}
 
 		if (updates.length === 0) return;

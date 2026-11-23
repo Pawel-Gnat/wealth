@@ -1,18 +1,63 @@
 import { pageSchema } from "@repo/api/schemas";
 import type { z } from "zod";
 
-export type FilterSchemas = Record<string, z.ZodType>;
+export type FilterSchemas<T> = {
+	[K in keyof T]: z.ZodType;
+};
 
-export type FilterValues<T extends FilterSchemas> = {
+export type FilterValues<T extends FilterSchemas<T>> = {
 	[K in keyof T]?: z.output<T[K]>;
 };
 
-export const parseUrlParams = <T extends FilterSchemas>(
+export type SchemaKey<T extends FilterSchemas<T>> = Extract<keyof T, string>;
+
+export const schemaKeys = <T extends FilterSchemas<T>>(schemas: T) =>
+	Object.keys(schemas) as SchemaKey<T>[];
+
+const applyFilter = <T extends FilterSchemas<T>, K extends SchemaKey<T>>(
+	filters: FilterValues<T>,
+	schemas: T,
+	key: K,
+	raw: string,
+) => {
+	const schema = schemas[key];
+
+	if (!schema) return false;
+
+	const result = schema.safeParse(raw);
+
+	if (!result.success) return false;
+
+	filters[key] = result.data;
+
+	return true;
+};
+
+export const filterToParam = <
+	T extends FilterSchemas<T>,
+	K extends SchemaKey<T>,
+>(
+	schemas: T,
+	key: K,
+	value: FilterValues<T>[K],
+) => {
+	const schema = schemas[key];
+
+	if (!schema) return;
+
+	const result = schema.safeParse(value);
+
+	if (!result.success || result.data == null) return;
+
+	return String(result.data);
+};
+
+export const parseUrlParams = <T extends FilterSchemas<T>>(
 	params: URLSearchParams,
 	schemas: T,
 ) => {
 	const normalized = new URLSearchParams(params);
-	const filters = {} as FilterValues<T>;
+	const filters: FilterValues<T> = {};
 
 	const rawPage = params.get("page");
 	const parsedPage = pageSchema.safeParse(rawPage);
@@ -23,20 +68,12 @@ export const parseUrlParams = <T extends FilterSchemas>(
 		normalized.delete("page");
 	}
 
-	for (const key of Object.keys(schemas) as Array<keyof T & string>) {
+	for (const key of schemaKeys(schemas)) {
 		const value = params.get(key);
 
 		if (value === null) continue;
 
-		const schema = schemas[key];
-
-		if (!schema) continue;
-
-		const result = schema.safeParse(value);
-
-		if (result.success) {
-			filters[key] = result.data as FilterValues<T>[typeof key];
-		} else {
+		if (!applyFilter(filters, schemas, key, value)) {
 			normalized.delete(key);
 		}
 	}
