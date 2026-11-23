@@ -38,9 +38,6 @@ const PaginationProbe = () => {
 			<button type="button" onClick={() => setFilter("limit", 30)}>
 				set-limit
 			</button>
-			<button type="button" onClick={() => setFilter("limit", 0)}>
-				invalid-limit
-			</button>
 			<button type="button" onClick={() => clearFilter("kind")}>
 				clear-kind
 			</button>
@@ -93,16 +90,15 @@ describe("useUrlPagination", () => {
 		);
 	});
 
-	it("writes a valid limit and ignores an invalid one", async () => {
+	it("drops a limit outside the page sizes and writes a valid one", async () => {
 		const user = userEvent.setup();
 
 		render(<PaginationProbe />, {
-			wrapper: createRouter("/records?page=2"),
+			wrapper: createRouter("/records?page=2&limit=15"),
 		});
 
-		await user.click(screen.getByRole("button", { name: "invalid-limit" }));
-
-		expect(screen.getByTestId("search")).toHaveTextContent("page=2");
+		expect(await screen.findByTestId("search")).toHaveTextContent("page=2");
+		expect(screen.getByTestId("limit")).toHaveTextContent("");
 
 		await user.click(screen.getByRole("button", { name: "set-limit" }));
 

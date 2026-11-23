@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DEFAULT_PAGE_SIZE } from "../constants/pagination.constant";
+import { isPageSize } from "../helpers/is-page-size.helper";
 import {
 	apiOffsetPaginatedPayload,
 	apiPayload,
@@ -59,11 +60,13 @@ export const recordUpdatePayloadSchema = recordCreatePayloadSchema.extend({
 	id: z.string(),
 });
 
+const pageSizeSchema = z.coerce.number().refine(isPageSize);
+
 export const recordListParamsSchema = z.object({
 	kind: recordKindSchema.optional(),
 	budgetId: z.string().optional(),
 	page: pageSchema.default(1),
-	limit: z.coerce.number().int().positive().default(DEFAULT_PAGE_SIZE),
+	limit: pageSizeSchema.default(DEFAULT_PAGE_SIZE),
 });
 
 export const recordCreateInputSchema = recordCreatePayloadSchema.extend({

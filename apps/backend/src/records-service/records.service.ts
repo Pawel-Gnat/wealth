@@ -2,8 +2,8 @@ import { Inject, Injectable } from "@nestjs/common";
 import { ORPCError } from "@orpc/nest";
 import { DEFAULT_PAGE_SIZE } from "@repo/api/constants";
 import { RECORD_EVENTS } from "@repo/api/events";
+import { offsetPagination } from "@repo/api/helpers";
 import {
-	offsetPagination,
 	RECORD_CREATED_MESSAGE,
 	RECORD_DELETED_MESSAGE,
 	RECORD_UPDATED_MESSAGE,

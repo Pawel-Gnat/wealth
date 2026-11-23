@@ -1,4 +1,4 @@
-import { offsetPagination } from "@repo/api/schemas";
+import { offsetPagination } from "@repo/api/helpers";
 import type { RecordListResponse } from "@repo/api/types";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
@@ -38,6 +38,7 @@ export const useRecordsList = ({
 		isLoading: useLoader({
 			isLoading: query.isPending && query.data === undefined,
 		}),
+		isPlaceholderData: query.isPlaceholderData,
 		isError: query.isError,
 		error: query.error,
 	};

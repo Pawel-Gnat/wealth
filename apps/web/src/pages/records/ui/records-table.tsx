@@ -1,6 +1,6 @@
 import { DEFAULT_PAGE_SIZE } from "@repo/api/constants";
 import { recordListParamsSchema } from "@repo/api/schemas";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { APP_ROUTES } from "@/app/routes";
 import { ErrorState, Table } from "@/shared/components";
@@ -18,16 +18,24 @@ type RecordsTableProps = {
 
 export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 	const { t, i18n } = useTranslation();
-	const { page, filters, setParams } = useUrlPagination(
+	const { page, setPage, filters, setParams } = useUrlPagination(
 		recordPaginationFilters,
 	);
 	const limit = filters.limit ?? DEFAULT_PAGE_SIZE;
 
-	const { data, pagination, isLoading, isError } = useRecordsList({
-		page,
-		limit,
-		...(budgetId ? { budgetId } : {}),
-	});
+	const { data, pagination, isLoading, isPlaceholderData, isError } =
+		useRecordsList({
+			page,
+			limit,
+			...(budgetId ? { budgetId } : {}),
+		});
+	const lastPage = Math.max(pagination.totalPages, 1);
+
+	useEffect(() => {
+		if (isLoading || isPlaceholderData || isError || page <= lastPage) return;
+
+		setPage(lastPage);
+	}, [isError, isLoading, isPlaceholderData, lastPage, page, setPage]);
 
 	const errorTitle = t("list.error.title", { ns: "records" });
 	const errorDescription = t("list.error.description", { ns: "records" });

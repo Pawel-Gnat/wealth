@@ -138,6 +138,45 @@ describe("RecordTable", () => {
 		).toBe(true);
 	});
 
+	it("moves an out of range page back to the last page", async () => {
+		const requestedPages: Array<string | null> = [];
+
+		server.use(
+			http.get("*/records", ({ request }) => {
+				const page = new URL(request.url).searchParams.get("page");
+				requestedPages.push(page);
+
+				return HttpResponse.json({
+					data:
+						page === "2"
+							? [
+									{
+										id: recordId,
+										date: "2024-03-01T12:00:00.000Z",
+										kind: "expense",
+										totalAmount: 2,
+									},
+								]
+							: [],
+					pagination: {
+						page: Number(page ?? "1"),
+						totalPages: 2,
+						hasNextPage: false,
+						hasPreviousPage: page === "3",
+					},
+				});
+			}),
+		);
+
+		renderWithProviders(<RecordsTable />, {
+			initialEntries: ["/records?page=3"],
+		});
+
+		await screen.findByText(formatPrice(2, "en"));
+		expect(requestedPages).toContain("3");
+		expect(requestedPages).toContain("2");
+	});
+
 	it("requests the limit chosen in the pager", async () => {
 		const user = userEvent.setup();
 		const requestedLimits: Array<string | null> = [];

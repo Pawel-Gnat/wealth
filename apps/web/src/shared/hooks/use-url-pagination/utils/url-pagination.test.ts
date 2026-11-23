@@ -23,7 +23,7 @@ describe("parseUrlParams", () => {
 	});
 
 	it("removes invalid parameters", () => {
-		const params = new URLSearchParams("page=abc&kind=unknown&limit=nope");
+		const params = new URLSearchParams("page=abc&kind=unknown&limit=15");
 
 		const result = parseUrlParams(params, schemas);
 

@@ -9,6 +9,11 @@
 			"import": "./dist/constants/index.js",
 			"default": "./dist/constants/index.js"
 		},
+		"./helpers": {
+			"types": "./dist/helpers/index.d.ts",
+			"import": "./dist/helpers/index.js",
+			"default": "./dist/helpers/index.js"
+		},
 		"./schemas": {
 			"types": "./dist/schemas/index.d.ts",
 			"import": "./dist/schemas/index.js",
