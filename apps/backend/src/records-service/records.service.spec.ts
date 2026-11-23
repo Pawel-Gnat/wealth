@@ -1,5 +1,6 @@
 import type { TestingModule } from "@nestjs/testing";
 import { ORPCError } from "@orpc/nest";
+import { DEFAULT_PAGE_SIZE } from "@repo/api/constants";
 import { RECORD_EVENTS } from "@repo/api/events";
 import {
 	RECORD_CREATED_MESSAGE,
@@ -84,6 +85,39 @@ describe("Records service", () => {
 		await moduleRef.close();
 	});
 
+	it("returns the requested page of personal records", async () => {
+		const db = moduleRef.get(DBS.APP);
+		const user = await createTestUser(usersService, {
+			passwordHash: "hashed-password",
+			emailTag: "offset-page",
+		});
+
+		await db.insert(recordsTable).values(
+			Array.from({ length: DEFAULT_PAGE_SIZE + 1 }, (_, index) => ({
+				userId: user.id,
+				kind: "expense" as const,
+				budgetId: null,
+				totalAmount: String(index + 1),
+				documentDate: "2024-01-01",
+			})),
+		);
+
+		const second = await recordsService.listByUserId(
+			user.id,
+			"expense",
+			undefined,
+			2,
+		);
+
+		expect(second.data).toHaveLength(1);
+		expect(second.pagination).toEqual({
+			page: 2,
+			totalPages: 2,
+			hasNextPage: false,
+			hasPreviousPage: true,
+		});
+	});
+
 	describe.each([
 		"expense",
 		"income",
@@ -97,7 +131,15 @@ describe("Records service", () => {
 			});
 
 			await expect(recordsService.listByUserId(user.id, kind)).resolves.toEqual(
-				{ data: [], pagination: {} },
+				{
+					data: [],
+					pagination: {
+						page: 1,
+						totalPages: 0,
+						hasNextPage: false,
+						hasPreviousPage: false,
+					},
+				},
 			);
 		});
 
@@ -163,7 +205,12 @@ describe("Records service", () => {
 
 			const forA = await recordsService.listByUserId(userA.id, kind);
 
-			expect(forA.pagination).toEqual({});
+			expect(forA.pagination).toEqual({
+				page: 1,
+				totalPages: 1,
+				hasNextPage: false,
+				hasPreviousPage: false,
+			});
 			expect(forA.data).toHaveLength(2);
 			expect(forA.data[0]).toMatchObject({
 				kind,

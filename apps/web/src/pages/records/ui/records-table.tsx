@@ -1,9 +1,16 @@
-import { useMemo } from "react";
+import { DEFAULT_PAGE_SIZE } from "@repo/api/constants";
+import { recordListParamsSchema } from "@repo/api/schemas";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { APP_ROUTES } from "@/app/routes";
 import { ErrorState, Table } from "@/shared/components";
+import { useUrlPagination } from "@/shared/hooks/use-url-pagination/use-url-pagination";
 import { recordColumns } from "../config/record-columns";
 import { useRecordsList } from "../hooks/use-records-list";
+
+const recordPaginationFilters = {
+	limit: recordListParamsSchema.shape.limit,
+};
 
 type RecordsTableProps = {
 	budgetId?: string;
@@ -11,9 +18,25 @@ type RecordsTableProps = {
 
 export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 	const { t, i18n } = useTranslation();
-	const { data, isLoading, isError } = useRecordsList(
-		budgetId ? { budgetId } : {},
+	const { page, setPage, filters, setParams } = useUrlPagination(
+		recordPaginationFilters,
 	);
+	const limit = filters.limit ?? DEFAULT_PAGE_SIZE;
+
+	const { data, pagination, isLoading, isPlaceholderData, isError } =
+		useRecordsList({
+			page,
+			limit,
+			...(budgetId ? { budgetId } : {}),
+		});
+	const lastPage = Math.max(pagination.totalPages, 1);
+
+	useEffect(() => {
+		if (isLoading || isPlaceholderData || isError || page <= lastPage) return;
+
+		setPage(lastPage);
+	}, [isError, isLoading, isPlaceholderData, lastPage, page, setPage]);
+
 	const errorTitle = t("list.error.title", { ns: "records" });
 	const errorDescription = t("list.error.description", { ns: "records" });
 	const emptyTitle = t("list.empty.title", { ns: "records" });
@@ -45,6 +68,12 @@ export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 			noResultsDescription={emptyDescription}
 			noResultsIcon={budgetId ? "group" : "money"}
 			isLoading={isLoading}
+			page={page}
+			pageSize={limit}
+			pageCount={pagination.totalPages}
+			onPaginationChange={({ page: nextPage, pageSize }) =>
+				setParams({ page: nextPage, limit: pageSize })
+			}
 		/>
 	);
 };

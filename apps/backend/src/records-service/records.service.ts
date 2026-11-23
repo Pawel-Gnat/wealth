@@ -1,6 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ORPCError } from "@orpc/nest";
+import { DEFAULT_PAGE_SIZE } from "@repo/api/constants";
 import { RECORD_EVENTS } from "@repo/api/events";
+import { offsetPagination } from "@repo/api/helpers";
 import {
 	RECORD_CREATED_MESSAGE,
 	RECORD_DELETED_MESSAGE,
@@ -21,7 +23,7 @@ import {
 	isStoredDocumentDateEqual,
 } from "@repo/common/helpers";
 import { hasPermission } from "@repo/common/permissions";
-import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNull } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { AuditsService } from "../audit-service/audits.service";
 import { DBS } from "../database-service/constants";
@@ -76,23 +78,34 @@ export class RecordsService {
 		userId: string,
 		kind?: RecordKind,
 		budgetId?: string,
+		page = 1,
+		limit: number = DEFAULT_PAGE_SIZE,
 	): Promise<RecordListResponse> {
 		if (budgetId) {
 			await this.assertCanViewBudget(userId, budgetId);
 		}
 
-		const rows = await this.db
-			.select()
-			.from(recordsTable)
-			.where(
-				and(
-					...(budgetId
-						? [eq(recordsTable.budgetId, budgetId)]
-						: [eq(recordsTable.userId, userId), isNull(recordsTable.budgetId)]),
-					...(kind ? [eq(recordsTable.kind, kind)] : []),
-				),
-			)
-			.orderBy(desc(recordsTable.documentDate), desc(recordsTable.id));
+		const where = and(
+			...(budgetId
+				? [eq(recordsTable.budgetId, budgetId)]
+				: [eq(recordsTable.userId, userId), isNull(recordsTable.budgetId)]),
+			...(kind ? [eq(recordsTable.kind, kind)] : []),
+		);
+
+		const offset = (page - 1) * limit;
+
+		const [rows, counted] = await Promise.all([
+			this.db
+				.select()
+				.from(recordsTable)
+				.where(where)
+				.orderBy(desc(recordsTable.documentDate), desc(recordsTable.id))
+				.limit(limit)
+				.offset(offset),
+
+			this.db.select({ total: count() }).from(recordsTable).where(where),
+		]);
+		const total = Number(counted[0]?.total ?? 0);
 
 		const owners = budgetId
 			? await this.usersService.findUsersByIds(rows.map((row) => row.userId))
@@ -110,7 +123,11 @@ export class RecordsService {
 					...(owner ? { owner } : {}),
 				};
 			}),
-			pagination: {},
+			pagination: offsetPagination({
+				page,
+				total,
+				limit,
+			}),
 		};
 	}
 

@@ -17,6 +17,8 @@ export class RecordsController {
 				userIdFromRequest(context.request),
 				input.kind,
 				input.budgetId,
+				input.page,
+				input.limit,
 			);
 		});
 	}
