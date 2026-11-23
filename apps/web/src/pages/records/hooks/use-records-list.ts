@@ -1,4 +1,3 @@
-import { DEFAULT_PAGE_SIZE } from "@repo/api/constants";
 import { offsetPagination } from "@repo/api/schemas";
 import type { RecordListResponse } from "@repo/api/types";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -10,16 +9,22 @@ import { queryKeys } from "@/shared/lib/tanstack/query-key-factory";
 type UseRecordsListProps = {
 	budgetId?: string;
 	page: number;
+	limit: number;
 };
 
-export const useRecordsList = ({ budgetId, page }: UseRecordsListProps) => {
+export const useRecordsList = ({
+	budgetId,
+	page,
+	limit,
+}: UseRecordsListProps) => {
 	const query = useQuery({
-		queryKey: [...queryKeys.records.list(budgetId), page],
+		queryKey: [...queryKeys.records.list(budgetId), page, limit],
 		placeholderData: keepPreviousData,
 		queryFn: async (): Promise<RecordListResponse> => {
 			return controlledAsync(() =>
 				orpcClient.records.list({
 					page,
+					limit,
 					...(budgetId ? { budgetId } : {}),
 				}),
 			);
@@ -29,8 +34,7 @@ export const useRecordsList = ({ budgetId, page }: UseRecordsListProps) => {
 	return {
 		data: query.data?.data ?? [],
 		pagination:
-			query.data?.pagination ??
-			offsetPagination({ page, total: 0, limit: DEFAULT_PAGE_SIZE }),
+			query.data?.pagination ?? offsetPagination({ page, total: 0, limit }),
 		isLoading: useLoader({
 			isLoading: query.isPending && query.data === undefined,
 		}),

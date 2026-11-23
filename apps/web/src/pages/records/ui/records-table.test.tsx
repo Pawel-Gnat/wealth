@@ -17,6 +17,10 @@ describe("RecordTable", () => {
 
 	beforeAll(async () => {
 		t = (await init18nWeb({ lng: "en" })) as TFunction;
+		HTMLElement.prototype.hasPointerCapture = () => false;
+		HTMLElement.prototype.setPointerCapture = () => {};
+		HTMLElement.prototype.releasePointerCapture = () => {};
+		HTMLElement.prototype.scrollIntoView = () => {};
 	});
 
 	it("shows error state when the list request fails", async () => {
@@ -132,5 +136,44 @@ describe("RecordTable", () => {
 		expect(
 			requestedPages.some((value) => value === null || value === "1"),
 		).toBe(true);
+	});
+
+	it("requests the limit chosen in the pager", async () => {
+		const user = userEvent.setup();
+		const requestedLimits: Array<string | null> = [];
+
+		server.use(
+			http.get("*/records", ({ request }) => {
+				requestedLimits.push(new URL(request.url).searchParams.get("limit"));
+
+				return HttpResponse.json({
+					data: [
+						{
+							id: recordId,
+							date: "2024-03-01T12:00:00.000Z",
+							kind: "expense",
+							totalAmount: 123.45,
+						},
+					],
+					pagination: {
+						page: 1,
+						totalPages: 1,
+						hasNextPage: false,
+						hasPreviousPage: false,
+					},
+				});
+			}),
+		);
+
+		renderWithProviders(<RecordsTable />);
+
+		await screen.findByText(formatPrice(123.45, "en"));
+
+		await user.click(screen.getByRole("combobox"));
+		await user.click(screen.getByRole("option", { name: "20" }));
+
+		await waitFor(() => {
+			expect(requestedLimits).toContain("20");
+		});
 	});
 });

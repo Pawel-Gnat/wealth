@@ -34,8 +34,9 @@ type DataTableProps<TData, TValue> = {
 	noResultsDescription: string;
 	noResultsIcon: IconName;
 	page?: number;
+	pageSize?: number;
 	pageCount?: number;
-	onPageChange?: (page: number) => void;
+	onPaginationChange?: (pagination: { page: number; pageSize: number }) => void;
 };
 
 export const Table = <TData, TValue>({
@@ -46,14 +47,16 @@ export const Table = <TData, TValue>({
 	noResultsDescription,
 	noResultsIcon,
 	page = 1,
+	pageSize = DEFAULT_PAGE_SIZE,
 	pageCount,
-	onPageChange,
+	onPaginationChange,
 }: DataTableProps<TData, TValue>) => {
 	const pageIndex = Math.max(0, page - 1);
-	const serverPaged = onPageChange !== undefined && pageCount !== undefined;
+	const serverPaged =
+		onPaginationChange !== undefined && pageCount !== undefined;
 	const pagination: PaginationState = {
 		pageIndex,
-		pageSize: DEFAULT_PAGE_SIZE,
+		pageSize,
 	};
 
 	const table = useReactTable({
@@ -69,9 +72,14 @@ export const Table = <TData, TValue>({
 					onPaginationChange: (updater: Updater<PaginationState>) => {
 						const next = resolveUpdater(updater, pagination);
 
-						if (next.pageIndex !== pageIndex) {
-							onPageChange(next.pageIndex + 1);
+						if (next.pageIndex === pageIndex && next.pageSize === pageSize) {
+							return;
 						}
+
+						onPaginationChange({
+							page: next.pageIndex + 1,
+							pageSize: next.pageSize,
+						});
 					},
 				}
 			: { getPaginationRowModel: getPaginationRowModel() }),

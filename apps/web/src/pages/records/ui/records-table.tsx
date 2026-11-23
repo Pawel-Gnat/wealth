@@ -1,10 +1,16 @@
+import { DEFAULT_PAGE_SIZE } from "@repo/api/constants";
+import { recordListParamsSchema } from "@repo/api/schemas";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { APP_ROUTES } from "@/app/routes";
 import { ErrorState, Table } from "@/shared/components";
-import { useUrlPage } from "@/shared/hooks/use-url-page";
+import { useUrlPagination } from "@/shared/hooks/use-url-pagination/use-url-pagination";
 import { recordColumns } from "../config/record-columns";
 import { useRecordsList } from "../hooks/use-records-list";
+
+const recordPaginationFilters = {
+	limit: recordListParamsSchema.shape.limit,
+};
 
 type RecordsTableProps = {
 	budgetId?: string;
@@ -12,9 +18,14 @@ type RecordsTableProps = {
 
 export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 	const { t, i18n } = useTranslation();
-	const { page, setPage } = useUrlPage();
+	const { page, filters, setParams } = useUrlPagination(
+		recordPaginationFilters,
+	);
+	const limit = filters.limit ?? DEFAULT_PAGE_SIZE;
+
 	const { data, pagination, isLoading, isError } = useRecordsList({
 		page,
+		limit,
 		...(budgetId ? { budgetId } : {}),
 	});
 
@@ -50,8 +61,11 @@ export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 			noResultsIcon={budgetId ? "group" : "money"}
 			isLoading={isLoading}
 			page={page}
+			pageSize={limit}
 			pageCount={pagination.totalPages}
-			onPageChange={setPage}
+			onPaginationChange={({ page: nextPage, pageSize }) =>
+				setParams({ page: nextPage, limit: pageSize })
+			}
 		/>
 	);
 };
