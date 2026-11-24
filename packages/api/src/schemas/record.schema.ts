@@ -12,9 +12,9 @@ export const RECORD_CREATED_MESSAGE = "record_created" as const;
 export const RECORD_UPDATED_MESSAGE = "record_updated" as const;
 export const RECORD_DELETED_MESSAGE = "record_deleted" as const;
 
-export const recordKinds = ["expense", "income"] as const;
+export const recordTypes = ["expense", "income"] as const;
 
-export const recordKindSchema = z.enum(recordKinds);
+export const recordTypeSchema = z.enum(recordTypes);
 
 export const lineItemSchema = z.object({
 	id: z.string(),
@@ -31,7 +31,7 @@ export const lineItemSchema = z.object({
 export const recordSchema = z.object({
 	id: z.string(),
 	date: z.date(),
-	kind: recordKindSchema,
+	type: recordTypeSchema,
 	totalAmount: z.number(),
 	lineItems: z.array(lineItemSchema),
 });
@@ -63,19 +63,19 @@ export const recordUpdatePayloadSchema = recordCreatePayloadSchema.extend({
 const pageSizeSchema = z.coerce.number().refine(isPageSize);
 
 export const recordListParamsSchema = z.object({
-	kind: recordKindSchema.optional(),
+	type: recordTypeSchema.optional(),
 	budgetId: z.string().optional(),
 	page: pageSchema.default(1),
 	limit: pageSizeSchema.default(DEFAULT_PAGE_SIZE),
 });
 
 export const recordCreateInputSchema = recordCreatePayloadSchema.extend({
-	kind: recordKindSchema,
+	type: recordTypeSchema,
 	budgetId: z.string().optional(),
 });
 
 export const recordUpdateInputSchema = recordUpdatePayloadSchema.extend({
-	kind: recordKindSchema,
+	type: recordTypeSchema,
 });
 
 export const recordCreateResponseDataSchema = z.object({
@@ -100,7 +100,7 @@ export const recordGetParamsSchema = z.object({
 
 export const recordParamsSchema = z.object({
 	id: z.string(),
-	kind: recordKindSchema,
+	type: recordTypeSchema,
 });
 
 export const recordDeleteResponseDataSchema = z.object({

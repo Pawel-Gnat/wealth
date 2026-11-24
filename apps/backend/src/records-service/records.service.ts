@@ -13,8 +13,8 @@ import type {
 	RecordCreateResponse,
 	RecordDeleteResponse,
 	RecordDetailsResponse,
-	RecordKind,
 	RecordListResponse,
+	RecordType,
 	RecordUpdateResponse,
 } from "@repo/api/types";
 import {
@@ -76,7 +76,7 @@ export class RecordsService {
 
 	async listByUserId(
 		userId: string,
-		kind?: RecordKind,
+		type?: RecordType,
 		budgetId?: string,
 		page = 1,
 		limit: number = DEFAULT_PAGE_SIZE,
@@ -89,7 +89,7 @@ export class RecordsService {
 			...(budgetId
 				? [eq(recordsTable.budgetId, budgetId)]
 				: [eq(recordsTable.userId, userId), isNull(recordsTable.budgetId)]),
-			...(kind ? [eq(recordsTable.kind, kind)] : []),
+			...(type ? [eq(recordsTable.type, type)] : []),
 		);
 
 		const offset = (page - 1) * limit;
@@ -118,7 +118,7 @@ export class RecordsService {
 				return {
 					id: row.id,
 					date: decodeDocumentDateFromStorage(row.documentDate),
-					kind: row.kind,
+					type: row.type,
 					totalAmount: Number(row.totalAmount),
 					...(owner ? { owner } : {}),
 				};
@@ -141,7 +141,7 @@ export class RecordsService {
 				userId: recordsTable.userId,
 				budgetId: recordsTable.budgetId,
 				date: recordsTable.documentDate,
-				kind: recordsTable.kind,
+				type: recordsTable.type,
 				totalAmount: recordsTable.totalAmount,
 			})
 			.from(recordsTable)
@@ -171,7 +171,7 @@ export class RecordsService {
 			data: {
 				id: record.id,
 				date: decodeDocumentDateFromStorage(record.date),
-				kind: record.kind,
+				type: record.type,
 				totalAmount: Number(record.totalAmount),
 				lineItems: lineItems.map((lineItem) => ({
 					id: lineItem.id,
@@ -185,7 +185,7 @@ export class RecordsService {
 
 	async createByUserId(
 		userId: string,
-		kind: RecordKind,
+		type: RecordType,
 		payload: RecordCreatePayload,
 		budgetId?: string,
 	): Promise<RecordCreateResponse> {
@@ -204,14 +204,14 @@ export class RecordsService {
 					.values({
 						userId,
 						budgetId: budgetId ?? null,
-						kind,
+						type,
 						documentDate: date,
 						totalAmount: totalAmount.toFixed(2),
 					})
 					.returning({ id: recordsTable.id });
 
 				if (!createdRecord) {
-					throw new Error(recordCopy[kind].insertFailed);
+					throw new Error(recordCopy[type].insertFailed);
 				}
 
 				await tx.insert(recordLineItemsTable).values(
@@ -232,14 +232,14 @@ export class RecordsService {
 						budgetId,
 						actorUserId: userId,
 						entityId: createdRecord.id,
-						event: RECORD_EVENTS[kind].created,
+						event: RECORD_EVENTS[type].created,
 						metadata,
 					});
 				} else {
 					await this.auditsService.createUserAudit(tx, {
 						userId,
 						entityId: createdRecord.id,
-						event: RECORD_EVENTS[kind].created,
+						event: RECORD_EVENTS[type].created,
 						metadata,
 					});
 				}
@@ -247,7 +247,7 @@ export class RecordsService {
 				const notifications = await this.recordNotifications(tx, {
 					actorId: userId,
 					budgetId: budgetId ?? null,
-					event: RECORD_EVENTS[kind].created,
+					event: RECORD_EVENTS[type].created,
 					recordId: createdRecord.id,
 				});
 
@@ -256,7 +256,7 @@ export class RecordsService {
 		);
 
 		this.logRecordEvent(
-			RECORD_EVENTS[kind].created,
+			RECORD_EVENTS[type].created,
 			userId,
 			budgetId ?? null,
 			recordId,
@@ -269,7 +269,7 @@ export class RecordsService {
 	async updateByUserId(
 		userId: string,
 		recordId: string,
-		kind: RecordKind,
+		type: RecordType,
 		payload: RecordCreatePayload,
 	): Promise<RecordUpdateResponse> {
 		const newTotalAmount = calculateRecordTotalAmount(payload);
@@ -287,7 +287,7 @@ export class RecordsService {
 					totalAmount: recordsTable.totalAmount,
 				})
 				.from(recordsTable)
-				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)))
+				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.type, type)))
 				.for("update");
 
 			if (!existing) {
@@ -362,14 +362,14 @@ export class RecordsService {
 					budgetId: existing.budgetId,
 					actorUserId: userId,
 					entityId: recordId,
-					event: RECORD_EVENTS[kind].updated,
+					event: RECORD_EVENTS[type].updated,
 					metadata,
 				});
 			} else {
 				await this.auditsService.createUserAudit(tx, {
 					userId,
 					entityId: recordId,
-					event: RECORD_EVENTS[kind].updated,
+					event: RECORD_EVENTS[type].updated,
 					metadata,
 				});
 			}
@@ -377,7 +377,7 @@ export class RecordsService {
 			const notifications = await this.recordNotifications(tx, {
 				actorId: userId,
 				budgetId: existing.budgetId,
-				event: RECORD_EVENTS[kind].updated,
+				event: RECORD_EVENTS[type].updated,
 				recordId,
 			});
 
@@ -390,7 +390,7 @@ export class RecordsService {
 
 		if (result.changed) {
 			this.logRecordEvent(
-				RECORD_EVENTS[kind].updated,
+				RECORD_EVENTS[type].updated,
 				userId,
 				result.budgetId,
 				recordId,
@@ -405,7 +405,7 @@ export class RecordsService {
 	async deleteByUserId(
 		userId: string,
 		recordId: string,
-		kind: RecordKind,
+		type: RecordType,
 	): Promise<RecordDeleteResponse> {
 		const deleted = await this.db.transaction(async (tx) => {
 			const [existing] = await tx
@@ -415,7 +415,7 @@ export class RecordsService {
 					budgetId: recordsTable.budgetId,
 				})
 				.from(recordsTable)
-				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.kind, kind)))
+				.where(and(eq(recordsTable.id, recordId), eq(recordsTable.type, type)))
 				.for("update");
 
 			if (!existing) {
@@ -447,7 +447,7 @@ export class RecordsService {
 			const notifications = await this.recordNotifications(tx, {
 				actorId: userId,
 				budgetId: existing.budgetId,
-				event: RECORD_EVENTS[kind].deleted,
+				event: RECORD_EVENTS[type].deleted,
 			});
 
 			const [deletedRecord] = await tx
@@ -463,7 +463,7 @@ export class RecordsService {
 		});
 
 		this.logRecordEvent(
-			RECORD_EVENTS[kind].deleted,
+			RECORD_EVENTS[type].deleted,
 			userId,
 			deleted.budgetId,
 			recordId,

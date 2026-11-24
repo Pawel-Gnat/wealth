@@ -13,7 +13,7 @@ const getRecordsListHandler = () => {
 			{
 				id: "01JTZKQX2GT6PHGQER0M8FS6K8",
 				date: "2024-03-01T12:00:00.000Z",
-				kind: "expense",
+				type: "expense",
 				totalAmount: 123.45,
 			},
 		],
@@ -37,7 +37,7 @@ const getRecordByIdHandler = () => {
 		data: {
 			id: "01JTZKQX2GT6PHGQER0M8FS6K8",
 			date: "2024-03-01T12:00:00.000Z",
-			kind: "expense",
+			type: "expense",
 			totalAmount: 123.45,
 			lineItems: [
 				{

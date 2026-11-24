@@ -9,6 +9,7 @@ import { init18nWeb } from "@/shared/lib/i18n/i18n";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 import { RecordsTable } from "./records-table";
+import { TableFilters } from "./table-filters";
 
 const recordId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 
@@ -105,7 +106,7 @@ describe("RecordTable", () => {
 						{
 							id: recordId,
 							date: "2024-03-01T12:00:00.000Z",
-							kind: "expense",
+							type: "expense",
 							totalAmount: Number(page ?? "1"),
 						},
 					],
@@ -153,7 +154,7 @@ describe("RecordTable", () => {
 									{
 										id: recordId,
 										date: "2024-03-01T12:00:00.000Z",
-										kind: "expense",
+										type: "expense",
 										totalAmount: 2,
 									},
 								]
@@ -190,7 +191,7 @@ describe("RecordTable", () => {
 						{
 							id: recordId,
 							date: "2024-03-01T12:00:00.000Z",
-							kind: "expense",
+							type: "expense",
 							totalAmount: 123.45,
 						},
 					],
@@ -208,11 +209,93 @@ describe("RecordTable", () => {
 
 		await screen.findByText(formatPrice(123.45, "en"));
 
-		await user.click(screen.getByRole("combobox"));
+		const pageSizeSelect = screen
+			.getAllByRole("combobox")
+			.find((element) => element.textContent === "10");
+
+		if (!pageSizeSelect) {
+			throw new Error("Missing page size select");
+		}
+
+		await user.click(pageSizeSelect);
 		await user.click(screen.getByRole("option", { name: "20" }));
 
 		await waitFor(() => {
 			expect(requestedLimits).toContain("20");
+		});
+	});
+
+	it("requests the selected type and clears it back to all records", async () => {
+		const user = userEvent.setup();
+		const requested = [] as Array<{ type: string | null; page: string | null }>;
+
+		server.use(
+			http.get("*/records", ({ request }) => {
+				const url = new URL(request.url);
+				requested.push({
+					type: url.searchParams.get("type"),
+					page: url.searchParams.get("page"),
+				});
+
+				return HttpResponse.json({
+					data: [
+						{
+							id: recordId,
+							date: "2024-03-01T12:00:00.000Z",
+							type: url.searchParams.get("type") ?? "expense",
+							totalAmount: 123.45,
+						},
+					],
+					pagination: {
+						page: Number(url.searchParams.get("page") ?? "1"),
+						totalPages: 2,
+						hasNextPage: url.searchParams.get("page") !== "2",
+						hasPreviousPage: url.searchParams.get("page") === "2",
+					},
+				});
+			}),
+		);
+
+		renderWithProviders(
+			<>
+				<TableFilters />
+				<RecordsTable />
+			</>,
+			{
+				initialEntries: ["/records?page=2"],
+			},
+		);
+
+		await screen.findByText(formatPrice(123.45, "en"));
+
+		await user.click(
+			screen.getByRole("combobox", {
+				name: t("list.type", { ns: "records" }),
+			}),
+		);
+		await user.click(
+			screen.getByRole("option", {
+				name: t("single.kind.income", { ns: "records" }),
+			}),
+		);
+
+		await waitFor(() => {
+			expect(requested).toContainEqual({ type: "income", page: "1" });
+		});
+
+		await user.click(
+			screen.getByRole("combobox", {
+				name: t("list.type", { ns: "records" }),
+			}),
+		);
+		await user.click(
+			screen.getByRole("option", {
+				name: t("list.all", { ns: "records" }),
+			}),
+		);
+
+		await waitFor(() => {
+			expect(requested.at(-1)).toEqual({ type: null, page: "1" });
 		});
 	});
 });

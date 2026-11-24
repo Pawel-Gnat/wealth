@@ -81,7 +81,7 @@ export const recordColumns = ({
 			},
 		},
 		{
-			accessorKey: "kind",
+			accessorKey: "type",
 			meta: { className: "w-[1%] whitespace-nowrap" },
 			header: () => (
 				<Text size="sm" weight="medium">
@@ -89,11 +89,11 @@ export const recordColumns = ({
 				</Text>
 			),
 			cell: ({ row }) => {
-				const kind = row.original.kind;
+				const type = row.original.type;
 
 				return (
-					<Badge variant={kind === "expense" ? "default" : "secondary"}>
-						{kind}
+					<Badge variant={type === "expense" ? "default" : "secondary"}>
+						{type}
 					</Badge>
 				);
 			},

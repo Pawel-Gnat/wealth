@@ -1,4 +1,4 @@
-import type { RecordKind } from "@repo/api/types";
+import type { RecordType } from "@repo/api/types";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { TFunction } from "i18next";
@@ -32,13 +32,13 @@ vi.mock("sonner", () => ({
 	},
 }));
 
-const formKinds = [
-	{ kind: "expense" },
-	{ kind: "income" },
-] as const satisfies readonly { kind: RecordKind }[];
+const formTypes = [
+	{ type: "expense" },
+	{ type: "income" },
+] as const satisfies readonly { type: RecordType }[];
 
-describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
-	const config = RECORD_CONFIG[kind];
+describe.each(formTypes)("$type RecordForm", ({ type }) => {
+	const config = RECORD_CONFIG[type];
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -54,7 +54,7 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 	describe("validation", () => {
 		it("shows title field error when submitting with empty line title", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<RecordForm kind={kind} />);
+			renderWithProviders(<RecordForm type={type} />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -69,7 +69,7 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 
 		it("shows price field error when submitting with price below 0.01", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<RecordForm kind={kind} />);
+			renderWithProviders(<RecordForm type={type} />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -92,7 +92,7 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 
 		it("shows quantity field error when submitting with quantity below 1", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<RecordForm kind={kind} />);
+			renderWithProviders(<RecordForm type={type} />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -115,7 +115,7 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 
 		it("shows quantity field error when submitting a fractional quantity", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<RecordForm kind={kind} />);
+			renderWithProviders(<RecordForm type={type} />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -138,7 +138,7 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 
 		it("add button click creates a new line item", async () => {
 			const user = userEvent.setup();
-			renderWithProviders(<RecordForm kind={kind} />);
+			renderWithProviders(<RecordForm type={type} />);
 
 			const addButton = screen.getByRole("button", {
 				name: t("action.add", { ns: "common" }),
@@ -156,7 +156,7 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 	describe("form submission", () => {
 		it("shows success toast and navigates after create", async () => {
 			const user = userEvent.setup();
-			const { queryClient } = renderWithProviders(<RecordForm kind={kind} />);
+			const { queryClient } = renderWithProviders(<RecordForm type={type} />);
 			const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
 			const createButton = screen.getByRole("button", {
@@ -187,7 +187,7 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 		it("navigates to the budget after create when budgetId is set", async () => {
 			const user = userEvent.setup();
 			const budgetId = "01M3NXV9X1Q10Y2MAJB5RED0P8";
-			renderWithProviders(<RecordForm kind={kind} budgetId={budgetId} />);
+			renderWithProviders(<RecordForm type={type} budgetId={budgetId} />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -217,7 +217,7 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 				),
 			);
 
-			renderWithProviders(<RecordForm kind={kind} />);
+			renderWithProviders(<RecordForm type={type} />);
 
 			const createButton = screen.getByRole("button", {
 				name: t("action.create", { ns: "common" }),
@@ -243,10 +243,10 @@ describe.each(formKinds)("$kind RecordForm", ({ kind }) => {
 			const recordId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 			renderWithProviders(
 				<RecordForm
-					kind={kind}
+					type={type}
 					recordId={recordId}
 					initialValues={{
-						kind,
+						type,
 						date: new Date("2024-03-01T12:00:00.000Z"),
 						lineItems: [{ title: "Taxi", quantity: 1, singleAmount: 123.45 }],
 					}}

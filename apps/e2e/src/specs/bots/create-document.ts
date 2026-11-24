@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test'
-import type { RecordCreatePayload, RecordKind } from '@repo/api/types'
+import type { RecordCreatePayload, RecordType } from '@repo/api/types'
 import { ensureI18nInit, getI18nText } from '../helpers/i18n'
 import { expect } from '../helpers/test'
 
@@ -7,14 +7,14 @@ type CreateLineItem = RecordCreatePayload['lineItems'][number]
 
 export const createExpenseDocument = async (page: Page, payload: CreateLineItem) => {
 	await createDocument(page, {
-		kind: 'expense',
+		type: 'expense',
 		payload,
 	})
 }
 
 export const createIncomeDocument = async (page: Page, payload: CreateLineItem) => {
 	await createDocument(page, {
-		kind: 'income',
+		type: 'income',
 		payload,
 	})
 }
@@ -22,7 +22,7 @@ export const createIncomeDocument = async (page: Page, payload: CreateLineItem) 
 const createDocument = async (
 	page: Page,
 	input: {
-		kind: RecordKind
+		type: RecordType
 		payload: CreateLineItem
 	},
 ) => {
@@ -33,20 +33,20 @@ const createDocument = async (
 	const createButton = getI18nText('common', 'action.create')
 	const heading = getI18nText('records', 'single.title-create')
 	const typeLabel = getI18nText('records', 'single.type')
-	const kindLabel = getI18nText(
+	const typeLabelOption = getI18nText(
 		'records',
-		input.kind === 'expense' ? 'single.kind.expense' : 'single.kind.income',
+		input.type === 'expense' ? 'single.kind.expense' : 'single.kind.income',
 	)
 	const lineItemLabel = getI18nText(
 		'form',
-		input.kind === 'expense' ? 'line-item.expense-label' : 'line-item.income-label',
+		input.type === 'expense' ? 'line-item.expense-label' : 'line-item.income-label',
 	)
 
 	await page.goto('/records/new')
 	await expect(page.getByRole('heading', { name: heading })).toBeVisible()
 
 	await page.getByLabel(typeLabel).click()
-	await page.getByRole('option', { name: kindLabel, exact: true }).click()
+	await page.getByRole('option', { name: typeLabelOption, exact: true }).click()
 
 	await page.getByLabel(lineItemLabel).nth(0).fill(input.payload.title)
 	await page.getByLabel(priceLabel).nth(0).fill(input.payload.singleAmount.toFixed(2))

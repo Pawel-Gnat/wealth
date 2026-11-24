@@ -9,6 +9,7 @@ import { recordColumns } from "../config/record-columns";
 import { useRecordsList } from "../hooks/use-records-list";
 
 const recordPaginationFilters = {
+	type: recordListParamsSchema.shape.type,
 	limit: recordListParamsSchema.shape.limit,
 };
 
@@ -22,11 +23,13 @@ export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 		recordPaginationFilters,
 	);
 	const limit = filters.limit ?? DEFAULT_PAGE_SIZE;
+	const type = filters.type;
 
 	const { data, pagination, isLoading, isPlaceholderData, isError } =
 		useRecordsList({
 			page,
 			limit,
+			...(type ? { type } : {}),
 			...(budgetId ? { budgetId } : {}),
 		});
 	const lastPage = Math.max(pagination.totalPages, 1);

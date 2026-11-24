@@ -1,5 +1,5 @@
 import { offsetPagination } from "@repo/api/helpers";
-import type { RecordListResponse } from "@repo/api/types";
+import type { RecordListResponse, RecordType } from "@repo/api/types";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { controlledAsync } from "@/shared/helpers/controlled-fetch";
 import { useLoader } from "@/shared/hooks/use-loader";
@@ -10,21 +10,24 @@ type UseRecordsListProps = {
 	budgetId?: string;
 	page: number;
 	limit: number;
+	type?: RecordType;
 };
 
 export const useRecordsList = ({
 	budgetId,
 	page,
 	limit,
+	type,
 }: UseRecordsListProps) => {
 	const query = useQuery({
-		queryKey: [...queryKeys.records.list(budgetId), page, limit],
+		queryKey: [...queryKeys.records.list(budgetId), page, limit, type],
 		placeholderData: keepPreviousData,
 		queryFn: async (): Promise<RecordListResponse> => {
 			return controlledAsync(() =>
 				orpcClient.records.list({
 					page,
 					limit,
+					...(type ? { type } : {}),
 					...(budgetId ? { budgetId } : {}),
 				}),
 			);

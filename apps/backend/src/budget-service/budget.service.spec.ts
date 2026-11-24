@@ -928,7 +928,7 @@ describe("Budget service", () => {
 				.values({
 					userId: owner.id,
 					budgetId: budget.id,
-					kind: "expense",
+					type: "expense",
 					totalAmount: "12.00",
 					documentDate: "2024-04-01",
 				})

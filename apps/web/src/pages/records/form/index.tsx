@@ -39,7 +39,7 @@ export const RecordFormPage = () => {
 							{...(id ? { recordId: id } : {})}
 							{...(budgetId ? { budgetId } : {})}
 							initialValues={{
-								kind: record.kind,
+								type: record.type,
 								date: record.date,
 								lineItems: record.lineItems.map(
 									({ title, quantity, singleAmount }) => ({

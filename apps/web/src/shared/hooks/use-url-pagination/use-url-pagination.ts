@@ -12,6 +12,14 @@ import {
 
 type WithoutPage<T> = "page" extends keyof T ? never : T;
 
+type FilterUpdates<T extends FilterSchemas<T>> = {
+	[K in keyof FilterValues<T>]?: FilterValues<T>[K] | null;
+};
+
+type ParamUpdates<T extends FilterSchemas<T>> = {
+	page?: number;
+} & FilterUpdates<T>;
+
 export const useUrlPagination = <const T extends FilterSchemas<T>>(
 	schemas: WithoutPage<T>,
 ) => {
@@ -32,7 +40,7 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 		setSearchParams(normalizedSearch, { replace: true });
 	}, [currentSearch, normalizedSearch, setSearchParams]);
 
-	const setParams = (values: { page?: number } & Partial<FilterValues<T>>) => {
+	const setParams = (values: ParamUpdates<T>) => {
 		const updates: Array<[string, string | null]> = [];
 
 		if (values.page !== undefined) {
@@ -46,7 +54,14 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 		for (const key of schemaKeys(filterSchemas)) {
 			if (!Object.hasOwn(values, key)) continue;
 
-			const serialized = filterToParam(filterSchemas, key, values[key]);
+			const value = values[key];
+
+			if (value === null) {
+				updates.push([key, null]);
+				continue;
+			}
+
+			const serialized = filterToParam(filterSchemas, key, value);
 
 			if (serialized === undefined) return;
 
@@ -55,26 +70,25 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 
 		if (updates.length === 0) return;
 
-		setSearchParams((prev) =>
-			updates.reduce(
-				(params, [key, value]) => serializeUrlParam(params, key, value),
-				new URLSearchParams(prev),
-			),
-		);
+		setSearchParams((prev) => {
+			const params = new URLSearchParams(prev);
+
+			for (const [key, value] of updates) {
+				if (value === null) {
+					params.delete(key);
+				} else {
+					params.set(key, value);
+				}
+			}
+
+			return params;
+		});
 	};
 
-	const setPage = (value: number) => {
-		const result = pageSchema.safeParse(value);
-
-		if (!result.success) return;
-
-		setSearchParams((prev) =>
-			serializeUrlParam(
-				prev,
-				"page",
-				result.data === 1 ? null : String(result.data),
-			),
-		);
+	const setPage = (page: number) => {
+		const values: ParamUpdates<T> = {};
+		values.page = page;
+		setParams(values);
 	};
 
 	const setFilter = <K extends keyof T & string>(

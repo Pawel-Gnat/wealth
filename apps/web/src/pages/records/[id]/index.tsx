@@ -25,8 +25,8 @@ export const RecordPage = () => {
 	const { data, isLoading, isError } = useRecord({
 		...(id ? { recordId: id } : {}),
 	});
-	const kind = data?.kind ?? "expense";
-	const config = getRecordConfig(kind);
+	const recordType = data?.type ?? "expense";
+	const config = getRecordConfig(recordType);
 
 	const title = t("single.title", { ns: "records" });
 	const description = t("single.description", { ns: "records" });
@@ -71,7 +71,7 @@ export const RecordPage = () => {
 				>
 					<RecordDeleteDialog
 						id={id}
-						kind={data.kind}
+						type={data.type}
 						onClose={() => setIsDeleteOpen(false)}
 					/>
 				</Suspense>

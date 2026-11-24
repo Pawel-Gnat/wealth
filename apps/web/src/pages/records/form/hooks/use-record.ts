@@ -24,7 +24,7 @@ export const useRecord = ({ recordId }: UseRecordProps) => {
 		select: (response): RecordDetails => ({
 			id: response.data.id,
 			date: decodeDocumentDateFromStorage(response.data.date),
-			kind: response.data.kind,
+			type: response.data.type,
 			totalAmount: response.data.totalAmount,
 			lineItems: response.data.lineItems,
 		}),

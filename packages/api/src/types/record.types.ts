@@ -8,17 +8,17 @@ import type {
 	recordDeleteResponseSchema,
 	recordDetailsResponseSchema,
 	recordGetParamsSchema,
-	recordKindSchema,
 	recordListItemSchema,
 	recordListResponseSchema,
 	recordParamsSchema,
 	recordSchema,
+	recordTypeSchema,
 	recordUpdatePayloadSchema,
 	recordUpdateResponseDataSchema,
 	recordUpdateResponseSchema,
 } from "../schemas/record.schema";
 
-export type RecordKind = z.infer<typeof recordKindSchema>;
+export type RecordType = z.infer<typeof recordTypeSchema>;
 export type RecordListItem = z.infer<typeof recordListItemSchema>;
 export type RecordListResponse = z.infer<typeof recordListResponseSchema>;
 export type LineItem = z.infer<typeof lineItemSchema>;

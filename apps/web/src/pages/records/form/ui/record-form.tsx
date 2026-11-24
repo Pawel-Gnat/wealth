@@ -1,4 +1,4 @@
-import type { RecordKind } from "@repo/api/types";
+import type { RecordType } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { Form } from "@/shared/components";
 import {
@@ -8,21 +8,21 @@ import {
 import { RecordFields } from "./record-fields";
 
 export type RecordFormProps = {
-	kind?: RecordKind;
+	type?: RecordType;
 	recordId?: string;
 	budgetId?: string;
 	initialValues?: RecordFormValues;
 };
 
 export const RecordForm = ({
-	kind,
+	type,
 	recordId,
 	budgetId,
 	initialValues,
 }: RecordFormProps) => {
 	const { t } = useTranslation();
 	const { form, isPending, isEditMode, onSubmit } = useUpsertRecord({
-		...(kind ? { kind } : {}),
+		...(type ? { type } : {}),
 		...(recordId ? { recordId } : {}),
 		...(budgetId ? { budgetId } : {}),
 		...(initialValues ? { initialValues } : {}),

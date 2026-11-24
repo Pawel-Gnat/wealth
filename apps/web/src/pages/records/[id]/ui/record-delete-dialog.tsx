@@ -1,4 +1,4 @@
-import type { RecordKind } from "@repo/api/types";
+import type { RecordType } from "@repo/api/types";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import { APP_ROUTES } from "@/app/routes";
@@ -8,22 +8,22 @@ import { useDeleteRecord } from "../hooks/use-delete-record";
 
 type RecordDeleteDialogProps = {
 	id: string;
-	kind: RecordKind;
+	type: RecordType;
 	onClose: () => void;
 };
 
 export const RecordDeleteDialog = ({
 	id,
-	kind,
+	type,
 	onClose,
 }: RecordDeleteDialogProps) => {
 	const { t } = useTranslation();
 	const { budgetId } = useParams();
-	const config = getRecordConfig(kind);
+	const config = getRecordConfig(type);
 	const navigate = useNavigate();
 
 	const { deleteRecord, isLoading } = useDeleteRecord({
-		kind,
+		type,
 		onSuccess: () => {
 			toast.success(t(config.toast.deleted, { ns: "common" }));
 			onClose();
@@ -34,7 +34,7 @@ export const RecordDeleteDialog = ({
 		},
 	});
 
-	const kindText = {
+	const typeText = {
 		expense: {
 			title: t("delete.expense.title", { ns: "records" }),
 			description: t("delete.expense.description", { ns: "records" }),
@@ -43,7 +43,7 @@ export const RecordDeleteDialog = ({
 			title: t("delete.income.title", { ns: "records" }),
 			description: t("delete.income.description", { ns: "records" }),
 		},
-	}[kind];
+	}[type];
 
 	return (
 		<AlertModal
@@ -53,8 +53,8 @@ export const RecordDeleteDialog = ({
 					onClose();
 				}
 			}}
-			title={kindText.title}
-			description={kindText.description}
+			title={typeText.title}
+			description={typeText.description}
 			cancelText={t("action.cancel", { ns: "common" })}
 			confirmText={t("action.delete", { ns: "common" })}
 			onConfirm={() => {

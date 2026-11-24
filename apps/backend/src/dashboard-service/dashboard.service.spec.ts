@@ -71,21 +71,21 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "100",
 					documentDate: "2026-07-01",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "50",
 					documentDate: "2026-07-10",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "999",
 					documentDate: "2026-06-15",
@@ -94,7 +94,7 @@ describe("Dashboard service", () => {
 
 			await db.insert(recordsTable).values({
 				userId: user.id,
-				kind: "income",
+				type: "income",
 				budgetId: null,
 				totalAmount: "300",
 				documentDate: "2026-07-05",
@@ -125,14 +125,14 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "40",
 					documentDate: "2026-07-10",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: budget.id,
 					totalAmount: "500",
 					documentDate: "2026-07-10",
@@ -154,14 +154,14 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "40",
 					documentDate: "2026-07-10",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "999",
 					documentDate: "2026-07-08",
@@ -182,7 +182,7 @@ describe("Dashboard service", () => {
 
 			await db.insert(recordsTable).values({
 				userId: user.id,
-				kind: "expense",
+				type: "expense",
 				budgetId: null,
 				totalAmount: "200",
 				documentDate: "2026-07-10",
@@ -205,14 +205,14 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "150",
 					documentDate: "2026-06-01",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "300",
 					documentDate: "2026-07-01",
@@ -241,14 +241,14 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "300",
 					documentDate: "2026-06-01",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "100",
 					documentDate: "2026-07-01",
@@ -279,14 +279,14 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "70",
 					documentDate: "2026-07-05",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "140",
 					documentDate: "2026-07-12",
@@ -316,14 +316,14 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "100",
 					documentDate: "2026-07-15",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "999",
 					documentDate: "2026-07-16",
@@ -347,14 +347,14 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "100",
 					documentDate: "2026-07-15",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "50",
 					documentDate: "2026-07-16",
@@ -405,14 +405,14 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "100",
 					documentDate: "2026-07-01",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "50",
 					documentDate: "2026-07-03",
@@ -421,7 +421,7 @@ describe("Dashboard service", () => {
 
 			await db.insert(recordsTable).values({
 				userId: user.id,
-				kind: "income",
+				type: "income",
 				budgetId: null,
 				totalAmount: "200",
 				documentDate: "2026-07-02",
@@ -525,14 +525,14 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "100",
 					documentDate: "2026-07-01",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "50",
 					documentDate: "2026-07-03",
@@ -541,7 +541,7 @@ describe("Dashboard service", () => {
 
 			await db.insert(recordsTable).values({
 				userId: user.id,
-				kind: "income",
+				type: "income",
 				budgetId: null,
 				totalAmount: "200",
 				documentDate: "2026-07-02",
@@ -580,14 +580,14 @@ describe("Dashboard service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "999",
 					documentDate: "2026-07-08",
 				},
 				{
 					userId: user.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "50",
 					documentDate: "2026-07-10",
@@ -596,7 +596,7 @@ describe("Dashboard service", () => {
 
 			await db.insert(recordsTable).values({
 				userId: user.id,
-				kind: "income",
+				type: "income",
 				budgetId: null,
 				totalAmount: "400",
 				documentDate: "2026-07-08",
@@ -639,7 +639,7 @@ describe("Dashboard service", () => {
 
 			await db.insert(recordsTable).values({
 				userId: user.id,
-				kind: "expense",
+				type: "expense",
 				budgetId: null,
 				totalAmount: "75",
 				documentDate: "2026-07-14",
@@ -647,7 +647,7 @@ describe("Dashboard service", () => {
 
 			await db.insert(recordsTable).values({
 				userId: user.id,
-				kind: "income",
+				type: "income",
 				budgetId: null,
 				totalAmount: "125",
 				documentDate: "2026-07-14",

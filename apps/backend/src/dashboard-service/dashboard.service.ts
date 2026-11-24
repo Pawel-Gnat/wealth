@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import type {
 	DashboardChartResponse,
 	Period,
-	RecordKind,
+	RecordType,
 	SummaryResponse,
 } from "@repo/api/types";
 import {
@@ -155,7 +155,7 @@ export class DashboardService {
 		userId: string,
 		rangeStart: string,
 		rangeEnd: string,
-		recordKind: RecordKind,
+		recordType: RecordType,
 	): Promise<number> {
 		const [row] = await this.db
 			.select({
@@ -166,7 +166,7 @@ export class DashboardService {
 				and(
 					eq(recordsTable.userId, userId),
 					isNull(recordsTable.budgetId),
-					eq(recordsTable.kind, recordKind),
+					eq(recordsTable.type, recordType),
 					gte(recordsTable.documentDate, rangeStart),
 					lte(recordsTable.documentDate, rangeEnd),
 				),
@@ -179,7 +179,7 @@ export class DashboardService {
 		userId: string,
 		rangeStart: string,
 		rangeEnd: string,
-		recordKind: RecordKind,
+		recordType: RecordType,
 	): Promise<Map<string, number>> {
 		const rows = await this.db
 			.select({
@@ -191,7 +191,7 @@ export class DashboardService {
 				and(
 					eq(recordsTable.userId, userId),
 					isNull(recordsTable.budgetId),
-					eq(recordsTable.kind, recordKind),
+					eq(recordsTable.type, recordType),
 					gte(recordsTable.documentDate, rangeStart),
 					lte(recordsTable.documentDate, rangeEnd),
 				),

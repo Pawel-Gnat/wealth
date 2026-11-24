@@ -1,9 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { recordCreatePayloadSchema, recordKindSchema } from "@repo/api/schemas";
+import { recordCreatePayloadSchema, recordTypeSchema } from "@repo/api/schemas";
 import type {
 	RecordCreatePayload,
 	RecordCreateResponse,
-	RecordKind,
+	RecordType,
 	RecordUpdateResponse,
 } from "@repo/api/types";
 import { normalizeDocumentDateForApi } from "@repo/common/helpers";
@@ -23,10 +23,10 @@ import { getRecordConfig } from "../../config/record-config";
 type RecordUpsertResponse = RecordCreateResponse | RecordUpdateResponse;
 
 export const recordFormSchema = recordCreatePayloadSchema.extend({
-	kind: recordKindSchema,
+	type: recordTypeSchema,
 });
 
-export type RecordFormValues = RecordCreatePayload & { kind: RecordKind };
+export type RecordFormValues = RecordCreatePayload & { type: RecordType };
 
 const DEFAULT_RECORD_VALUES: RecordCreatePayload = {
 	date: new Date(),
@@ -34,14 +34,14 @@ const DEFAULT_RECORD_VALUES: RecordCreatePayload = {
 };
 
 export type UseUpsertRecordProps = {
-	kind?: RecordKind;
+	type?: RecordType;
 	recordId?: string;
 	budgetId?: string;
 	initialValues?: RecordFormValues;
 };
 
 export const useUpsertRecord = ({
-	kind,
+	type,
 	recordId,
 	budgetId,
 	initialValues,
@@ -52,7 +52,7 @@ export const useUpsertRecord = ({
 	const isEditMode = Boolean(recordId);
 	const defaultValues = {
 		...(initialValues ?? DEFAULT_RECORD_VALUES),
-		...(kind ? { kind } : {}),
+		...(type ? { type } : {}),
 	} as RecordFormValues;
 
 	const form = useForm<RecordFormValues>({
@@ -73,7 +73,7 @@ export const useUpsertRecord = ({
 	>({
 		mutationFn: (payload) =>
 			runWithRequestId(async () => {
-				const config = getRecordConfig(payload.kind);
+				const config = getRecordConfig(payload.type);
 				const normalizedPayload = {
 					...payload,
 					date: normalizeDocumentDateForApi(payload.date),
@@ -81,10 +81,10 @@ export const useUpsertRecord = ({
 
 				return recordId
 					? await controlledAsync<RecordUpsertResponse>(async () => {
-							const { kind: recordKind, ...updatePayload } = normalizedPayload;
+							const { type: recordType, ...updatePayload } = normalizedPayload;
 							return config.client.update({
 								id: recordId,
-								kind: recordKind,
+								type: recordType,
 								...updatePayload,
 							});
 						})
@@ -96,7 +96,7 @@ export const useUpsertRecord = ({
 						);
 			}),
 		onSuccess: (_data, payload) => {
-			const config = getRecordConfig(payload.kind);
+			const config = getRecordConfig(payload.type);
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.dashboard.all(),
 			});
@@ -114,7 +114,7 @@ export const useUpsertRecord = ({
 			navigate(budgetId ? APP_ROUTES.budgets.view(budgetId) : config.listRoute);
 		},
 		onError: (_error, payload) => {
-			const config = getRecordConfig(payload.kind);
+			const config = getRecordConfig(payload.type);
 			toast.error(
 				t(isEditMode ? config.toast.updateError : config.toast.createError, {
 					ns: "common",

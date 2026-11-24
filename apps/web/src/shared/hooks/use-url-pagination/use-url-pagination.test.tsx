@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { useUrlPagination } from "./use-url-pagination";
 
 const schemas = {
-	kind: recordListParamsSchema.shape.kind,
+	type: recordListParamsSchema.shape.type,
 	budgetId: recordListParamsSchema.shape.budgetId,
 	limit: recordListParamsSchema.shape.limit,
 };
@@ -26,7 +26,7 @@ const PaginationProbe = () => {
 	return (
 		<>
 			<span data-testid="page">{page}</span>
-			<span data-testid="kind">{filters.kind ?? ""}</span>
+			<span data-testid="type">{filters.type ?? ""}</span>
 			<span data-testid="limit">{filters.limit ?? ""}</span>
 			<span data-testid="search">{params.toString()}</span>
 			<button type="button" onClick={() => setPage(3)}>
@@ -38,11 +38,14 @@ const PaginationProbe = () => {
 			<button type="button" onClick={() => setFilter("limit", 30)}>
 				set-limit
 			</button>
-			<button type="button" onClick={() => clearFilter("kind")}>
-				clear-kind
+			<button type="button" onClick={() => clearFilter("type")}>
+				clear-type
 			</button>
 			<button type="button" onClick={() => setParams({ page: 2, limit: 20 })}>
 				set-params
+			</button>
+			<button type="button" onClick={() => setParams({ page: 1, type: null })}>
+				clear-type-and-page
 			</button>
 		</>
 	);
@@ -51,22 +54,22 @@ const PaginationProbe = () => {
 describe("useUrlPagination", () => {
 	it("reads the page and record list filters from the url", () => {
 		render(<PaginationProbe />, {
-			wrapper: createRouter("/records?page=2&kind=income&limit=20"),
+			wrapper: createRouter("/records?page=2&type=income&limit=20"),
 		});
 
 		expect(screen.getByTestId("page")).toHaveTextContent("2");
-		expect(screen.getByTestId("kind")).toHaveTextContent("income");
+		expect(screen.getByTestId("type")).toHaveTextContent("income");
 		expect(screen.getByTestId("limit")).toHaveTextContent("20");
 	});
 
 	it("drops invalid record list filters from the url", async () => {
 		render(<PaginationProbe />, {
-			wrapper: createRouter("/records?page=abc&kind=unknown&limit=nope"),
+			wrapper: createRouter("/records?page=abc&type=unknown&limit=nope"),
 		});
 
 		expect(await screen.findByTestId("search")).toHaveTextContent(/^$/);
 		expect(screen.getByTestId("page")).toHaveTextContent("1");
-		expect(screen.getByTestId("kind")).toHaveTextContent("");
+		expect(screen.getByTestId("type")).toHaveTextContent("");
 		expect(screen.getByTestId("limit")).toHaveTextContent("");
 	});
 
@@ -74,19 +77,19 @@ describe("useUrlPagination", () => {
 		const user = userEvent.setup();
 
 		render(<PaginationProbe />, {
-			wrapper: createRouter("/records?kind=expense"),
+			wrapper: createRouter("/records?type=expense"),
 		});
 
 		await user.click(screen.getByRole("button", { name: "set-page" }));
 
 		expect(await screen.findByTestId("search")).toHaveTextContent(
-			"kind=expense&page=3",
+			"type=expense&page=3",
 		);
 
 		await user.click(screen.getByRole("button", { name: "reset-page" }));
 
 		expect(await screen.findByTestId("search")).toHaveTextContent(
-			"kind=expense",
+			"type=expense",
 		);
 	});
 
@@ -112,10 +115,10 @@ describe("useUrlPagination", () => {
 		const user = userEvent.setup();
 
 		render(<PaginationProbe />, {
-			wrapper: createRouter("/records?page=4&kind=expense&limit=40"),
+			wrapper: createRouter("/records?page=4&type=expense&limit=40"),
 		});
 
-		await user.click(screen.getByRole("button", { name: "clear-kind" }));
+		await user.click(screen.getByRole("button", { name: "clear-type" }));
 
 		expect(await screen.findByTestId("search")).toHaveTextContent(
 			"page=4&limit=40",
@@ -128,5 +131,21 @@ describe("useUrlPagination", () => {
 		);
 		expect(screen.getByTestId("page")).toHaveTextContent("2");
 		expect(screen.getByTestId("limit")).toHaveTextContent("20");
+	});
+
+	it("clears a filter and the page in one update", async () => {
+		const user = userEvent.setup();
+
+		render(<PaginationProbe />, {
+			wrapper: createRouter("/records?page=4&type=expense&limit=40"),
+		});
+
+		await user.click(
+			screen.getByRole("button", { name: "clear-type-and-page" }),
+		);
+
+		expect(await screen.findByTestId("search")).toHaveTextContent("limit=40");
+		expect(screen.getByTestId("page")).toHaveTextContent("1");
+		expect(screen.getByTestId("type")).toHaveTextContent("");
 	});
 });

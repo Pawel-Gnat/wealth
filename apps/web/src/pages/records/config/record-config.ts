@@ -1,4 +1,4 @@
-import type { RecordKind } from "@repo/api/types";
+import type { RecordType } from "@repo/api/types";
 import type { ParseKeys, ParseNsKeys } from "@repo/common/i18n";
 import { APP_ROUTES } from "@/app/routes";
 import { orpcClient } from "@/shared/lib/orpc/orpc-client";
@@ -62,6 +62,6 @@ export const RECORD_CONFIG = {
 	},
 } as const;
 
-export const getRecordConfig = (kind: RecordKind) => {
-	return RECORD_CONFIG[kind];
+export const getRecordConfig = (type: RecordType) => {
+	return RECORD_CONFIG[type];
 };

@@ -6,6 +6,7 @@ import { PageLayout } from "@/shared/layouts";
 import { BudgetActions } from "./ui/budget-actions";
 import { RecordsAuditLog } from "./ui/records-audit-log";
 import { RecordsTable } from "./ui/records-table";
+import { TableFilters } from "./ui/table-filters";
 
 export const RecordsListPage = () => {
 	const { t } = useTranslation();
@@ -39,7 +40,10 @@ export const RecordsListPage = () => {
 					</>
 				}
 			>
-				<RecordsTable {...(budgetId ? { budgetId } : {})} />
+				<div className="flex flex-col gap-4">
+					<TableFilters />
+					<RecordsTable {...(budgetId ? { budgetId } : {})} />
+				</div>
 			</Card>
 			<RecordsAuditLog {...(budgetId ? { budgetId } : {})} />
 		</PageLayout>

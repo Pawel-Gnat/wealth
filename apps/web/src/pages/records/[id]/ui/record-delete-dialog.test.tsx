@@ -1,4 +1,4 @@
-import { recordKinds } from "@repo/api/schemas";
+import { recordTypes } from "@repo/api/schemas";
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { TFunction } from "i18next";
@@ -21,8 +21,8 @@ vi.mock("sonner", () => ({
 
 const recordId = "01JTZKQX2GT6PHGQER0M8FS6K8";
 
-describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
-	const config = RECORD_CONFIG[kind];
+describe.each(recordTypes)("%s RecordDeleteDialog", (type) => {
+	const config = RECORD_CONFIG[type];
 	let t: TFunction;
 
 	beforeAll(async () => {
@@ -38,12 +38,12 @@ describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
 		const onClose = vi.fn();
 
 		renderWithProviders(
-			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
+			<RecordDeleteDialog id={recordId} type={type} onClose={onClose} />,
 		);
 
 		expect(
 			screen.getByText(
-				t(kind === "expense" ? "delete.expense.title" : "delete.income.title", {
+				t(type === "expense" ? "delete.expense.title" : "delete.income.title", {
 					ns: "records",
 				}),
 			),
@@ -51,7 +51,7 @@ describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
 		expect(
 			screen.getByText(
 				t(
-					kind === "expense"
+					type === "expense"
 						? "delete.expense.description"
 						: "delete.income.description",
 					{ ns: "records" },
@@ -75,7 +75,7 @@ describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
 		const onClose = vi.fn();
 
 		const { queryClient } = renderWithProviders(
-			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
+			<RecordDeleteDialog id={recordId} type={type} onClose={onClose} />,
 		);
 		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
@@ -110,7 +110,7 @@ describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
 		);
 
 		renderWithProviders(
-			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
+			<RecordDeleteDialog id={recordId} type={type} onClose={onClose} />,
 		);
 
 		await user.click(
@@ -135,7 +135,7 @@ describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
 		);
 
 		renderWithProviders(
-			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
+			<RecordDeleteDialog id={recordId} type={type} onClose={onClose} />,
 		);
 
 		const dialog = screen.getByRole("alertdialog");
@@ -167,7 +167,7 @@ describe.each(recordKinds)("%s RecordDeleteDialog", (kind) => {
 		);
 
 		renderWithProviders(
-			<RecordDeleteDialog id={recordId} kind={kind} onClose={onClose} />,
+			<RecordDeleteDialog id={recordId} type={type} onClose={onClose} />,
 		);
 
 		const dialog = screen.getByRole("alertdialog");

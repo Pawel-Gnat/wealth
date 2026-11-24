@@ -7,7 +7,7 @@ import {
 	RECORD_DELETED_MESSAGE,
 	RECORD_UPDATED_MESSAGE,
 } from "@repo/api/schemas";
-import type { RecordKind } from "@repo/api/types";
+import type { RecordType } from "@repo/api/types";
 import { decodeDocumentDateFromStorage } from "@repo/common/helpers";
 import { logger } from "@repo/observability/node";
 import { and, eq } from "drizzle-orm";
@@ -54,8 +54,8 @@ const documentMessages = {
 	},
 } as const;
 
-const otherKind = (kind: RecordKind): RecordKind =>
-	kind === "expense" ? "income" : "expense";
+const otherKind = (type: RecordType): RecordType =>
+	type === "expense" ? "income" : "expense";
 
 describe("Records service", () => {
 	let moduleRef: TestingModule;
@@ -95,7 +95,7 @@ describe("Records service", () => {
 		await db.insert(recordsTable).values(
 			Array.from({ length: DEFAULT_PAGE_SIZE + 1 }, (_, index) => ({
 				userId: user.id,
-				kind: "expense" as const,
+				type: "expense" as const,
 				budgetId: null,
 				totalAmount: String(index + 1),
 				documentDate: "2024-01-01",
@@ -168,35 +168,35 @@ describe("Records service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: userA.id,
-					kind,
+					type: kind,
 					budgetId: null,
 					totalAmount: "100",
 					documentDate: "2024-01-15",
 				},
 				{
 					userId: userA.id,
-					kind,
+					type: kind,
 					budgetId: null,
 					totalAmount: "50.50",
 					documentDate: "2024-06-01",
 				},
 				{
 					userId: userA.id,
-					kind: otherKind(kind),
+					type: otherKind(kind),
 					budgetId: null,
 					totalAmount: "8",
 					documentDate: "2024-12-01",
 				},
 				{
 					userId: userA.id,
-					kind,
+					type: kind,
 					budgetId: budget.id,
 					totalAmount: "77",
 					documentDate: "2024-08-01",
 				},
 				{
 					userId: userB.id,
-					kind,
+					type: kind,
 					budgetId: null,
 					totalAmount: "9.99",
 					documentDate: "2024-03-01",
@@ -213,7 +213,7 @@ describe("Records service", () => {
 			});
 			expect(forA.data).toHaveLength(2);
 			expect(forA.data[0]).toMatchObject({
-				kind,
+				type: kind,
 				totalAmount: 50.5,
 				date: decodeDocumentDateFromStorage("2024-06-01"),
 			});
@@ -252,7 +252,7 @@ describe("Records service", () => {
 				.where(eq(recordsTable.userId, user.id));
 
 			expect(createdDocument).toMatchObject({
-				kind,
+				type: kind,
 				budgetId: null,
 				totalAmount: "55.00",
 				documentDate: "2026-05-01",
@@ -365,7 +365,7 @@ describe("Records service", () => {
 
 			expect(details.data).toMatchObject({
 				id: documentId,
-				kind,
+				type: kind,
 				date: payload.date,
 				totalAmount: 18,
 			});
@@ -394,7 +394,7 @@ describe("Records service", () => {
 				.insert(recordsTable)
 				.values({
 					userId: owner.id,
-					kind,
+					type: kind,
 					budgetId: null,
 					totalAmount: "20.00",
 					documentDate: "2026-05-04",
@@ -405,7 +405,7 @@ describe("Records service", () => {
 				.insert(recordsTable)
 				.values({
 					userId: otherUser.id,
-					kind,
+					type: kind,
 					budgetId: null,
 					totalAmount: "30.00",
 					documentDate: "2026-05-05",
@@ -538,7 +538,7 @@ describe("Records service", () => {
 				.insert(recordsTable)
 				.values({
 					userId: otherUser.id,
-					kind,
+					type: kind,
 					budgetId: null,
 					totalAmount: "44.00",
 					documentDate: "2026-05-06",
@@ -566,7 +566,7 @@ describe("Records service", () => {
 				.insert(recordsTable)
 				.values({
 					userId: user.id,
-					kind,
+					type: kind,
 					budgetId: null,
 					totalAmount: "20.00",
 					documentDate: "2024-01-01",
@@ -631,7 +631,7 @@ describe("Records service", () => {
 				.insert(recordsTable)
 				.values({
 					userId: user.id,
-					kind,
+					type: kind,
 					budgetId: null,
 					totalAmount: "55.00",
 					documentDate,
@@ -726,7 +726,7 @@ describe("Records service", () => {
 				.insert(recordsTable)
 				.values({
 					userId: otherUser.id,
-					kind,
+					type: kind,
 					budgetId: null,
 					totalAmount: "22.00",
 					documentDate: "2026-05-07",
@@ -781,7 +781,7 @@ describe("Records service", () => {
 				.insert(recordsTable)
 				.values({
 					userId: user.id,
-					kind,
+					type: kind,
 					budgetId: budget.id,
 					totalAmount: "40.00",
 					documentDate: "2026-05-09",
@@ -852,7 +852,7 @@ describe("Records service", () => {
 				.insert(recordsTable)
 				.values({
 					userId: creator.id,
-					kind,
+					type: kind,
 					budgetId: budget.id,
 					totalAmount: "12.00",
 					documentDate: "2026-05-12",
@@ -889,7 +889,7 @@ describe("Records service", () => {
 			await expect(
 				recordsService.getByUserId(member.id, groupDocument.id),
 			).resolves.toMatchObject({
-				data: { id: groupDocument.id, kind },
+				data: { id: groupDocument.id, type: kind },
 			});
 
 			const lineItems = await db
@@ -929,28 +929,28 @@ describe("Records service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: owner.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "5.00",
 					documentDate: "2026-01-01",
 				},
 				{
 					userId: owner.id,
-					kind: "income",
+					type: "income",
 					budgetId: budget.id,
 					totalAmount: "25.50",
 					documentDate: "2026-04-01",
 				},
 				{
 					userId: owner.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: budget.id,
 					totalAmount: "10.00",
 					documentDate: "2026-02-01",
 				},
 				{
 					userId: owner.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: otherBudget.id,
 					totalAmount: "99.00",
 					documentDate: "2026-06-01",
@@ -965,11 +965,11 @@ describe("Records service", () => {
 
 			expect(listed.data).toHaveLength(2);
 			expect(listed.data[0]).toMatchObject({
-				kind: "income",
+				type: "income",
 				totalAmount: 25.5,
 			});
 			expect(listed.data[1]).toMatchObject({
-				kind: "expense",
+				type: "expense",
 				totalAmount: 10,
 			});
 		});
@@ -1026,7 +1026,7 @@ describe("Records service", () => {
 				}),
 			]);
 			expect(shared.data[0]).toMatchObject({
-				kind: "expense",
+				type: "expense",
 				totalAmount: 18,
 			});
 		});
@@ -1044,7 +1044,7 @@ describe("Records service", () => {
 				{
 					id: "01J00000000000000000000000",
 					userId: owner.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "10.00",
 					documentDate: "2026-08-01",
@@ -1052,7 +1052,7 @@ describe("Records service", () => {
 				{
 					id: "01K00000000000000000000000",
 					userId: owner.id,
-					kind: "income",
+					type: "income",
 					budgetId: null,
 					totalAmount: "30.00",
 					documentDate: "2026-08-01",
@@ -1060,7 +1060,7 @@ describe("Records service", () => {
 				{
 					id: "01M00000000000000000000000",
 					userId: owner.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "5.00",
 					documentDate: "2026-07-01",
@@ -1108,21 +1108,21 @@ describe("Records service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: owner.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: budget.id,
 					totalAmount: "10.00",
 					documentDate: "2026-01-01",
 				},
 				{
 					userId: activeMember.id,
-					kind: "income",
+					type: "income",
 					budgetId: budget.id,
 					totalAmount: "25.50",
 					documentDate: "2026-04-01",
 				},
 				{
 					userId: owner.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: null,
 					totalAmount: "99.00",
 					documentDate: "2026-06-01",
@@ -1143,13 +1143,13 @@ describe("Records service", () => {
 			expect(forOwner.data).toEqual(forMember.data);
 			expect(forOwner.data).toHaveLength(2);
 			expect(forOwner.data[0]).toMatchObject({
-				kind: "income",
+				type: "income",
 				totalAmount: 25.5,
 				date: decodeDocumentDateFromStorage("2026-04-01"),
 				owner: { id: activeMember.id, email: activeMember.email },
 			});
 			expect(forOwner.data[1]).toMatchObject({
-				kind: "expense",
+				type: "expense",
 				totalAmount: 10,
 				date: decodeDocumentDateFromStorage("2026-01-01"),
 				owner: { id: owner.id, email: owner.email },
@@ -1176,14 +1176,14 @@ describe("Records service", () => {
 			await db.insert(recordsTable).values([
 				{
 					userId: owner.id,
-					kind: "expense",
+					type: "expense",
 					budgetId: budget.id,
 					totalAmount: "10.00",
 					documentDate: "2026-02-01",
 				},
 				{
 					userId: owner.id,
-					kind: "income",
+					type: "income",
 					budgetId: budget.id,
 					totalAmount: "20.00",
 					documentDate: "2026-03-01",
@@ -1198,7 +1198,7 @@ describe("Records service", () => {
 
 			expect(expenses.data).toHaveLength(1);
 			expect(expenses.data[0]).toMatchObject({
-				kind: "expense",
+				type: "expense",
 				totalAmount: 10,
 			});
 		});

@@ -15,7 +15,7 @@ export class RecordsController {
 		return implement(rpcContract.records.list).handler(({ context, input }) => {
 			return this.recordsService.listByUserId(
 				userIdFromRequest(context.request),
-				input.kind,
+				input.type,
 				input.budgetId,
 				input.page,
 				input.limit,
@@ -29,7 +29,7 @@ export class RecordsController {
 			({ context, input }) => {
 				return this.recordsService.createByUserId(
 					userIdFromRequest(context.request),
-					input.kind,
+					input.type,
 					{ date: input.date, lineItems: input.lineItems },
 					input.budgetId,
 				);
@@ -54,7 +54,7 @@ export class RecordsController {
 				return this.recordsService.updateByUserId(
 					userIdFromRequest(context.request),
 					input.id,
-					input.kind,
+					input.type,
 					{ date: input.date, lineItems: input.lineItems },
 				);
 			},
@@ -68,7 +68,7 @@ export class RecordsController {
 				return this.recordsService.deleteByUserId(
 					userIdFromRequest(context.request),
 					input.id,
-					input.kind,
+					input.type,
 				);
 			},
 		);

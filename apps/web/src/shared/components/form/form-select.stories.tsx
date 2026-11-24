@@ -1,11 +1,11 @@
-import { recordKinds } from "@repo/api/schemas";
+import { recordTypes } from "@repo/api/schemas";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useTranslation } from "react-i18next";
 import { FormSelect } from "./form-select";
 import { FormFieldStory } from "./helpers/form-field-story";
 
-type KindValues = {
-	kind: string;
+type TypeValues = {
+	type: string;
 };
 
 const KindField = ({
@@ -18,19 +18,19 @@ const KindField = ({
 	const { t } = useTranslation();
 
 	return (
-		<FormFieldStory<KindValues>
-			defaultValues={{ kind: "" }}
+		<FormFieldStory<TypeValues>
+			defaultValues={{ type: "" }}
 			{...(disabled ? { disabled } : {})}
-			{...(error ? { error: { name: "kind", message: error } } : {})}
+			{...(error ? { error: { name: "type", message: error } } : {})}
 		>
 			{(control) => (
 				<FormSelect
-					name="kind"
+					name="type"
 					label={t("single.type", { ns: "records" })}
 					control={control}
-					options={recordKinds.map((kind) => ({
-						value: kind,
-						label: t(`single.kind.${kind}`, { ns: "records" }),
+					options={recordTypes.map((recordType) => ({
+						value: recordType,
+						label: t(`single.kind.${recordType}`, { ns: "records" }),
 					}))}
 				/>
 			)}

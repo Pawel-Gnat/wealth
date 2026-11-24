@@ -6842,82 +6842,38 @@
                             },
                             {
                               "type": "frame",
-                              "id": "T6jjNJ",
-                              "name": "Type Pills",
+                              "id": "XXP7A",
+                              "name": "Type Select",
                               "width": "fill_container",
                               "height": 36,
                               "fill": "$muted",
                               "cornerRadius": "$radius-pill",
-                              "gap": 4,
-                              "padding": 4,
+                              "padding": [
+                                0,
+                                12
+                              ],
+                              "justifyContent": "space_between",
                               "alignItems": "center",
                               "children": [
                                 {
-                                  "type": "frame",
-                                  "id": "Wq3Cj",
-                                  "name": "Type All",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "fill": "$card",
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "T9hNo",
-                                      "name": "All Label",
-                                      "fill": "$foreground",
-                                      "content": "All",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "500"
-                                    }
-                                  ]
+                                  "type": "text",
+                                  "id": "UUUkp",
+                                  "name": "Type Value",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 },
                                 {
-                                  "type": "frame",
-                                  "id": "rBAAM",
-                                  "name": "Type Expense",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "WH1hf",
-                                      "name": "Expense Label",
-                                      "fill": "$foreground",
-                                      "content": "Expense",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "UflNC",
-                                  "name": "Type Income",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "e42LN",
-                                      "name": "Income Label",
-                                      "fill": "$foreground",
-                                      "content": "Income",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
+                                  "type": "icon",
+                                  "id": "LtGBZ",
+                                  "name": "Type Chevron",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "$muted-foreground"
                                 }
                               ]
                             }
@@ -8254,118 +8210,83 @@
                   "alignItems": "end",
                   "children": [
                     {
-                      "id": "y9xAN",
-                      "type": "ref",
-                      "ref": "gIJ2L",
-                      "name": "Date Filter",
-                      "width": 280,
-                      "descendants": {
-                        "ZWsLX": {
-                          "content": "Date"
-                        },
-                        "Eyb4X": {
-                          "icon": "calendar"
-                        },
-                        "xV4Tl": {
-                          "content": "August 2026",
-                          "fill": "$foreground"
-                        }
-                      }
-                    },
-                    {
                       "type": "frame",
-                      "id": "J0a9sx",
-                      "name": "Type Filter",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 6,
+                      "id": "DdZ6t",
+                      "name": "Filters",
+                      "gap": 12,
+                      "alignItems": "end",
                       "children": [
                         {
-                          "type": "text",
-                          "id": "Q298Z",
-                          "name": "Type Label",
-                          "fill": "$foreground",
-                          "content": "Type",
-                          "fontFamily": "$font-sans",
-                          "fontSize": 14,
-                          "fontWeight": "500"
+                          "id": "y9xAN",
+                          "type": "ref",
+                          "ref": "gIJ2L",
+                          "name": "Date Filter",
+                          "width": 280,
+                          "descendants": {
+                            "ZWsLX": {
+                              "content": "Date"
+                            },
+                            "Eyb4X": {
+                              "icon": "calendar"
+                            },
+                            "xV4Tl": {
+                              "content": "August 2026",
+                              "fill": "$foreground"
+                            }
+                          }
                         },
                         {
                           "type": "frame",
-                          "id": "KJiCx",
-                          "name": "Type Pills",
-                          "width": "fill_container",
-                          "height": 36,
-                          "fill": "$muted",
-                          "cornerRadius": "$radius-pill",
-                          "gap": 4,
-                          "padding": 4,
-                          "alignItems": "center",
+                          "id": "J0a9sx",
+                          "name": "Type Filter",
+                          "width": 200,
+                          "layout": "vertical",
+                          "gap": 6,
                           "children": [
                             {
+                              "type": "text",
+                              "id": "Q298Z",
+                              "name": "Type Label",
+                              "fill": "$foreground",
+                              "content": "Type",
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "500"
+                            },
+                            {
                               "type": "frame",
-                              "id": "idaXR",
-                              "name": "Type All",
+                              "id": "a5UTb",
+                              "name": "Type Select",
                               "width": "fill_container",
-                              "height": 28,
-                              "fill": "$card",
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
+                              "height": 36,
+                              "fill": "$muted",
+                              "cornerRadius": "$radius-pill",
+                              "padding": [
+                                0,
+                                12
+                              ],
+                              "justifyContent": "space_between",
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "SHfiA",
-                                  "name": "All Label",
+                                  "id": "u0Yxu",
+                                  "name": "Type Value",
                                   "fill": "$foreground",
                                   "content": "All",
                                   "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "500"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "EQS0V",
-                              "name": "Type Expense",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "CMcSK",
-                                  "name": "Expense Label",
-                                  "fill": "$foreground",
-                                  "content": "Expense",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
+                                  "fontSize": 14,
                                   "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "E0jdI0",
-                              "name": "Type Income",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
+                                },
                                 {
-                                  "type": "text",
-                                  "id": "eticT",
-                                  "name": "Income Label",
-                                  "fill": "$foreground",
-                                  "content": "Income",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
+                                  "type": "icon",
+                                  "id": "xaY46",
+                                  "name": "Type Chevron",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "$muted-foreground"
                                 }
                               ]
                             }
@@ -19232,82 +19153,38 @@
                         },
                         {
                           "type": "frame",
-                          "id": "z4thBP",
-                          "name": "Type Pills",
+                          "id": "zJUFR",
+                          "name": "Type Select",
                           "width": "fill_container",
                           "height": 36,
                           "fill": "$muted",
                           "cornerRadius": "$radius-pill",
-                          "gap": 4,
-                          "padding": 4,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "justifyContent": "space_between",
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "frame",
-                              "id": "LpaDP",
-                              "name": "Type All",
-                              "width": "fill_container",
-                              "height": 28,
-                              "fill": "$card",
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "vh4uv",
-                                  "name": "All Label",
-                                  "fill": "$foreground",
-                                  "content": "All",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "500"
-                                }
-                              ]
+                              "type": "text",
+                              "id": "rLG0l",
+                              "name": "Type Value",
+                              "fill": "$foreground",
+                              "content": "All",
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
                             },
                             {
-                              "type": "frame",
-                              "id": "QSkDy",
-                              "name": "Type Expense",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "GIHKb",
-                                  "name": "Expense Label",
-                                  "fill": "$foreground",
-                                  "content": "Expense",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "w7Q98Y",
-                              "name": "Type Income",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "Ac8S9",
-                                  "name": "Income Label",
-                                  "fill": "$foreground",
-                                  "content": "Income",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
+                              "type": "icon",
+                              "id": "HJ9la",
+                              "name": "Type Chevron",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "chevron-down",
+                              "library": "lucide",
+                              "fill": "$muted-foreground"
                             }
                           ]
                         }
@@ -27012,82 +26889,38 @@
                             },
                             {
                               "type": "frame",
-                              "id": "Y65VfR",
-                              "name": "Type Pills",
+                              "id": "z9k7nr",
+                              "name": "Type Select",
                               "width": "fill_container",
                               "height": 36,
                               "fill": "$muted",
                               "cornerRadius": "$radius-pill",
-                              "gap": 4,
-                              "padding": 4,
+                              "padding": [
+                                0,
+                                12
+                              ],
+                              "justifyContent": "space_between",
                               "alignItems": "center",
                               "children": [
                                 {
-                                  "type": "frame",
-                                  "id": "Uy6Km",
-                                  "name": "Type All",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "fill": "$card",
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "q8wZT9",
-                                      "name": "All Label",
-                                      "fill": "$foreground",
-                                      "content": "All",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "500"
-                                    }
-                                  ]
+                                  "type": "text",
+                                  "id": "XBx88",
+                                  "name": "Type Value",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 },
                                 {
-                                  "type": "frame",
-                                  "id": "jFzl2",
-                                  "name": "Type Expense",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "ix1fI",
-                                      "name": "Expense Label",
-                                      "fill": "$foreground",
-                                      "content": "Expense",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "MP52R",
-                                  "name": "Type Income",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "WoeiY",
-                                      "name": "Income Label",
-                                      "fill": "$foreground",
-                                      "content": "Income",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
+                                  "type": "icon",
+                                  "id": "FFPub",
+                                  "name": "Type Chevron",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "$muted-foreground"
                                 }
                               ]
                             }
@@ -29570,82 +29403,38 @@
                         },
                         {
                           "type": "frame",
-                          "id": "Pxl9L",
-                          "name": "Type Pills",
+                          "id": "s7cPi",
+                          "name": "Type Select",
                           "width": "fill_container",
                           "height": 36,
                           "fill": "$muted",
                           "cornerRadius": "$radius-pill",
-                          "gap": 4,
-                          "padding": 4,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "justifyContent": "space_between",
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "frame",
-                              "id": "fdVsF",
-                              "name": "Type All",
-                              "width": "fill_container",
-                              "height": 28,
-                              "fill": "$card",
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "d74jR",
-                                  "name": "All Label",
-                                  "fill": "$foreground",
-                                  "content": "All",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "500"
-                                }
-                              ]
+                              "type": "text",
+                              "id": "acnE2",
+                              "name": "Type Value",
+                              "fill": "$foreground",
+                              "content": "All",
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
                             },
                             {
-                              "type": "frame",
-                              "id": "bJKf1",
-                              "name": "Type Expense",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "eTNIh",
-                                  "name": "Expense Label",
-                                  "fill": "$foreground",
-                                  "content": "Expense",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "bn7g6",
-                              "name": "Type Income",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "i2St7I",
-                                  "name": "Income Label",
-                                  "fill": "$foreground",
-                                  "content": "Income",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
+                              "type": "icon",
+                              "id": "Ww2sW",
+                              "name": "Type Chevron",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "chevron-down",
+                              "library": "lucide",
+                              "fill": "$muted-foreground"
                             }
                           ]
                         }
@@ -31052,82 +30841,38 @@
                             },
                             {
                               "type": "frame",
-                              "id": "q5pyl",
-                              "name": "Type Pills",
+                              "id": "Ni1uv",
+                              "name": "Type Select",
                               "width": "fill_container",
                               "height": 36,
                               "fill": "$muted",
                               "cornerRadius": "$radius-pill",
-                              "gap": 4,
-                              "padding": 4,
+                              "padding": [
+                                0,
+                                12
+                              ],
+                              "justifyContent": "space_between",
                               "alignItems": "center",
                               "children": [
                                 {
-                                  "type": "frame",
-                                  "id": "PkM6j",
-                                  "name": "Type All",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "fill": "$card",
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "w9B7rg",
-                                      "name": "All Label",
-                                      "fill": "$foreground",
-                                      "content": "All",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "500"
-                                    }
-                                  ]
+                                  "type": "text",
+                                  "id": "FJqHs",
+                                  "name": "Type Value",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 },
                                 {
-                                  "type": "frame",
-                                  "id": "JXel6",
-                                  "name": "Type Expense",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "HkfBw",
-                                      "name": "Expense Label",
-                                      "fill": "$foreground",
-                                      "content": "Expense",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "U4TyA4",
-                                  "name": "Type Income",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "AHVIK",
-                                      "name": "Income Label",
-                                      "fill": "$foreground",
-                                      "content": "Income",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
+                                  "type": "icon",
+                                  "id": "K8Yh9F",
+                                  "name": "Type Chevron",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "$muted-foreground"
                                 }
                               ]
                             }
@@ -32776,82 +32521,38 @@
                         },
                         {
                           "type": "frame",
-                          "id": "an5by",
-                          "name": "Type Pills",
+                          "id": "luLoK",
+                          "name": "Type Select",
                           "width": "fill_container",
                           "height": 36,
                           "fill": "$muted",
                           "cornerRadius": "$radius-pill",
-                          "gap": 4,
-                          "padding": 4,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "justifyContent": "space_between",
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "frame",
-                              "id": "fQeA4",
-                              "name": "Type All",
-                              "width": "fill_container",
-                              "height": 28,
-                              "fill": "$card",
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "ZVeh9",
-                                  "name": "All Label",
-                                  "fill": "$foreground",
-                                  "content": "All",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "500"
-                                }
-                              ]
+                              "type": "text",
+                              "id": "y7h97",
+                              "name": "Type Value",
+                              "fill": "$foreground",
+                              "content": "All",
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
                             },
                             {
-                              "type": "frame",
-                              "id": "lU5uU",
-                              "name": "Type Expense",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "ILh0i",
-                                  "name": "Expense Label",
-                                  "fill": "$foreground",
-                                  "content": "Expense",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "pxQmN",
-                              "name": "Type Income",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "jFnvy",
-                                  "name": "Income Label",
-                                  "fill": "$foreground",
-                                  "content": "Income",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
+                              "type": "icon",
+                              "id": "Y3Cph2",
+                              "name": "Type Chevron",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "chevron-down",
+                              "library": "lucide",
+                              "fill": "$muted-foreground"
                             }
                           ]
                         }
@@ -34294,82 +33995,38 @@
                             },
                             {
                               "type": "frame",
-                              "id": "v0PY2",
-                              "name": "Type Pills",
+                              "id": "peX1I",
+                              "name": "Type Select",
                               "width": "fill_container",
                               "height": 36,
                               "fill": "$muted",
                               "cornerRadius": "$radius-pill",
-                              "gap": 4,
-                              "padding": 4,
+                              "padding": [
+                                0,
+                                12
+                              ],
+                              "justifyContent": "space_between",
                               "alignItems": "center",
                               "children": [
                                 {
-                                  "type": "frame",
-                                  "id": "P9Rfo",
-                                  "name": "Type All",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "fill": "$card",
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "i96Atr",
-                                      "name": "All Label",
-                                      "fill": "$foreground",
-                                      "content": "All",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "500"
-                                    }
-                                  ]
+                                  "type": "text",
+                                  "id": "D4Dfoa",
+                                  "name": "Type Value",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 },
                                 {
-                                  "type": "frame",
-                                  "id": "j4bN1s",
-                                  "name": "Type Expense",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "vo4Lo",
-                                      "name": "Expense Label",
-                                      "fill": "$foreground",
-                                      "content": "Expense",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "t4hmb",
-                                  "name": "Type Income",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "pKUyM",
-                                      "name": "Income Label",
-                                      "fill": "$foreground",
-                                      "content": "Income",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
+                                  "type": "icon",
+                                  "id": "mLqaU",
+                                  "name": "Type Chevron",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "$muted-foreground"
                                 }
                               ]
                             }
@@ -35666,82 +35323,38 @@
                         },
                         {
                           "type": "frame",
-                          "id": "JP89j",
-                          "name": "Type Pills",
+                          "id": "dtvD6",
+                          "name": "Type Select",
                           "width": "fill_container",
                           "height": 36,
                           "fill": "$muted",
                           "cornerRadius": "$radius-pill",
-                          "gap": 4,
-                          "padding": 4,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "justifyContent": "space_between",
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "frame",
-                              "id": "q08N8b",
-                              "name": "Type All",
-                              "width": "fill_container",
-                              "height": 28,
-                              "fill": "$card",
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "b4A8F",
-                                  "name": "All Label",
-                                  "fill": "$foreground",
-                                  "content": "All",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "500"
-                                }
-                              ]
+                              "type": "text",
+                              "id": "WqST4",
+                              "name": "Type Value",
+                              "fill": "$foreground",
+                              "content": "All",
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
                             },
                             {
-                              "type": "frame",
-                              "id": "gqU77",
-                              "name": "Type Expense",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "zDsWu",
-                                  "name": "Expense Label",
-                                  "fill": "$foreground",
-                                  "content": "Expense",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "hx0qC",
-                              "name": "Type Income",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "wvGq0",
-                                  "name": "Income Label",
-                                  "fill": "$foreground",
-                                  "content": "Income",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
+                              "type": "icon",
+                              "id": "PDPPa",
+                              "name": "Type Chevron",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "chevron-down",
+                              "library": "lucide",
+                              "fill": "$muted-foreground"
                             }
                           ]
                         }
@@ -37139,82 +36752,38 @@
                             },
                             {
                               "type": "frame",
-                              "id": "Q38Iax",
-                              "name": "Type Pills",
+                              "id": "BKtz9",
+                              "name": "Type Select",
                               "width": "fill_container",
                               "height": 36,
                               "fill": "$muted",
                               "cornerRadius": "$radius-pill",
-                              "gap": 4,
-                              "padding": 4,
+                              "padding": [
+                                0,
+                                12
+                              ],
+                              "justifyContent": "space_between",
                               "alignItems": "center",
                               "children": [
                                 {
-                                  "type": "frame",
-                                  "id": "QNOl3",
-                                  "name": "Type All",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "fill": "$card",
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "M7fKTu",
-                                      "name": "All Label",
-                                      "fill": "$foreground",
-                                      "content": "All",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "500"
-                                    }
-                                  ]
+                                  "type": "text",
+                                  "id": "r43VHo",
+                                  "name": "Type Value",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 },
                                 {
-                                  "type": "frame",
-                                  "id": "Ei0uj",
-                                  "name": "Type Expense",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "uOYMJ",
-                                      "name": "Expense Label",
-                                      "fill": "$foreground",
-                                      "content": "Expense",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "rbKYZ",
-                                  "name": "Type Income",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "LHQFV",
-                                      "name": "Income Label",
-                                      "fill": "$foreground",
-                                      "content": "Income",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
+                                  "type": "icon",
+                                  "id": "avMu7",
+                                  "name": "Type Chevron",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "$muted-foreground"
                                 }
                               ]
                             }
@@ -38537,82 +38106,38 @@
                         },
                         {
                           "type": "frame",
-                          "id": "Zz5gn",
-                          "name": "Type Pills",
+                          "id": "WsmKo",
+                          "name": "Type Select",
                           "width": "fill_container",
                           "height": 36,
                           "fill": "$muted",
                           "cornerRadius": "$radius-pill",
-                          "gap": 4,
-                          "padding": 4,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "justifyContent": "space_between",
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "frame",
-                              "id": "hLec8",
-                              "name": "Type All",
-                              "width": "fill_container",
-                              "height": 28,
-                              "fill": "$card",
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "AFfJ5",
-                                  "name": "All Label",
-                                  "fill": "$foreground",
-                                  "content": "All",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "500"
-                                }
-                              ]
+                              "type": "text",
+                              "id": "Op6i0",
+                              "name": "Type Value",
+                              "fill": "$foreground",
+                              "content": "All",
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
                             },
                             {
-                              "type": "frame",
-                              "id": "d4Am2",
-                              "name": "Type Expense",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "Slvbv",
-                                  "name": "Expense Label",
-                                  "fill": "$foreground",
-                                  "content": "Expense",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "sFvAf",
-                              "name": "Type Income",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "B0tkA",
-                                  "name": "Income Label",
-                                  "fill": "$foreground",
-                                  "content": "Income",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
+                              "type": "icon",
+                              "id": "Y3mtzY",
+                              "name": "Type Chevron",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "chevron-down",
+                              "library": "lucide",
+                              "fill": "$muted-foreground"
                             }
                           ]
                         }
@@ -40046,82 +39571,38 @@
                             },
                             {
                               "type": "frame",
-                              "id": "Todbr",
-                              "name": "Type Pills",
+                              "id": "a5xxF",
+                              "name": "Type Select",
                               "width": "fill_container",
                               "height": 36,
                               "fill": "$muted",
                               "cornerRadius": "$radius-pill",
-                              "gap": 4,
-                              "padding": 4,
+                              "padding": [
+                                0,
+                                12
+                              ],
+                              "justifyContent": "space_between",
                               "alignItems": "center",
                               "children": [
                                 {
-                                  "type": "frame",
-                                  "id": "m8Jkr",
-                                  "name": "Type All",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "fill": "$card",
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "qCT9M",
-                                      "name": "All Label",
-                                      "fill": "$foreground",
-                                      "content": "All",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "500"
-                                    }
-                                  ]
+                                  "type": "text",
+                                  "id": "g5kPXT",
+                                  "name": "Type Value",
+                                  "fill": "$foreground",
+                                  "content": "All",
+                                  "fontFamily": "$font-sans",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 },
                                 {
-                                  "type": "frame",
-                                  "id": "O970G3",
-                                  "name": "Type Expense",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "oE7qq",
-                                      "name": "Expense Label",
-                                      "fill": "$foreground",
-                                      "content": "Expense",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "ENvzq",
-                                  "name": "Type Income",
-                                  "width": "fill_container",
-                                  "height": 28,
-                                  "cornerRadius": 24,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "x4REi0",
-                                      "name": "Income Label",
-                                      "fill": "$foreground",
-                                      "content": "Income",
-                                      "fontFamily": "$font-sans",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
+                                  "type": "icon",
+                                  "id": "z3R8p",
+                                  "name": "Type Chevron",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "$muted-foreground"
                                 }
                               ]
                             }
@@ -40609,82 +40090,38 @@
                         },
                         {
                           "type": "frame",
-                          "id": "JHCVr",
-                          "name": "Type Pills",
+                          "id": "eoWam",
+                          "name": "Type Select",
                           "width": "fill_container",
                           "height": 36,
                           "fill": "$muted",
                           "cornerRadius": "$radius-pill",
-                          "gap": 4,
-                          "padding": 4,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "justifyContent": "space_between",
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "frame",
-                              "id": "BYyq7",
-                              "name": "Type All",
-                              "width": "fill_container",
-                              "height": 28,
-                              "fill": "$card",
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "ajEII",
-                                  "name": "All Label",
-                                  "fill": "$foreground",
-                                  "content": "All",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "500"
-                                }
-                              ]
+                              "type": "text",
+                              "id": "GZTNU",
+                              "name": "Type Value",
+                              "fill": "$foreground",
+                              "content": "All",
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
                             },
                             {
-                              "type": "frame",
-                              "id": "yvPEJ",
-                              "name": "Type Expense",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "e37u2K",
-                                  "name": "Expense Label",
-                                  "fill": "$foreground",
-                                  "content": "Expense",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "lKos6",
-                              "name": "Type Income",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "EO6gC",
-                                  "name": "Income Label",
-                                  "fill": "$foreground",
-                                  "content": "Income",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
+                              "type": "icon",
+                              "id": "h4pIY",
+                              "name": "Type Chevron",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "chevron-down",
+                              "library": "lucide",
+                              "fill": "$muted-foreground"
                             }
                           ]
                         }
@@ -43518,82 +42955,38 @@
                         },
                         {
                           "type": "frame",
-                          "id": "jCDm8",
-                          "name": "Type Pills",
+                          "id": "k8PaH",
+                          "name": "Type Select",
                           "width": "fill_container",
                           "height": 36,
                           "fill": "$muted",
                           "cornerRadius": "$radius-pill",
-                          "gap": 4,
-                          "padding": 4,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "justifyContent": "space_between",
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "frame",
-                              "id": "v6WgNk",
-                              "name": "Type All",
-                              "width": "fill_container",
-                              "height": 28,
-                              "fill": "$card",
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "VGHYQ",
-                                  "name": "All Label",
-                                  "fill": "$foreground",
-                                  "content": "All",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "500"
-                                }
-                              ]
+                              "type": "text",
+                              "id": "U1kANN",
+                              "name": "Type Value",
+                              "fill": "$foreground",
+                              "content": "All",
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
                             },
                             {
-                              "type": "frame",
-                              "id": "hwRkm",
-                              "name": "Type Expense",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "yUnLe",
-                                  "name": "Expense Label",
-                                  "fill": "$foreground",
-                                  "content": "Expense",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "D1xqp",
-                              "name": "Type Income",
-                              "width": "fill_container",
-                              "height": 28,
-                              "cornerRadius": 24,
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "jNKa1",
-                                  "name": "Income Label",
-                                  "fill": "$foreground",
-                                  "content": "Income",
-                                  "fontFamily": "$font-sans",
-                                  "fontSize": 12,
-                                  "fontWeight": "normal"
-                                }
-                              ]
+                              "type": "icon",
+                              "id": "m96q3",
+                              "name": "Type Chevron",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "chevron-down",
+                              "library": "lucide",
+                              "fill": "$muted-foreground"
                             }
                           ]
                         }

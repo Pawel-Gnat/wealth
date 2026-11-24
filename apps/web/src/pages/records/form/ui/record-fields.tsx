@@ -1,4 +1,4 @@
-import { recordKinds } from "@repo/api/schemas";
+import { recordTypes } from "@repo/api/schemas";
 import { type UseFormReturn, useFieldArray, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
@@ -30,9 +30,9 @@ type RecordFieldsProps = {
 };
 
 export const RecordFields = ({ form, isKindLocked }: RecordFieldsProps) => {
-	const kind =
-		useWatch({ control: form.control, name: "kind" }) ?? recordKinds[0];
-	const config = getRecordConfig(kind);
+	const recordType =
+		useWatch({ control: form.control, name: "type" }) ?? recordTypes[0];
+	const config = getRecordConfig(recordType);
 	const { t, i18n } = useTranslation();
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
@@ -53,13 +53,13 @@ export const RecordFields = ({ form, isKindLocked }: RecordFieldsProps) => {
 			/>
 
 			<FormSelect
-				name="kind"
+				name="type"
 				label={t("single.type", { ns: "records" })}
 				control={form.control}
 				disabled={isKindLocked}
-				options={recordKinds.map((recordKind) => ({
-					value: recordKind,
-					label: t(`single.kind.${recordKind}`, { ns: "records" }),
+				options={recordTypes.map((recordType) => ({
+					value: recordType,
+					label: t(`single.kind.${recordType}`, { ns: "records" }),
 				}))}
 			/>
 
