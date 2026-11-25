@@ -1,57 +1,66 @@
-import {
-	recordListParamsSchema,
-	recordTypeSchema,
-	recordTypes,
-} from "@repo/api/schemas";
-import { useMemo } from "react";
+import { recordListParamsSchema } from "@repo/api/schemas";
 import { useTranslation } from "react-i18next";
-import { Select } from "@/shared/components";
+import { Button, Select } from "@/shared/components";
 import { useUrlPagination } from "@/shared/hooks/use-url-pagination/use-url-pagination";
-
-const ALL_RECORD_TYPES = "all";
+import {
+	readRecordDateRange,
+	recordDateFilters,
+} from "../helpers/record-date-range";
+import { useRecordTypeFilter } from "../hooks/use-record-type-filter";
+import { DateRangeFilter } from "./date-range-filter";
 
 const recordTypeFilter = {
 	type: recordListParamsSchema.shape.type,
+	...recordDateFilters,
 };
 
 export const TableFilters = () => {
 	const { t } = useTranslation();
 	const { filters, setParams } = useUrlPagination(recordTypeFilter);
-
-	const typeOptions = useMemo(
-		() => [
-			{
-				value: ALL_RECORD_TYPES,
-				label: t("list.all", { ns: "records" }),
-			},
-			...recordTypes.map((recordType) => ({
-				value: recordType,
-				label: t(`single.kind.${recordType}`, { ns: "records" }),
-			})),
-		],
-		[t],
+	const { typeOptions, typeValue, onTypeChange } = useRecordTypeFilter(
+		filters.type,
+		setParams,
 	);
-
-	const onTypeChange = (value: string) => {
-		if (value === ALL_RECORD_TYPES) {
-			setParams({ page: 1, type: null });
-			return;
-		}
-
-		const parsed = recordTypeSchema.safeParse(value);
-
-		if (!parsed.success) return;
-
-		setParams({ page: 1, type: parsed.data });
-	};
+	const hasActiveFilters =
+		Boolean(filters.type) || Boolean(readRecordDateRange(filters));
 
 	return (
-		<Select
-			className="max-w-50 w-full min-w-30 gap-1.5"
-			label={t("list.type", { ns: "records" })}
-			value={filters.type ?? ALL_RECORD_TYPES}
-			options={typeOptions}
-			onValueChange={onTypeChange}
-		/>
+		<div className="flex w-full flex-wrap items-end gap-3">
+			<DateRangeFilter
+				dateFrom={filters.dateFrom}
+				dateTo={filters.dateTo}
+				onRangeChange={(range) => {
+					if (!range) {
+						setParams({ page: 1, dateFrom: null, dateTo: null });
+						return;
+					}
+
+					setParams({ page: 1, ...range });
+				}}
+			/>
+			<Select
+				className="w-full min-w-0 gap-1.5 xs:max-w-50 xs:min-w-30"
+				label={t("list.filters.type.label", { ns: "records" })}
+				value={typeValue}
+				options={typeOptions}
+				onValueChange={onTypeChange}
+			/>
+			{hasActiveFilters ? (
+				<Button
+					className="ml-auto xs:ml-0"
+					variant="destructive"
+					onClick={() =>
+						setParams({
+							page: 1,
+							type: null,
+							dateFrom: null,
+							dateTo: null,
+						})
+					}
+				>
+					{t("list.filters.clear", { ns: "records" })}
+				</Button>
+			) : null}
+		</div>
 	);
 };

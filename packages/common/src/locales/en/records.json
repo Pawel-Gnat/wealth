@@ -19,8 +19,17 @@
 	"list": {
 		"title": "Manage your records",
 		"subtitle": "Track and edit your personal income and expense records.",
-		"type": "Type",
-		"all": "All",
+		"filters": {
+			"clear": "Clear",
+			"date": {
+				"label": "Date",
+				"placeholder": "Select a range"
+			},
+			"type": {
+				"label": "Type",
+				"all": "All"
+			}
+		},
 		"owner": "Owner",
 		"empty": {
 			"title": "No transactions found",

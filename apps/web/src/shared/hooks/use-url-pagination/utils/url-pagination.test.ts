@@ -32,6 +32,35 @@ describe("parseUrlParams", () => {
 		expect(result.normalized.toString()).toBe("");
 	});
 
+	it("removes a date range that is missing one bound or reversed", () => {
+		const dateSchemas = {
+			...schemas,
+			dateFrom: recordListParamsSchema.shape.dateFrom,
+			dateTo: recordListParamsSchema.shape.dateTo,
+		};
+		const partial = parseUrlParams(
+			new URLSearchParams("dateFrom=2024-03-01&type=expense"),
+			dateSchemas,
+		);
+		const reversed = parseUrlParams(
+			new URLSearchParams("dateFrom=2024-03-31&dateTo=2024-03-01"),
+			dateSchemas,
+		);
+		const complete = parseUrlParams(
+			new URLSearchParams("dateFrom=2024-03-01&dateTo=2024-03-31"),
+			dateSchemas,
+		);
+
+		expect(partial.filters.dateFrom).toBeUndefined();
+		expect(partial.normalized.toString()).toBe("type=expense");
+		expect(reversed.filters.dateFrom).toBeUndefined();
+		expect(reversed.normalized.toString()).toBe("");
+		expect(complete.filters).toMatchObject({
+			dateFrom: "2024-03-01",
+			dateTo: "2024-03-31",
+		});
+	});
+
 	it("keeps valid filters when the page is invalid", () => {
 		const params = new URLSearchParams("page=0&type=income&limit=30");
 

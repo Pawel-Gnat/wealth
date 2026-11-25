@@ -9,6 +9,7 @@ import type {
 	recordDetailsResponseSchema,
 	recordGetParamsSchema,
 	recordListItemSchema,
+	recordListParamsSchema,
 	recordListResponseSchema,
 	recordParamsSchema,
 	recordSchema,
@@ -20,6 +21,7 @@ import type {
 
 export type RecordType = z.infer<typeof recordTypeSchema>;
 export type RecordListItem = z.infer<typeof recordListItemSchema>;
+export type RecordListParams = z.infer<typeof recordListParamsSchema>;
 export type RecordListResponse = z.infer<typeof recordListResponseSchema>;
 export type LineItem = z.infer<typeof lineItemSchema>;
 export type RecordDetails = z.infer<typeof recordSchema>;

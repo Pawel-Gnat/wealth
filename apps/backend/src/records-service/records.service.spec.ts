@@ -118,6 +118,57 @@ describe("Records service", () => {
 		});
 	});
 
+	it("lists personal records inside an inclusive document date range", async () => {
+		const db = moduleRef.get(DBS.APP);
+		const user = await createTestUser(usersService, {
+			passwordHash: "hashed-password",
+			emailTag: "date-range",
+		});
+
+		await db.insert(recordsTable).values([
+			{
+				userId: user.id,
+				type: "expense",
+				budgetId: null,
+				totalAmount: "1",
+				documentDate: "2024-01-01",
+			},
+			{
+				userId: user.id,
+				type: "expense",
+				budgetId: null,
+				totalAmount: "2",
+				documentDate: "2024-01-15",
+			},
+			{
+				userId: user.id,
+				type: "expense",
+				budgetId: null,
+				totalAmount: "3",
+				documentDate: "2024-01-31",
+			},
+			{
+				userId: user.id,
+				type: "expense",
+				budgetId: null,
+				totalAmount: "4",
+				documentDate: "2024-02-01",
+			},
+		]);
+
+		const listed = await recordsService.listByUserId(
+			user.id,
+			undefined,
+			undefined,
+			1,
+			DEFAULT_PAGE_SIZE,
+			"2024-01-15",
+			"2024-01-31",
+		);
+
+		expect(listed.data.map((record) => record.totalAmount)).toEqual([3, 2]);
+	});
+
 	describe.each([
 		"expense",
 		"income",

@@ -8291,6 +8291,32 @@
                               ]
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "KWPsR",
+                          "name": "Clear Filters",
+                          "height": 36,
+                          "fill": "$destructive-soft",
+                          "cornerRadius": "$radius-pill",
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Ipk4R",
+                              "name": "Clear Label",
+                              "fill": "$destructive",
+                              "content": "Clear",
+                              "fontFamily": "$font-sans",
+                              "fontSize": 14,
+                              "fontWeight": "500"
+                            }
+                          ]
                         }
                       ]
                     },
@@ -19192,6 +19218,32 @@
                     },
                     {
                       "type": "frame",
+                      "id": "zqjG2",
+                      "name": "Clear Filters",
+                      "height": 36,
+                      "fill": "$destructive-soft",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        12
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "SpbzX",
+                          "name": "Clear Label",
+                          "fill": "$destructive",
+                          "content": "Clear",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
                       "id": "BNSPf",
                       "name": "Create Button",
                       "width": "fill_container",
@@ -29442,6 +29494,32 @@
                     },
                     {
                       "type": "frame",
+                      "id": "u6l8u",
+                      "name": "Clear Filters",
+                      "height": 36,
+                      "fill": "$destructive-soft",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        12
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "kaFzg",
+                          "name": "Clear Label",
+                          "fill": "$destructive",
+                          "content": "Clear",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
                       "id": "TOcXO",
                       "name": "Create Button",
                       "height": 36,
@@ -32560,6 +32638,32 @@
                     },
                     {
                       "type": "frame",
+                      "id": "boEV3",
+                      "name": "Clear Filters",
+                      "height": 36,
+                      "fill": "$destructive-soft",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        12
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "SuxY5",
+                          "name": "Clear Label",
+                          "fill": "$destructive",
+                          "content": "Clear",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
                       "id": "Qex8B",
                       "name": "Create Button",
                       "width": "fill_container",
@@ -35362,6 +35466,32 @@
                     },
                     {
                       "type": "frame",
+                      "id": "DrE6s",
+                      "name": "Clear Filters",
+                      "height": 36,
+                      "fill": "$destructive-soft",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        12
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "W9Ivnm",
+                          "name": "Clear Label",
+                          "fill": "$destructive",
+                          "content": "Clear",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
                       "id": "T6Uppr",
                       "name": "Create Button",
                       "height": 36,
@@ -38145,6 +38275,32 @@
                     },
                     {
                       "type": "frame",
+                      "id": "P6uNQh",
+                      "name": "Clear Filters",
+                      "height": 36,
+                      "fill": "$destructive-soft",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        12
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "r5IhA",
+                          "name": "Clear Label",
+                          "fill": "$destructive",
+                          "content": "Clear",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
                       "id": "rPxXD",
                       "name": "Create Button",
                       "width": "fill_container",
@@ -40124,6 +40280,32 @@
                               "fill": "$muted-foreground"
                             }
                           ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bAUi5",
+                      "name": "Clear Filters",
+                      "height": 36,
+                      "fill": "$destructive-soft",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        12
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "R3ijzG",
+                          "name": "Clear Label",
+                          "fill": "$destructive",
+                          "content": "Clear",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
                         }
                       ]
                     },
@@ -42989,6 +43171,32 @@
                               "fill": "$muted-foreground"
                             }
                           ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "MvEzs",
+                      "name": "Clear Filters",
+                      "height": 36,
+                      "fill": "$destructive-soft",
+                      "cornerRadius": "$radius-pill",
+                      "padding": [
+                        0,
+                        12
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "tDFS0",
+                          "name": "Clear Label",
+                          "fill": "$destructive",
+                          "content": "Clear",
+                          "fontFamily": "$font-sans",
+                          "fontSize": 14,
+                          "fontWeight": "500"
                         }
                       ]
                     },

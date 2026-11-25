@@ -78,6 +78,26 @@ export const parseUrlParams = <T extends FilterSchemas<T>>(
 		}
 	}
 
+	if ("dateFrom" in schemas && "dateTo" in schemas) {
+		const dateFrom = normalized.get("dateFrom");
+		const dateTo = normalized.get("dateTo");
+		const incomplete = Boolean(dateFrom) !== Boolean(dateTo);
+		const inverted = Boolean(dateFrom && dateTo && dateFrom > dateTo);
+
+		if (incomplete || inverted) {
+			normalized.delete("dateFrom");
+			normalized.delete("dateTo");
+
+			const rangedFilters = filters as {
+				dateFrom?: string;
+				dateTo?: string;
+			};
+
+			delete rangedFilters.dateFrom;
+			delete rangedFilters.dateTo;
+		}
+	}
+
 	return { page, filters, normalized };
 };
 

@@ -85,7 +85,7 @@ export const recordColumns = ({
 			meta: { className: "w-[1%] whitespace-nowrap" },
 			header: () => (
 				<Text size="sm" weight="medium">
-					{t("list.type", { ns: "records" })}
+					{t("list.filters.type.label", { ns: "records" })}
 				</Text>
 			),
 			cell: ({ row }) => {

@@ -215,6 +215,7 @@
 }
 
 @theme {
+	--breakpoint-xs: 30rem;
 	--animate-route-loading: route-loading 1s ease-in-out infinite;
 
 	@keyframes route-loading {

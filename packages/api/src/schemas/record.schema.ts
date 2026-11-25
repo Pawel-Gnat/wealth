@@ -62,12 +62,31 @@ export const recordUpdatePayloadSchema = recordCreatePayloadSchema.extend({
 
 const pageSizeSchema = z.coerce.number().refine(isPageSize);
 
-export const recordListParamsSchema = z.object({
-	type: recordTypeSchema.optional(),
-	budgetId: z.string().optional(),
-	page: pageSchema.default(1),
-	limit: pageSizeSchema.default(DEFAULT_PAGE_SIZE),
-});
+const documentDateParamSchema = z.iso.date();
+
+export const recordListParamsSchema = z
+	.object({
+		type: recordTypeSchema.optional(),
+		budgetId: z.string().optional(),
+		dateFrom: documentDateParamSchema.optional(),
+		dateTo: documentDateParamSchema.optional(),
+		page: pageSchema.default(1),
+		limit: pageSizeSchema.default(DEFAULT_PAGE_SIZE),
+	})
+	.refine(
+		(value) => {
+			if (value.dateFrom === undefined && value.dateTo === undefined) {
+				return true;
+			}
+
+			if (value.dateFrom === undefined || value.dateTo === undefined) {
+				return false;
+			}
+
+			return value.dateFrom <= value.dateTo;
+		},
+		{ path: ["dateFrom"] },
+	);
 
 export const recordCreateInputSchema = recordCreatePayloadSchema.extend({
 	type: recordTypeSchema,

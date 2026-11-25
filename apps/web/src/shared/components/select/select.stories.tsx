@@ -10,11 +10,11 @@ const TypeSelectStory = () => {
 	return (
 		<Select
 			className="max-w-50 w-full min-w-30 gap-1.5"
-			label={t("list.type", { ns: "records" })}
+			label={t("list.filters.type.label", { ns: "records" })}
 			value={value}
 			onValueChange={setValue}
 			options={[
-				{ value: "all", label: t("list.all", { ns: "records" }) },
+				{ value: "all", label: t("list.filters.type.all", { ns: "records" }) },
 				{
 					value: "expense",
 					label: t("single.kind.expense", { ns: "records" }),

@@ -19,6 +19,8 @@ export class RecordsController {
 				input.budgetId,
 				input.page,
 				input.limit,
+				input.dateFrom,
+				input.dateTo,
 			);
 		});
 	}

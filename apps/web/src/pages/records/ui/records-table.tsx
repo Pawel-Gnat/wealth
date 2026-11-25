@@ -6,11 +6,16 @@ import { APP_ROUTES } from "@/app/routes";
 import { ErrorState, Table } from "@/shared/components";
 import { useUrlPagination } from "@/shared/hooks/use-url-pagination/use-url-pagination";
 import { recordColumns } from "../config/record-columns";
+import {
+	readRecordDateRange,
+	recordDateFilters,
+} from "../helpers/record-date-range";
 import { useRecordsList } from "../hooks/use-records-list";
 
 const recordPaginationFilters = {
 	type: recordListParamsSchema.shape.type,
 	limit: recordListParamsSchema.shape.limit,
+	...recordDateFilters,
 };
 
 type RecordsTableProps = {
@@ -24,12 +29,14 @@ export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 	);
 	const limit = filters.limit ?? DEFAULT_PAGE_SIZE;
 	const type = filters.type;
+	const dateRange = readRecordDateRange(filters);
 
 	const { data, pagination, isLoading, isPlaceholderData, isError } =
 		useRecordsList({
 			page,
 			limit,
 			...(type ? { type } : {}),
+			...(dateRange ?? {}),
 			...(budgetId ? { budgetId } : {}),
 		});
 	const lastPage = Math.max(pagination.totalPages, 1);
