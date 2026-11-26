@@ -25,15 +25,12 @@ export type FilterValues<T extends FilterSchemas<T>> = {
 	[K in keyof T]?: FilterOutput<T[K]>;
 };
 
-export type SchemaKey<T extends FilterSchemas<T>> = Extract<keyof T, string>;
-
 export type UrlParamRelation = (
 	filters: Record<string, unknown>,
 	params: URLSearchParams,
 ) => void;
 
-export const schemaKeys = <T extends FilterSchemas<T>>(schemas: T) =>
-	Object.keys(schemas) as SchemaKey<T>[];
+type Scalar = string | number | boolean;
 
 const readParsed = <Schema extends z.ZodType>(
 	schema: Schema,
@@ -46,7 +43,7 @@ const readParsed = <Schema extends z.ZodType>(
 	return result.data as z.output<Schema>;
 };
 
-export const textFilter = <Schema extends z.ZodType>(
+export const textFilter = <Schema extends z.ZodType<Scalar | undefined>>(
 	schema: Schema,
 ): UrlFilter<z.output<Schema>> => ({
 	parse: (raw) => readParsed(schema, raw),
@@ -59,7 +56,10 @@ export const textFilter = <Schema extends z.ZodType>(
 	},
 });
 
-export const listFilter = <Schema extends z.ZodType>(
+export const listFilter = <
+	Item extends Scalar,
+	Schema extends z.ZodType<Item[] | undefined>,
+>(
 	schema: Schema,
 ): UrlFilter<z.output<Schema>> => ({
 	parse: (raw) => {
@@ -118,16 +118,12 @@ export const parseUrlParams = <T extends FilterSchemas<T>>(
 		normalized.delete("page");
 	}
 
-	for (const key of schemaKeys(schemas)) {
+	for (const key of Object.keys(schemas) as Array<keyof T & string>) {
 		const value = params.get(key);
 
 		if (value === null) continue;
 
-		const filter = schemas[key];
-
-		if (!filter) continue;
-
-		const parsed = filter.parse(value);
+		const parsed = schemas[key].parse(value);
 
 		if (parsed === undefined) {
 			normalized.delete(key);
@@ -142,20 +138,4 @@ export const parseUrlParams = <T extends FilterSchemas<T>>(
 	}
 
 	return { page, filters, normalized };
-};
-
-export const serializeUrlParam = (
-	params: URLSearchParams,
-	key: string,
-	value: string | null,
-): URLSearchParams => {
-	const next = new URLSearchParams(params);
-
-	if (value === null) {
-		next.delete(key);
-	} else {
-		next.set(key, value);
-	}
-
-	return next;
 };

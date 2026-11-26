@@ -5,7 +5,6 @@ import {
 	listFilter,
 	parseUrlParams,
 	requireOrderedParams,
-	serializeUrlParam,
 	textFilter,
 } from "./url-pagination";
 
@@ -115,16 +114,11 @@ describe("parseUrlParams", () => {
 		expect(empty.filters.colors).toBeUndefined();
 		expect(empty.normalized.toString()).toBe("");
 	});
-});
 
-describe("serializeUrlParam", () => {
-	it("preserves valid parameters", () => {
-		const params = new URLSearchParams("page=2&type=expense");
-
-		const result = serializeUrlParam(params, "limit", "20");
-
-		expect(result.get("page")).toBe("2");
-		expect(result.get("type")).toBe("expense");
-		expect(result.get("limit")).toBe("20");
+	it("serializes a scalar and drops a value the schema rejects", () => {
+		expect(schemas.type.serialize("expense")).toBe("expense");
+		expect(schemas.type.serialize("unknown" as "expense")).toBeUndefined();
+		expect(schemas.limit.serialize(20)).toBe("20");
+		expect(schemas.limit.serialize(15)).toBeUndefined();
 	});
 });

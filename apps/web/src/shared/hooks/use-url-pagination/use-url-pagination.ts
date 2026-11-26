@@ -5,8 +5,6 @@ import {
 	type FilterSchemas,
 	type FilterValues,
 	parseUrlParams,
-	schemaKeys,
-	serializeUrlParam,
 	type UrlParamRelation,
 } from "./utils/url-pagination";
 
@@ -67,7 +65,7 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 			updates.push(["page", result.data === 1 ? null : String(result.data)]);
 		}
 
-		for (const key of schemaKeys(filterSchemas)) {
+		for (const key of Object.keys(filterSchemas) as Array<keyof T & string>) {
 			if (!Object.hasOwn(values, key)) continue;
 
 			const value = values[key];
@@ -77,11 +75,7 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 				continue;
 			}
 
-			const filter = filterSchemas[key];
-
-			if (!filter) return;
-
-			const serialized = filter.serialize(value as never);
+			const serialized = filterSchemas[key].serialize(value as never);
 
 			if (serialized === undefined) return;
 
@@ -121,7 +115,9 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 	};
 
 	const clearFilter = (key: keyof T & string) => {
-		setSearchParams((prev) => serializeUrlParam(prev, key, null));
+		const values: FilterUpdates<T> = {};
+		values[key] = null;
+		setParams(values);
 	};
 
 	return { page, setPage, filters, setFilter, clearFilter, setParams };
