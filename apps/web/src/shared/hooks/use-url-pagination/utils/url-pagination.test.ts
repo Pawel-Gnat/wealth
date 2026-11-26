@@ -1,12 +1,27 @@
 import { recordListParamsSchema } from "@repo/api/schemas";
 import { describe, expect, it } from "vitest";
-import { parseUrlParams, serializeUrlParam } from "./url-pagination";
+import { z } from "zod";
+import {
+	listFilter,
+	parseUrlParams,
+	requireOrderedParams,
+	serializeUrlParam,
+	textFilter,
+} from "./url-pagination";
 
 const schemas = {
-	type: recordListParamsSchema.shape.type,
-	budgetId: recordListParamsSchema.shape.budgetId,
-	limit: recordListParamsSchema.shape.limit,
+	type: textFilter(recordListParamsSchema.shape.type),
+	budgetId: textFilter(recordListParamsSchema.shape.budgetId),
+	limit: textFilter(recordListParamsSchema.shape.limit),
 };
+
+const dateSchemas = {
+	...schemas,
+	dateFrom: textFilter(recordListParamsSchema.shape.dateFrom),
+	dateTo: textFilter(recordListParamsSchema.shape.dateTo),
+};
+
+const dateRelation = [requireOrderedParams("dateFrom", "dateTo")];
 
 describe("parseUrlParams", () => {
 	it("parses valid URL parameters", () => {
@@ -32,23 +47,33 @@ describe("parseUrlParams", () => {
 		expect(result.normalized.toString()).toBe("");
 	});
 
-	it("removes a date range that is missing one bound or reversed", () => {
-		const dateSchemas = {
-			...schemas,
-			dateFrom: recordListParamsSchema.shape.dateFrom,
-			dateTo: recordListParamsSchema.shape.dateTo,
-		};
+	it("keeps one date bound until a relation removes the pair", () => {
 		const partial = parseUrlParams(
 			new URLSearchParams("dateFrom=2024-03-01&type=expense"),
 			dateSchemas,
 		);
+
+		expect(partial.filters.dateFrom).toBe("2024-03-01");
+		expect(partial.normalized.toString()).toBe(
+			"dateFrom=2024-03-01&type=expense",
+		);
+	});
+
+	it("removes a date range that is missing one bound or reversed", () => {
+		const partial = parseUrlParams(
+			new URLSearchParams("dateFrom=2024-03-01&type=expense"),
+			dateSchemas,
+			dateRelation,
+		);
 		const reversed = parseUrlParams(
 			new URLSearchParams("dateFrom=2024-03-31&dateTo=2024-03-01"),
 			dateSchemas,
+			dateRelation,
 		);
 		const complete = parseUrlParams(
 			new URLSearchParams("dateFrom=2024-03-01&dateTo=2024-03-31"),
 			dateSchemas,
+			dateRelation,
 		);
 
 		expect(partial.filters.dateFrom).toBeUndefined();
@@ -70,6 +95,25 @@ describe("parseUrlParams", () => {
 		expect(result.filters.type).toBe("income");
 		expect(result.filters.limit).toBe(30);
 		expect(result.normalized.toString()).toBe("type=income&limit=30");
+	});
+
+	it("parses and serializes a list from a comma separated value", () => {
+		const colors = {
+			colors: listFilter(z.array(z.string().min(2))),
+		};
+		const parsed = parseUrlParams(
+			new URLSearchParams("colors=red,green"),
+			colors,
+		);
+		const invalid = parseUrlParams(new URLSearchParams("colors=red,g"), colors);
+		const empty = parseUrlParams(new URLSearchParams("colors=,"), colors);
+
+		expect(parsed.filters.colors).toEqual(["red", "green"]);
+		expect(colors.colors.serialize(["red", "green"])).toBe("red,green");
+		expect(invalid.filters.colors).toBeUndefined();
+		expect(invalid.normalized.toString()).toBe("");
+		expect(empty.filters.colors).toBeUndefined();
+		expect(empty.normalized.toString()).toBe("");
 	});
 });
 

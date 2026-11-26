@@ -1,60 +1,110 @@
 import { pageSchema } from "@repo/api/schemas";
 import type { z } from "zod";
 
-export type FilterSchemas<T> = {
-	[K in keyof T]: z.ZodType;
+export type UrlFilter<Value> = {
+	parse: (raw: string) => Value | undefined;
+	serialize: (value: Value) => string | undefined;
 };
 
+type AnyUrlFilter = {
+	parse: (raw: string) => unknown;
+	serialize: (value: never) => string | undefined;
+};
+
+export type FilterSchemas<T> = {
+	[K in keyof T]: AnyUrlFilter;
+};
+
+type FilterOutput<Filter> = Filter extends {
+	parse: (raw: string) => infer Value;
+}
+	? Exclude<Value, undefined>
+	: never;
+
 export type FilterValues<T extends FilterSchemas<T>> = {
-	[K in keyof T]?: z.output<T[K]>;
+	[K in keyof T]?: FilterOutput<T[K]>;
 };
 
 export type SchemaKey<T extends FilterSchemas<T>> = Extract<keyof T, string>;
 
+export type UrlParamRelation = (
+	filters: Record<string, unknown>,
+	params: URLSearchParams,
+) => void;
+
 export const schemaKeys = <T extends FilterSchemas<T>>(schemas: T) =>
 	Object.keys(schemas) as SchemaKey<T>[];
 
-const applyFilter = <T extends FilterSchemas<T>, K extends SchemaKey<T>>(
-	filters: FilterValues<T>,
-	schemas: T,
-	key: K,
-	raw: string,
+const readParsed = <Schema extends z.ZodType>(
+	schema: Schema,
+	value: unknown,
 ) => {
-	const schema = schemas[key];
-
-	if (!schema) return false;
-
-	const result = schema.safeParse(raw);
-
-	if (!result.success) return false;
-
-	filters[key] = result.data;
-
-	return true;
-};
-
-export const filterToParam = <
-	T extends FilterSchemas<T>,
-	K extends SchemaKey<T>,
->(
-	schemas: T,
-	key: K,
-	value: FilterValues<T>[K],
-) => {
-	const schema = schemas[key];
-
-	if (!schema) return;
-
 	const result = schema.safeParse(value);
 
-	if (!result.success || result.data == null) return;
+	if (!result.success || result.data == null || result.data === "") return;
 
-	return String(result.data);
+	return result.data as z.output<Schema>;
 };
+
+export const textFilter = <Schema extends z.ZodType>(
+	schema: Schema,
+): UrlFilter<z.output<Schema>> => ({
+	parse: (raw) => readParsed(schema, raw),
+	serialize: (value) => {
+		const parsed = readParsed(schema, value);
+
+		if (parsed == null) return;
+
+		return String(parsed);
+	},
+});
+
+export const listFilter = <Schema extends z.ZodType>(
+	schema: Schema,
+): UrlFilter<z.output<Schema>> => ({
+	parse: (raw) => {
+		const items = raw
+			.split(",")
+			.map((item) => item.trim())
+			.filter((item) => item.length > 0);
+
+		if (items.length === 0) return;
+
+		const parsed = readParsed(schema, items);
+
+		if (!Array.isArray(parsed) || parsed.length === 0) return;
+
+		return parsed;
+	},
+	serialize: (value) => {
+		const parsed = readParsed(schema, value);
+
+		if (!Array.isArray(parsed) || parsed.length === 0) return;
+
+		return parsed.join(",");
+	},
+});
+
+export const requireOrderedParams =
+	(fromKey: string, toKey: string): UrlParamRelation =>
+	(filters, params) => {
+		const from = params.get(fromKey);
+		const to = params.get(toKey);
+		const incomplete = Boolean(from) !== Boolean(to);
+		const inverted = Boolean(from && to && from > to);
+
+		if (!incomplete && !inverted) return;
+
+		params.delete(fromKey);
+		params.delete(toKey);
+		delete filters[fromKey];
+		delete filters[toKey];
+	};
 
 export const parseUrlParams = <T extends FilterSchemas<T>>(
 	params: URLSearchParams,
 	schemas: T,
+	relations: readonly UrlParamRelation[] = [],
 ) => {
 	const normalized = new URLSearchParams(params);
 	const filters: FilterValues<T> = {};
@@ -73,29 +123,22 @@ export const parseUrlParams = <T extends FilterSchemas<T>>(
 
 		if (value === null) continue;
 
-		if (!applyFilter(filters, schemas, key, value)) {
+		const filter = schemas[key];
+
+		if (!filter) continue;
+
+		const parsed = filter.parse(value);
+
+		if (parsed === undefined) {
 			normalized.delete(key);
+			continue;
 		}
+
+		filters[key] = parsed as FilterValues<T>[typeof key];
 	}
 
-	if ("dateFrom" in schemas && "dateTo" in schemas) {
-		const dateFrom = normalized.get("dateFrom");
-		const dateTo = normalized.get("dateTo");
-		const incomplete = Boolean(dateFrom) !== Boolean(dateTo);
-		const inverted = Boolean(dateFrom && dateTo && dateFrom > dateTo);
-
-		if (incomplete || inverted) {
-			normalized.delete("dateFrom");
-			normalized.delete("dateTo");
-
-			const rangedFilters = filters as {
-				dateFrom?: string;
-				dateTo?: string;
-			};
-
-			delete rangedFilters.dateFrom;
-			delete rangedFilters.dateTo;
-		}
+	for (const relate of relations) {
+		relate(filters as Record<string, unknown>, normalized);
 	}
 
 	return { page, filters, normalized };

@@ -1,9 +1,18 @@
 import { recordListParamsSchema } from "@repo/api/schemas";
+import {
+	requireOrderedParams,
+	textFilter,
+} from "@/shared/hooks/use-url-pagination/utils/url-pagination";
 
 export const recordDateFilters = {
-	dateFrom: recordListParamsSchema.shape.dateFrom,
-	dateTo: recordListParamsSchema.shape.dateTo,
+	dateFrom: textFilter(recordListParamsSchema.shape.dateFrom),
+	dateTo: textFilter(recordListParamsSchema.shape.dateTo),
 };
+
+export const recordDateRangeRelation = requireOrderedParams(
+	"dateFrom",
+	"dateTo",
+);
 
 export type RecordDateRange = {
 	dateFrom: string;

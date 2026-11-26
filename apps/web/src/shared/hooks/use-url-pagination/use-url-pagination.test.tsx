@@ -1,15 +1,16 @@
 import { recordListParamsSchema } from "@repo/api/schemas";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ReactNode } from "react";
-import { MemoryRouter, useSearchParams } from "react-router";
+import { type ReactNode, useEffect, useRef } from "react";
+import { MemoryRouter, useNavigate, useSearchParams } from "react-router";
 import { describe, expect, it } from "vitest";
 import { useUrlPagination } from "./use-url-pagination";
+import { textFilter } from "./utils/url-pagination";
 
 const schemas = {
-	type: recordListParamsSchema.shape.type,
-	budgetId: recordListParamsSchema.shape.budgetId,
-	limit: recordListParamsSchema.shape.limit,
+	type: textFilter(recordListParamsSchema.shape.type),
+	budgetId: textFilter(recordListParamsSchema.shape.budgetId),
+	limit: textFilter(recordListParamsSchema.shape.limit),
 };
 
 const createRouter = (initialEntry: string) => {
@@ -147,5 +148,68 @@ describe("useUrlPagination", () => {
 		expect(await screen.findByTestId("search")).toHaveTextContent("limit=40");
 		expect(screen.getByTestId("page")).toHaveTextContent("1");
 		expect(screen.getByTestId("type")).toHaveTextContent("");
+	});
+
+	it("keeps a filter written while an invalid url is normalized", async () => {
+		const NormalizeProbe = () => {
+			const { filters, setParams } = useUrlPagination(schemas);
+			const [params] = useSearchParams();
+			const started = useRef(false);
+
+			useEffect(() => {
+				if (started.current) return;
+
+				started.current = true;
+				setParams({ limit: 30 });
+			}, [setParams]);
+
+			return (
+				<>
+					<span data-testid="limit">{filters.limit ?? ""}</span>
+					<span data-testid="search">{params.toString()}</span>
+				</>
+			);
+		};
+
+		render(<NormalizeProbe />, {
+			wrapper: createRouter("/records?type=unknown"),
+		});
+
+		expect(await screen.findByTestId("search")).toHaveTextContent("limit=30");
+		expect(screen.getByTestId("limit")).toHaveTextContent("30");
+	});
+
+	it("restores filters when navigation goes back", async () => {
+		const user = userEvent.setup();
+		const HistoryProbe = () => {
+			const { filters, setFilter } = useUrlPagination(schemas);
+			const navigate = useNavigate();
+
+			return (
+				<>
+					<span data-testid="type">{filters.type ?? ""}</span>
+					<button type="button" onClick={() => setFilter("type", "income")}>
+						set-income
+					</button>
+					<button type="button" onClick={() => navigate(-1)}>
+						back
+					</button>
+				</>
+			);
+		};
+
+		render(<HistoryProbe />, {
+			wrapper: createRouter("/records?type=expense"),
+		});
+
+		expect(screen.getByTestId("type")).toHaveTextContent("expense");
+
+		await user.click(screen.getByRole("button", { name: "set-income" }));
+
+		expect(await screen.findByTestId("type")).toHaveTextContent("income");
+
+		await user.click(screen.getByRole("button", { name: "back" }));
+
+		expect(await screen.findByTestId("type")).toHaveTextContent("expense");
 	});
 });

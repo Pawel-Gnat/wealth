@@ -5,19 +5,26 @@ import { useTranslation } from "react-i18next";
 import { APP_ROUTES } from "@/app/routes";
 import { ErrorState, Table } from "@/shared/components";
 import { useUrlPagination } from "@/shared/hooks/use-url-pagination/use-url-pagination";
+import {
+	listFilter,
+	textFilter,
+} from "@/shared/hooks/use-url-pagination/utils/url-pagination";
 import { recordColumns } from "../config/record-columns";
 import {
 	readRecordDateRange,
 	recordDateFilters,
+	recordDateRangeRelation,
 } from "../helpers/record-date-range";
 import { useRecordsList } from "../hooks/use-records-list";
 
 const recordPaginationFilters = {
-	type: recordListParamsSchema.shape.type,
-	userIds: recordListParamsSchema.shape.userIds,
-	limit: recordListParamsSchema.shape.limit,
+	type: textFilter(recordListParamsSchema.shape.type),
+	userIds: listFilter(recordListParamsSchema.shape.userIds),
+	limit: textFilter(recordListParamsSchema.shape.limit),
 	...recordDateFilters,
 };
+
+const recordFilterRelations = [recordDateRangeRelation];
 
 type RecordsTableProps = {
 	budgetId?: string;
@@ -27,6 +34,7 @@ export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 	const { t, i18n } = useTranslation();
 	const { page, setPage, filters, setParams } = useUrlPagination(
 		recordPaginationFilters,
+		recordFilterRelations,
 	);
 	const limit = filters.limit ?? DEFAULT_PAGE_SIZE;
 	const type = filters.type;

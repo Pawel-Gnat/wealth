@@ -4,13 +4,19 @@ import { useSearchParams } from "react-router";
 import {
 	type FilterSchemas,
 	type FilterValues,
-	filterToParam,
 	parseUrlParams,
 	schemaKeys,
 	serializeUrlParam,
+	type UrlParamRelation,
 } from "./utils/url-pagination";
 
-type WithoutPage<T> = "page" extends keyof T ? never : T;
+const noRelations: readonly UrlParamRelation[] = [];
+
+type WithoutPage<T> = "page" extends keyof T
+	? string extends keyof T
+		? T
+		: never
+	: T;
 
 type FilterUpdates<T extends FilterSchemas<T>> = {
 	[K in keyof FilterValues<T>]?: FilterValues<T>[K] | null;
@@ -22,23 +28,33 @@ type ParamUpdates<T extends FilterSchemas<T>> = {
 
 export const useUrlPagination = <const T extends FilterSchemas<T>>(
 	schemas: WithoutPage<T>,
+	relations: readonly UrlParamRelation[] = noRelations,
 ) => {
 	const filterSchemas: T = schemas;
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	const { page, filters, normalized } = parseUrlParams(
+	const { page, filters } = parseUrlParams(
 		searchParams,
 		filterSchemas,
+		relations,
 	);
 
-	const currentSearch = searchParams.toString();
-	const normalizedSearch = normalized.toString();
-
 	useEffect(() => {
-		if (currentSearch === normalizedSearch) return;
+		const current = searchParams.toString();
 
-		setSearchParams(normalizedSearch, { replace: true });
-	}, [currentSearch, normalizedSearch, setSearchParams]);
+		setSearchParams(
+			(prev) => {
+				if (prev.toString() !== current) return prev;
+
+				const next = parseUrlParams(prev, filterSchemas, relations).normalized;
+
+				if (prev.toString() === next.toString()) return prev;
+
+				return next;
+			},
+			{ replace: true },
+		);
+	}, [filterSchemas, relations, searchParams, setSearchParams]);
 
 	const setParams = (values: ParamUpdates<T>) => {
 		const updates: Array<[string, string | null]> = [];
@@ -61,7 +77,11 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 				continue;
 			}
 
-			const serialized = filterToParam(filterSchemas, key, value);
+			const filter = filterSchemas[key];
+
+			if (!filter) return;
+
+			const serialized = filter.serialize(value as never);
 
 			if (serialized === undefined) return;
 

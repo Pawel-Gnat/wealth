@@ -3,8 +3,13 @@ import { useTranslation } from "react-i18next";
 import { Button, Select } from "@/shared/components";
 import { useUrlPagination } from "@/shared/hooks/use-url-pagination/use-url-pagination";
 import {
+	listFilter,
+	textFilter,
+} from "@/shared/hooks/use-url-pagination/utils/url-pagination";
+import {
 	readRecordDateRange,
 	recordDateFilters,
+	recordDateRangeRelation,
 } from "../helpers/record-date-range";
 import { memberIdsParam } from "../helpers/record-members";
 import { useRecordTypeFilter } from "../hooks/use-record-type-filter";
@@ -12,10 +17,12 @@ import { DateRangeFilter } from "./date-range-filter";
 import { MemberFilter } from "./member-filter";
 
 const recordTypeFilter = {
-	type: recordListParamsSchema.shape.type,
-	userIds: recordListParamsSchema.shape.userIds,
+	type: textFilter(recordListParamsSchema.shape.type),
+	userIds: listFilter(recordListParamsSchema.shape.userIds),
 	...recordDateFilters,
 };
+
+const recordFilterRelations = [recordDateRangeRelation];
 
 type TableFiltersProps = {
 	budgetId?: string;
@@ -23,7 +30,10 @@ type TableFiltersProps = {
 
 export const TableFilters = ({ budgetId }: TableFiltersProps) => {
 	const { t } = useTranslation();
-	const { filters, setParams } = useUrlPagination(recordTypeFilter);
+	const { filters, setParams } = useUrlPagination(
+		recordTypeFilter,
+		recordFilterRelations,
+	);
 	const { typeOptions, typeValue, onTypeChange } = useRecordTypeFilter(
 		filters.type,
 		setParams,
