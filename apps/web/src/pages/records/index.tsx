@@ -41,7 +41,7 @@ export const RecordsListPage = () => {
 				}
 			>
 				<div className="flex flex-col gap-4">
-					<TableFilters />
+					<TableFilters {...(budgetId ? { budgetId } : {})} />
 					<RecordsTable {...(budgetId ? { budgetId } : {})} />
 				</div>
 			</Card>

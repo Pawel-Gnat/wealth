@@ -14,6 +14,7 @@ import { useRecordsList } from "../hooks/use-records-list";
 
 const recordPaginationFilters = {
 	type: recordListParamsSchema.shape.type,
+	userIds: recordListParamsSchema.shape.userIds,
 	limit: recordListParamsSchema.shape.limit,
 	...recordDateFilters,
 };
@@ -30,6 +31,7 @@ export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 	const limit = filters.limit ?? DEFAULT_PAGE_SIZE;
 	const type = filters.type;
 	const dateRange = readRecordDateRange(filters);
+	const userIds = filters.userIds;
 
 	const { data, pagination, isLoading, isPlaceholderData, isError } =
 		useRecordsList({
@@ -38,6 +40,7 @@ export const RecordsTable = ({ budgetId }: RecordsTableProps) => {
 			...(type ? { type } : {}),
 			...(dateRange ?? {}),
 			...(budgetId ? { budgetId } : {}),
+			...(budgetId && userIds?.length ? { userIds } : {}),
 		});
 	const lastPage = Math.max(pagination.totalPages, 1);
 

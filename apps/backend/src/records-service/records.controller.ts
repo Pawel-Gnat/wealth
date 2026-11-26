@@ -21,6 +21,7 @@ export class RecordsController {
 				input.limit,
 				input.dateFrom,
 				input.dateTo,
+				input.userIds,
 			);
 		});
 	}

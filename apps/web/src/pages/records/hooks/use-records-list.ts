@@ -13,6 +13,7 @@ export const useRecordsList = ({
 	type,
 	dateFrom,
 	dateTo,
+	userIds,
 }: RecordListParams) => {
 	const query = useQuery({
 		queryKey: [
@@ -22,6 +23,7 @@ export const useRecordsList = ({
 			type,
 			dateFrom,
 			dateTo,
+			userIds,
 		],
 		placeholderData: keepPreviousData,
 		queryFn: async (): Promise<RecordListResponse> => {
@@ -32,6 +34,7 @@ export const useRecordsList = ({
 					...(type ? { type } : {}),
 					...(dateFrom && dateTo ? { dateFrom, dateTo } : {}),
 					...(budgetId ? { budgetId } : {}),
+					...(userIds?.length ? { userIds } : {}),
 				}),
 			);
 		},

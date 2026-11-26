@@ -7,6 +7,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { APP_ROUTES } from "@/app/routes";
 import { formatPrice } from "@/shared/components/price/helpers/price.helpers";
 import { init18nWeb } from "@/shared/lib/i18n/i18n";
+import { MOCK_MEMBER_BUDGET_ID } from "@/test/handlers/budgets";
+import { MOCK_USER } from "@/test/mocks/user";
 import { renderWithProviders } from "@/test/render-with-providers";
 import { server } from "@/test/servers";
 import {
@@ -536,5 +538,76 @@ describe("RecordTable", () => {
 
 		expect(requested.every((request) => request.dateFrom === null)).toBe(true);
 		expect(requested.every((request) => request.dateTo === null)).toBe(true);
+	});
+
+	it("requests the selected budget members and clears them", async () => {
+		const user = userEvent.setup();
+		const ownerId = "01JTZKQX2GT6PHGQER0M8FS6KC";
+		const requested = [] as string[];
+
+		server.use(
+			http.get("*/records", ({ request }) => {
+				requested.push(request.url);
+
+				return HttpResponse.json({
+					data: [
+						{
+							id: recordId,
+							date: "2024-03-01T12:00:00.000Z",
+							type: "expense",
+							totalAmount: 123.45,
+						},
+					],
+					pagination: {
+						page: Number(new URL(request.url).searchParams.get("page") ?? "1"),
+						totalPages: 2,
+						hasNextPage: false,
+						hasPreviousPage: false,
+					},
+				});
+			}),
+		);
+
+		renderWithProviders(
+			<>
+				<TableFilters budgetId={MOCK_MEMBER_BUDGET_ID} />
+				<RecordsTable budgetId={MOCK_MEMBER_BUDGET_ID} />
+			</>,
+			{
+				initialEntries: [`/budgets/${MOCK_MEMBER_BUDGET_ID}?page=2`],
+			},
+		);
+
+		await screen.findByText(formatPrice(123.45, "en"));
+
+		await user.click(
+			screen.getByRole("combobox", {
+				name: t("list.filters.member.label", { ns: "records" }),
+			}),
+		);
+		await user.click(screen.getByRole("option", { name: "Ola Nowak" }));
+		await user.click(screen.getByRole("option", { name: "John Doe" }));
+
+		await waitFor(() => {
+			const latest = requested.at(-1) ?? "";
+
+			expect(latest).toContain(ownerId);
+			expect(latest).toContain(MOCK_USER.id);
+			expect(latest).toContain("page=1");
+		});
+
+		await user.click(
+			screen.getByRole("button", {
+				name: t("list.filters.clear", { ns: "records" }),
+			}),
+		);
+
+		await waitFor(() => {
+			const latest = new URL(requested.at(-1) ?? "http://localhost/records");
+
+			expect(latest.searchParams.get("userIds")).toBeNull();
+			expect(latest.searchParams.getAll("userIds")).toEqual([]);
+			expect(latest.searchParams.get("page")).toBe("1");
+		});
 	});
 });

@@ -28,6 +28,12 @@
 			"type": {
 				"label": "Type",
 				"all": "All"
+			},
+			"member": {
+				"label": "Member",
+				"all": "All members",
+				"selected-one": "{{count}} member",
+				"selected-other": "{{count}} members"
 			}
 		},
 		"owner": "Owner",

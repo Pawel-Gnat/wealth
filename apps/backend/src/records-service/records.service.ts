@@ -23,7 +23,17 @@ import {
 	isStoredDocumentDateEqual,
 } from "@repo/common/helpers";
 import { hasPermission } from "@repo/common/permissions";
-import { and, asc, count, desc, eq, gte, isNull, lte } from "drizzle-orm";
+import {
+	and,
+	asc,
+	count,
+	desc,
+	eq,
+	gte,
+	inArray,
+	isNull,
+	lte,
+} from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { AuditsService } from "../audit-service/audits.service";
 import { DBS } from "../database-service/constants";
@@ -82,6 +92,7 @@ export class RecordsService {
 		limit: number = DEFAULT_PAGE_SIZE,
 		dateFrom?: string,
 		dateTo?: string,
+		userIds?: string[],
 	): Promise<RecordListResponse> {
 		if (budgetId) {
 			await this.assertCanViewBudget(userId, budgetId);
@@ -98,6 +109,7 @@ export class RecordsService {
 						lte(recordsTable.documentDate, dateTo),
 					]
 				: []),
+			...(userIds?.length ? [inArray(recordsTable.userId, userIds)] : []),
 		);
 
 		const offset = (page - 1) * limit;

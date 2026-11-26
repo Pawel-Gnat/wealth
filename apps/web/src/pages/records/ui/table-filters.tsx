@@ -6,23 +6,33 @@ import {
 	readRecordDateRange,
 	recordDateFilters,
 } from "../helpers/record-date-range";
+import { memberIdsParam } from "../helpers/record-members";
 import { useRecordTypeFilter } from "../hooks/use-record-type-filter";
 import { DateRangeFilter } from "./date-range-filter";
+import { MemberFilter } from "./member-filter";
 
 const recordTypeFilter = {
 	type: recordListParamsSchema.shape.type,
+	userIds: recordListParamsSchema.shape.userIds,
 	...recordDateFilters,
 };
 
-export const TableFilters = () => {
+type TableFiltersProps = {
+	budgetId?: string;
+};
+
+export const TableFilters = ({ budgetId }: TableFiltersProps) => {
 	const { t } = useTranslation();
 	const { filters, setParams } = useUrlPagination(recordTypeFilter);
 	const { typeOptions, typeValue, onTypeChange } = useRecordTypeFilter(
 		filters.type,
 		setParams,
 	);
+	const selectedUserIds = filters.userIds ?? [];
 	const hasActiveFilters =
-		Boolean(filters.type) || Boolean(readRecordDateRange(filters));
+		Boolean(filters.type) ||
+		Boolean(readRecordDateRange(filters)) ||
+		selectedUserIds.length > 0;
 
 	return (
 		<div className="flex w-full flex-wrap items-end gap-3">
@@ -45,6 +55,16 @@ export const TableFilters = () => {
 				options={typeOptions}
 				onValueChange={onTypeChange}
 			/>
+			{budgetId ? (
+				<MemberFilter
+					className="w-full min-w-0 gap-1.5 xs:max-w-64"
+					budgetId={budgetId}
+					value={selectedUserIds}
+					onValueChange={(userIds) =>
+						setParams({ page: 1, userIds: memberIdsParam(userIds) })
+					}
+				/>
+			) : null}
 			{hasActiveFilters ? (
 				<Button
 					className="ml-auto xs:ml-0"
@@ -53,6 +73,7 @@ export const TableFilters = () => {
 						setParams({
 							page: 1,
 							type: null,
+							userIds: null,
 							dateFrom: null,
 							dateTo: null,
 						})

@@ -64,10 +64,21 @@ const pageSizeSchema = z.coerce.number().refine(isPageSize);
 
 const documentDateParamSchema = z.iso.date();
 
+export const recordUserIdsParamSchema = z
+	.union([z.array(z.string().min(1)), z.string().min(1)])
+	.transform((value) => {
+		const ids = Array.isArray(value) ? value : value.split(",");
+
+		return [
+			...new Set(ids.map((id) => id.trim()).filter((id) => id.length > 0)),
+		];
+	});
+
 export const recordListParamsSchema = z
 	.object({
 		type: recordTypeSchema.optional(),
 		budgetId: z.string().optional(),
+		userIds: recordUserIdsParamSchema.optional(),
 		dateFrom: documentDateParamSchema.optional(),
 		dateTo: documentDateParamSchema.optional(),
 		page: pageSchema.default(1),

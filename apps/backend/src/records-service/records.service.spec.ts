@@ -1254,6 +1254,63 @@ describe("Records service", () => {
 			});
 		});
 
+		it("filters group documents by member user id", async () => {
+			const db = moduleRef.get(DBS.APP);
+
+			const owner = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-docs-member-owner",
+			});
+			const member = await createTestUser(usersService, {
+				passwordHash: "hash",
+				emailTag: "budget-docs-member",
+			});
+
+			const [budget] = await db
+				.insert(budgetTable)
+				.values({ title: "Members", ownerId: owner.id })
+				.returning({ id: budgetTable.id });
+
+			if (!budget) {
+				throw new Error("Expected seeded budget");
+			}
+
+			await db.insert(recordsTable).values([
+				{
+					userId: owner.id,
+					type: "expense",
+					budgetId: budget.id,
+					totalAmount: "10.00",
+					documentDate: "2026-02-01",
+				},
+				{
+					userId: member.id,
+					type: "income",
+					budgetId: budget.id,
+					totalAmount: "20.00",
+					documentDate: "2026-03-01",
+				},
+			]);
+
+			const listed = await recordsService.listByUserId(
+				owner.id,
+				undefined,
+				budget.id,
+				1,
+				DEFAULT_PAGE_SIZE,
+				undefined,
+				undefined,
+				[member.id],
+			);
+
+			expect(listed.data).toHaveLength(1);
+			expect(listed.data[0]).toMatchObject({
+				type: "income",
+				totalAmount: 20,
+				owner: { id: member.id, email: member.email },
+			});
+		});
+
 		it("hides the budget from a pending member and from a stranger", async () => {
 			const db = moduleRef.get(DBS.APP);
 			const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
