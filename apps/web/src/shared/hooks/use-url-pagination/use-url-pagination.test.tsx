@@ -4,8 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { type ReactNode, useEffect, useRef } from "react";
 import { MemoryRouter, useNavigate, useSearchParams } from "react-router";
 import { describe, expect, it } from "vitest";
+import { requireOrderedParams, textFilter } from "./helpers/url-pagination";
 import { useUrlPagination } from "./use-url-pagination";
-import { requireOrderedParams, textFilter } from "./utils/url-pagination";
 
 const schemas = {
 	type: textFilter(recordListParamsSchema.shape.type),

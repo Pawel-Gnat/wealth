@@ -2,7 +2,7 @@ import { recordListParamsSchema } from "@repo/api/schemas";
 import {
 	requireOrderedParams,
 	textFilter,
-} from "@/shared/hooks/use-url-pagination/utils/url-pagination";
+} from "@/shared/hooks/use-url-pagination/helpers/url-pagination";
 
 export const recordDateFilters = {
 	dateFrom: textFilter(recordListParamsSchema.shape.dateFrom),

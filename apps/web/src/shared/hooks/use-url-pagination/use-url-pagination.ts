@@ -6,7 +6,7 @@ import {
 	type FilterValues,
 	parseUrlParams,
 	type UrlParamRelation,
-} from "./utils/url-pagination";
+} from "./helpers/url-pagination";
 
 const noRelations: readonly UrlParamRelation[] = [];
 

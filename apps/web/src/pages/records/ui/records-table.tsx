@@ -4,11 +4,11 @@ import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { APP_ROUTES } from "@/app/routes";
 import { ErrorState, Table } from "@/shared/components";
-import { useUrlPagination } from "@/shared/hooks/use-url-pagination/use-url-pagination";
 import {
 	listFilter,
 	textFilter,
-} from "@/shared/hooks/use-url-pagination/utils/url-pagination";
+} from "@/shared/hooks/use-url-pagination/helpers/url-pagination";
+import { useUrlPagination } from "@/shared/hooks/use-url-pagination/use-url-pagination";
 import { recordColumns } from "../config/record-columns";
 import {
 	readRecordDateRange,

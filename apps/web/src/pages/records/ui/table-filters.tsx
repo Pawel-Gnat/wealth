@@ -1,11 +1,11 @@
 import { recordListParamsSchema } from "@repo/api/schemas";
 import { useTranslation } from "react-i18next";
 import { Button, Select } from "@/shared/components";
-import { useUrlPagination } from "@/shared/hooks/use-url-pagination/use-url-pagination";
 import {
 	listFilter,
 	textFilter,
-} from "@/shared/hooks/use-url-pagination/utils/url-pagination";
+} from "@/shared/hooks/use-url-pagination/helpers/url-pagination";
+import { useUrlPagination } from "@/shared/hooks/use-url-pagination/use-url-pagination";
 import {
 	readRecordDateRange,
 	recordDateFilters,
