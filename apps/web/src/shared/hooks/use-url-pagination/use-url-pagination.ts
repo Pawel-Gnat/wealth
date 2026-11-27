@@ -10,12 +10,6 @@ import {
 
 const noRelations: readonly UrlParamRelation[] = [];
 
-type WithoutPage<T> = "page" extends keyof T
-	? string extends keyof T
-		? T
-		: never
-	: T;
-
 type FilterUpdates<T extends FilterSchemas<T>> = {
 	[K in keyof FilterValues<T>]?: FilterValues<T>[K] | null;
 };
@@ -25,34 +19,26 @@ type ParamUpdates<T extends FilterSchemas<T>> = {
 } & FilterUpdates<T>;
 
 export const useUrlPagination = <const T extends FilterSchemas<T>>(
-	schemas: WithoutPage<T>,
+	schemas: T & { page?: never },
 	relations: readonly UrlParamRelation[] = noRelations,
 ) => {
 	const filterSchemas: T = schemas;
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	const { page, filters } = parseUrlParams(
+	const { page, filters, normalized } = parseUrlParams(
 		searchParams,
 		filterSchemas,
 		relations,
 	);
 
+	const currentSearch = searchParams.toString();
+	const normalizedSearch = normalized.toString();
+
 	useEffect(() => {
-		const current = searchParams.toString();
+		if (currentSearch === normalizedSearch) return;
 
-		setSearchParams(
-			(prev) => {
-				if (prev.toString() !== current) return prev;
-
-				const next = parseUrlParams(prev, filterSchemas, relations).normalized;
-
-				if (prev.toString() === next.toString()) return prev;
-
-				return next;
-			},
-			{ replace: true },
-		);
-	}, [filterSchemas, relations, searchParams, setSearchParams]);
+		setSearchParams(normalizedSearch, { replace: true });
+	}, [currentSearch, normalizedSearch, setSearchParams]);
 
 	const setParams = (values: ParamUpdates<T>) => {
 		const updates: Array<[string, string | null]> = [];
@@ -65,7 +51,7 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 			updates.push(["page", result.data === 1 ? null : String(result.data)]);
 		}
 
-		for (const key of Object.keys(filterSchemas) as Array<keyof T & string>) {
+		for (const key in filterSchemas) {
 			if (!Object.hasOwn(values, key)) continue;
 
 			const value = values[key];
@@ -75,7 +61,7 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 				continue;
 			}
 
-			const serialized = filterSchemas[key].serialize(value as never);
+			const serialized = filterSchemas[key].serialize(value);
 
 			if (serialized === undefined) return;
 
@@ -95,7 +81,7 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 				}
 			}
 
-			return params;
+			return parseUrlParams(params, filterSchemas, relations).normalized;
 		});
 	};
 
@@ -107,7 +93,7 @@ export const useUrlPagination = <const T extends FilterSchemas<T>>(
 
 	const setFilter = <K extends keyof T & string>(
 		key: K,
-		value: FilterValues<T>[K],
+		value: NonNullable<FilterValues<T>[K]>,
 	) => {
 		const values: Partial<FilterValues<T>> = {};
 		values[key] = value;

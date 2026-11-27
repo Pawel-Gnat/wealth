@@ -12,6 +12,7 @@ export const recordDateFilters = {
 export const recordDateRangeRelation = requireOrderedParams(
 	"dateFrom",
 	"dateTo",
+	(from, to) => from.localeCompare(to),
 );
 
 export type RecordDateRange = {

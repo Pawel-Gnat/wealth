@@ -20,7 +20,11 @@ const dateSchemas = {
 	dateTo: textFilter(recordListParamsSchema.shape.dateTo),
 };
 
-const dateRelation = [requireOrderedParams("dateFrom", "dateTo")];
+const dateRelation = [
+	requireOrderedParams("dateFrom", "dateTo", (from, to) =>
+		from.localeCompare(to),
+	),
+];
 
 describe("parseUrlParams", () => {
 	it("parses valid URL parameters", () => {
@@ -113,6 +117,59 @@ describe("parseUrlParams", () => {
 		expect(invalid.normalized.toString()).toBe("");
 		expect(empty.filters.colors).toBeUndefined();
 		expect(empty.normalized.toString()).toBe("");
+	});
+
+	it("rewrites a valid list into the serialized form", () => {
+		const colors = {
+			colors: listFilter(z.array(z.string().min(2))),
+		};
+		const parsed = parseUrlParams(
+			new URLSearchParams("colors=red,%20green"),
+			colors,
+		);
+
+		expect(parsed.filters.colors).toEqual(["red", "green"]);
+		expect(parsed.normalized.get("colors")).toBe("red,green");
+	});
+
+	it("orders a numeric range with the given compare", () => {
+		const amounts = {
+			amountFrom: textFilter(z.string()),
+			amountTo: textFilter(z.string()),
+		};
+		const byNumber = [
+			requireOrderedParams(
+				"amountFrom",
+				"amountTo",
+				(from, to) => Number(from) - Number(to),
+			),
+		];
+		const reversed = parseUrlParams(
+			new URLSearchParams("amountFrom=10&amountTo=2"),
+			amounts,
+			byNumber,
+		);
+		const ordered = parseUrlParams(
+			new URLSearchParams("amountFrom=2&amountTo=10"),
+			amounts,
+			byNumber,
+		);
+
+		expect(reversed.normalized.toString()).toBe("");
+		expect(ordered.filters).toMatchObject({ amountFrom: "2", amountTo: "10" });
+	});
+
+	it("drops a parsed value that cannot be serialized", () => {
+		const labels = {
+			label: {
+				parse: (raw: string) => raw || undefined,
+				serialize: () => undefined,
+			},
+		};
+		const parsed = parseUrlParams(new URLSearchParams("label=hello"), labels);
+
+		expect(parsed.filters.label).toBeUndefined();
+		expect(parsed.normalized.has("label")).toBe(false);
 	});
 
 	it("serializes a scalar and drops a value the schema rejects", () => {

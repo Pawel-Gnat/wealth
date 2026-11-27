@@ -5,13 +5,25 @@ import { type ReactNode, useEffect, useRef } from "react";
 import { MemoryRouter, useNavigate, useSearchParams } from "react-router";
 import { describe, expect, it } from "vitest";
 import { useUrlPagination } from "./use-url-pagination";
-import { textFilter } from "./utils/url-pagination";
+import { requireOrderedParams, textFilter } from "./utils/url-pagination";
 
 const schemas = {
 	type: textFilter(recordListParamsSchema.shape.type),
 	budgetId: textFilter(recordListParamsSchema.shape.budgetId),
 	limit: textFilter(recordListParamsSchema.shape.limit),
 };
+
+const dateSchemas = {
+	dateFrom: textFilter(recordListParamsSchema.shape.dateFrom),
+	dateTo: textFilter(recordListParamsSchema.shape.dateTo),
+	type: textFilter(recordListParamsSchema.shape.type),
+};
+
+const dateRelations = [
+	requireOrderedParams("dateFrom", "dateTo", (from, to) =>
+		from.localeCompare(to),
+	),
+];
 
 const createRouter = (initialEntry: string) => {
 	return ({ children }: { children: ReactNode }) => (
@@ -177,6 +189,53 @@ describe("useUrlPagination", () => {
 
 		expect(await screen.findByTestId("search")).toHaveTextContent("limit=30");
 		expect(screen.getByTestId("limit")).toHaveTextContent("30");
+	});
+
+	it("removes an inverted date range in the same update", async () => {
+		const user = userEvent.setup();
+		const seen: string[] = [];
+		const DateProbe = () => {
+			const { filters, setFilter } = useUrlPagination(
+				dateSchemas,
+				dateRelations,
+			);
+			const [params] = useSearchParams();
+			const search = params.toString();
+
+			if (seen.at(-1) !== search) seen.push(search);
+
+			return (
+				<>
+					<span data-testid="from">{filters.dateFrom ?? ""}</span>
+					<span data-testid="to">{filters.dateTo ?? ""}</span>
+					<span data-testid="search">{search}</span>
+					<button
+						type="button"
+						onClick={() => setFilter("dateFrom", "2026-12-01")}
+					>
+						move-from
+					</button>
+				</>
+			);
+		};
+
+		render(<DateProbe />, {
+			wrapper: createRouter(
+				"/records?dateFrom=2026-11-01&dateTo=2026-11-20&type=expense",
+			),
+		});
+
+		await user.click(screen.getByRole("button", { name: "move-from" }));
+
+		expect(await screen.findByTestId("search")).toHaveTextContent(
+			"type=expense",
+		);
+		expect(screen.getByTestId("from")).toHaveTextContent("");
+		expect(screen.getByTestId("to")).toHaveTextContent("");
+		expect(seen).toEqual([
+			"dateFrom=2026-11-01&dateTo=2026-11-20&type=expense",
+			"type=expense",
+		]);
 	});
 
 	it("restores filters when navigation goes back", async () => {

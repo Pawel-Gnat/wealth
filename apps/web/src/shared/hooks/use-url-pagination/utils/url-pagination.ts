@@ -2,13 +2,13 @@ import { pageSchema } from "@repo/api/schemas";
 import type { z } from "zod";
 
 export type UrlFilter<Value> = {
-	parse: (raw: string) => Value | undefined;
-	serialize: (value: Value) => string | undefined;
+	parse(raw: string): Value | undefined;
+	serialize(value: Value): string | undefined;
 };
 
 type AnyUrlFilter = {
-	parse: (raw: string) => unknown;
-	serialize: (value: never) => string | undefined;
+	parse(raw: string): unknown;
+	serialize(value: unknown): string | undefined;
 };
 
 export type FilterSchemas<T> = {
@@ -40,7 +40,7 @@ const readParsed = <Schema extends z.ZodType>(
 
 	if (!result.success || result.data == null || result.data === "") return;
 
-	return result.data as z.output<Schema>;
+	return result.data;
 };
 
 export const textFilter = <Schema extends z.ZodType<Scalar | undefined>>(
@@ -86,14 +86,16 @@ export const listFilter = <
 });
 
 export const requireOrderedParams =
-	(fromKey: string, toKey: string): UrlParamRelation =>
+	(
+		fromKey: string,
+		toKey: string,
+		compare: (from: string, to: string) => number,
+	): UrlParamRelation =>
 	(filters, params) => {
 		const from = params.get(fromKey);
 		const to = params.get(toKey);
-		const incomplete = Boolean(from) !== Boolean(to);
-		const inverted = Boolean(from && to && from > to);
 
-		if (!incomplete && !inverted) return;
+		if (from && to && compare(from, to) <= 0) return;
 
 		params.delete(fromKey);
 		params.delete(toKey);
@@ -107,7 +109,7 @@ export const parseUrlParams = <T extends FilterSchemas<T>>(
 	relations: readonly UrlParamRelation[] = [],
 ) => {
 	const normalized = new URLSearchParams(params);
-	const filters: FilterValues<T> = {};
+	const filters: Record<string, unknown> = {};
 
 	const rawPage = params.get("page");
 	const parsedPage = pageSchema.safeParse(rawPage);
@@ -118,7 +120,7 @@ export const parseUrlParams = <T extends FilterSchemas<T>>(
 		normalized.delete("page");
 	}
 
-	for (const key of Object.keys(schemas) as Array<keyof T & string>) {
+	for (const key in schemas) {
 		const value = params.get(key);
 
 		if (value === null) continue;
@@ -130,12 +132,21 @@ export const parseUrlParams = <T extends FilterSchemas<T>>(
 			continue;
 		}
 
-		filters[key] = parsed as FilterValues<T>[typeof key];
+		filters[key] = parsed;
+
+		const serialized = schemas[key].serialize(parsed);
+
+		if (serialized === undefined) {
+			normalized.delete(key);
+			delete filters[key];
+		} else if (serialized !== value) {
+			normalized.set(key, serialized);
+		}
 	}
 
 	for (const relate of relations) {
-		relate(filters as Record<string, unknown>, normalized);
+		relate(filters, normalized);
 	}
 
-	return { page, filters, normalized };
+	return { page, filters: filters as FilterValues<T>, normalized };
 };
